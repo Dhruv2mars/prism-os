@@ -1,0 +1,29 @@
+{
+  "project": "Prism OS",
+  "tagline": "A spatial operating system for Meta Ray-Ban Display-class glasses, built to visionOS / Horizon OS quality. 16 pieces, each built then judged blind by fresh critics against rendered output.",
+  "updated": "",
+  "wave": 1,
+  "pieces": [
+    { "id": "00", "name": "foundation kit", "wave": 0, "status": "critic", "round": 1, "verdict": "", "gap": "" },
+    { "id": "01", "name": "boot + recovery", "wave": 1, "status": "building", "round": 0, "verdict": "", "gap": "" },
+    { "id": "02", "name": "home environment", "wave": 1, "status": "building", "round": 0, "verdict": "", "gap": "" },
+    { "id": "03", "name": "window manager", "wave": 1, "status": "building", "round": 0, "verdict": "", "gap": "" },
+    { "id": "04", "name": "gesture trainer", "wave": 1, "status": "building", "round": 0, "verdict": "", "gap": "" },
+    { "id": "05", "name": "notifications", "wave": 2, "status": "queued", "round": 0, "verdict": "", "gap": "" },
+    { "id": "06", "name": "AI assistant", "wave": 2, "status": "queued", "round": 0, "verdict": "", "gap": "" },
+    { "id": "07", "name": "camera + capture", "wave": 2, "status": "queued", "round": 0, "verdict": "", "gap": "" },
+    { "id": "08", "name": "live captions", "wave": 2, "status": "queued", "round": 0, "verdict": "", "gap": "" },
+    { "id": "09", "name": "navigation", "wave": 2, "status": "queued", "round": 0, "verdict": "", "gap": "" },
+    { "id": "10", "name": "messages + calls", "wave": 3, "status": "queued", "round": 0, "verdict": "", "gap": "" },
+    { "id": "11", "name": "settings", "wave": 3, "status": "queued", "round": 0, "verdict": "", "gap": "" },
+    { "id": "12", "name": "web apps platform", "wave": 3, "status": "queued", "round": 0, "verdict": "", "gap": "" },
+    { "id": "13", "name": "accessibility", "wave": 3, "status": "queued", "round": 0, "verdict": "", "gap": "" },
+    { "id": "14", "name": "onboarding + pairing", "wave": 3, "status": "queued", "round": 0, "verdict": "", "gap": "" },
+    { "id": "15", "name": "performance HUD", "wave": 4, "status": "queued", "round": 0, "verdict": "", "gap": "" }
+  ],
+  "log": [
+    { "t": "t+0m", "msg": "repo scaffolded · design system frozen · probe harness live" },
+    { "t": "t+0m", "msg": "foundation specimen shipped (materials, type, controls, motion)" },
+    { "t": "t+0m", "msg": "wave 1 builders dispatched: boot, home, window manager, gestures" }
+  ]
+}

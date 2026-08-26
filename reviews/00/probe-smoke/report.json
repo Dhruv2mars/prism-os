@@ -1,0 +1,19 @@
+{
+  "url": "http://localhost:4310/components/00-foundation/index.html",
+  "probedAt": "2026-08-26T10:06:31.364Z",
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "focusableCount": 8,
+  "unlabeledIconButtons": [
+    "<div class=\"toggle\" role=\"switch\" aria-checked=\"true\" data-focusable=\"\" tabindex=\"0\"></div",
+    "<div class=\"toggle\" role=\"switch\" aria-checked=\"false\" data-focusable=\"\" tabindex=\"0\"></di"
+  ],
+  "subTenPxTextCount": 0,
+  "lowAlphaTextCount": 0,
+  "reducedMotionSupport": true,
+  "hiddenFocusables": 0,
+  "title": "Prism OS — Foundation Specimen"
+}

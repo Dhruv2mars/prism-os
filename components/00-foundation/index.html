@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Foundation Specimen</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+  .spec { position: absolute; inset: 44px 0 0 0; overflow-y: auto; padding: var(--sp-5); display: grid; gap: var(--sp-4); align-content: start; scrollbar-width: none; }
+  .spec::-webkit-scrollbar { display: none; }
+  .row { display: flex; gap: var(--sp-3); flex-wrap: wrap; align-items: center; }
+  h2 { font-size: var(--fs-caption); text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-40); font-weight: 700; margin-bottom: var(--sp-2); }
+  .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .swatch { height: 44px; border-radius: var(--r-sm); outline: 1px solid var(--stroke-glass); }
+  .type-demo div:nth-child(1){font-size:var(--fs-hero);font-weight:800;letter-spacing:-0.02em}
+  .type-demo div:nth-child(2){font-size:var(--fs-display);font-weight:700}
+  .type-demo div:nth-child(3){font-size:var(--fs-callout);font-weight:600;color:var(--ink-80)}
+  .type-demo div:nth-child(4){font-size:var(--fs-body);color:var(--ink-60)}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="stage-shell"><div class="stage" data-stage></div></div>
+</div>
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+const os = createOS(document.querySelector('[data-stage]'));
+const s = os.stage;
+s.appendChild(os.statusbar());
+const main = document.createElement('main');
+main.className = 'spec stage-scroll';
+main.innerHTML = `
+  <section><h2>Materials</h2>
+    <div class="row">
+      <div class="card caption" style="width:120px;height:64px;display:grid;place-items:center">glass</div>
+      <div class="card raised" style="width:120px;height:64px;display:grid;place-items:center">raised</div>
+      <div class="card sunken" style="width:120px;height:64px;display:grid;place-items:center">sunken</div>
+    </div></section>
+  <section><h2>Type scale</h2>
+    <div class="type-demo rise-in"><div>9:41</div><div>Spatial, glanceable</div><div>Callout 17 semibold</div><div>Body 14 regular secondary</div></div></section>
+  <section><h2>Accent & states</h2>
+    <div class="swatches">
+      <div class="swatch" style="background:var(--accent)" title="accent"></div>
+      <div class="swatch" style="background:var(--ok)" title="ok"></div>
+      <div class="swatch" style="background:var(--warn)" title="warn"></div>
+      <div class="swatch" style="background:var(--danger)" title="danger"></div>
+      <div class="swatch" style="background:rgba(255,255,255,.14)" title="glass stroke"></div>
+      <div class="swatch" style="background:var(--accent-wash)" title="wash"></div>
+    </div></section>
+  <section><h2>Controls</h2>
+    <div class="row">
+      <button class="btn primary" data-focusable>Primary</button>
+      <button class="btn" data-focusable>Default</button>
+      <button class="btn ghost" data-focusable>Ghost</button>
+      <button class="btn destructive" data-focusable>Delete</button>
+      <span class="chip" data-focusable>chip</span>
+      <div class="toggle" role="switch" aria-checked="true" data-focusable tabindex="0"></div>
+      <div class="toggle" role="switch" aria-checked="false" data-focusable tabindex="0"></div>
+    </div></section>
+  <section><h2>Motion tokens</h2>
+    <p class="caption">fast ${'160ms'} · base 260ms · slow 380ms · ease cubic-bezier(.32,.72,0,1)</p>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="toastDemo" data-focusable>Show banner</button>
+    </div></section>`;
+s.appendChild(main);
+document.querySelectorAll('.toggle').forEach((t) => t.addEventListener('click', () =>
+  t.setAttribute('aria-checked', t.getAttribute('aria-checked') === 'true' ? 'false' : 'true')));
+s.querySelector('#toastDemo')?.addEventListener('click', () =>
+  os.banner('<strong>Banner</strong><span class="caption">tap to dismiss · auto 4.2s</span>', { timeout: 0 }));
+</script>
+</body>
+</html>
