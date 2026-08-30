@@ -1,0 +1,948 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Accessibility</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+ .stage{
+  background:
+   radial-gradient(120% 90% at 50% 16%, rgba(42,53,80,0.56) 0%, rgba(20,26,40,0.72) 36%, rgba(10,14,23,0.90) 70%),
+   radial-gradient(68% 46% at 78% 86%, rgba(86,184,255,0.09), transparent 56%),
+   rgba(6,10,16,0.76);
+  --a11y-scale: 1.25;
+  --a11y-outline: rgba(255,255,255,0.12);
+ }
+ .stage.high-contrast{
+  --stroke-glass: rgba(255,255,255,0.22);
+  --a11y-outline: rgba(255,255,255,0.26);
+  --ink-60: rgba(255,255,255,0.78);
+  --ink-40: rgba(255,255,255,0.60);
+ }
+ .stage.a11y-reduced .pulse-dot,
+ .stage.a11y-reduced .wave i,
+ .stage.a11y-reduced .shimmerPulse{ animation:none !important; opacity:0.55 !important; }
+ .stage-shell{
+  position:relative;
+  width:600px;height:600px;
+  display:grid;place-items:center;
+  flex:none;
+ }
+ /* DEV controls — fixed OUTSIDE .stage */
+ .dev-controls{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  display:flex;gap:6px;
+  z-index:1000;
+  justify-content:center;
+  flex-wrap:wrap;
+  pointer-events:none;
+  padding:8px 12px;
+  border-radius:var(--r-pill);
+  background:rgba(10,15,23,0.74);
+  outline:1px solid var(--stroke-glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.32);
+  max-width:92vw;
+ }
+ .stage .dev-controls{display:none !important}
+ .dev-controls .chip{
+  pointer-events:auto;
+  height:26px;padding:0 10px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  transition:background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+  border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+ }
+ .dev-controls .chip.active{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423;outline-color:transparent;
+ }
+ .dev-controls .chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .dev-controls .chip.gaze-focus{transform:scale(1.04)}
+
+ /* viewport */
+ .a11y-viewport{
+  position:absolute;
+  inset:44px 0 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:10px 12px 68px 12px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+ }
+ .a11y-viewport::-webkit-scrollbar{display:none}
+
+ /* header */
+ .a11y-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  animation: rise-in var(--dur-base) var(--ease-prism) both;
+  padding:2px 2px 0 2px;
+ }
+ .a11y-title{font-size:22px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:var(--ink-100)}
+ .a11y-subtitle{font-size:11px;font-weight:600;letter-spacing:0.04em;color:var(--ink-60);line-height:1;margin-top:4px;display:flex;align-items:center;gap:6px}
+ .a11y-subtitle .dot{width:6px;height:6px}
+ .header-actions{display:flex;gap:6px;align-items:center;flex:none}
+ .hdr-chip{
+  appearance:none;-webkit-appearance:none;border:none;
+  height:28px;padding:0 11px;border-radius:999px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.07);color:var(--ink-80);
+  transition: transform var(--dur-base) var(--ease-prism), background var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+ }
+ .hdr-chip.primary{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;outline-color:transparent;box-shadow:0 6px 14px rgba(16,92,180,0.22)}
+ .hdr-chip.gaze-focus{transform:scale(1.04)}
+ .hdr-chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+
+ /* groups */
+ .group{
+  display:flex;flex-direction:column;gap:6px;
+  animation: rise-in var(--dur-base) var(--ease-prism) both;
+ }
+ .group:nth-of-type(1){animation-delay:40ms}
+ .group:nth-of-type(2){animation-delay:70ms}
+ .group:nth-of-type(3){animation-delay:100ms}
+ .group:nth-of-type(4){animation-delay:130ms}
+ .group:nth-of-type(5){animation-delay:160ms}
+ .group-head{
+  display:flex;align-items:center;gap:8px;
+  padding:4px 4px 0 4px;
+ }
+ .group-label{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-60)}
+ .group-count{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);padding:3px 6px;border-radius:999px}
+ .group-line{flex:1;height:1px;background:rgba(255,255,255,0.06)}
+ .group-card{
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--a11y-outline);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 12px 28px rgba(0,0,0,0.22);
+  display:flex;flex-direction:column;
+  transition: outline-color var(--dur-base) var(--ease-prism), background var(--dur-base) var(--ease-prism);
+ }
+
+ /* rows */
+ .a11y-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 12px;
+  cursor:pointer;
+  position:relative;
+  transition: background var(--dur-fast) var(--ease-prism), transform var(--dur-base) var(--ease-prism);
+  min-height:56px;
+ }
+ .a11y-row + .a11y-row{border-top:1px solid rgba(255,255,255,0.06)}
+ .a11y-row:hover{background:rgba(255,255,255,0.04)}
+ .a11y-row.gaze-focus{background:rgba(86,184,255,0.08);outline:2px solid var(--stroke-focus);outline-offset:-2px;z-index:1}
+ .a11y-row:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px;z-index:2}
+ .a11y-row:active{transform:scale(0.99)}
+ .row-icon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none;background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.08);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);color:var(--ink-80)}
+ .row-icon.accent{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#04121f;outline-color:transparent;box-shadow:0 4px 12px rgba(16,92,180,0.22)}
+ .row-icon.ok{background:linear-gradient(180deg,#4cd47c 0%, #1a8a4a 100%);color:#fff}
+ .row-icon.warn{background:linear-gradient(180deg,#ffc247 0%, #ff7a1a 100%);color:#1a0f00}
+ .row-icon.purple{background:linear-gradient(180deg,#a58bff 0%, #6a4bff 100%);color:#fff}
+ .row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+ .row-title{font-size:14px;font-weight:700;color:var(--ink-100);letter-spacing:-0.01em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .row-sub{font-size:11px;font-weight:500;color:var(--ink-60);letter-spacing:0.01em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .row-ctrl{flex:none;display:flex;align-items:center;gap:8px}
+  .row-value{font-size:11px;font-weight:700;letter-spacing:0.02em;color:var(--ink-60);font-variant-numeric:tabular-nums;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);padding:6px 8px;border-radius:999px;min-width:42px;text-align:center}
+ .row-value.accent{color:var(--accent);background:rgba(86,184,255,0.12);outline-color:rgba(86,184,255,0.18)}
+ .row-chevron{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none;color:var(--ink-40);background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06)}
+
+ /* slider row */
+ .slider-row{flex-direction:column;align-items:stretch;gap:10px;padding:12px 12px 14px 12px;cursor:default}
+ .slider-row:hover{background:transparent}
+ .slider-head{display:flex;align-items:center;gap:12px;width:100%}
+ .slider-head .row-main{flex:1}
+ .scale-chips{display:flex;gap:6px;flex:none}
+ .scale-chip{
+  appearance:none;-webkit-appearance:none;border:none;
+  height:24px;padding:0 10px;border-radius:999px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  display:inline-flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.07);color:var(--ink-60);cursor:pointer;
+  transition: background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism);
+ }
+ .scale-chip.active{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;outline-color:transparent;box-shadow:0 4px 10px rgba(16,92,180,0.18)}
+ .scale-chip.gaze-focus{transform:scale(1.04);outline:2px solid var(--stroke-focus)}
+ .scale-chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .slider-track-wrap{display:flex;align-items:center;gap:10px;width:100%}
+ .slider-track{flex:1;position:relative;height:28px;display:flex;align-items:center}
+ .range{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;cursor:pointer}
+ .range::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:rgba(255,255,255,0.10);outline:1px solid rgba(255,255,255,0.06)}
+ .range::-moz-range-track{height:6px;border-radius:999px;background:rgba(255,255,255,0.10)}
+ .range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid rgba(255,255,255,0.9);box-shadow:0 2px 8px rgba(0,0,0,0.32), 0 0 0 4px rgba(86,184,255,0.12);margin-top:-8px;transition:transform 160ms var(--ease-prism), box-shadow 160ms var(--ease-prism)}
+ .range:active::-webkit-slider-thumb{transform:scale(1.06);box-shadow:0 4px 14px rgba(0,0,0,0.36), 0 0 0 6px rgba(86,184,255,0.16)}
+ .range::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.32)}
+ .slider-fill{position:absolute;left:0;top:50%;transform:translateY(-50%);height:6px;border-radius:999px;background:linear-gradient(90deg, var(--accent), var(--accent-strong));pointer-events:none;box-shadow:0 0 8px rgba(86,184,255,0.32)}
+ .slider-minmax{display:flex;justify-content:space-between;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);padding:0 1px}
+
+ /* live preview card — signature moment */
+ .preview-card{
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--a11y-outline);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 12px 28px rgba(0,0,0,0.22);
+  display:flex;flex-direction:column;
+  transition: outline-color var(--dur-base) var(--ease-prism);
+ }
+ .preview-header{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 12px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  background:linear-gradient(180deg, rgba(255,255,255,0.04), transparent);
+ }
+ .preview-head-label{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-40);display:flex;align-items:center;gap:6px}
+ .live-badge{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:999px;background:rgba(86,184,255,0.12);outline:1px solid rgba(86,184,255,0.18);font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent)}
+ .live-badge .pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.6);flex:none;animation:pulseLive 1.4s ease-in-out infinite}
+ .a11y-reduced .pulse-dot{animation:none !important;opacity:0.5}
+ @keyframes pulseLive{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.55;transform:scale(0.78)}}
+ .preview-badges{display:flex;gap:6px;align-items:center}
+  .preview-badge{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-60);background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);padding:4px 7px;border-radius:999px;font-variant-numeric:tabular-nums}
+ .preview-badge.on{color:var(--ink-100);background:rgba(86,184,255,0.12);outline-color:rgba(86,184,255,0.18)}
+ .preview-stage{
+  position:relative;
+  margin:10px 12px 12px 12px;
+  border-radius:16px;
+  overflow:hidden;
+  background:
+   radial-gradient(120% 90% at 50% 16%, rgba(42,53,80,0.66) 0%, rgba(20,26,40,0.84) 40%, rgba(10,14,23,0.96) 70%),
+   linear-gradient(180deg, rgba(255,255,255,0.04), transparent 54%);
+  outline:1px solid rgba(255,255,255,0.08);
+  padding:14px 14px 12px 14px;
+  display:flex;flex-direction:column;gap:10px;
+  min-height:148px;
+  transition: outline-color var(--dur-base) var(--ease-prism), filter var(--dur-base) var(--ease-prism);
+ }
+ .high-contrast .preview-stage{outline-color:rgba(255,255,255,0.20);outline-width:1.5px}
+ .preview-stage::before{content:"";position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 14%, rgba(86,184,255,0.10), transparent 62%);pointer-events:none}
+ .preview-content{position:relative;z-index:1;display:flex;flex-direction:column;gap:6px}
+ .preview-kicker{font-size:calc(10px * var(--a11y-scale));font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--accent)}
+ .preview-title{font-size:calc(18px * var(--a11y-scale));font-weight:800;letter-spacing:-0.02em;color:var(--ink-100);line-height:1.1}
+ .preview-body{font-size:calc(13px * var(--a11y-scale));font-weight:500;color:var(--ink-80);line-height:1.4}
+ .preview-caption{font-size:calc(11px * var(--a11y-scale));font-weight:500;color:var(--ink-60);line-height:1.35;display:flex;align-items:center;gap:6px}
+ .preview-metrics{display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1}
+  .metric-pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.08);font-size:11px;font-weight:700;color:var(--ink-80);font-variant-numeric:tabular-nums;transition:outline-color var(--dur-base) var(--ease-prism)}
+ .high-contrast .metric-pill{outline-color:rgba(255,255,255,0.18);background:rgba(255,255,255,0.10)}
+ .metric-pill .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulseLive 1.2s ease-in-out infinite;flex:none}
+ .wave{display:flex;align-items:center;gap:3px;height:18px}
+ .wave i{width:3px;border-radius:999px;background:linear-gradient(180deg, #dff0ff 0%, var(--accent) 48%, var(--accent-strong) 100%);height:var(--h,10px);animation:wavePulse 280ms var(--ease-prism) infinite alternate}
+ .wave.muted i{opacity:0.22;animation-play-state:paused}
+ .wave.paused i{animation:none !important;opacity:0.36}
+ @keyframes wavePulse{from{transform:scaleY(0.52);opacity:0.72}to{transform:scaleY(1);opacity:1}}
+ .mono-icon{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;flex:none;background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80);transition:background var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism)}
+ .mono-icon.on{background:rgba(86,184,255,0.14);outline-color:rgba(86,184,255,0.22);color:var(--ink-100)}
+
+ /* colorblind preview */
+ .color-row{display:flex;gap:8px;padding:10px 12px;align-items:center;flex-wrap:wrap}
+ .color-chip{
+  flex:1;min-width:76px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:10px 8px;border-radius:14px;
+  background:rgba(255,255,255,0.05);outline:1px solid rgba(255,255,255,0.06);
+  position:relative;overflow:hidden;
+  cursor:default;
+  transition: transform var(--dur-base) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+ }
+ .color-chip.gaze-focus{transform:scale(1.03);outline-color:var(--stroke-focus)}
+ .chip-dot{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none;box-shadow:inset 0 1px 0 rgba(255,255,255,0.14), 0 4px 12px rgba(0,0,0,0.16);outline:1px solid rgba(255,255,255,0.08);color:#fff;font-weight:800;font-size:12px;position:relative;overflow:hidden}
+ .chip-dot::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,255,255,0.10), transparent 54%);pointer-events:none;border-radius:inherit}
+ .chip-label{font-size:11px;font-weight:700;letter-spacing:0.02em;color:var(--ink-80);text-align:center;line-height:1}
+ .chip-sub{font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);text-align:center;margin-top:-2px}
+ .chip-pattern{position:absolute;inset:auto 0 0 0;height:4px;opacity:0.92}
+ .color-note{flex-basis:100%;font-size:11px;font-weight:500;color:var(--ink-60);line-height:1.35;padding:0 2px;margin-top:2px;display:flex;align-items:center;gap:6px}
+ .color-note strong{color:var(--ink-80);font-weight:700}
+
+ /* focus helper */
+ .focus-demo{display:flex;gap:8px;padding:12px 12px;align-items:center;justify-content:center;flex-wrap:wrap}
+ .focus-btn{
+  appearance:none;-webkit-appearance:none;border:none;
+  min-height:36px;padding:0 14px;border-radius:999px;
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80);
+  font-size:13px;font-weight:700;letter-spacing:0.01em;cursor:pointer;
+  transition: transform var(--dur-base) var(--ease-prism), background var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
+ }
+ .focus-btn.primary{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;outline-color:transparent;box-shadow:0 6px 14px rgba(16,92,180,0.22)}
+ .focus-btn.gaze-focus{transform:scale(1.04);outline-color:var(--stroke-focus);box-shadow:0 0 0 2.5px rgba(86,184,255,0.18), 0 0 14px rgba(86,184,255,0.18)}
+ .focus-btn:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .focus-legend{display:flex;align-items:center;gap:8px;justify-content:center;padding:0 12px 12px 12px;font-size:11px;font-weight:500;color:var(--ink-60);line-height:1.35;text-align:center}
+ .legend-dot{width:14px;height:14px;border-radius:50%;flex:none;display:grid;place-items:center;background:rgba(255,255,255,0.06);outline:1px solid rgba(86,184,255,0.9);box-shadow:0 0 10px rgba(86,184,255,0.22)}
+ .equivalence-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:0 12px 12px 12px}
+ .eq-cell{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:10px 6px;border-radius:12px;
+  background:rgba(255,255,255,0.05);outline:1px solid rgba(255,255,255,0.06);
+  text-align:center;
+ }
+ .eq-icon{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80)}
+ .eq-label{font-size:11px;font-weight:700;color:var(--ink-100);letter-spacing:0.01em;line-height:1}
+ .eq-sub{font-size:10px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-40);line-height:1}
+
+ /* hintbar */
+ .hintbar{
+  position:absolute;left:12px;right:12px;bottom:12px;z-index:540;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:8px 10px;border-radius:12px;
+  background:rgba(0,0,0,0.38);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  outline:1px solid rgba(255,255,255,0.06);
+  font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-60);line-height:1;
+ }
+ .hintbar strong{color:var(--ink-80);font-weight:700;letter-spacing:0.02em;text-transform:none;font-size:11px}
+ .hint-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.6);flex:none;display:inline-block}
+
+ /* state layer */
+ .state-layer{
+  position:absolute;inset:44px 0 0 0;z-index:520;
+  display:none;overflow-y:auto;scrollbar-width:none;
+  padding:12px 14px 14px 14px;
+ }
+ .state-layer::-webkit-scrollbar{display:none}
+ .state-layer.on{display:block;animation: rise-in var(--dur-base) var(--ease-prism) both}
+ .state-layer.dim-on{display:grid;place-items:center;padding:12px 14px;animation: rise-in var(--dur-base) var(--ease-prism) both}
+ .state-card{
+  width:100%;max-width:420px;
+  background:var(--mat-raised);backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
+  outline:1px solid var(--stroke-glass);border-radius:var(--r-lg);
+  padding:24px 20px 18px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;
+  box-shadow:0 18px 44px rgba(0,0,0,0.36);animation: rise-in var(--dur-base) var(--ease-prism) both;position:relative;overflow:hidden;
+ }
+ .state-card::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 8%, rgba(86,184,255,0.08), transparent 62%);pointer-events:none}
+ .state-illus{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.08);margin-bottom:2px;position:relative}
+ .state-illus.danger{background:rgba(255,93,93,0.10);outline-color:rgba(255,93,93,0.18)}
+ .state-illus.warn{background:rgba(255,194,71,0.10);outline-color:rgba(255,194,71,0.18)}
+ .state-title{font-size:18px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-100);line-height:1.1;position:relative}
+ .state-body{font-size:13px;font-weight:500;color:var(--ink-60);line-height:1.45;max-width:300px;position:relative}
+ .state-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px;position:relative}
+ .state-actions .btn{min-height:36px;font-size:13px}
+ .skeleton{border-radius:var(--r-sm);background: linear-gradient(100deg, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.06) 60%);background-size:200% 100%;animation: shimmer 1.2s linear infinite}
+ button:focus-visible, [data-focusable]:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ @media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important}
+  .wave i{animation:none !important}
+  .pulse-dot{animation:none !important}
+ }
+</style>
+</head>
+<body>
+<div class="device">
+ <div class="stage-shell">
+  <div class="stage" data-stage></div>
+ </div>
+</div>
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+const stage = document.querySelector('[data-stage]');
+const device = document.querySelector('.device');
+const os = createOS(stage, { dwell:true, dwellMs:350 });
+stage.appendChild(os.statusbar('<span style="color:var(--ink-60);font-size:11px;letter-spacing:0.04em;font-weight:700">Accessibility · Prism</span>'));
+
+const h = (tag, attrs={}, ...children)=>{
+ const el=document.createElement(tag);
+ for(const [k,v] of Object.entries(attrs)){
+  if(k==='class') el.className=v;
+  else if(k==='html') el.innerHTML=v;
+  else if(v!==null && v!==undefined) el.setAttribute(k,v);
+ }
+ for(const c of children){
+  if(c==null) continue;
+  if(typeof c==='string') el.appendChild(document.createTextNode(c));
+  else el.appendChild(c);
+ }
+ return el;
+};
+
+function iconSvg(name){
+ const map={
+  a11y:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="2.8" stroke="white" stroke-width="1.6"/><path d="M12 10.8v7.2M9.2 15.2H14.8M7.2 18.5h9.6" stroke="white" stroke-width="1.6" stroke-linecap="round"/><path d="M6 12a6 6 0 1012 0" stroke="white" stroke-opacity="0.65" stroke-width="1.4"/></svg>`,
+  type:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 16.5l2.8-7.2h3l2.8 7.2" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.6 12.6h4.8" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M14.2 9.3V16.5M14.2 16.5l3-7.2M17.2 9.3V16.5" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  contrast:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.2" stroke="white" stroke-width="1.6"/><path d="M12 4.8A7.2 7.2 0 0012 19.2V4.8z" fill="white" fill-opacity="0.86"/><path d="M8.8 10.5l1.2 1 1.2-1" stroke="#0a0e17" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  motion:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4.5 12h6l1.2-3.2 2.2 6.4L15.1 12H19.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="7.2" stroke="white" stroke-opacity="0.22" stroke-width="1.2"/></svg>`,
+  audio:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5l-4 3.2H4.2v7.6H7L11 19V5z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M14.6 9.8a4 4 0 010 4.4" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M16.8 7.8a7 7 0 010 8.4" stroke="white" stroke-opacity="0.75" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  voice:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="4.5" width="6" height="11" rx="3" stroke="white" stroke-width="1.6"/><path d="M7 11.2a5 5 0 0010 0" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M12 15.5v3" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M9.5 18.5h5" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  captions:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="6.5" width="17.6" height="11" rx="2.4" stroke="white" stroke-width="1.6"/><path d="M7 11.2h3.2M7 14.2h5.4M14.2 11.2h2.8M14.2 14.2h2.8" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  eye:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.8 12s3.4-6 9.2-6 9.2 6 9.2 6-3.4 6-9.2 6-9.2-6-9.2-6z" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="2.8" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="1" fill="white"/></svg>`,
+  key:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="7.2" width="17.6" height="9.6" rx="2.4" stroke="white" stroke-width="1.6"/><path d="M7.2 11.2h3.6M11 9.4v3.6" stroke="white" stroke-width="1.6" stroke-linecap="round"/><rect x="14.6" y="10" width="2.2" height="2.2" rx="0.6" stroke="white" stroke-width="1.2"/></svg>`,
+  focus:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5" stroke="white" stroke-width="1.8"/><path d="M12 7v3M12 14v3M7 12h3M14 12h3" stroke="white" stroke-opacity="0.9" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  check:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 12.2l3 3 6-6.8" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  warn:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4.2L20.5 19H3.5L12 4.2z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9v4.4" stroke="white" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.1" fill="white"/></svg>`,
+  danger:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="6.8" stroke="white" stroke-width="1.6"/><path d="M8.2 8.2l7.6 7.6M15.8 8.2L8.2 15.8" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  mono:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5l-4 3.2H4.2v7.6H7L11 19V5z" stroke="white" stroke-width="1.5"/><path d="M14 9h2v6h-2z" stroke="white" stroke-width="1.4"/><path d="M18 8v8" stroke="white" stroke-opacity="0.0" stroke-width="1.4"/></svg>`,
+  stereo:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5l-4 3.2H4.2v7.6H7L11 19V5z" stroke="white" stroke-width="1.5"/><path d="M14.6 9.8a4 4 0 010 4.4" stroke="white" stroke-width="1.3" stroke-linecap="round"/><path d="M16.8 7.8a7 7 0 010 8.4" stroke="white" stroke-opacity="0.82" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+  chevron:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ };
+ return map[name]||map.a11y;
+}
+function makeToggle(initial, label){
+ const t=h('div', {class:'toggle', role:'switch', 'aria-checked':String(initial), 'aria-label':label, tabindex:'0', 'data-focusable':''});
+ t.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const on=t.getAttribute('aria-checked')==='true';
+  t.setAttribute('aria-checked', String(!on));
+  t.dispatchEvent(new CustomEvent('togglechange', {detail:{on:!on}}));
+  if(!os.state.reducedMotion) t.animate([{transform:'scale(0.96)'},{transform:'scale(1)'}],{duration:160,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ });
+ t.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); t.click(); }});
+ return t;
+}
+
+// dev controls outside stage
+const edgeRow = h('div', {class:'dev-controls', role:'toolbar', 'aria-label':'Accessibility edge state controls'});
+const edgeStates = [
+ {id:'normal', label:'Normal'},
+ {id:'loading', label:'Loading'},
+ {id:'empty', label:'Empty'},
+ {id:'error', label:'Error'},
+ {id:'offline', label:'Offline'},
+ {id:'permission', label:'Blocked'},
+];
+edgeStates.forEach(s=>{
+ const b=h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Show ${s.label} state`, 'data-state':s.id}, s.label);
+ if(s.id==='normal') b.classList.add('active');
+ b.addEventListener('click', ()=> setEdge(s.id));
+ edgeRow.appendChild(b);
+});
+device.appendChild(edgeRow);
+
+// containers
+const viewport = h('div', {class:'a11y-viewport', id:'viewport'});
+const stateLayer = h('div', {class:'state-layer', id:'stateLayer', 'aria-live':'polite'});
+const hintbar = h('div', {class:'hintbar', id:'hintbar'});
+hintbar.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="hint-dot" aria-hidden="true"></span><strong>Gaze dwell 350 ms = Tap · Tab cycles</strong></span><span style="display:flex;align-items:center;gap:6px">Focus ring 2.5 px · Esc back</span>`;
+stage.append(viewport, stateLayer, hintbar);
+
+// state
+let edgeState='normal';
+let scalePct = 125;
+let highContrast=false;
+let reducedMotion=false;
+let mono=false;
+
+function updateStageScale(v){
+ scalePct=v;
+ stage.style.setProperty('--a11y-scale', String(v/100));
+ // update badges
+ const pv=document.getElementById('previewScaleVal');
+ if(pv) pv.textContent=`${v}%`;
+ const chip=document.getElementById('scaleChipVal');
+ if(chip) chip.textContent=`${v}%`;
+ const fill=document.getElementById('scaleFill');
+ if(fill) fill.style.width=((v-100)/50)*100+'%';
+ document.querySelectorAll('.scale-chip').forEach(c=>{
+  c.classList.toggle('active', parseInt(c.dataset.scale,10)===v);
+ });
+ // update metric pills?
+ os.banner(`<strong>Text scale ${v}%</strong><span class="caption">· --a11y-scale ${ (v/100).toFixed(2) }</span>`,{timeout:1400});
+}
+function setContrast(on){
+ highContrast=on;
+ stage.classList.toggle('high-contrast', on);
+ const badge=document.getElementById('contrastBadge');
+ if(badge){ badge.textContent=on?'High':'Standard'; badge.classList.toggle('on', on); }
+ const val=document.getElementById('contrastVal');
+ if(val) val.textContent=on?'High':'Standard';
+ os.banner(`<strong>Contrast ${on?'High':'Standard'}</strong><span class="caption">outline ${on?'0.26 · stronger':'0.12 · glass'}</span>`,{timeout:1500});
+}
+function setReduced(on){
+ reducedMotion=on;
+ stage.classList.toggle('a11y-reduced', on);
+ const badge=document.getElementById('motionBadge');
+ if(badge){ badge.textContent=on?'Reduced':'Default'; badge.classList.toggle('on', on); }
+ const val=document.getElementById('motionVal');
+ if(val) val.textContent=on?'Reduced':'Default';
+ // update wave state
+ const wave=document.getElementById('previewWave');
+ if(wave) wave.className= on ? 'wave paused' : (mono? 'wave muted' : 'wave');
+ os.banner(on ? '<strong>Reduced motion on</strong><span class="caption">animations paused · 0.01ms · prism-ease held</span>' : '<strong>Animations live</strong><span class="caption">260 ms · cubic-bezier(.32,.72,0,1)</span>',{timeout:1800});
+}
+function setMono(on){
+ mono=on;
+ const badge=document.getElementById('monoBadge');
+ if(badge){ badge.innerHTML= on ? 'Mono · single cue' : 'Stereo'; badge.classList.toggle('on', on); }
+ const val=document.getElementById('monoVal');
+ if(val) val.textContent=on?'Mono':'Stereo';
+ const icon=document.getElementById('monoIcon');
+ if(icon){ icon.innerHTML = on ? iconSvg('mono') : iconSvg('stereo'); icon.classList.toggle('on', on); icon.setAttribute('aria-label', on?'Mono audio, single channel, cues merged':'Stereo audio, two channels'); }
+ const wave=document.getElementById('previewWave');
+ if(wave && !reducedMotion) wave.className = on ? 'wave muted' : 'wave';
+ os.banner(on ? '<strong>Mono audio on</strong><span class="caption">cues merged · single channel · haptics paired</span>' : '<strong>Stereo audio</strong><span class="caption">spatial cues · L / R</span>',{timeout:1600});
+}
+
+function render(){
+ viewport.innerHTML='';
+ viewport.style.display='';
+ stateLayer.className='state-layer';
+ stateLayer.style.display='none';
+ stateLayer.innerHTML='';
+ hintbar.style.display='';
+
+ // header
+ const header=h('div', {class:'a11y-header'});
+ const left=h('div', {});
+ const title=h('div', {class:'a11y-title', html:'Accessibility'});
+ const subtitle=h('div', {class:'a11y-subtitle'});
+  subtitle.innerHTML=`<span class="dot ok" aria-hidden="true"></span> Prism OS · scale <span class="tabular">${scalePct}%</span> · ${highContrast?'high contrast':'standard'} · ${reducedMotion?'reduced':'motion'}`;
+ left.append(title, subtitle);
+ const acts=h('div', {class:'header-actions'});
+ const resetBtn=h('button', {class:'hdr-chip', 'data-focusable':'', tabindex:'0', 'aria-label':'Reset accessibility to defaults'}, 'Reset');
+ resetBtn.addEventListener('click', ()=>{
+  updateStageScale(100);
+  const range=document.getElementById('scaleRange');
+  if(range) range.value='100';
+  if(highContrast){ highContrast=false; stage.classList.remove('high-contrast'); document.getElementById('contrastBadge').textContent='Standard'; document.getElementById('contrastBadge').classList.remove('on'); const cVal=document.getElementById('contrastVal'); if(cVal) cVal.textContent='Standard'; document.getElementById('contrastToggle').setAttribute('aria-checked','false'); }
+  if(reducedMotion){ setReduced(false); document.getElementById('motionToggle').setAttribute('aria-checked','false'); }
+  if(mono){ setMono(false); document.getElementById('monoToggle').setAttribute('aria-checked','false'); }
+  render();
+  os.banner('<strong>Accessibility reset</strong><span class="caption">100% · standard · motion · stereo · scrim</span>',{timeout:1800});
+ });
+ const doneBtn=h('button', {class:'hdr-chip primary', 'data-focusable':'', tabindex:'0', 'aria-label':'Done, save accessibility prefs'}, 'Done');
+ doneBtn.addEventListener('click', ()=> os.banner('<strong>Prefs saved</strong><span class="caption">on-device · cached · scalable</span>',{timeout:1600}));
+ acts.append(resetBtn, doneBtn);
+ header.append(left, acts);
+ viewport.appendChild(header);
+
+ // Group: Vision — text scale
+ const visionGroup = h('div', {class:'group', role:'group', 'aria-label':'Vision controls'});
+ const visionHead = h('div', {class:'group-head'});
+ visionHead.innerHTML=`<span class="group-label">Vision</span><span class="group-count ">2 controls</span><span class="group-line" aria-hidden="true"></span>`;
+ const visionCard = h('div', {class:'group-card'});
+ // scale slider row
+ const scaleRow = h('div', {class:'a11y-row slider-row', 'data-focusable':'', tabindex:'0', 'aria-label':'Text scale, 100 to 150 percent'});
+ const scaleHead = h('div', {class:'slider-head'});
+ scaleHead.innerHTML=`<div class="row-icon accent">${iconSvg('type')}</div><div class="row-main"><div class="row-title">Text scale</div><div class="row-sub">Stage scales via --a11y-scale · glanceable at arm’s length</div></div>`;
+ const chipWrap = h('div', {class:'scale-chips'});
+ [100,125,150].forEach(v=>{
+  const chip=h('button', {class:'scale-chip' + (v===scalePct?' active':''), 'data-scale':String(v), 'data-focusable':'', tabindex:'0', 'aria-label':`Set text scale to ${v} percent`}, `${v}%`);
+  chip.addEventListener('click', (e)=>{
+   e.stopPropagation();
+   scalePct=v;
+   stage.style.setProperty('--a11y-scale', String(v/100));
+   const rangeEl=document.getElementById('scaleRange');
+   if(rangeEl) rangeEl.value=String(v);
+   const fillEl=document.getElementById('scaleFill');
+   if(fillEl) fillEl.style.width=((v-100)/50)*100+'%';
+   const pvEl=document.getElementById('previewScaleVal'); if(pvEl) pvEl.textContent=`${v}%`;
+   const cvEl=document.getElementById('scaleChipVal'); if(cvEl) cvEl.textContent=`${v}%`;
+   chipWrap.querySelectorAll('.scale-chip').forEach(c=> c.classList.toggle('active', parseInt(c.dataset.scale,10)===v));
+   // live refresh subtitle
+   const subEl=document.querySelector('.a11y-subtitle');
+      if(subEl) subEl.innerHTML=`<span class="dot ok" aria-hidden="true"></span> Prism OS · scale <span class="tabular">${v}%</span> · ${highContrast?'high contrast':'standard'} · ${reducedMotion?'reduced':'motion'}`;
+   os.banner(`<strong>Text scale ${v}%</strong><span class="caption">--a11y-scale ${ (v/100).toFixed(2) } · live</span>`,{timeout:1400});
+   // animate preview
+   if(!os.state.reducedMotion && !reducedMotion){
+    const ps=document.getElementById('previewStage'); if(ps) ps.animate([{transform:'scale(0.99)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(0.32,0.72,0,1)'});
+   }
+  });
+  chipWrap.appendChild(chip);
+ });
+ scaleHead.appendChild(chipWrap);
+ const trackWrap = h('div', {class:'slider-track-wrap'});
+ const track = h('div', {class:'slider-track'});
+ const fill = h('div', {class:'slider-fill', id:'scaleFill', style:`width:${((scalePct-100)/50)*100}%`});
+ const range = h('input', {class:'range', type:'range', min:'100', max:'150', step:'25', value:String(scalePct), 'aria-label':'Text scale, 100 to 150 percent', id:'scaleRange'});
+ range.addEventListener('input', ()=>{
+  const v=parseInt(range.value,10);
+  scalePct=v;
+  fill.style.width=((v-100)/50)*100+'%';
+  stage.style.setProperty('--a11y-scale', String(v/100));
+  document.querySelectorAll('.scale-chip').forEach(c=> c.classList.toggle('active', parseInt(c.dataset.scale,10)===v));
+  const pv=document.getElementById('previewScaleVal'); if(pv) pv.textContent=`${v}%`;
+  const cv=document.getElementById('scaleChipVal'); if(cv) cv.textContent=`${v}%`;
+    const subEl=document.querySelector('.a11y-subtitle'); if(subEl) subEl.innerHTML=`<span class="dot ok" aria-hidden="true"></span> Prism OS · scale <span class="tabular">${v}%</span> · ${highContrast?'high contrast':'standard'} · ${reducedMotion?'reduced':'motion'}`;
+ });
+ range.addEventListener('change', ()=> os.banner(`<strong>Scale ${scalePct}%</strong><span class="caption">saved · preview scaled</span>`,{timeout:1200}));
+ track.append(fill, range);
+ trackWrap.append(track, h('span', {class:'row-value accent ', id:'scaleChipVal'}, `${scalePct}%`));
+ const minmax=h('div', {class:'slider-minmax'});
+ minmax.innerHTML=`<span>100% · standard</span><span>150% · large</span>`;
+ scaleRow.append(scaleHead, trackWrap, minmax);
+ visionCard.append(scaleRow);
+ // contrast row
+ const contrastRow=h('div', {class:'a11y-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':`High contrast ${highContrast?'on':'off'}, toggle`});
+ contrastRow.innerHTML=`<div class="row-icon">${iconSvg('contrast')}</div><div class="row-main"><div class="row-title">High contrast</div><div class="row-sub">Increases outline opacity 0.12 → 0.26 · glass stays translucent</div></div><span class="row-value " id="contrastVal">${highContrast?'High':'Standard'}</span>`;
+ const contrastToggle=makeToggle(highContrast,'High contrast');
+ contrastToggle.id='contrastToggle';
+ contrastToggle.addEventListener('togglechange', e=> setContrast(e.detail.on));
+ contrastRow.appendChild(contrastToggle);
+ contrastRow.addEventListener('click', ()=> contrastToggle.click());
+ contrastRow.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); contrastToggle.click(); }});
+ visionCard.append(contrastRow);
+ visionGroup.append(visionHead, visionCard);
+ viewport.appendChild(visionGroup);
+
+ // Live preview card — focal element
+ const previewGroup=h('div', {class:'group', role:'group', 'aria-label':'Live preview'});
+ const previewHead=h('div', {class:'group-head'});
+ previewHead.innerHTML=`<span class="group-label">Live preview</span><span class="group-count ">scales · responds</span><span class="group-line" aria-hidden="true"></span>`;
+ const previewCard=h('div', {class:'preview-card'});
+ const previewHeader=h('div', {class:'preview-header'});
+ previewHeader.innerHTML=`
+  <div class="preview-head-label"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.6);flex:none;display:inline-block"></span> Preview · stage</div>
+  <div class="preview-badges">
+   <span class="preview-badge ${highContrast?'on':''}" id="contrastBadge">${highContrast?'High':'Standard'}</span>
+   <span class="preview-badge ${reducedMotion?'on':''}" id="motionBadge">${reducedMotion?'Reduced':'Default'}</span>
+   <span class="live-badge"><span class="pulse-dot" aria-hidden="true"></span>Live</span>
+  </div>`;
+ const previewStage=h('div', {class:'preview-stage', id:'previewStage'});
+ // waveform + mono demo inside preview
+ const waveState = reducedMotion ? 'wave paused' : (mono ? 'wave muted' : 'wave');
+ previewStage.innerHTML=`
+  <div class="preview-content" id="previewContent">
+      <div class="preview-kicker">Prism glass · <span class="tabular" id="previewScaleVal">${scalePct}%</span></div>
+   <div class="preview-title">Notifications — glanceable</div>
+      <div class="preview-body">Glass scrim over world. Outline <span class="tabular">${highContrast?'0.26':'0.12'}</span> · mono ${mono?'on':'off'} · motion ${reducedMotion?'paused':'live'}.</div>
+   <div class="preview-caption"><span style="width:14px;height:14px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.08);flex:none">${iconSvg('focus')}</span> Focus ring 2.5 px · gaze = Tab · dwell 350 ms</div>
+  </div>
+  <div class="preview-metrics" id="previewMetrics">
+   <span class="metric-pill "><span class="pulse-dot" aria-hidden="true"></span> 00:42 · live</span>
+   <span class="wave ${waveState}" id="previewWave" aria-hidden="true">${Array(8).fill(0).map((_,i)=>`<i style="--h:${8+(i%3)*4}px;height:${8+(i%3)*4}px;animation-delay:${i*66}ms"></i>`).join('')}</span>
+   <span class="mono-icon ${mono?'on':''}" id="monoIcon" aria-label="${mono?'Mono audio, single channel':'Stereo audio'}">${mono ? iconSvg('mono') : iconSvg('stereo')}</span>
+   <span class="preview-badge ${mono?'on':''}" id="monoBadge" style="height:26px;display:inline-flex;align-items:center">${mono?'Mono · single cue':'Stereo'}</span>
+  </div>`;
+ previewCard.append(previewHeader, previewStage);
+ previewGroup.append(previewHead, previewCard);
+ viewport.appendChild(previewGroup);
+
+ // Motion & Audio group
+ const maGroup=h('div', {class:'group', role:'group', 'aria-label':'Motion and audio'});
+ const maHead=h('div', {class:'group-head'});
+ maHead.innerHTML=`<span class="group-label">Motion &amp; sound</span><span class="group-count ">2 controls</span><span class="group-line" aria-hidden="true"></span>`;
+ const maCard=h('div', {class:'group-card'});
+ const motionRow=h('div', {class:'a11y-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':`Reduced motion ${reducedMotion?'on':'off'}, toggle`});
+ motionRow.innerHTML=`<div class="row-icon purple">${iconSvg('motion')}</div><div class="row-main"><div class="row-title">Reduced motion</div><div class="row-sub">Disables 260 ms animations · respects prefers-reduced-motion</div></div><span class="row-value " id="motionVal">${reducedMotion?'Reduced':'Default'}</span>`;
+ const motionToggle=makeToggle(reducedMotion,'Reduced motion');
+ motionToggle.id='motionToggle';
+ motionToggle.addEventListener('togglechange', e=> setReduced(e.detail.on));
+ motionRow.appendChild(motionToggle);
+ motionRow.addEventListener('click', ()=> motionToggle.click());
+ motionRow.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); motionToggle.click(); }});
+ const monoRow=h('div', {class:'a11y-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':`Mono audio ${mono?'on':'off'}, toggle`});
+ monoRow.innerHTML=`<div class="row-icon">${iconSvg('audio')}</div><div class="row-main"><div class="row-title">Mono audio</div><div class="row-sub">Merges spatial cues · one channel + haptics</div></div><span class="row-value " id="monoVal">${mono?'Mono':'Stereo'}</span>`;
+ const monoToggle=makeToggle(mono,'Mono audio');
+ monoToggle.id='monoToggle';
+ monoToggle.addEventListener('togglechange', e=> setMono(e.detail.on));
+ monoRow.appendChild(monoToggle);
+ monoRow.addEventListener('click', ()=> monoToggle.click());
+ monoRow.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); monoToggle.click(); }});
+ maCard.append(motionRow, monoRow);
+ maGroup.append(maHead, maCard);
+ viewport.appendChild(maGroup);
+
+ // Color & Shortcuts group
+ const csGroup=h('div', {class:'group', role:'group', 'aria-label':'Color and shortcuts'});
+ const csHead=h('div', {class:'group-head'});
+ csHead.innerHTML=`<span class="group-label">Color &amp; shortcuts</span><span class="group-count ">safe accents</span><span class="group-line" aria-hidden="true"></span>`;
+ const csCard=h('div', {class:'group-card'});
+ // colorblind safe row — custom layout
+ const colorWrap=h('div', {style:'display:flex;flex-direction:column;gap:0'});
+ const colorTitleRow=h('div', {class:'a11y-row', style:'cursor:default', 'data-focusable':'', tabindex:'0', 'aria-label':'Colorblind-safe palette, accent distinguishable from ok warn danger by shape and icon'});
+ colorTitleRow.innerHTML=`<div class="row-icon accent">${iconSvg('eye')}</div><div class="row-main"><div class="row-title">Colorblind-safe accents</div><div class="row-sub">Accent always blue · never only color · shape + icon</div></div><span class="row-chevron">${iconSvg('chevron')}</span>`;
+ colorTitleRow.addEventListener('click', ()=> os.banner('<strong>Accents · safe</strong><span class="caption">accent #56b8ff vs ok #4cd47c · icon + pattern</span>',{timeout:1600}));
+ const colorRow=h('div', {class:'color-row'});
+ const chips=[
+  {label:'Accent', sub:'circle · blue', bg:'linear-gradient(180deg, var(--accent), var(--accent-strong))', icon:iconSvg('focus'), pattern:'linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%)'},
+  {label:'OK', sub:'check · green', bg:'linear-gradient(180deg, #4cd47c, #1a8a4a)', icon:iconSvg('check'), pattern:'repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 2px, transparent 2px 6px)'},
+  {label:'Warn', sub:'triangle · amber', bg:'linear-gradient(180deg, #ffc247, #ff7a1a)', icon:iconSvg('warn'), pattern:'repeating-linear-gradient(90deg, rgba(0,0,0,0.10) 0 3px, transparent 3px 7px)'},
+  {label:'Danger', sub:'x · red', bg:'linear-gradient(180deg, #ff5d5d, #c42323)', icon:iconSvg('danger'), pattern:'repeating-linear-gradient(135deg, rgba(255,255,255,0.14) 0 3px, transparent 3px 8px)'},
+ ];
+ chips.forEach(c=>{
+  const chip=h('div', {class:'color-chip', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':`${c.label} accent, ${c.sub}, distinguishable by icon and pattern, not color alone`});
+  chip.innerHTML=`<span class="chip-dot" style="background:${c.bg}">${c.icon}</span><span class="chip-label">${c.label}</span><span class="chip-sub">${c.sub}</span><span class="chip-pattern" style="background:${c.pattern}"></span>`;
+  chip.addEventListener('click', ()=> os.banner(`<strong>${c.label} · ${c.sub}</strong><span class="caption">distinguishable without color · icon + pattern</span>`,{timeout:1400}));
+  chip.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); chip.click(); }});
+  colorRow.appendChild(chip);
+ });
+ const note=h('div', {class:'color-note'});
+ note.innerHTML=`<span style="width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px rgba(76,212,124,0.5);flex:none;display:inline-block"></span> <strong>Test:</strong> accent is cyan-blue with circle icon vs OK green check — you can tell without hue. <span style="margin-left:auto;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40)">WCAG AA</span>`;
+ colorWrap.append(colorTitleRow, colorRow, note);
+ csCard.appendChild(colorWrap);
+
+ // voice row
+ const voiceRow=h('div', {class:'a11y-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Voice shortcut Hey Prism, tap to test'});
+ voiceRow.innerHTML=`<div class="row-icon purple">${iconSvg('voice')}</div><div class="row-main"><div class="row-title">Voice · Hey Prism</div><div class="row-sub">Wake anywhere · dwell alternative · mono merges cue</div></div><span class="row-value accent ">Voice</span><span class="row-chevron">${iconSvg('chevron')}</span>`;
+ voiceRow.addEventListener('click', ()=> os.banner('<strong>Hey Prism</strong><span class="caption">voice wake · gaze dwell 350 ms equivalent · Space</span>',{timeout:1800}));
+ voiceRow.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); voiceRow.click(); }});
+ // captions row
+ const capRow=h('div', {class:'a11y-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Live captions shortcut, tap to open captions'});
+ capRow.innerHTML=`<div class="row-icon ok">${iconSvg('captions')}</div><div class="row-main"><div class="row-title">Live captions</div><div class="row-sub">System captions · Space to pause timer</div></div><span class="row-value ">Captions</span><span class="row-chevron">${iconSvg('chevron')}</span>`;
+ capRow.addEventListener('click', ()=> os.banner('<strong>Captions · Live</strong><span class="caption">on-device · word-by-word · monospace timer</span>',{timeout:1800}));
+ capRow.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); capRow.click(); }});
+ csCard.append(voiceRow, capRow);
+ csGroup.append(csHead, csCard);
+ viewport.appendChild(csGroup);
+
+ // Focus & Input equivalence group
+ const fiGroup=h('div', {class:'group', role:'group', 'aria-label':'Focus and input equivalence'});
+ const fiHead=h('div', {class:'group-head'});
+ fiHead.innerHTML=`<span class="group-label">Focus &amp; input</span><span class="group-count ">gaze = keyboard</span><span class="group-line" aria-hidden="true"></span>`;
+ const fiCard=h('div', {class:'group-card'});
+ // focus helper demo
+ const focusTitleRow=h('div', {class:'a11y-row', style:'cursor:default;flex-direction:column;align-items:stretch;gap:10px', 'data-focusable':'', tabindex:'0', 'aria-label':'Focus ring helper, visible 2.5 pixel accent ring on gaze and keyboard'});
+ focusTitleRow.innerHTML=`<div style="display:flex;align-items:center;gap:12px;width:100%"><div class="row-icon">${iconSvg('focus')}</div><div class="row-main"><div class="row-title">Focus ring helper</div><div class="row-sub">2.5 px accent ring · gaze halo vs keyboard Tab · same outcome</div></div><span class="row-value accent ">2.5 px</span></div>`;
+ const focusDemo=h('div', {class:'focus-demo'});
+ const gazeBtn=h('button', {class:'focus-btn primary', 'data-focusable':'', tabindex:'0', 'aria-label':'Gaze focus demo, dwell 350 milliseconds to activate'}, 'Gaze dwell');
+ gazeBtn.innerHTML=`<span style="width:14px;height:14px;border-radius:50%;background:#051423;display:grid;place-items:center">${iconSvg('eye').replace('white',' #051423')}</span> Gaze dwell <span style="font-size:10px;opacity:0.62">350 ms</span>`;
+ // we need to recolor icon inside primary button? simpler keep
+ gazeBtn.innerHTML=`${iconSvg('eye')} Gaze dwell <span style="font-size:11px;opacity:0.8">350 ms</span>`;
+ gazeBtn.addEventListener('click', ()=>{
+  gazeBtn.classList.add('gaze-focus');
+  os.banner('<strong>Gaze focus</strong><span class="caption">halo + 2.5 px ring · dwell or tap</span>',{timeout:1400});
+  setTimeout(()=> gazeBtn.classList.remove('gaze-focus'), 800);
+ });
+ const keyBtn=h('button', {class:'focus-btn', 'data-focusable':'', tabindex:'0', 'aria-label':'Keyboard focus demo, Tab to cycle, Enter to activate'}, 'Tab cycle');
+ keyBtn.innerHTML=`${iconSvg('key')} Tab cycle <span style="font-size:11px;opacity:0.72">Enter</span>`;
+ keyBtn.addEventListener('click', ()=> os.banner('<strong>Keyboard focus</strong><span class="caption">Tab cycles · Enter / Space activates · same as gaze</span>',{timeout:1400}));
+ const focusTrigger=h('button', {class:'focus-btn', 'data-focusable':'', tabindex:'0', 'aria-label':'Show focus ring, press to highlight ring'}, 'Show ring');
+ focusTrigger.innerHTML=`${iconSvg('focus')} Show ring`;
+ focusTrigger.addEventListener('click', ()=>{
+  // briefly force visible ring on both buttons
+  gazeBtn.style.outline='2.5px solid var(--stroke-focus)';
+  gazeBtn.style.outlineOffset='2px';
+  keyBtn.style.outline='2.5px solid var(--stroke-focus)';
+  keyBtn.style.outlineOffset='2px';
+  os.banner('<strong>Focus ring 2.5 px</strong><span class="caption">visible on keyboard and gaze · WCAG focus-visible</span>',{timeout:1800});
+  setTimeout(()=>{ gazeBtn.style.outline=''; gazeBtn.style.outlineOffset=''; keyBtn.style.outline=''; keyBtn.style.outlineOffset=''; }, 1700);
+ });
+ focusDemo.append(gazeBtn, keyBtn, focusTrigger);
+ const legend=h('div', {class:'focus-legend'});
+  legend.innerHTML=`<span class="legend-dot" aria-hidden="true">${iconSvg('focus')}</span><span><strong style="color:var(--ink-80)">Ring:</strong> 2.5 px <span style="color:var(--accent)">#56b8ff</span> · <span class="tabular">0.9</span> opacity · offset 2 px · seen on Tab and gaze hover</span>`;
+ focusTitleRow.append(focusDemo, legend);
+ fiCard.appendChild(focusTitleRow);
+ // equivalence grid
+ const eqWrap=h('div', {style:'display:flex;flex-direction:column;gap:0'});
+ const eqHeadRow=h('div', {class:'a11y-row', style:'cursor:default;padding-bottom:8px', 'data-focusable':'', tabindex:'0', 'aria-label':'Input equivalence table, gaze, touch, keyboard, voice all activate same action'});
+ eqHeadRow.innerHTML=`<div class="row-icon">${iconSvg('key')}</div><div class="row-main"><div class="row-title">Gaze vs keyboard equivalence</div><div class="row-sub">Every action reachable three ways · no dead ends</div></div>`;
+ const eqGrid=h('div', {class:'equivalence-grid'});
+ const eqs=[
+  {icon:iconSvg('eye'), label:'Gaze dwell', sub:'350 ms halo'},
+  {icon:iconSvg('a11y'), label:'Tap', sub:'temple / click'},
+  {icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12h10" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/></svg>`, label:'Enter', sub:'keyboard'},
+  {icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="9" width="16" height="7" rx="1.6" stroke="white" stroke-width="1.4"/><path d="M8 9V7a4 4 0 018 0v2" stroke="white" stroke-width="1.4"/><path d="M12 12v2" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>`, label:'Space', sub:'capture'},
+  {icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 8h10M7 12h10M7 16h5" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M4 8v8M20 8v8" stroke="white" stroke-opacity="0.65" stroke-width="1.2"/></svg>`, label:'Tab', sub:'cycle focus'},
+  {icon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5l6 4-6 4-6-4 6-4z" stroke="white" stroke-width="1.4" stroke-linejoin="round"/><path d="M6 9v4M18 9v4" stroke="white" stroke-opacity="0.8" stroke-width="1.3" stroke-linecap="round"/></svg>`, label:'Esc', sub:'back · dismiss'},
+ ];
+ eqs.forEach(eq=>{
+  const cell=h('div', {class:'eq-cell', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':`${eq.label}, ${eq.sub}, equivalent to gaze dwell`});
+  cell.innerHTML=`<span class="eq-icon" aria-hidden="true">${eq.icon}</span><span class="eq-label">${eq.label}</span><span class="eq-sub">${eq.sub}</span>`;
+  cell.addEventListener('click', ()=> os.banner(`<strong>${eq.label}</strong><span class="caption">${eq.sub} · equivalent · same action</span>`,{timeout:1400}));
+  cell.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); cell.click(); }});
+  eqGrid.appendChild(cell);
+ });
+ eqWrap.append(eqHeadRow, eqGrid);
+ fiCard.appendChild(eqWrap);
+ fiGroup.append(fiHead, fiCard);
+ viewport.appendChild(fiGroup);
+
+ // footer spacer hint already in viewport padding
+ stage.appendChild(os.cursor);
+ stage.appendChild(hintbar);
+ stage.appendChild(stateLayer);
+ // ensure scale var applied
+ stage.style.setProperty('--a11y-scale', String(scalePct/100));
+ if(highContrast) stage.classList.add('high-contrast');
+ if(reducedMotion) stage.classList.add('a11y-reduced');
+}
+
+function setEdge(id){
+ edgeState=id;
+ edgeRow.querySelectorAll('.chip').forEach(c=> c.classList.toggle('active', c.dataset.state===id));
+ stateLayer.className='state-layer';
+ stateLayer.innerHTML='';
+ stateLayer.style.display='';
+ viewport.style.display='';
+ viewport.style.opacity='';
+ viewport.style.filter='';
+ viewport.style.pointerEvents='';
+ hintbar.style.display='';
+
+ if(id==='normal'){
+  stateLayer.classList.remove('on','dim-on');
+  stateLayer.style.display='none';
+  viewport.style.display='flex';
+  render();
+  return;
+ }
+ if(id==='loading'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML=`
+   <div style="display:grid;gap:10px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:0 2px;opacity:0.92">
+     <div style="display:grid;gap:6px"><div class="skeleton" style="width:132px;height:20px;border-radius:8px"></div><div class="skeleton" style="width:170px;height:10px;border-radius:6px"></div></div>
+     <div class="skeleton" style="width:74px;height:28px;border-radius:999px"></div>
+    </div>
+    <div style="background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:18px;padding:12px;display:grid;gap:10px">
+     <div style="display:flex;align-items:center;gap:12px"><div class="skeleton" style="width:32px;height:32px;border-radius:10px"></div><div style="flex:1;display:grid;gap:6px"><div class="skeleton" style="width:68%;height:12px;border-radius:6px"></div><div class="skeleton" style="width:82%;height:10px;border-radius:6px"></div></div><div class="skeleton" style="width:64px;height:18px;border-radius:999px"></div></div>
+     <div class="skeleton" style="width:100%;height:10px;border-radius:6px"></div>
+     <div class="skeleton" style="width:88%;height:10px;border-radius:6px"></div>
+     <div style="display:flex;gap:8px"><div class="skeleton" style="width:74px;height:28px;border-radius:999px"></div><div class="skeleton" style="width:56px;height:28px;border-radius:999px"></div></div>
+    </div>
+    <div style="display:grid;gap:8px">
+     ${Array(3).fill(0).map((_,i)=>`
+      <div style="background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:18px;padding:12px;display:flex;gap:10px;align-items:center;opacity:${1-i*0.14}">
+       <div class="skeleton" style="width:32px;height:32px;border-radius:10px;flex:none"></div>
+       <div style="flex:1;display:grid;gap:6px"><div class="skeleton" style="width:54%;height:12px;border-radius:6px"></div><div class="skeleton" style="width:78%;height:10px;border-radius:6px"></div></div>
+       <div class="skeleton" style="width:36px;height:28px;border-radius:999px"></div>
+      </div>
+     `).join('')}
+    </div>
+    <div class="caption" style="text-align:center;color:var(--ink-40);display:flex;align-items:center;justify-content:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5);flex:none;display:inline-block"></span> Loading prefs · shimmer 1.2 s · cached after load</div>
+   </div>`;
+  stage.appendChild(os.cursor);
+  return;
+ }
+ if(id==='empty'){
+  viewport.style.display='none';
+  stateLayer.classList.add('dim-on');
+  stateLayer.style.display='grid';
+  stateLayer.innerHTML=`
+   <div class="state-card">
+    <div class="state-illus" aria-hidden="true">
+     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="2.6" stroke="white" stroke-opacity="0.92" stroke-width="1.5"/><path d="M7.2 14.2c1.1-1.5 2.7-2.4 4.8-2.4 2.1 0 3.7 0.9 4.8 2.4" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M12 11.8v3.8" stroke="white" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="12" r="8.5" stroke="white" stroke-opacity="0.14" stroke-width="1.2"/></svg>
+    </div>
+    <div class="state-title">Accessibility at defaults</div>
+    <div class="state-body">No custom prefs yet. Text is at 100%, contrast is standard — adjust scale or toggles above to tailor Prism to your eyes and ears.</div>
+    <div class="state-actions">
+     <button class="btn primary" data-focusable tabindex="0" aria-label="Enable high contrast">Enable high contrast</button>
+     <button class="btn ghost" data-focusable tabindex="0" aria-label="Set text scale to 125 percent">Set 125%</button>
+    </div>
+    <p class="caption" style="color:var(--ink-40);font-size:11px">Humane empty · nothing blocked · adjust any time</p>
+    <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);border-radius:999px;padding:6px 10px"><span style="font-size:11px;font-weight:700;color:var(--ink-80)">100% · Standard · Motion on</span><span style="width:1px;height:10px;background:rgba(255,255,255,0.08)"></span><span class="caption" style="color:var(--ink-40)"></span></div>
+   </div>`;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    const t=b.textContent.trim();
+    if(t.includes('high contrast')){ highContrast=true; stage.classList.add('high-contrast'); setEdge('normal'); os.banner('<strong>High contrast on</strong><span class="caption">outline 0.26 · saved</span>',{timeout:1800}); }
+    else { scalePct=125; stage.style.setProperty('--a11y-scale','1.25'); setEdge('normal'); os.banner('<strong>Scale 125%</strong><span class="caption">--a11y-scale 1.25 · live preview scaled</span>',{timeout:1800}); }
+   });
+  });
+  stage.appendChild(os.cursor);
+  return;
+ }
+ if(id==='error'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML=`
+   <div style="display:grid;gap:10px;justify-items:center;padding:18px 0 0 0">
+    <div class="state-card" style="outline-color:rgba(255,93,93,0.18)">
+     <div class="state-illus danger" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5L21.5 19H2.5L12 3.5z" stroke="#ff8a8a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.5v4.2" stroke="#ffb3b3" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.25" fill="#ffb3b3"/></svg>
+     </div>
+     <div class="state-title">Prefs failed to save</div>
+          <div class="state-body">Prism couldn’t update accessibility prefs. Your previous scale <span class="tabular">${scalePct}%</span> and contrast are still active — try again. No dead ends.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Retry saving prefs" id="retryBtn">Retry</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Use cached prefs">Use cached</button>
+     </div>
+     <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;width:100%;justify-content:center">
+      <span class="dot bad" aria-hidden="true"></span><span class="caption " style="color:var(--ink-60)">PR-A11Y-503 · ${new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</span><span class="caption" style="margin-left:auto;color:var(--ink-40)">tap Retry</span>
+     </div>
+    </div>
+   </div>`;
+  const retryBtn=stateLayer.querySelector('#retryBtn');
+  retryBtn.addEventListener('click', ()=>{
+   retryBtn.textContent='Retrying…';
+   retryBtn.setAttribute('disabled','true');
+   stateLayer.querySelector('.state-card').innerHTML=`<div style="display:grid;gap:10px;width:100%;justify-items:center;padding:8px 0"><div class="skeleton" style="width:64px;height:64px;border-radius:18px"></div><div class="skeleton" style="width:62%;height:16px;border-radius:8px"></div><div class="skeleton" style="width:78%;height:12px;border-radius:6px"></div><div class="skeleton" style="width:100%;height:56px;border-radius:12px;margin-top:6px"></div></div>`;
+   setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Prefs restored</strong><span class="caption">saved · cached updated</span>',{timeout:1800}); }, 1100);
+  });
+  stateLayer.querySelectorAll('button')[1].addEventListener('click', ()=>{ setEdge('normal'); os.banner('<strong>Cached prefs active</strong><span class="caption">no change · safe</span>',{timeout:1600}); });
+  stage.appendChild(os.cursor);
+  return;
+ }
+ if(id==='offline'){
+  viewport.style.display='flex';
+  viewport.style.opacity='0.52';
+  viewport.style.filter='blur(1px)';
+  viewport.style.pointerEvents='none';
+  stateLayer.classList.add('dim-on');
+  stateLayer.style.display='grid';
+  stateLayer.innerHTML=`
+   <div class="state-card">
+    <div class="state-illus warn" aria-hidden="true">
+     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 9.5a9 9 0 0117 0" stroke="white" stroke-opacity="0.92" stroke-width="1.5" stroke-linecap="round"/><path d="M6 12.5a6 6 0 0112 0" stroke="white" stroke-opacity="0.82" stroke-width="1.5" stroke-linecap="round"/><path d="M8.8 15.5a2.8 2.8 0 016.4 0" stroke="white" stroke-opacity="0.78" stroke-width="1.4" stroke-linecap="round"/><path d="M2 2l20 20" stroke="#ffc247" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </div>
+    <div class="state-title">Offline · cached prefs</div>
+        <div class="state-body">You’re offline — showing cached accessibility prefs. Scale <span class="tabular">${scalePct}%</span>, contrast ${highContrast?'high':'standard'}, motion ${reducedMotion?'reduced':'live'} remain. Changes will queue.</div>
+    <div style="width:100%;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+     <span style="font-size:11px;font-weight:700;color:var(--ink-80)">Cached · 00:43 ago</span><span style="flex:1"></span><span class="dot warn" aria-hidden="true"></span><span class="caption" style="color:var(--ink-60)">offline</span>
+    </div>
+    <div class="state-actions">
+     <button class="btn primary" data-focusable tabindex="0" aria-label="Retry connection">Retry</button>
+     <button class="btn" data-focusable tabindex="0" aria-label="Continue offline">Use cached</button>
+    </div>
+    <p class="caption" style="color:var(--ink-40)">Preview still scales · outline stays · no dead end</p>
+   </div>`;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    const t=b.textContent.trim();
+    if(t.includes('Retry')){
+     b.textContent='Retrying…';
+     setTimeout(()=>{ os.banner('<strong>Still offline</strong><span class="caption">cached prefs still active · queued</span>',{timeout:1800}); b.textContent='Retry'; }, 900);
+    } else { setEdge('normal'); os.banner('<strong>Using cached prefs</strong><span class="caption">offline · queued changes</span>',{timeout:1800}); viewport.style.opacity=''; viewport.style.filter=''; viewport.style.pointerEvents=''; }
+   });
+  });
+  stage.appendChild(os.cursor);
+  return;
+ }
+ if(id==='permission'){
+  viewport.style.display='flex';
+  viewport.style.opacity='0.42';
+  viewport.style.filter='blur(1px)';
+  viewport.style.pointerEvents='none';
+  stateLayer.classList.add('dim-on');
+  stateLayer.style.display='grid';
+  stateLayer.innerHTML=`
+   <div class="state-card">
+    <div class="state-illus" aria-hidden="true">
+     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="9.5" width="14" height="10" rx="2.4" stroke="white" stroke-opacity="0.92" stroke-width="1.6"/><path d="M8.5 9.5V7.8a3.5 3.5 0 017 0v1.7" stroke="white" stroke-width="1.5"/><circle cx="12" cy="14.5" r="1.35" fill="white"/><path d="M12 15.85v1.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="8" r="2.2" stroke="white" stroke-opacity="0.42" stroke-width="1.3"/></svg>
+    </div>
+    <div class="state-title">Voice access blocked</div>
+    <div class="state-body">Prism needs microphone for “Hey Prism” and mono audio routing to work fully. Captions and visual prefs still work — allow when ready. Gaze and keyboard stay equivalent.</div>
+    <div style="width:100%;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px">
+     <span class="row-icon" style="width:28px;height:28px">${iconSvg('voice')}</span><div style="flex:1;text-align:left"><div style="font-size:13px;font-weight:700;color:var(--ink-100)">Microphone · blocked</div><div style="font-size:11px;color:var(--ink-60)">Voice = gaze = keyboard — remain equivalent</div></div><span class="dot bad" aria-hidden="true"></span>
+    </div>
+    <div class="state-actions">
+     <button class="btn primary" data-focusable tabindex="0" aria-label="Allow microphone access">Allow access</button>
+     <button class="btn ghost" data-focusable tabindex="0" aria-label="Not now, keep blocked">Not now</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);outline:1px solid rgba(255,255,255,0.06);border-radius:999px;padding:6px 10px"><span class="caption" style="color:var(--ink-60)">Settings → Privacy → Prism · Microphone</span></div>
+   </div>`;
+  const allowBtn=stateLayer.querySelector('.btn.primary');
+  allowBtn.addEventListener('click', ()=>{
+   allowBtn.textContent='Allowing…';
+   allowBtn.setAttribute('disabled','true');
+   setTimeout(()=>{ viewport.style.opacity=''; viewport.style.filter=''; viewport.style.pointerEvents=''; setEdge('normal'); os.banner('<strong>Voice allowed</strong><span class="caption">Hey Prism + mono cues active · equivalent inputs</span>',{timeout:1800}); }, 900);
+  });
+  stateLayer.querySelectorAll('button')[1].addEventListener('click', ()=>{ viewport.style.opacity=''; viewport.style.filter=''; viewport.style.pointerEvents=''; setEdge('normal'); os.banner('<strong>Voice kept blocked</strong><span class="caption">visual prefs active · gaze/keyboard equivalent</span>',{timeout:1800}); });
+  stage.appendChild(os.cursor);
+  return;
+ }
+}
+
+// init
+stage.style.setProperty('--a11y-scale', String(scalePct/100));
+render();
+
+// keyboard Esc etc via core bus back
+os.on('back', ()=>{
+ if(edgeState!=='normal'){ setEdge('normal'); }
+});
+
+console.log('Prism a11y ready — scale var --a11y-scale, contrast, reduced-motion, mono, colorblind-safe, focus ring, gaze equivalence');
+</script>
+</body>
+</html>

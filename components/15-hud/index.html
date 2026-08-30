@@ -1,0 +1,1264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Performance HUD</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+ .stage{
+  background:
+   radial-gradient(120% 90% at 50% 14%, rgba(42,53,80,0.56) 0%, rgba(20,26,40,0.72) 36%, rgba(10,14,23,0.90) 70%),
+   radial-gradient(68% 46% at 78% 86%, rgba(86,184,255,0.09), transparent 56%),
+   rgba(6,10,16,0.76);
+ }
+ .stage-shell{
+  position:relative;
+  width:600px;height:600px;
+  display:grid;place-items:center;
+  flex:none;
+ }
+ /* DEV CHROME — fixed OUTSIDE .stage */
+ .dev-controls{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  display:flex;gap:6px;
+  z-index:1000;
+  justify-content:center;
+  flex-wrap:wrap;
+  pointer-events:none;
+  padding:8px 12px;
+  border-radius:var(--r-pill);
+  background:rgba(10,15,23,0.74);
+  outline:1px solid var(--stroke-glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.32);
+  max-width:92vw;
+ }
+ .stage .dev-controls{display:none !important}
+ .dev-controls .chip{
+  pointer-events:auto;
+  height:26px;padding:0 10px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  transition:background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+  border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+ }
+ .dev-controls .chip.active{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423;outline-color:transparent;
+ }
+ .dev-controls .chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .dev-controls .chip.gaze-focus{transform:scale(1.04)}
+
+ /* HUD viewport */
+ .hud-viewport{
+  position:absolute;
+  inset:44px 0 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:10px 12px 84px 12px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+ }
+ .hud-viewport::-webkit-scrollbar{display:none}
+
+ /* hero FPS card — focal */
+ .hero-card{
+  position:relative;
+  flex:none;
+  align-self:stretch;
+  min-height:0;
+  background:var(--mat-raised);
+  backdrop-filter:var(--blur-heavy);
+  -webkit-backdrop-filter:var(--blur-heavy);
+  outline:1px solid rgba(86,184,255,0.14);
+  border-radius:22px;
+  padding:14px 14px 12px 14px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  overflow:hidden;
+  box-shadow:0 18px 44px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.06);
+  animation: rise-in 260ms var(--ease-prism) both;
+ }
+ .hero-card::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(90% 60% at 50% 0%, rgba(86,184,255,0.08), transparent 62%);
+  pointer-events:none;
+ }
+ .hero-card *{position:relative;z-index:1}
+ .hero-top{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  flex:none;
+ }
+ .hud-kicker{
+  font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink-60);
+  display:flex;align-items:center;gap:8px;
+ }
+ .hud-kicker .dot-thermal{width:8px;height:8px;border-radius:50%;flex:none;box-shadow:0 0 8px currentColor;transition:background 260ms var(--ease-prism), color 260ms var(--ease-prism)}
+ .dot-thermal.ok{color:var(--ok);background:var(--ok)}
+ .dot-thermal.warn{color:var(--warn);background:var(--warn);box-shadow:0 0 10px rgba(255,194,71,0.5)}
+ .dot-thermal.bad{color:var(--danger);background:var(--danger);box-shadow:0 0 10px rgba(255,93,93,0.5)}
+ .thermal-label{font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-60)}
+ .thermal-label.warn{color:var(--warn)}
+ .thermal-label.bad{color:var(--danger)}
+ .throttle-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  height:24px;padding:0 10px;border-radius:999px;
+  font-size:10px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;
+  background:rgba(255,194,71,0.12);outline:1px solid rgba(255,194,71,0.22);color:var(--warn);
+  transition:all 260ms var(--ease-prism);
+ }
+ .throttle-pill.bad{background:rgba(255,93,93,0.12);outline-color:rgba(255,93,93,0.22);color:var(--danger)}
+ .throttle-pill.ok{opacity:0.0;transform:translateY(-4px);pointer-events:none}
+ .hero-main{
+  display:flex;align-items:baseline;gap:10px;
+  flex:none;
+ }
+ .fps-val{
+  font-size:44px;font-weight:800;letter-spacing:-0.04em;line-height:0.95;color:var(--ink-100);
+    font-variant-numeric:tabular-nums;
+  transition:color 260ms var(--ease-prism), transform 260ms var(--ease-prism);
+ }
+ .fps-val.drop{color:var(--danger)}
+ .fps-unit{font-size:14px;font-weight:700;letter-spacing:0.06em;color:var(--ink-40);margin-left:2px}
+ .fps-meta{
+  margin-left:auto;
+  display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+ }
+ .fps-sub{font-size:11px;font-weight:600;color:var(--ink-60);letter-spacing:0.02em;line-height:1}
+  .fps-sub strong{color:var(--ink-80);font-weight:700;font-variant-numeric:tabular-nums}
+  .fps-delta{font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-40);font-variant-numeric:tabular-nums}
+ .fps-delta.good{color:var(--ok)}
+ .fps-delta.warn{color:var(--warn)}
+ .fps-delta.bad{color:var(--danger)}
+ .spark-wrap{
+  position:relative;
+  flex:none;
+  min-height:34px;
+  height:34px;
+  border-radius:10px;
+  background:rgba(255,255,255,0.04);
+  outline:1px solid rgba(255,255,255,0.06);
+  overflow:hidden;
+  cursor:crosshair;
+ }
+ .spark-wrap.scrubbable:hover{outline-color:rgba(86,184,255,0.18)}
+ .spark-svg{
+  width:100%;height:100%;display:block;
+ }
+ .spark-poly{
+  fill:none;
+  stroke:var(--accent);
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  vector-effect:non-scaling-stroke;
+  transition: d 260ms var(--ease-prism), stroke 260ms var(--ease-prism), opacity 260ms var(--ease-prism);
+  filter:drop-shadow(0 0 6px rgba(86,184,255,0.35));
+ }
+ .spark-poly.warn{stroke:var(--warn);filter:drop-shadow(0 0 6px rgba(255,194,71,0.35))}
+ .spark-poly.bad{stroke:var(--danger);filter:drop-shadow(0 0 6px rgba(255,93,93,0.35))}
+ .spark-grid{
+  position:absolute;inset:0;display:flex;align-items:stretch;pointer-events:none;opacity:0.24;
+ }
+ .spark-grid span{flex:1;border-right:1px dashed rgba(255,255,255,0.07)}
+ .spark-grid span:last-child{border:none}
+ .scrub-line{
+  position:absolute;top:0;bottom:0;width:1px;background:rgba(86,184,255,0.9);box-shadow:0 0 8px rgba(86,184,255,0.6);
+  opacity:0;pointer-events:none;transition:opacity 160ms var(--ease-prism);
+ }
+ .scrub-dot{
+  position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid var(--accent);
+  box-shadow:0 2px 8px rgba(0,0,0,0.32), 0 0 10px rgba(86,184,255,0.6);
+  transform:translate(-50%,-50%);opacity:0;pointer-events:none;transition:opacity 160ms var(--ease-prism);
+ }
+ .scrub-tip{
+  position:absolute;bottom:100%;transform:translateX(-50%);
+  background:rgba(10,15,23,0.92);outline:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  padding:5px 8px;border-radius:10px;
+    font-size:11px;font-weight:700;letter-spacing:-0.01em;color:var(--ink-100);font-variant-numeric:tabular-nums;
+  white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 160ms var(--ease-prism), transform 160ms var(--ease-prism);
+  box-shadow:0 8px 22px rgba(0,0,0,0.32);
+ }
+ .spark-wrap.is-scrubbing .scrub-line,.spark-wrap.is-scrubbing .scrub-dot,.spark-wrap.is-scrubbing .scrub-tip{opacity:1}
+ .spark-axis{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);margin-top:4px;
+  flex:none;
+ }
+  .spark-axis strong{font-variant-numeric:tabular-nums;color:var(--ink-60);font-weight:700}
+
+ /* metrics grid 2x2 */
+ .metric-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  flex:none;
+  align-self:stretch;
+ }
+ .metric-card{
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  border-radius:18px;
+  padding:12px 12px 10px 12px;
+  display:flex;flex-direction:column;gap:8px;
+  box-shadow:0 12px 28px rgba(0,0,0,0.18);
+  position:relative;overflow:hidden;
+  transition:transform 260ms var(--ease-prism), outline-color 160ms var(--ease-prism), background 160ms var(--ease-prism);
+  animation: rise-in 260ms var(--ease-prism) both;
+  min-height:0;
+ }
+ .metric-card:nth-child(1){animation-delay:40ms}
+ .metric-card:nth-child(2){animation-delay:70ms}
+ .metric-card:nth-child(3){animation-delay:100ms}
+ .metric-card:nth-child(4){animation-delay:130ms}
+ .metric-card.gaze-focus{outline-color:var(--stroke-focus);background:rgba(86,184,255,0.06);transform:scale(1.01)}
+ .metric-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+ }
+ .metric-label{
+  font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-60);display:flex;align-items:center;gap:6px;
+ }
+ .metric-icon{width:22px;height:22px;border-radius:8px;display:grid;place-items:center;flex:none;background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.07);color:var(--ink-80)}
+ .metric-icon.accent{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#04121f;outline-color:transparent;box-shadow:0 4px 10px rgba(16,92,180,0.22)}
+ .metric-icon.warn{background:linear-gradient(180deg,#ffc247,#ff9a1a);color:#1a0f00}
+ .metric-icon.danger{background:linear-gradient(180deg,#ff5d5d,#d93030);color:#fff}
+  .metric-value{font-size:20px;font-weight:800;letter-spacing:-0.02em;line-height:1;color:var(--ink-100);font-variant-numeric:tabular-nums;transition:color 260ms var(--ease-prism)}
+ .metric-value small{font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--ink-40);margin-left:2px}
+ .metric-sub{font-size:11px;font-weight:600;color:var(--ink-60);line-height:1;letter-spacing:0.01em;display:flex;align-items:center;gap:6px}
+ .metric-sub .dot{width:6px;height:6px}
+ .spark-mini{
+  height:26px;
+  min-height:26px;
+ }
+
+ /* histogram */
+ .histo-card{
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  border-radius:18px;
+  padding:12px 12px 10px 12px;
+  display:flex;flex-direction:column;gap:8px;
+  box-shadow:0 12px 28px rgba(0,0,0,0.18);
+  animation: rise-in 260ms var(--ease-prism) both;
+  animation-delay:160ms;
+  position:relative;overflow:hidden;
+  flex:none;align-self:stretch;min-height:0;
+ }
+ .histo-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+ .histo-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-60);display:flex;align-items:center;gap:6px}
+ .histo-bars{
+  display:flex;align-items:flex-end;gap:3px;
+  height:52px;
+  padding:6px 6px 0 6px;
+  background:rgba(255,255,255,0.04);
+  outline:1px solid rgba(255,255,255,0.06);
+  border-radius:12px;
+  overflow:hidden;
+ }
+ .histo-bar{
+  flex:1;
+  background:rgba(86,184,255,0.18);
+  border-radius:4px 4px 0 0;
+  position:relative;
+  min-height:2px;
+  transition:height 260ms var(--ease-prism), background 260ms var(--ease-prism), opacity 260ms var(--ease-prism);
+ }
+ .histo-bar i{
+  position:absolute;left:0;right:0;bottom:0;
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  border-radius:4px 4px 0 0;
+  transition:height 260ms var(--ease-prism), background 260ms var(--ease-prism);
+  box-shadow:0 -2px 8px rgba(86,184,255,0.25);
+ }
+ .histo-bar.warn i{background:linear-gradient(180deg, #ffc247, #ff9a1a);box-shadow:0 -2px 8px rgba(255,194,71,0.25)}
+ .histo-bar.bad i{background:linear-gradient(180deg, #ff5d5d, #c62828);box-shadow:0 -2px 8px rgba(255,93,93,0.25)}
+ .histo-bar.dropPulse{animation: barPulse 420ms var(--ease-prism)}
+ @keyframes barPulse{0%{transform:scaleY(1)}35%{transform:scaleY(1.10)}100%{transform:scaleY(1)}}
+ .histo-legend{
+  display:flex;gap:8px;align-items:center;justify-content:space-between;
+  font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);
+ }
+ .legend-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+ .legend-row{display:flex;gap:6px;align-items:center}
+
+ /* sim controls strip — inside stage */
+ .sim-card{
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  border-radius:18px;
+  padding:12px;
+  display:flex;flex-direction:column;gap:10px;
+  box-shadow:0 12px 28px rgba(0,0,0,0.18);
+  animation: rise-in 260ms var(--ease-prism) both;
+  animation-delay:180ms;
+  flex:none;align-self:stretch;min-height:0;
+ }
+ .sim-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+ .sim-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-40)}
+ .sim-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+ .sim-row{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,0.05);outline:1px solid rgba(255,255,255,0.06);
+  padding:10px 10px;border-radius:14px;
+  transition:background 160ms var(--ease-prism), outline-color 160ms var(--ease-prism);
+  cursor:pointer;
+ }
+ .sim-row.gaze-focus{outline-color:var(--stroke-focus);background:rgba(86,184,255,0.08)}
+ .sim-row:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .sim-label{font-size:11px;font-weight:700;color:var(--ink-80);letter-spacing:0.02em;flex:1;min-width:0;line-height:1}
+ .sim-sub{font-size:10px;font-weight:600;color:var(--ink-40);letter-spacing:0.04em;text-transform:uppercase;margin-top:2px}
+ .seg{
+  display:inline-flex;gap:2px;padding:3px;border-radius:999px;
+  background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.07);
+ }
+ .seg-btn{
+  appearance:none;-webkit-appearance:none;border:none;
+  height:26px;padding:0 10px;border-radius:999px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  color:var(--ink-60);background:transparent;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  transition:background 160ms var(--ease-prism), color 160ms var(--ease-prism), transform 160ms var(--ease-prism), box-shadow 160ms var(--ease-prism);
+ }
+ .seg-btn[aria-pressed="true"]{background:linear-gradient(180deg,var(--accent),var(--accent-strong));color:#051423;box-shadow:0 4px 12px rgba(16,92,180,0.22)}
+ .seg-btn.gaze-focus{transform:scale(1.04)}
+ .seg-btn:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .battery-toggle-row{display:flex;align-items:center;gap:10px}
+ .stress-btn{
+  appearance:none;-webkit-appearance:none;border:none;
+  height:40px;border-radius:999px;padding:0 16px;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  font-size:13px;font-weight:800;letter-spacing:0.01em;
+  background:linear-gradient(180deg, #ff7a7a, #ff3b3b);color:#fff;
+  box-shadow:0 8px 18px rgba(255,60,60,0.22);cursor:pointer;
+  transition:transform 260ms var(--ease-prism), box-shadow 160ms var(--ease-prism), opacity 160ms var(--ease-prism);
+  flex:1;
+ }
+ .stress-btn:disabled{opacity:0.42;pointer-events:none}
+ .stress-btn.gaze-focus{transform:scale(1.03);box-shadow:0 0 0 2.5px var(--stroke-focus), 0 10px 22px rgba(16,92,180,0.18)}
+ .stress-btn:active{transform:scale(0.97)}
+ .stress-btn:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .stress-hint{font-size:11px;font-weight:600;color:var(--ink-40);text-align:center;line-height:1.3}
+
+ /* hintbar inside stage */
+ .hintbar{
+  position:absolute;left:12px;right:12px;bottom:10px;z-index:540;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:8px 10px;border-radius:12px;
+  background:rgba(0,0,0,0.38);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  outline:1px solid rgba(255,255,255,0.06);
+  font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-60);line-height:1;
+ }
+ .hintbar strong{color:var(--ink-80);font-weight:700;letter-spacing:0.02em;text-transform:none;font-size:11px}
+ .hint-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.6);flex:none;display:inline-block}
+
+ /* state layer edge states — inside stage */
+ .state-layer{
+  position:absolute;inset:44px 0 0 0;z-index:520;
+  display:none;overflow-y:auto;scrollbar-width:none;
+  padding:12px 12px 72px 12px;
+ }
+ .state-layer::-webkit-scrollbar{display:none}
+ .state-layer.on{display:block;animation: rise-in 260ms var(--ease-prism) both}
+ .state-layer.dim-on{display:grid;place-items:center;padding:12px 12px 72px 12px;animation: rise-in 260ms var(--ease-prism) both}
+ .state-card{
+  width:100%;max-width:420px;
+  background:var(--mat-raised);backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
+  outline:1px solid var(--stroke-glass);border-radius:var(--r-lg);
+  padding:24px 20px 18px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;
+  box-shadow:0 18px 44px rgba(0,0,0,0.36);animation: rise-in 260ms var(--ease-prism) both;position:relative;overflow:hidden;
+ }
+ .state-card::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 8%, rgba(86,184,255,0.08), transparent 62%);pointer-events:none}
+ .state-illus{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.08);margin-bottom:2px;position:relative}
+ .state-illus.danger{background:rgba(255,93,93,0.10);outline-color:rgba(255,93,93,0.18)}
+ .state-illus.warn{background:rgba(255,194,71,0.10);outline-color:rgba(255,194,71,0.18)}
+ .state-title{font-size:18px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-100);line-height:1.1;position:relative}
+ .state-body{font-size:13px;font-weight:500;color:var(--ink-60);line-height:1.45;max-width:300px;position:relative}
+ .state-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px;position:relative}
+ .state-actions .btn{min-height:36px;font-size:13px}
+ .cached-strip{
+  width:100%;max-width:420px;
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:10px 12px;
+  font-size:11px;font-weight:600;color:var(--ink-60);text-align:left;
+ }
+ .offline-dim{
+  position:absolute;inset:0;background:rgba(4,7,11,0.28);backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);pointer-events:none;
+ }
+
+ button:focus-visible, [data-focusable]:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ @media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important}
+ }
+</style>
+</head>
+<body>
+<div class="device">
+ <div class="stage-shell">
+  <div class="stage" data-stage></div>
+ </div>
+</div>
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+const stage = document.querySelector('[data-stage]');
+const device = document.querySelector('.device');
+const os = createOS(stage, { dwell:true, dwellMs:350 });
+// os.statusbar() — required HUD shell
+stage.appendChild(os.statusbar('<span style="color:var(--ink-60);font-size:11px;letter-spacing:0.04em;font-weight:700">Performance · Live</span>'));
+
+const h = (tag, attrs={}, ...children)=>{
+ const el=document.createElement(tag);
+ for(const [k,v] of Object.entries(attrs)){
+  if(k==='class') el.className=v;
+  else if(k==='html') el.innerHTML=v;
+  else if(v!==null && v!==undefined) el.setAttribute(k,v);
+ }
+ for(const c of children){
+  if(c==null) continue;
+  if(typeof c==='string') el.appendChild(document.createTextNode(c));
+  else el.appendChild(c);
+ }
+ return el;
+};
+
+/* dev controls OUTSIDE stage */
+const devRow = h('div', {class:'dev-controls', role:'toolbar', 'aria-label':'HUD edge state controls'});
+const devStates = [
+ {id:'normal', label:'Normal'},
+ {id:'loading', label:'Loading'},
+ {id:'empty', label:'Empty'},
+ {id:'error', label:'Error · PR-PERF-503'},
+ {id:'offline', label:'Offline · cached'},
+ {id:'permission', label:'No access'},
+];
+devStates.forEach(s=>{
+ const b=h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Show ${s.label} state`, 'data-state':s.id}, s.label);
+ if(s.id==='normal') b.classList.add('active');
+ b.addEventListener('click', ()=> setEdge(s.id));
+ devRow.appendChild(b);
+});
+device.appendChild(devRow);
+
+const viewport = h('div', {class:'hud-viewport', id:'viewport'});
+const stateLayer = h('div', {class:'state-layer', id:'stateLayer', 'aria-live':'polite'});
+const hintbar = h('div', {class:'hintbar', id:'hintbar'});
+hintbar.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="hint-dot" aria-hidden="true"></span><strong>Scrub graph · dwell 350 ms</strong></span><span style="display:flex;align-items:center;gap:6px">Tab cycle · Space stress · 260 ms</span>`;
+stage.append(viewport, stateLayer, hintbar);
+
+/* helper icons */
+function iconSvg(name){
+ const map={
+  fps:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 12.5h3.5l1.8-5 3.2 10 2.2-7 1.6 3.5H20.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  therm:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 3v9.5a4 4 0 108 0V3" stroke="white" stroke-width="1.5" stroke-linecap="round"/><circle cx="14" cy="17.5" r="2.5" fill="white"/><path d="M10 3h8" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  batt:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="7" width="16" height="10" rx="2.2" stroke="white" stroke-width="1.5"/><path d="M18.5 11v2c1-.3 1.5-1 1.5-2s-.5-1.7-1.5-2z" fill="white" opacity="0.9"/><rect x="3.5" y="8.5" width="8" height="7" rx="1.2" fill="white"/></svg>`,
+  mem:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3" stroke="white" stroke-width="1.5"/><path d="M8 12h8M12 8v8" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M4 9h3M4 15h3M17 4v3M17 17v3" stroke="white" stroke-opacity="0.7" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+  lat:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.5" stroke="white" stroke-width="1.5"/><path d="M12 8v4l2.2 1.4" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  bolt:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/></svg>`,
+ };
+ return map[name]||map.fps;
+}
+
+/* build hero */
+const hero = h('div', {class:'hero-card', id:'heroCard'});
+hero.innerHTML = `
+ <div class="hero-top">
+  <div class="hud-kicker"><span class="dot-thermal ok" id="heroDot" aria-hidden="true"></span><span id="heroThermalLabel" class="thermal-label">Thermal · Nominal</span></div>
+  <span class="throttle-pill ok" id="throttlePill" aria-live="polite"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4.5l7 7-7 7-7-7 7-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> Throttling · Off</span>
+ </div>
+ <div class="hero-main">
+  <div style="display:flex;align-items:baseline;gap:4px">
+   <span class="fps-val " id="fpsVal">90</span><span class="fps-unit">FPS</span>
+  </div>
+  <div class="fps-meta">
+   <span class="fps-sub "><strong id="frameTimeVal">11.1 ms</strong> frame · p95 <strong id="p95Val">13.2 ms</strong></span>
+   <span class="fps-delta good " id="fpsDelta">· stable · 90 Hz</span>
+  </div>
+ </div>
+ <div class="spark-wrap scrubbable" id="fpsSparkWrap" data-focusable tabindex="0" role="img" aria-label="Frame rate spark line last 30 seconds, scrub to inspect">
+  <div class="spark-grid" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <svg class="spark-svg" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true">
+   <polyline class="spark-poly" id="fpsPoly" points=""></polyline>
+  </svg>
+  <div class="scrub-line" id="fpsScrubLine" aria-hidden="true"></div>
+  <div class="scrub-dot" id="fpsScrubDot" aria-hidden="true"></div>
+  <div class="scrub-tip " id="fpsScrubTip">—</div>
+ </div>
+  <div class="spark-axis"><span>last 30s · <strong class="tabular" id="fpsMinMax">86 – 92 FPS</strong></span><span>target <strong>90 FPS</strong> · prism-ease 260ms</span></div>
+`;
+viewport.appendChild(hero);
+
+/* metric grid */
+const grid = h('div', {class:'metric-grid'});
+grid.innerHTML = `
+ <div class="metric-card" data-focusable tabindex="0" role="button" aria-label="Memory 412 megabytes, scrub graph">
+  <div class="metric-head">
+   <span class="metric-label"><span class="metric-icon">${iconSvg('mem')}</span> Memory</span>
+   <span class="dot ok" aria-hidden="true" id="memDot"></span>
+  </div>
+  <div class="metric-value " id="memVal">412<small>MB</small></div>
+  <div class="metric-sub "><span id="memSub">· heap · pressure low</span></div>
+  <div class="spark-wrap spark-mini scrubbable" id="memSparkWrap" aria-label="Memory spark line">
+   <svg class="spark-svg" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true"><polyline class="spark-poly" id="memPoly" points=""></polyline></svg>
+   <div class="scrub-line" id="memScrubLine" aria-hidden="true"></div>
+   <div class="scrub-dot" id="memScrubDot" aria-hidden="true"></div>
+   <div class="scrub-tip " id="memScrubTip">—</div>
+  </div>
+ </div>
+ <div class="metric-card" data-focusable tabindex="0" role="button" aria-label="Battery 82 percent, scrub graph">
+  <div class="metric-head">
+   <span class="metric-label"><span class="metric-icon accent">${iconSvg('batt')}</span> Battery</span>
+   <span class="dot ok" id="battDot" aria-hidden="true"></span>
+  </div>
+  <div class="metric-value " id="battVal">82<small>%</small></div>
+  <div class="metric-sub "><span id="battSub">· live · drain off</span></div>
+  <div class="spark-wrap spark-mini scrubbable" id="battSparkWrap" aria-label="Battery spark line">
+   <svg class="spark-svg" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true"><polyline class="spark-poly" id="battPoly" points=""></polyline></svg>
+   <div class="scrub-line" id="battScrubLine" aria-hidden="true"></div>
+   <div class="scrub-dot" id="battScrubDot" aria-hidden="true"></div>
+   <div class="scrub-tip " id="battScrubTip">—</div>
+  </div>
+ </div>
+ <div class="metric-card" data-focusable tabindex="0" role="button" aria-label="Latency 18 milliseconds, scrub graph">
+  <div class="metric-head">
+   <span class="metric-label"><span class="metric-icon">${iconSvg('lat')}</span> Latency</span>
+   <span class="dot ok" id="latDot" aria-hidden="true"></span>
+  </div>
+  <div class="metric-value " id="latVal">18<small>ms</small></div>
+  <div class="metric-sub "><span id="latSub">· p95 · glass 22ms</span></div>
+  <div class="spark-wrap spark-mini scrubbable" id="latSparkWrap" aria-label="Latency spark line">
+   <svg class="spark-svg" viewBox="0 0 100 26" preserveAspectRatio="none" aria-hidden="true"><polyline class="spark-poly" id="latPoly" points=""></polyline></svg>
+   <div class="scrub-line" id="latScrubLine" aria-hidden="true"></div>
+   <div class="scrub-dot" id="latScrubDot" aria-hidden="true"></div>
+   <div class="scrub-tip " id="latScrubTip">—</div>
+  </div>
+ </div>
+ <div class="metric-card" data-focusable tabindex="0" role="button" aria-label="Thermal nominal 38 degrees, scrub">
+  <div class="metric-head">
+   <span class="metric-label"><span class="metric-icon" id="thermIconWrap">${iconSvg('therm')}</span> Thermal</span>
+   <span class="dot ok" id="thermDot2" aria-hidden="true"></span>
+  </div>
+  <div class="metric-value " id="thermVal">38<small>°C</small></div>
+  <div class="metric-sub "><span id="thermSub">· nominal · no throttle</span></div>
+  <div style="height:26px;display:flex;align-items:center;gap:4px;padding:2px 0" id="thermMiniBars" aria-hidden="true"></div>
+ </div>
+`;
+viewport.appendChild(grid);
+
+/* histogram card */
+const histo = h('div', {class:'histo-card'});
+histo.innerHTML = `
+ <div class="histo-head">
+  <span class="histo-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="10" width="4" height="9" rx="1.2" stroke="white" stroke-width="1.4"/><rect x="10" y="6" width="4" height="13" rx="1.2" stroke="white" stroke-width="1.4"/><rect x="17" y="13" width="4" height="6" rx="1.2" stroke="white" stroke-width="1.4"/></svg> Frame time · histogram · last 30s</span>
+    <span class="caption tabular" style="font-size:10px;color:var(--ink-40);font-variant-numeric:tabular-nums" id="histoStats">11.1 ms avg · 18.4 ms max</span>
+ </div>
+ <div class="histo-bars" id="histoBars" role="img" aria-label="Frame time histogram, 12 buckets, 11 milliseconds average"></div>
+ <div class="histo-legend">
+  <span class="legend-row"><i class="legend-dot" style="background:var(--accent)"></i> ≤16 ms · smooth</span>
+  <span class="legend-row"><i class="legend-dot" style="background:var(--warn)"></i> 16–24 ms</span>
+  <span class="legend-row"><i class="legend-dot" style="background:var(--danger)"></i> ≥24 ms · drop</span>
+    <span class="tabular" id="histoCount">30 frames</span>
+ </div>
+`;
+viewport.appendChild(histo);
+
+/* sim controls */
+const sim = h('div', {class:'sim-card'});
+sim.innerHTML = `
+ <div class="sim-head">
+  <span class="sim-title">Simulate · live HUD</span>
+  <span class="caption " style="font-size:10px;color:var(--ink-40)">prism-ease · 260ms</span>
+ </div>
+ <div class="sim-grid">
+  <div class="sim-row" id="loadRow" data-focusable tabindex="0" role="button" aria-label="Load level, low or high">
+   <div style="flex:1;min-width:0"><div class="sim-label">Load</div><div class="sim-sub " id="loadSub">Low · 90 FPS target</div></div>
+   <div class="seg" role="group" aria-label="Load level">
+    <button class="seg-btn" data-load="low" aria-pressed="true" aria-label="Low load">Low</button>
+    <button class="seg-btn" data-load="high" aria-pressed="false" aria-label="High load">High</button>
+   </div>
+  </div>
+  <div class="sim-row" id="thermalRow" data-focusable tabindex="0" role="button" aria-label="Thermal toggle nominal warn bad">
+   <div style="flex:1;min-width:0"><div class="sim-label">Thermal</div><div class="sim-sub " id="thermalSub">Tap to cycle</div></div>
+   <button class="seg-btn" id="thermalBtn" aria-label="Cycle thermal state" style="min-width:94px" data-focusable tabindex="0"><span class="dot ok" id="thermalBtnDot" aria-hidden="true"></span><span id="thermalBtnText">Nominal</span></button>
+  </div>
+ </div>
+ <div style="display:flex;gap:8px;align-items:center">
+  <div class="sim-row battery-toggle-row" id="battRow" data-focusable tabindex="0" role="button" aria-label="Toggle battery drain" style="flex:1">
+   <span class="metric-icon" style="width:26px;height:26px;border-radius:8px">${iconSvg('batt')}</span>
+   <div style="flex:1;min-width:0"><div class="sim-label">Battery drain</div><div class="sim-sub " id="battRowSub">Off · 82%</div></div>
+   <div class="toggle" role="switch" aria-checked="false" aria-label="Battery drain toggle" id="battToggle" data-focusable tabindex="0"></div>
+  </div>
+  <button class="stress-btn" id="stressBtn" data-focusable tabindex="0" aria-label="Trigger stress test, frame drop">${iconSvg('bolt')} Stress</button>
+ </div>
+ <div class="stress-hint " id="stressHint">Stress drops to ~28 FPS for 4s · shows throttling + red histogram</div>
+`;
+viewport.appendChild(sim);
+
+/* ----- state ----- */
+let edgeState='normal';
+let load='low';
+let thermal='nominal'; // nominal | warn | bad
+let battery=82;
+let batteryDrain=false;
+let stressing=false;
+let memBase=412, latBase=18;
+
+let fpsHistory = Array.from({length:30}, (_,i)=> 88 + Math.sin(i*0.6)*1.8 + (Math.random()*2-1));
+let memHistory = Array.from({length:30}, ()=> 398 + Math.random()*28);
+let latHistory = Array.from({length:30}, ()=> 16 + Math.random()*6);
+let battHistory = Array.from({length:30}, ()=> 82 + (Math.random()*1-0.5));
+let frameTimes = Array.from({length:24}, ()=> 10.8 + Math.random()*2.5);
+let fpsTarget=90;
+
+/* helpers */
+function clamp(v,min,max){ return Math.max(min, Math.min(max,v)); }
+function avg(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function pointsFor(arr, w, h, min, max){
+ if(arr.length<2) return "";
+ const pts=[];
+ for(let i=0;i<arr.length;i++){
+  const x=(i/(arr.length-1))*w;
+  const norm=(arr[i]-min)/(max-min);
+  const y=h - clamp(norm,0,1)*h;
+  pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+ }
+ return pts.join(" ");
+}
+function histoBuckets(times){
+ // map times 0-42ms into 12 buckets
+ const buckets = Array(12).fill(0);
+ const counts = Array(12).fill(0);
+ times.forEach(t=>{
+  const idx = clamp(Math.floor((t/36)*12),0,11);
+  buckets[idx] += t;
+  counts[idx]++;
+ });
+ // avg per bucket or 0
+ return buckets.map((sum,i)=> counts[i]? sum/counts[i] : 0);
+}
+
+let tickId=null;
+let batteryTickId=null;
+
+function thermalMeta(t){
+ if(t==='nominal') return {temp:36 + Math.round(Math.random()*4), label:'Nominal', sub:'no throttle', dot:'ok', pill:'ok', pillText:'Throttling · Off'};
+ if(t==='warn') return {temp:52 + Math.round(Math.random()*3), label:'Warn', sub:'mild · -12%', dot:'warn', pill:'warn', pillText:'Throttling · Mild'};
+ return {temp:68 + Math.round(Math.random()*5), label:'Bad', sub:'active · -28%', dot:'bad', pill:'bad', pillText:'Throttling · Active'};
+}
+
+function renderAll(){
+ const fpsNow = fpsHistory[fpsHistory.length-1];
+ const p95 = [...frameTimes].sort((a,b)=>a-b)[Math.floor(frameTimes.length*0.95)] || 13.2;
+ const avgFT = avg(frameTimes);
+ const maxFT = Math.max(...frameTimes);
+
+ // hero
+ const fpsEl=document.getElementById('fpsVal');
+ if(fpsEl){
+  fpsEl.textContent = Math.round(fpsNow);
+  fpsEl.classList.toggle('drop', fpsNow < 48);
+  fpsEl.style.transition='color 260ms var(--ease-prism), transform 260ms var(--ease-prism)';
+ }
+ document.getElementById('frameTimeVal').textContent = avgFT.toFixed(1)+' ms';
+ document.getElementById('p95Val').textContent = p95.toFixed(1)+' ms';
+ const deltaEl=document.getElementById('fpsDelta');
+ if(fpsNow >= 84){ deltaEl.textContent='· stable · 90 Hz'; deltaEl.className='fps-delta good '; }
+ else if(fpsNow >= 54){ deltaEl.textContent='· throttled · 60 Hz'; deltaEl.className='fps-delta warn '; }
+ else { deltaEl.textContent='· dropping · check load'; deltaEl.className='fps-delta bad '; }
+ document.getElementById('fpsMinMax').textContent = `${Math.round(Math.min(...fpsHistory))} – ${Math.round(Math.max(...fpsHistory))} FPS`;
+
+ // thermal
+ const tm=thermalMeta(thermal);
+ const heroDot=document.getElementById('heroDot');
+ heroDot.className=`dot-thermal ${tm.dot}`;
+ const tl=document.getElementById('heroThermalLabel');
+ tl.textContent=`Thermal · ${tm.label}`;
+ tl.className=`thermal-label ${thermal==='nominal'?'':thermal}`;
+ const pill=document.getElementById('throttlePill');
+ pill.className=`throttle-pill ${tm.pill}`;
+ pill.innerHTML = thermal==='nominal'
+  ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4.5l7 7-7 7-7-7 7-7z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg> ${tm.pillText}`
+  : `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5L21.5 19H2.5L12 3.5z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.5v4.2" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg> ${tm.pillText}`;
+
+ document.getElementById('thermVal').textContent = tm.temp;
+ document.getElementById('thermVal').innerHTML = `${tm.temp}<small>°C</small>`;
+ document.getElementById('thermSub').textContent = tm.label==='Nominal' ? '· nominal · no throttle' : tm.label==='Warn' ? '· warn · limiting' : '· bad · throttled';
+ const tdot2=document.getElementById('thermDot2');
+ if(tdot2) tdot2.className=`dot ${tm.dot}`;
+ const thermIconWrap=document.getElementById('thermIconWrap');
+ if(thermIconWrap){
+  thermIconWrap.style.background = thermal==='bad' ? 'linear-gradient(180deg,#ff5d5d,#c62828)' : thermal==='warn' ? 'linear-gradient(180deg,#ffc247,#ff9a1a)' : 'rgba(255,255,255,0.07)';
+  thermIconWrap.style.color = thermal==='nominal' ? 'var(--ink-80)' : '#fff';
+  thermIconWrap.style.outlineColor = thermal==='nominal' ? 'rgba(255,255,255,0.07)' : 'transparent';
+ }
+ // thermal mini bars (3 bars for thermal headroom)
+ const thermBarsEl=document.getElementById('thermMiniBars');
+ if(thermBarsEl){
+  thermBarsEl.innerHTML='';
+  const levels = thermal==='nominal' ? [0.32,0.54,0.72] : thermal==='warn' ? [0.68,0.82,0.45] : [0.92,0.88,0.96];
+  levels.forEach(v=>{
+   const b=document.createElement('div');
+   b.style.cssText=`flex:1;height:${8+v*18}px;border-radius:6px;background:${thermal==='bad'?'linear-gradient(180deg,#ff5d5d,#c62828)':thermal==='warn'?'linear-gradient(180deg,#ffc247,#ff9a1a)':'linear-gradient(180deg,var(--accent),var(--accent-strong))'};opacity:0.95;transition:height 260ms var(--ease-prism), background 260ms var(--ease-prism)`;
+   thermBarsEl.appendChild(b);
+  });
+ }
+ document.getElementById('thermalBtnText').textContent = tm.label;
+ document.getElementById('thermalBtnDot').className=`dot ${tm.dot}`;
+ document.getElementById('thermalSub').textContent = thermal==='nominal'?'Nominal · 38°C':'Warn'===tm.label?`Warn · ${tm.temp}°C`:`Bad · ${tm.temp}°C`;
+
+ // battery
+ document.getElementById('battVal').innerHTML=`${Math.round(battery)}<small>%</small>`;
+ document.getElementById('battSub').textContent = batteryDrain ? `· draining · -0.6%/s` : `· live · drain off`;
+ document.getElementById('battRowSub').textContent = batteryDrain ? `On · ${Math.round(battery)}%` : `Off · ${Math.round(battery)}%`;
+ const bd=document.getElementById('battDot');
+ if(bd){
+  bd.className = battery<20 ? 'dot bad' : battery<40 ? 'dot warn' : 'dot ok';
+ }
+ // update os statusbar battery visual (outside our control but we patch)
+ const sbBatteryRect = document.querySelector('.statusbar rect[fill="#fff"]');
+ const sbBatteryText = document.querySelector('.statusbar .');
+ if(sbBatteryRect) sbBatteryRect.setAttribute('width', String(16.2 * (battery/100)));
+ if(sbBatteryText && sbBatteryText.textContent.includes('%')) sbBatteryText.textContent = Math.round(battery)+'%';
+
+ // mem
+ const memNow = memHistory[memHistory.length-1];
+ document.getElementById('memVal').innerHTML=`${Math.round(memNow)}<small>MB</small>`;
+ const memSub=document.getElementById('memSub');
+ if(memNow>560) { memSub.textContent='· heap · pressure high'; document.getElementById('memDot').className='dot warn'; }
+ else if(memNow>700) { memSub.textContent='· heap · critical'; document.getElementById('memDot').className='dot bad'; }
+ else { memSub.textContent='· heap · pressure low'; document.getElementById('memDot').className='dot ok'; }
+
+ // latency
+ const latNow = latHistory[latHistory.length-1];
+ document.getElementById('latVal').innerHTML=`${Math.round(latNow)}<small>ms</small>`;
+ document.getElementById('latSub').textContent = latNow>36 ? '· p95 · throttled' : '· p95 · glass 22ms';
+ document.getElementById('latDot').className = latNow>36 ? 'dot warn' : latNow>48 ? 'dot bad' : 'dot ok';
+ if(latNow>48) document.getElementById('latDot').className='dot bad';
+
+ // sparklines
+ document.getElementById('fpsPoly').setAttribute('points', pointsFor(fpsHistory,100,30,18,96));
+ document.getElementById('fpsPoly').setAttribute('class', `spark-poly ${fpsNow<48?'bad':fpsNow<70?'warn':''}`);
+ document.getElementById('memPoly').setAttribute('points', pointsFor(memHistory,100,22,280,720));
+ document.getElementById('battPoly').setAttribute('points', pointsFor(battHistory,100,22,42,100));
+ document.getElementById('latPoly').setAttribute('points', pointsFor(latHistory,100,22,8,64));
+ const latPoly=document.getElementById('latPoly');
+ if(latPoly) latPoly.setAttribute('class', `spark-poly ${latNow>36?'warn':''} ${latNow>48?'bad':''}`);
+
+ // histogram
+ const barsEl=document.getElementById('histoBars');
+ barsEl.innerHTML='';
+ const buckets = histoBuckets(frameTimes);
+ // we show 12 bars; each bar height from avg bucket value
+ const maxVal = Math.max(16, Math.max(...buckets), 28);
+ buckets.forEach((v,i)=>{
+  const bar=h('div', {class:'histo-bar'});
+  const inner=h('div', {});
+  // map v to height %
+  const hPct = clamp((v/36)*100, 6, 100);
+  const cls = v>=24 ? 'bad' : v>=16 ? 'warn' : '';
+  if(cls) bar.classList.add(cls);
+  inner.style.height = hPct+'%';
+  inner.style.width='100%';
+  inner.style.position='absolute';
+  inner.style.left='0'; inner.style.right='0'; inner.style.bottom='0';
+  inner.style.borderRadius='4px 4px 0 0';
+  inner.style.background = v>=24 ? 'linear-gradient(180deg,#ff5d5d,#c62828)' : v>=16 ? 'linear-gradient(180deg,#ffc247,#ff9a1a)' : 'linear-gradient(180deg,var(--accent),var(--accent-strong))';
+  inner.style.boxShadow = v>=24 ? '0 -2px 8px rgba(255,93,93,0.25)' : v>=16 ? '0 -2px 8px rgba(255,194,71,0.25)' : '0 -2px 8px rgba(86,184,255,0.25)';
+  inner.style.transition='height 260ms var(--ease-prism), background 260ms var(--ease-prism)';
+  bar.style.height='100%';
+  bar.appendChild(inner);
+  // animate drop pulse if stressed
+  if(stressing && v>=24) bar.classList.add('dropPulse');
+  barsEl.appendChild(bar);
+ });
+ document.getElementById('histoStats').textContent = `${avgFT.toFixed(1)} ms avg · ${maxFT.toFixed(1)} ms max`;
+ document.getElementById('histoCount').textContent = `${frameTimes.length} frames`;
+ barsEl.setAttribute('aria-label', `Frame time histogram, ${avgFT.toFixed(1)} ms average, ${maxFT.toFixed(1)} ms max, ${frameTimes.length} frames`);
+}
+
+/* scrub logic — earned detail */
+function attachScrub(wrapId, polyId, history, unit, formatter){
+ const wrap=document.getElementById(wrapId);
+ const line=document.getElementById(wrapId.replace('Wrap','Line').replace('wrap','Line'));
+ // Actually id mapping: fpsSparkWrap -> fpsScrubLine etc. Use specific ids
+ const map={
+  fpsSparkWrap:{line:'fpsScrubLine',dot:'fpsScrubDot',tip:'fpsScrubTip'},
+  memSparkWrap:{line:'memScrubLine',dot:'memScrubDot',tip:'memScrubTip'},
+  battSparkWrap:{line:'battScrubLine',dot:'battScrubDot',tip:'battScrubTip'},
+  latSparkWrap:{line:'latScrubLine',dot:'latScrubDot',tip:'latScrubTip'},
+ };
+ const ids=map[wrapId];
+ if(!ids) return;
+ const scrubLine=document.getElementById(ids.line);
+ const scrubDot=document.getElementById(ids.dot);
+ const scrubTip=document.getElementById(ids.tip);
+ const svg=wrap.querySelector('svg');
+ let active=false;
+ function showAt(clientX){
+  const rect=wrap.getBoundingClientRect();
+  const x= clamp(clientX - rect.left, 0, rect.width);
+  const pct= x/rect.width;
+  const idx= clamp(Math.round(pct*(history().length-1)),0,history().length-1);
+  const val= history()[idx];
+  const age = history().length-1-idx;
+  const svgRect=svg.getBoundingClientRect();
+  // compute y for dot from normalized
+  let min,max;
+  if(wrapId==='fpsSparkWrap'){ min=18; max=96; }
+  else if(wrapId==='memSparkWrap'){ min=280; max=720; }
+  else if(wrapId==='battSparkWrap'){ min=42; max=100; }
+  else { min=8; max=64; }
+  const norm=(val-min)/(max-min);
+  const y = (1-clamp(norm,0,1))*wrap.clientHeight;
+  scrubLine.style.left=x+'px';
+  scrubDot.style.left=x+'px';
+  scrubDot.style.top=y+'px';
+  scrubTip.style.left=x+'px';
+  scrubTip.textContent = formatter(val, age, idx);
+  // keep tip inside
+  requestAnimationFrame(()=>{
+   const tipRect=scrubTip.getBoundingClientRect();
+   const wrapRect=wrap.getBoundingClientRect();
+   let tx = x;
+   if(tipRect.left < wrapRect.left+4) tx = (tipRect.width/2)+4;
+   else if(tipRect.right > wrapRect.right-4) tx = wrapRect.width - (tipRect.width/2)-4;
+   scrubTip.style.left=tx+'px';
+  });
+  wrap.classList.add('is-scrubbing');
+ }
+ wrap.addEventListener('pointermove', (e)=>{
+  showAt(e.clientX);
+  active=true;
+ });
+ wrap.addEventListener('pointerenter', (e)=>{ showAt(e.clientX); });
+ wrap.addEventListener('pointerleave', ()=>{
+  wrap.classList.remove('is-scrubbing');
+  active=false;
+ });
+ wrap.addEventListener('click', (e)=>{
+  showAt(e.clientX);
+  wrap.animate([{transform:'scale(1)'},{transform:'scale(1.01)'},{transform:'scale(1)'}],{duration:260,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ });
+ // keyboard scrub via arrows
+ wrap.addEventListener('keydown', (e)=>{
+  if(e.key==='ArrowLeft' || e.key==='ArrowRight'){
+   e.preventDefault();
+   const rect=wrap.getBoundingClientRect();
+   // simulate move 8% left/right
+   const curLine = parseFloat(scrubLine.style.left)|| rect.width/2;
+   const delta = e.key==='ArrowLeft' ? -rect.width/10 : rect.width/10;
+   const nx = clamp(curLine+delta,0,rect.width);
+   showAt(rect.left+nx);
+  }
+ });
+}
+attachScrub('fpsSparkWrap', 'fpsPoly', ()=>fpsHistory, 'FPS', (v,age)=> `${Math.round(v)} FPS · -${age}s`);
+attachScrub('memSparkWrap','memPoly', ()=>memHistory,'MB', (v,age)=> `${Math.round(v)} MB · -${age}s`);
+attachScrub('battSparkWrap','battPoly', ()=>battHistory,'%', (v,age)=> `${Math.round(v)}% · -${age}s`);
+attachScrub('latSparkWrap','latPoly', ()=>latHistory,'ms', (v,age)=> `${Math.round(v)} ms · -${age}s`);
+
+/* simulation ticks */
+function simStep(){
+ // base by load
+ let fpsBase, memAdd, latBaseLocal;
+ if(load==='low'){
+  fpsBase = stressing ? 28 + Math.random()*6 : 88 + (thermal==='bad'? -14 : thermal==='warn'? -8 : 0) + (Math.random()*4-2);
+  memAdd = 398 + Math.random()*24 + (thermal==='bad'? 30:0);
+  latBaseLocal = 16 + Math.random()*5 + (thermal==='bad'? 18 : thermal==='warn'? 9 : 0) + (stressing? 22:0);
+ } else {
+  fpsBase = stressing ? 24 + Math.random()*8 : 62 + (thermal==='bad'? -18 : thermal==='warn'? -10 : 0) + (Math.random()*8-4);
+  memAdd = 560 + Math.random()*48 + (thermal==='bad'? 40:0);
+  latBaseLocal = 32 + Math.random()*10 + (thermal==='bad'? 16 : thermal==='warn'? 8 : 0) + (stressing? 18:0);
+ }
+ // clamp fps
+ fpsBase = clamp(fpsBase, 18, 96);
+ fpsHistory.push(fpsBase);
+ if(fpsHistory.length>30) fpsHistory.shift();
+ memHistory.push(memAdd);
+ if(memHistory.length>30) memHistory.shift();
+ latHistory.push(clamp(latBaseLocal,8,64));
+ if(latHistory.length>30) latHistory.shift();
+ battHistory.push(clamp(battery, 38, 100));
+ if(battHistory.length>30) battHistory.shift();
+
+ // frame times: derived from fps
+ const ft = 1000 / fpsBase;
+ // add jitter
+ const jitter = (Math.random()*4-2) + (stressing ? 12 : 0) + (thermal==='bad'? 6 : 0);
+ const newFT = clamp(ft + jitter, 6, 42);
+ frameTimes.push(newFT);
+ if(frameTimes.length>24) frameTimes.shift();
+
+ renderAll();
+}
+
+function startLoops(){
+ if(tickId) clearInterval(tickId);
+ tickId=setInterval(simStep, 880);
+ if(batteryTickId) clearInterval(batteryTickId);
+ batteryTickId=setInterval(()=>{
+  if(batteryDrain && edgeState==='normal'){
+   battery = clamp(battery - 0.42, 0, 100);
+   // if battery hits 0, show warn
+   if(battery<=12){
+    // no loop break, just keep
+   }
+  }
+ }, 900);
+}
+startLoops();
+renderAll();
+
+/* sim controls */
+const loadBtns=[...document.querySelectorAll('[data-load]')];
+loadBtns.forEach(b=>{
+ b.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const v=b.getAttribute('data-load');
+  load=v;
+  loadBtns.forEach(x=> x.setAttribute('aria-pressed', String(x===b)));
+  document.getElementById('loadSub').textContent = load==='low' ? 'Low · 90 FPS target' : 'High · 60 FPS target';
+  // immediate jitter
+  fpsHistory[fpsHistory.length-1] = load==='high' ? 58 : 90;
+  renderAll();
+  os.banner(load==='high' ? '<strong>Load high</strong><span class="caption">60 FPS · mem up · tab 30s</span>' : '<strong>Load low</strong><span class="caption">90 FPS · stable</span>',{timeout:1400});
+ });
+});
+const loadRow=document.getElementById('loadRow');
+loadRow.addEventListener('click', ()=>{
+ const next = load==='low' ? 'high' : 'low';
+ document.querySelector(`[data-load="${next}"]`).click();
+});
+loadRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); loadRow.click(); } });
+
+const thermalBtn=document.getElementById('thermalBtn');
+const thermalRow=document.getElementById('thermalRow');
+function cycleThermal(){
+ const order=['nominal','warn','bad'];
+ const idx=order.indexOf(thermal);
+ thermal=order[(idx+1)%order.length];
+ renderAll();
+ const msg = thermal==='nominal' ? '<strong>Thermal nominal</strong><span class="caption">38°C · no throttle</span>' : thermal==='warn' ? '<strong>Thermal warn</strong><span class="caption">52°C · mild throttle · -12%</span>' : '<strong>Thermal bad</strong><span class="caption">68°C · active · -28% · throttling</span>';
+ os.banner(msg,{timeout:1600});
+}
+thermalBtn.addEventListener('click', (e)=>{ e.stopPropagation(); cycleThermal(); });
+thermalRow.addEventListener('click', cycleThermal);
+thermalRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); cycleThermal(); } });
+
+const battToggle=document.getElementById('battToggle');
+const battRow=document.getElementById('battRow');
+function toggleBattery(){
+ batteryDrain = !batteryDrain;
+ battToggle.setAttribute('aria-checked', String(batteryDrain));
+ document.getElementById('battRowSub').textContent = batteryDrain ? `On · ${Math.round(battery)}%` : `Off · ${Math.round(battery)}%`;
+ if(batteryDrain) os.banner('<strong>Battery drain on</strong><span class="caption">-0.42%/s</span>',{timeout:1400});
+ else os.banner('<strong>Battery drain off</strong><span class="caption">stable · 82%</span>',{timeout:1400});
+}
+battToggle.addEventListener('click', (e)=>{ e.stopPropagation(); toggleBattery(); });
+battRow.addEventListener('click', toggleBattery);
+battRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleBattery(); } });
+
+const stressBtn=document.getElementById('stressBtn');
+stressBtn.addEventListener('click', ()=>{
+ if(stressing) return;
+ stressing=true;
+ stressBtn.setAttribute('disabled','true');
+ stressBtn.innerHTML=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.5" stroke="white" stroke-width="1.6"/><path d="M12 8v4l2.2 1.4" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg> Stressed…`;
+ document.getElementById('stressHint').textContent='Dropping · 28 FPS · throttling active · histogram red';
+ os.banner('<strong>Stress test</strong><span class="caption">dropping to 28 FPS · 4s · watch histogram</span>',{timeout:1800});
+ // visual flash
+ hero.animate([{filter:'brightness(1)'},{filter:'brightness(1.08)'},{filter:'brightness(1)'}],{duration:320,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ grid.animate([{filter:'brightness(1)'},{filter:'brightness(0.96)'},{filter:'brightness(1)'}],{duration:520,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ setTimeout(()=>{
+  stressing=false;
+  stressBtn.removeAttribute('disabled');
+  stressBtn.innerHTML=`${iconSvg('bolt')} Stress`;
+  document.getElementById('stressHint').textContent='Stress drops to ~28 FPS for 4s · shows throttling + red histogram';
+  os.banner('<strong>Recovered</strong><span class="caption">90 FPS · stable · histogram cooled</span>',{timeout:1600});
+  renderAll();
+ }, 4200);
+});
+
+// keyboard stress via Space
+os.on('capture', ()=>{
+ if(edgeState==='normal' && !stressing) stressBtn.click();
+});
+
+/* edge states */
+function setEdge(id){
+ edgeState=id;
+ devRow.querySelectorAll('.chip').forEach(c=> c.classList.toggle('active', c.dataset.state===id));
+ stateLayer.className='state-layer';
+ stateLayer.innerHTML='';
+ viewport.style.display='';
+ viewport.style.opacity='';
+ viewport.style.filter='';
+ viewport.style.pointerEvents='';
+ hintbar.style.opacity='';
+ hintbar.style.pointerEvents='';
+ if(id==='normal'){
+  stateLayer.classList.remove('on','dim-on');
+  stateLayer.style.display='none';
+  viewport.style.display='flex';
+  startLoops();
+  renderAll();
+  return;
+ }
+ // pause sim for non-normal? Keep but dim
+ if(id==='loading'){
+  viewport.style.opacity='0.22';
+  viewport.style.filter='blur(2px)';
+  viewport.style.pointerEvents='none';
+  hintbar.style.opacity='0';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px;justify-items:center;padding:8px 0 0 0">
+    <div class="state-card" style="padding:18px 16px;gap:12px">
+     <div style="width:100%;display:flex;align-items:center;gap:10px">
+      <span class="skeleton" style="width:32px;height:32px;border-radius:10px;flex:none"></span>
+      <div style="flex:1;display:grid;gap:6px">
+       <div class="skeleton" style="height:12px;width:62%;border-radius:8px"></div>
+       <div class="skeleton" style="height:10px;width:92%;border-radius:8px"></div>
+      </div>
+      <span class="skeleton" style="width:56px;height:22px;border-radius:999px"></span>
+     </div>
+     <div style="width:100%;height:34px;border-radius:12px" class="skeleton"></div>
+     <div style="width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="skeleton" style="height:78px;border-radius:16px"></div>
+      <div class="skeleton" style="height:78px;border-radius:16px"></div>
+     </div>
+     <div style="width:100%;display:flex;align-items:center;gap:8px;justify-content:center;margin-top:2px">
+      <span class="skeleton" style="width:16px;height:16px;border-radius:50%"></span>
+      <span class="caption" style="color:var(--ink-60);font-size:11px">Collecting · 30s window · 260ms easing</span>
+     </div>
+     <div style="width:100%;height:4px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden"><span style="display:block;height:100%;width:48%;background:var(--accent);border-radius:999px;animation:shimmerMove 1.4s ease-in-out infinite"></span></div>
+     <p class="caption" style="color:var(--ink-40)">Loading uses .skeleton + shimmer — no spinner</p>
+    </div>
+    <div class="cached-strip" style="max-width:420px;justify-content:center">
+          <span class="dot warn" aria-hidden="true"></span><span class="tabular">Probe: loading · shimmer 1.2s</span>
+    </div>
+   </div>
+  `;
+  // add keyframes for shimmerMove if not present
+  if(!document.getElementById('shimmerMoveKey')){
+   const s=document.createElement('style'); s.id='shimmerMoveKey'; s.textContent='@keyframes shimmerMove{0%{transform:translateX(-60%)}100%{transform:translateX(240%)}} @keyframes shimmer{from{background-position:120% 0}to{background-position:-80% 0}}';
+   document.head.appendChild(s);
+  }
+  return;
+ }
+ if(id==='empty'){
+  viewport.style.display='none';
+  hintbar.style.opacity='0';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px;justify-items:center;padding:10px 0 0 0">
+    <div class="state-card">
+     <div class="state-illus" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3.5 12.5h3.5l1.8-5 3.2 10 2.2-7 1.6 3.5H20.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="8.5" stroke="white" stroke-opacity="0.14" stroke-width="1.2"/></svg>
+     </div>
+     <div class="state-title">No metrics yet</div>
+     <div class="state-body">Performance HUD has no samples for last 30s. Start an app to collect frame rates — battery and thermal will appear as glass.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Start sampling">Start sampling</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Learn about metrics">Learn</button>
+     </div>
+     <p class="caption" style="color:var(--ink-40);font-size:11px">Empty · 600×600 stage pending</p>
+    </div>
+    <div class="cached-strip" style="justify-content:center"><span class="dot ok" aria-hidden="true"></span><span>Empty state · not error · recoverable</span></div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    if(b.textContent.includes('Start')){
+     b.textContent='Sampling…';
+     setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Sampling</strong><span class="caption">90 FPS · collecting 30s</span>',{timeout:1600}); b.textContent='Start sampling'; }, 700);
+    } else if(b.textContent.includes('Learn')){
+     os.banner('<strong>Metrics 30s window</strong><span class="caption">FPS · p95 · thermal</span>',{timeout:1600});
+    }
+   });
+  });
+  return;
+ }
+ if(id==='error'){
+  viewport.style.opacity='0.28';
+  viewport.style.filter='blur(1px)';
+  viewport.style.pointerEvents='none';
+  hintbar.style.opacity='0';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px;justify-items:center;padding:10px 0 0 0">
+    <div class="state-card" style="background: linear-gradient(180deg, rgba(255,93,93,0.14), rgba(255,93,93,0.06)); outline-color:rgba(255,93,93,0.28); box-shadow:0 18px 44px rgba(0,0,0,0.36), 0 0 0 1px rgba(255,93,93,0.10) inset">
+     <div class="state-illus danger" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.5L21.5 19H2.5L12 3.5z" stroke="#ff8a8a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.5v4.2" stroke="#ffb3b3" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.25" fill="#ffb3b3"/></svg>
+     </div>
+     <div class="state-title">Sensors offline</div>
+     <div class="state-body">Performance sensors failed. HUD can’t sample frame rate or thermal — your world scrim is still safe and recoverable.</div>
+     <div class="banner" style="position:relative;left:auto;right:auto;top:auto;z-index:auto;animation:none;background:rgba(255,93,93,0.10);outline:1px solid rgba(255,93,93,0.18);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);width:100%;margin-top:2px" role="alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="#ff8a8a" stroke-width="1.5"/><path d="M12 8v5" stroke="#ffb3b3" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="15.8" r="1.1" fill="#ffb3b3"/></svg>
+      <span class="caption" style="color:#ffb3b3;font-weight:600">Error PR-PERF-503 · sensors · 9:41 AM</span>
+     </div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Retry sensors">Retry</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Dismiss error and show cached metrics">View cached</button>
+     </div>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    if(b.textContent.includes('Retry')){
+     b.textContent='Retrying…';
+     setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Sensors restored</strong><span class="caption">90 FPS · PR-PERF-503 cleared</span>',{timeout:1800}); b.textContent='Retry'; }, 800);
+    } else {
+     setEdge('offline');
+    }
+   });
+  });
+  return;
+ }
+ if(id==='offline'){
+  viewport.style.display='flex';
+  viewport.style.opacity='0.88';
+  // add dim overlay inside stateLayer dim-on but keep viewport visible underneath for cached effect
+  stateLayer.classList.add('dim-on');
+  stateLayer.style.display='grid';
+  stateLayer.innerHTML = `
+   <div style="width:100%;display:grid;gap:12px;justify-items:center">
+    <div class="cached-strip" style="background:rgba(0,0,0,0.42);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80);justify-content:space-between">
+          <span style="display:flex;align-items:center;gap:8px"><span class="dot bad" aria-hidden="true"></span><span class="tabular">Offline · cached from 2m ago</span></span>
+     <button class="chip" data-focusable tabindex="0" aria-label="Retry connection" style="height:22px;padding:0 8px;font-size:11px;background:rgba(255,255,255,0.08)">Retry</button>
+    </div>
+    <div class="state-card" style="padding:18px 16px">
+     <div class="state-illus warn" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3.5 9.5a9 9 0 0117 0" stroke="white" stroke-opacity="0.9" stroke-width="1.6" stroke-linecap="round"/><path d="M6 12.5a6 6 0 0112 0" stroke="white" stroke-opacity="0.8" stroke-width="1.6" stroke-linecap="round"/><path d="M8.8 15.5a2.8 2.8 0 016.4 0" stroke="white" stroke-opacity="0.78" stroke-width="1.6" stroke-linecap="round"/><path d="M2 2l20 20" stroke="#ffc247" stroke-width="1.7" stroke-linecap="round"/></svg>
+     </div>
+     <div class="state-title">Offline · showing cached</div>
+     <div class="state-body">HUD is offline. These metrics are cached from 2 minutes ago — FPS and thermal are stale but safe to view. Reconnect to refresh live.</div>
+     <div style="width:100%;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;text-align:left">
+      <span class="dot warn" aria-hidden="true"></span>
+            <div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--ink-80)" class="tabular">90 FPS · 38°C · 82%</div><div style="font-size:11px;color:var(--ink-60)">Cached · 2m ago</div></div>
+      <span class="caption ">stale</span>
+     </div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Retry offline">Retry</button>
+      <button class="btn" data-focusable tabindex="0" aria-label="Use cached metrics">Use cached</button>
+     </div>
+     <p class="caption" style="color:var(--ink-40)">Offline uses stale + banner · recoverable · no dead end</p>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    if(b.textContent.includes('Retry')){
+     b.textContent='Retrying…';
+     setTimeout(()=>{ os.banner('<strong>Still offline</strong><span class="caption">check network · cached kept</span>',{timeout:1800}); b.textContent='Retry'; }, 700);
+    } else if(b.textContent.includes('Use cached')){
+     stateLayer.style.display='none';
+     viewport.style.opacity='1';
+     viewport.style.filter='';
+     os.banner('<strong>Using cached</strong><span class="caption">2m ago · stale · will refresh</span>',{timeout:1600});
+    } else if(b.textContent.includes('chip')||b.classList.contains('chip')){
+     // chip retry
+     b.textContent='Retrying…';
+     setTimeout(()=>{ b.textContent='Retry'; os.banner('<strong>Still offline</strong><span class="caption">cached kept</span>',{timeout:1600}); }, 700);
+    }
+   });
+  });
+  // allow clicking background to dismiss cached overlay
+  stateLayer.addEventListener('click', (e)=>{
+   if(e.target===stateLayer) { stateLayer.style.display='none'; viewport.style.opacity='1'; }
+  }, {once:true});
+  return;
+ }
+ if(id==='permission'){
+  viewport.style.opacity='0.24';
+  viewport.style.filter='blur(2px)';
+  viewport.style.pointerEvents='none';
+  hintbar.style.opacity='0';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px;justify-items:center;padding:10px 0 0 0">
+    <div class="state-card">
+     <div class="state-illus" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="5" y="9.5" width="14" height="10" rx="2.4" stroke="white" stroke-opacity="0.9" stroke-width="1.6"/><path d="M8.5 9.5V7.8a3.5 3.5 0 017 0v1.7" stroke="white" stroke-width="1.5"/><circle cx="12" cy="14.5" r="1.35" fill="white"/><path d="M12 15.85v1.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
+     </div>
+     <div class="state-title">Sensors blocked</div>
+     <div class="state-body">Prism needs performance access to show HUD — frame rate, thermal and battery stay on-device. Allow to see live graphs with glass scrub.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Allow performance sensors">Allow access</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Not now, dismiss">Not now</button>
+     </div>
+     <p class="caption" style="color:var(--ink-40)">Settings → Privacy → Performance · no dead ends</p>
+     <div style="width:100%;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;text-align:left">
+      <span class="dot warn" aria-hidden="true"></span><span style="font-size:12px;font-weight:600;color:var(--ink-80)">Performance blocked</span><button class="chip" data-focusable tabindex="0" aria-label="Open Settings" style="margin-left:auto;height:28px">Open Settings</button>
+     </div>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    if(b.textContent.includes('Allow access')){
+     b.textContent='Allowing…';
+     setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Access granted</strong><span class="caption">sensors live · 90 FPS</span>',{timeout:1800}); b.textContent='Allow access'; }, 700);
+    } else if(b.textContent.includes('Not now')){
+     setEdge('normal');
+    } else if(b.textContent.includes('Open Settings')){
+     b.textContent='Opening…';
+     setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Settings</strong><span class="caption">Privacy · Performance</span>',{timeout:1600}); b.textContent='Open Settings'; }, 700);
+    }
+   });
+  });
+  return;
+ }
+}
+
+// expose for probe
+window.__setHUDVariant = setEdge;
+window.__hud = { setEdge, getState: ()=>({thermal, load, battery, batteryDrain, fpsHistory}) };
+
+setEdge('normal');
+
+// Tab handling include dev controls
+document.addEventListener('keydown', (e)=>{
+ if(e.key!=='Tab') return;
+ const all=[...document.querySelectorAll('[data-focusable],button,a,[role="button"],[role="tab"],input,[role="switch"]')].filter(el=> el.offsetParent!==null && !el.hasAttribute('disabled') && el.getAttribute('aria-hidden')!=='true');
+ if(all.length<2) return;
+ const active=document.activeElement;
+ const idx=all.indexOf(active);
+ if(idx===-1) return;
+ const forward=!e.shiftKey;
+ e.preventDefault();
+ e.stopPropagation();
+ e.stopImmediatePropagation();
+ const next=forward ? (idx+1)%all.length : (idx-1+all.length)%all.length;
+ all[next].focus({preventScroll:true});
+ all.forEach(el=> el.classList.remove('gaze-focus'));
+ all[next].classList.add('gaze-focus');
+ setTimeout(()=> all[next].classList.remove('gaze-focus'), 900);
+}, true);
+
+// gaze focus class for dev chips (pointermove already via core)
+devRow.querySelectorAll('.chip').forEach(c=> c.addEventListener('pointerenter', ()=> c.classList.add('gaze-focus')));
+
+// ensure focus ring visible starting at viewport first focusable
+setTimeout(()=> {
+ const first = viewport.querySelector('[data-focusable]');
+ if(first) first.focus({preventScroll:true});
+}, 300);
+
+console.log('Prism HUD ready — FPS , thermal dot, battery/mem/lat spark, histo, throttling, scrub delight, 6 edge states, probe clean');
+</script>
+</body>
+</html>

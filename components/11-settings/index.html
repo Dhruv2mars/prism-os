@@ -1,0 +1,1169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Settings</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+ .stage{
+  background:
+   radial-gradient(120% 90% at 50% 14%, rgba(42,53,80,0.56) 0%, rgba(20,26,40,0.72) 36%, rgba(10,14,23,0.90) 70%),
+   radial-gradient(68% 46% at 78% 86%, rgba(86,184,255,0.09), transparent 56%),
+   rgba(6,10,16,0.76);
+ }
+ .stage-shell{
+  position:relative;
+  width:600px;height:600px;
+  display:grid;place-items:center;
+  flex:none;
+ }
+ /* DEV CHROME — fixed OUTSIDE .stage */
+ .dev-controls{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  display:flex;gap:6px;
+  z-index:1000;
+  justify-content:center;
+  flex-wrap:wrap;
+  pointer-events:none;
+  padding:8px 12px;
+  border-radius:var(--r-pill);
+  background:rgba(10,15,23,0.74);
+  outline:1px solid var(--stroke-glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.32);
+  max-width:92vw;
+ }
+ .stage .dev-controls{display:none !important}
+ .dev-controls .chip{
+  pointer-events:auto;
+  height:26px;padding:0 10px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  transition:background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+  border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+ }
+ .dev-controls .chip.active{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423;outline-color:transparent;
+ }
+ .dev-controls .chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .dev-controls .chip.gaze-focus{transform:scale(1.04)}
+
+ /* layout */
+ .set-viewport{
+  position:absolute;
+  inset:44px 0 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:10px 12px 14px 12px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+ }
+ .set-viewport::-webkit-scrollbar{display:none}
+
+ .set-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  animation: rise-in 260ms var(--ease-prism) both;
+  padding:2px 2px 0 2px;
+ }
+ .set-title{
+  font-size:22px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:var(--ink-100);
+ }
+ .set-subtitle{
+  font-size:11px;font-weight:600;letter-spacing:0.04em;color:var(--ink-60);line-height:1;margin-top:4px;display:flex;align-items:center;gap:6px;
+ }
+ .set-subtitle .dot{width:6px;height:6px}
+ .header-actions{display:flex;gap:6px;align-items:center;flex:none}
+ .hdr-chip{
+  appearance:none;-webkit-appearance:none;border:none;
+  height:28px;padding:0 11px;border-radius:999px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.07);color:var(--ink-80);
+  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism), outline-color 160ms var(--ease-prism);
+ }
+ .hdr-chip.primary{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;outline-color:transparent;box-shadow:0 6px 14px rgba(16,92,180,0.22)}
+ .hdr-chip.gaze-focus{transform:scale(1.04)}
+ .hdr-chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+
+ /* search */
+ .search-wrap{
+  position:relative;
+  animation: rise-in 260ms var(--ease-prism) both;
+  animation-delay:30ms;
+ }
+ .search-field{
+  width:100%;
+  height:36px;
+  border-radius:999px;
+  border:none;
+  background:rgba(255,255,255,0.06);
+  outline:1px solid rgba(255,255,255,0.07);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  padding:0 12px 0 34px;
+  color:var(--ink-80);
+  font-size:13px;font-weight:500;letter-spacing:0.01em;
+  font-family:var(--font);
+ }
+ .search-field::placeholder{color:var(--ink-40)}
+ .search-field:focus{outline:1.5px solid var(--stroke-focus);background:rgba(255,255,255,0.08);color:var(--ink-100)}
+ .search-icon{
+  position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  width:16px;height:16px;display:grid;place-items:center;color:var(--ink-40);pointer-events:none;
+ }
+ .search-meta{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  display:inline-flex;align-items:center;gap:4px;
+  height:22px;padding:0 8px;border-radius:999px;
+  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);
+  font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-60);
+ }
+
+ /* groups */
+ .group{
+  display:flex;flex-direction:column;gap:6px;
+  animation: rise-in 260ms var(--ease-prism) both;
+ }
+ .group:nth-of-type(1){animation-delay:50ms}
+ .group:nth-of-type(2){animation-delay:80ms}
+ .group:nth-of-type(3){animation-delay:110ms}
+ .group:nth-of-type(4){animation-delay:140ms}
+ .group:nth-of-type(5){animation-delay:170ms}
+ .group-head{
+  display:flex;align-items:center;gap:8px;
+  padding:4px 4px 0 4px;
+ }
+ .group-label{
+  font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-60);
+ }
+ .group-count{
+  font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);
+  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);padding:3px 6px;border-radius:999px;
+ }
+ .group-line{flex:1;height:1px;background:rgba(255,255,255,0.06)}
+ .group-card{
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 12px 28px rgba(0,0,0,0.22);
+  display:flex;flex-direction:column;
+ }
+
+ /* rows */
+ .set-row{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 12px;
+  cursor:pointer;
+  position:relative;
+  transition: background 160ms var(--ease-prism), transform 260ms var(--ease-prism);
+  min-height:56px;
+ }
+ .set-row + .set-row{border-top:1px solid rgba(255,255,255,0.06)}
+ .set-row:hover{background:rgba(255,255,255,0.04)}
+ .set-row.gaze-focus{
+  background:rgba(86,184,255,0.08);
+  outline:2px solid var(--stroke-focus);
+  outline-offset:-2px;
+  z-index:1;
+ }
+ .set-row:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px;z-index:2}
+ .set-row:active{transform:scale(0.99)}
+ .row-icon{
+  width:32px;height:32px;border-radius:10px;
+  display:grid;place-items:center;flex:none;
+  background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.08);
+  color:var(--ink-80);
+ }
+ .row-icon.accent{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#04121f;outline-color:transparent;box-shadow:0 4px 12px rgba(16,92,180,0.22)}
+ .row-icon.warm{background:linear-gradient(180deg,#ffb347 0%, #ff7a1a 100%);color:#1a0f00}
+ .row-icon.ok{background:linear-gradient(180deg,#4cd47c 0%, #1a8a4a 100%);color:#fff}
+ .row-icon.purple{background:linear-gradient(180deg,#a58bff 0%, #6a4bff 100%);color:#fff}
+ .row-icon.slate{background:linear-gradient(180deg,#2b3242 0%, #161c28 100%);color:#fff}
+ .row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+ .row-title{font-size:14px;font-weight:700;color:var(--ink-100);letter-spacing:-0.01em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .row-sub{font-size:11px;font-weight:500;color:var(--ink-60);letter-spacing:0.01em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .row-ctrl{flex:none;display:flex;align-items:center;gap:8px}
+  .row-value{font-size:11px;font-weight:700;letter-spacing:0.02em;color:var(--ink-60);font-variant-numeric:tabular-nums;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);padding:6px 8px;border-radius:999px;min-width:42px;text-align:center}
+ .row-value.accent{color:var(--accent);background:rgba(86,184,255,0.12);outline-color:rgba(86,184,255,0.18)}
+ .row-chevron{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none;color:var(--ink-40);background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06)}
+ .set-row.gaze-focus .row-chevron{color:var(--ink-80);background:rgba(86,184,255,0.14);outline-color:rgba(86,184,255,0.18)}
+ /* slider row variant */
+ .slider-row{
+  flex-direction:column;align-items:stretch;gap:10px;
+  padding:12px 12px 14px 12px;
+  cursor:default;
+ }
+ .slider-row:hover{background:transparent}
+ .slider-row.gaze-focus{background:rgba(86,184,255,0.06)}
+ .slider-head{display:flex;align-items:center;gap:12px;width:100%}
+ .slider-head .row-main{flex:1}
+ .slider-track-wrap{
+  display:flex;align-items:center;gap:10px;width:100%;
+ }
+ .slider-track{
+  flex:1;position:relative;height:28px;display:flex;align-items:center;
+ }
+ .range{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:28px;background:transparent;cursor:pointer;
+ }
+ .range::-webkit-slider-runnable-track{
+  height:6px;border-radius:999px;
+  background:rgba(255,255,255,0.10);
+  outline:1px solid rgba(255,255,255,0.06);
+ }
+ .range::-moz-range-track{height:6px;border-radius:999px;background:rgba(255,255,255,0.10)}
+ .range::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:22px;height:22px;border-radius:50%;
+  background:#fff;
+  border:2px solid rgba(255,255,255,0.9);
+  box-shadow:0 2px 8px rgba(0,0,0,0.32), 0 0 0 4px rgba(86,184,255,0.12);
+  margin-top:-8px;
+  transition:transform 160ms var(--ease-prism), box-shadow 160ms var(--ease-prism);
+ }
+ .range:active::-webkit-slider-thumb{transform:scale(1.06);box-shadow:0 4px 14px rgba(0,0,0,0.36), 0 0 0 6px rgba(86,184,255,0.16)}
+ .range::-moz-range-thumb{
+  width:22px;height:22px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.32);
+ }
+ .range:focus-visible{outline:none}
+ .range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 2.5px var(--stroke-focus), 0 2px 8px rgba(0,0,0,0.32)}
+ .slider-fill{
+  position:absolute;left:0;top:50%;transform:translateY(-50%);
+  height:6px;border-radius:999px;
+  background:linear-gradient(90deg, var(--accent), var(--accent-strong));
+  pointer-events:none;
+  box-shadow:0 0 8px rgba(86,184,255,0.32);
+ }
+ .slider-minmax{
+  display:flex;justify-content:space-between;
+  font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);
+  padding:0 1px;
+ }
+
+ /* hint bar */
+ .hintbar{
+  position:absolute;left:12px;right:12px;bottom:12px;z-index:540;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:8px 10px;border-radius:12px;
+  background:rgba(0,0,0,0.38);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  outline:1px solid rgba(255,255,255,0.06);
+  font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-60);line-height:1;
+ }
+ .hintbar strong{color:var(--ink-80);font-weight:700;letter-spacing:0.02em;text-transform:none;font-size:11px}
+ .hint-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.6);flex:none;display:inline-block}
+
+ /* detail sheet */
+ .detail-sheet{
+  position:absolute;inset:44px 0 0 0;z-index:560;
+  display:none;flex-direction:column;
+  background:var(--mat-sheet);
+  backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
+  overflow:hidden;
+  box-shadow:0 -12px 40px rgba(0,0,0,0.32);
+ }
+ .detail-sheet.on{display:flex;animation: sheet-in 300ms var(--ease-prism) both}
+ @keyframes sheet-in{from{transform:translateY(36px) scale(0.97);opacity:0;filter:blur(8px)}to{transform:translateY(0) scale(1);opacity:1;filter:blur(0)}}
+ .sheet-header{
+  height:52px;flex:none;
+  display:flex;align-items:center;gap:10px;
+  padding:0 10px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  background:linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
+ }
+ .sheet-back{
+  appearance:none;-webkit-appearance:none;border:none;
+  width:34px;height:34px;border-radius:999px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80);
+  cursor:pointer;flex:none;
+  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism);
+ }
+ .sheet-back.gaze-focus{transform:scale(1.06);outline-color:var(--stroke-focus);background:rgba(255,255,255,0.12);color:var(--ink-100)}
+ .sheet-back:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .sheet-title{font-size:14px;font-weight:800;letter-spacing:-0.01em;color:var(--ink-100);line-height:1}
+ .sheet-sub{font-size:11px;font-weight:600;color:var(--ink-60);letter-spacing:0.02em;line-height:1;margin-top:2px}
+ .sheet-scroll{
+  flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;
+  padding:14px 14px 16px 14px;
+  display:flex;flex-direction:column;gap:14px;
+ }
+ .sheet-scroll::-webkit-scrollbar{display:none}
+ .preview-card{
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  border-radius:18px;
+  padding:14px;
+  display:flex;flex-direction:column;gap:12px;
+  box-shadow:0 12px 28px rgba(0,0,0,0.22);
+  position:relative;overflow:hidden;
+ }
+ .preview-card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,255,255,0.04), transparent 54%);pointer-events:none;border-radius:inherit}
+ .preview-top{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1}
+ .preview-label{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-60)}
+  .preview-val{font-size:22px;font-weight:800;letter-spacing:-0.03em;color:var(--ink-100);font-variant-numeric:tabular-nums;line-height:1}
+ .preview-val small{font-size:11px;font-weight:700;color:var(--ink-60);letter-spacing:0.06em;margin-left:2px}
+ .preview-stage{
+  height:112px;border-radius:14px;overflow:hidden;position:relative;
+  background:radial-gradient(120% 90% at 50% 20%, rgba(42,53,80,0.9) 0%, rgba(20,26,40,0.96) 50%, rgba(10,14,23,1) 78%);
+  outline:1px solid rgba(255,255,255,0.08);
+  display:grid;place-items:center;
+  transition: filter 260ms var(--ease-prism), background 260ms var(--ease-prism);
+ }
+ .preview-stage::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(80% 60% at 50% 30%, rgba(86,184,255,0.18), transparent 62%), linear-gradient(180deg, rgba(255,255,255,0.06), transparent 44%);
+  pointer-events:none;
+ }
+ .preview-glass{
+  position:relative;z-index:1;
+  width:78%;height:64px;border-radius:16px;
+  background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  box-shadow:0 10px 24px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 14px;
+  transition: opacity 260ms var(--ease-prism), transform 260ms var(--ease-prism);
+ }
+ .preview-glass strong{font-size:14px;font-weight:800;letter-spacing:-0.01em;color:var(--ink-100)}
+ .preview-glass span{font-size:11px;font-weight:600;color:var(--ink-60)}
+ .sheet-section-label{font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink-40);padding:0 2px}
+ .sheet-card{
+  background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);border-radius:18px;overflow:hidden;
+  box-shadow:0 12px 28px rgba(0,0,0,0.18);
+ }
+ .sheet-row{
+  display:flex;align-items:center;gap:12px;padding:12px 12px;min-height:52px;
+  transition: background 160ms var(--ease-prism);
+ }
+ .sheet-row + .sheet-row{border-top:1px solid rgba(255,255,255,0.06)}
+ .sheet-row.gaze-focus{background:rgba(86,184,255,0.08);outline:2px solid var(--stroke-focus);outline-offset:-2px;z-index:1}
+ .sheet-row:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .sheet-icon{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;flex:none;background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.07);color:var(--ink-80)}
+ .sheet-main{flex:1;min-width:0}
+ .sheet-main .row-title{font-size:13px}
+ .sheet-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:4px 0}
+ .sheet-actions .btn{min-height:38px;font-size:13px}
+
+ /* state layer */
+ .state-layer{
+  position:absolute;inset:44px 0 0 0;z-index:520;
+  display:none;overflow-y:auto;scrollbar-width:none;
+  padding:12px 14px 14px 14px;
+ }
+ .state-layer::-webkit-scrollbar{display:none}
+ .state-layer.on{display:block;animation: rise-in 260ms var(--ease-prism) both}
+ .state-layer.dim-on{display:grid;place-items:center;padding:12px 14px;animation: rise-in 260ms var(--ease-prism) both}
+ .state-card{
+  width:100%;max-width:420px;
+  background:var(--mat-raised);backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
+  outline:1px solid var(--stroke-glass);border-radius:var(--r-lg);
+  padding:24px 20px 18px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;
+  box-shadow:0 18px 44px rgba(0,0,0,0.36);animation: rise-in 260ms var(--ease-prism) both;position:relative;overflow:hidden;
+ }
+ .state-card::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 8%, rgba(86,184,255,0.08), transparent 62%);pointer-events:none}
+ .state-illus{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.08);margin-bottom:2px;position:relative}
+ .state-illus.danger{background:rgba(255,93,93,0.10);outline-color:rgba(255,93,93,0.18)}
+ .state-illus.warn{background:rgba(255,194,71,0.10);outline-color:rgba(255,194,71,0.18)}
+ .state-title{font-size:18px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-100);line-height:1.1;position:relative}
+ .state-body{font-size:13px;font-weight:500;color:var(--ink-60);line-height:1.45;max-width:300px;position:relative}
+ .state-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px;position:relative}
+ .state-actions .btn{min-height:36px;font-size:13px}
+ .skel{border-radius:var(--r-sm);background: linear-gradient(100deg, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.06) 60%);background-size:200% 100%;animation: shimmer 1.2s linear infinite}
+ button:focus-visible, [data-focusable]:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ @media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important}
+ }
+</style>
+</head>
+<body>
+<div class="device">
+ <div class="stage-shell">
+  <div class="stage" data-stage></div>
+ </div>
+</div>
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+const stage = document.querySelector('[data-stage]');
+const device = document.querySelector('.device');
+const os = createOS(stage, { dwell:true, dwellMs:350 });
+stage.appendChild(os.statusbar('<span style="color:var(--ink-60);font-size:11px;letter-spacing:0.04em;font-weight:700">Settings · Prism</span>'));
+
+const h = (tag, attrs={}, ...children)=>{
+ const el=document.createElement(tag);
+ for(const [k,v] of Object.entries(attrs)){
+  if(k==='class') el.className=v;
+  else if(k==='html') el.innerHTML=v;
+  else if(v!==null && v!==undefined) el.setAttribute(k,v);
+ }
+ for(const c of children){
+  if(c==null) continue;
+  if(typeof c==='string') el.appendChild(document.createTextNode(c));
+  else el.appendChild(c);
+ }
+ return el;
+};
+
+// dev controls OUTSIDE stage
+const edgeRow = h('div', {class:'dev-controls', role:'toolbar', 'aria-label':'Settings edge state controls'});
+const edgeStates = [
+ {id:'normal', label:'Normal'},
+ {id:'loading', label:'Loading'},
+ {id:'empty', label:'Empty'},
+ {id:'error', label:'Error'},
+ {id:'offline', label:'Offline'},
+ {id:'permission', label:'No access'},
+];
+edgeStates.forEach(s=>{
+ const b=h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Show ${s.label} state`, 'data-state':s.id}, s.label);
+ if(s.id==='normal') b.classList.add('active');
+ b.addEventListener('click', ()=> setEdge(s.id));
+ edgeRow.appendChild(b);
+});
+device.appendChild(edgeRow);
+
+// containers
+const viewport = h('div', {class:'set-viewport', id:'viewport'});
+const stateLayer = h('div', {class:'state-layer', id:'stateLayer', 'aria-live':'polite'});
+const hintbar = h('div', {class:'hintbar', id:'hintbar'});
+hintbar.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="hint-dot" aria-hidden="true"></span><strong>Gaze dwell 350 ms</strong></span><span style="display:flex;align-items:center;gap:6px">Tab cycle · Esc back</span>`;
+const detailSheet = h('div', {class:'detail-sheet', id:'detailSheet', role:'dialog', 'aria-modal':'true', 'aria-label':'Display brightness settings'});
+stage.append(viewport, stateLayer, hintbar, detailSheet);
+
+// state
+let edgeState='normal';
+let brightness=68;
+let volume=72;
+let dwellMs=350;
+let s = {
+ nightShift:false,
+ worldDim:true,
+ haptics:true,
+ templeDouble:true,
+ autoBright:true,
+ mic:true,
+ location:true,
+ camLens:true,
+ spatial:true,
+ mono:false,
+ raiseToSpeak:false,
+};
+
+let searchQuery='';
+
+// helpers
+function iconSvg(name){
+ const map={
+  optics:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.4" stroke="white" stroke-width="1.6"/><path d="M12 2.5a15.8 15.8 0 014.2 2.1M12 21.5a15.8 15.8 0 01-4.2-2.1M2.5 12a15.8 15.8 0 012.1-4.2M21.5 12a15.8 15.8 0 01-2.1 4.2M4.9 4.9l2.4 2.4M16.7 16.7l2.4 2.4M19.1 4.9l-2.4 2.4M7.3 16.7l-2.4 2.4" stroke="white" stroke-width="1.25" stroke-linecap="round" opacity="0.95"/></svg>`,
+  gestures:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 10.5V6.2a2 2 0 014 0v4.8" stroke="white" stroke-width="1.6" stroke-linecap="round"/><path d="M13 10.5V7.8a1 1 0 112 0v2.7" stroke="white" stroke-width="1.6" stroke-linecap="round"/><path d="M15 9.6V8.2a1 1 0 112 0v3.8a5 5 0 01-5 5H8a2 2 0 01-2-2v-4.2a2 2 0 012-2h1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  privacy:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l7 3.2v5.1c0 3.8-2.4 6.5-7 8.3-4.6-1.8-7-4.5-7-8.3V6.4l7-3.2z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="11.2" r="2.1" stroke="white" stroke-width="1.5"/><path d="M9.4 14.2l1.4 1.4 3.8-3.8" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  audio:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5l-4 3.2H4.2v7.6H7L11 19V5z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M14.6 9.8a4 4 0 010 4.4" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M16.8 7.8a7 7 0 010 8.4" stroke="white" stroke-opacity="0.9" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  system:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4.5" y="4.5" width="15" height="15" rx="3.2" stroke="white" stroke-width="1.6"/><path d="M12 8v5l3 1.8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="1" fill="white"/></svg>`,
+  sun:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.6" stroke="white" stroke-width="1.6"/><path d="M12 2v1.6M12 20.4V22M4.8 4.8l1.1 1.1M18.1 18.1l1.1 1.1M2 12h1.6M20.4 12H22M4.8 19.2l1.1-1.1M18.1 5.9l1.1-1.1" stroke="white" stroke-opacity="0.9" stroke-width="1.4" stroke-linecap="round"/></svg>`,
+  moon:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M17.2 14.2a6 6 0 01-7.4-7.4 6 6 0 107.4 7.4z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+  mic:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 14a3 3 0 003-3V6a3 3 0 10-6 0v5a3 3 0 003 3z" stroke="white" stroke-width="1.5"/><path d="M19 10a7 7 0 01-14 0" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M12 17v3" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  loc:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s6-4.2 6-9a6 6 0 10-12 0c0 4.8 6 9 6 9z" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="2.2" stroke="white" stroke-width="1.5"/></svg>`,
+  vol:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5l-4 3h-3v8h3l4 3V5z" stroke="white" stroke-width="1.5"/><circle cx="15.2" cy="12" r="1.2" fill="white"/></svg>`,
+  cam:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="7" width="15" height="10" rx="2.2" stroke="white" stroke-width="1.5"/><circle cx="10.5" cy="12" r="2.6" stroke="white" stroke-width="1.5"/><path d="M15 10.2l3-1.4v6.4l-3-1.4" stroke="white" stroke-width="1.4" stroke-linejoin="round"/></svg>`,
+  chevron:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+ };
+ return map[name]||map.system;
+}
+
+function makeToggle(initial, label){
+ const t=h('div', {class:'toggle', role:'switch', 'aria-checked':String(initial), 'aria-label':label, tabindex:'0', 'data-focusable':''});
+ t.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  const on=t.getAttribute('aria-checked')==='true';
+  t.setAttribute('aria-checked', String(!on));
+  // update state mapping by label
+  t.dispatchEvent(new CustomEvent('togglechange', {detail:{on:!on}}));
+  os.banner(`<strong>${label} ${!on?'on':'off'}</strong><span class="caption">saved · ${!on?'enabled':'disabled'}</span>`,{timeout:1600});
+  if(!os.state.reducedMotion) t.animate([{transform:'scale(0.96)'},{transform:'scale(1)'}],{duration:160,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ });
+ t.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); t.click(); }});
+ return t;
+}
+
+function openBrightnessSheet(){
+ if(edgeState!=='normal') return;
+ detailSheet.innerHTML='';
+ detailSheet.classList.add('on');
+ detailSheet.setAttribute('aria-label','Display brightness detail');
+
+ const header=h('div', {class:'sheet-header'});
+ const back=h('button', {class:'sheet-back', 'data-focusable':'', tabindex:'0', 'aria-label':'Back to Settings'});
+ back.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.2 6L8.2 12l6 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+ back.addEventListener('click', closeSheet);
+ const hTitle=h('div', {style:'flex:1;min-width:0'});
+ hTitle.innerHTML=`<div class="sheet-title">Display</div><div class="sheet-sub">Optics · Brightness</div>`;
+ const done=h('button', {class:'hdr-chip primary', 'data-focusable':'', tabindex:'0', 'aria-label':'Done, close display settings'}, 'Done');
+ done.addEventListener('click', closeSheet);
+ header.append(back, hTitle, done);
+
+ const scroll=h('div', {class:'sheet-scroll'});
+
+ // preview card
+ const preview=h('div', {class:'preview-card'});
+ const pTop=h('div', {class:'preview-top'});
+ pTop.innerHTML=`<span class="preview-label">Brightness</span><span class="preview-val " id="sheetBrightVal">${brightness}<small>%</small></span>`;
+ const pStage=h('div', {class:'preview-stage', id:'previewStage'});
+ pStage.innerHTML=`<div class="preview-glass" id="previewGlass"><span style="width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#04121f">${iconSvg('optics')}</span><div style="display:flex;flex-direction:column;gap:1px"><strong>Prism glass</strong><span id="previewSub">World scrim · ${brightness}% · auto ${s.autoBright?'on':'off'}</span></div></div>`;
+ // apply brightness filter
+ const applyPreview=()=>{
+  const b=Math.max(0,Math.min(100,brightness));
+  // blend: lower brightness reduces sheen opacity and dims
+  const dim = 1 - (b/100)*0.12;
+  // adjust glass opacity + stage brightness
+  const glass=document.getElementById('previewGlass');
+  const st=document.getElementById('previewStage');
+  if(st) st.style.filter=`brightness(${0.62 + (b/100)*0.54})`;
+  if(glass) glass.style.opacity=`${0.72 + (b/100)*0.28}`;
+  const val=document.getElementById('sheetBrightVal');
+  if(val) val.innerHTML=`${b}<small>%</small>`;
+  const sub=document.getElementById('previewSub');
+  if(sub) sub.textContent=`World scrim · ${b}% · auto ${s.autoBright?'on':'off'}`;
+ };
+ preview.append(pTop, pStage);
+
+ // slider card
+ const sliderCard=h('div', {class:'sheet-card'});
+ const sRow=h('div', {class:'sheet-row', style:'flex-direction:column;align-items:stretch;gap:10px;padding:14px 12px'});
+ sRow.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;width:100%"><span style="font-size:13px;font-weight:700;color:var(--ink-100)">Brightness</span><span class="row-value accent " id="sliderVal">${brightness}%</span></div>`;
+ const trackWrap=h('div', {class:'slider-track-wrap', style:'width:100%'});
+ const track=h('div', {class:'slider-track', style:'flex:1'});
+ const fill=h('div', {class:'slider-fill', id:'sheetFill', style:`width:${brightness}%`});
+ const input=h('input', {class:'range', type:'range', min:'8', max:'100', value:String(brightness), 'aria-label':'Display brightness, 8 to 100 percent'});
+ input.addEventListener('input', ()=>{
+  brightness=parseInt(input.value,10);
+  fill.style.width=brightness+'%';
+  const v=document.getElementById('sliderVal');
+  if(v) v.textContent=brightness+'%';
+  const pv=document.getElementById('sheetBrightVal');
+  if(pv) pv.innerHTML=brightness+'<small>%</small>';
+  applyPreview();
+  // also update main list value if exists
+  const mainVal=document.getElementById('mainBrightnessVal');
+  if(mainVal) mainVal.textContent=brightness+'%';
+ });
+ input.addEventListener('change', ()=>{
+  os.banner(`<strong>Brightness ${brightness}%</strong><span class="caption">· saved</span>`,{timeout:1600});
+ });
+ track.append(fill, input);
+ trackWrap.append(track);
+ const minmax=h('div', {class:'slider-minmax'});
+ minmax.innerHTML=`<span>8%</span><span>100% · auto</span>`;
+ sRow.append(trackWrap, minmax);
+ sliderCard.append(sRow);
+ // auto row
+ const autoRow=h('div', {class:'sheet-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Toggle auto-brightness'});
+ autoRow.innerHTML=`<div class="sheet-icon">${iconSvg('sun')}</div><div class="sheet-main"><div class="row-title">Auto-brightness</div><div class="row-sub">Adapts to world light · 600×600 scrim</div></div>`;
+ const autoTog=makeToggle(s.autoBright, 'Auto-brightness');
+ autoTog.addEventListener('togglechange', (e)=>{
+  s.autoBright=e.detail.on;
+  applyPreview();
+  // update fill disabled visual?
+  input.disabled=e.detail.on;
+  track.style.opacity=e.detail.on?'0.42':'1';
+  track.style.pointerEvents=e.detail.on?'none':'auto';
+ });
+ if(s.autoBright){ input.disabled=true; track.style.opacity='0.42'; track.style.pointerEvents='none'; }
+ autoRow.appendChild(autoTog);
+ autoRow.addEventListener('click', ()=> autoTog.click());
+ autoRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); autoTog.click(); }});
+ sliderCard.append(autoRow);
+
+ // appearance row card
+ const appearCard=h('div', {class:'sheet-card'});
+ const appearRow=h('div', {class:'sheet-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Appearance, choose light or dark'});
+ appearRow.innerHTML=`<div class="sheet-icon">${iconSvg('moon')}</div><div class="sheet-main"><div class="row-title">Appearance</div><div class="row-sub">Light · Dark · Auto · glass stays translucent</div></div><span class="row-chevron">${iconSvg('chevron')}</span>`;
+ appearRow.addEventListener('click', ()=> os.banner(`<strong>Appearance</strong><span class="caption">Light / Dark · glass mat stays</span>`,{timeout:1600}));
+ appearCard.append(appearRow);
+ const tintRow=h('div', {class:'sheet-row'});
+ tintRow.innerHTML=`<div class="sheet-icon" style="background:linear-gradient(180deg,#56b8ff,#0b5ed7);color:#fff;outline-color:transparent">${iconSvg('optics')}</div><div class="sheet-main"><div class="row-title">Lens tint</div><div class="row-sub">Neutral · warm for bright world</div></div><span class="row-value ">Neutral</span>`;
+ appearCard.append(tintRow);
+
+ // actions
+ const actions=h('div', {class:'sheet-actions'});
+ const resetBtn=h('button', {class:'btn ghost', 'data-focusable':'', tabindex:'0', 'aria-label':'Reset display to defaults'}, 'Reset');
+ const applyBtn=h('button', {class:'btn primary', 'data-focusable':'', tabindex:'0', 'aria-label':'Apply brightness'}, 'Apply');
+ resetBtn.addEventListener('click', ()=>{
+  brightness=68; s.autoBright=false;
+  input.value='68'; fill.style.width='68%';
+  document.getElementById('sliderVal').textContent='68%';
+  const pv=document.getElementById('sheetBrightVal'); if(pv) pv.innerHTML='68<small>%</small>';
+  input.disabled=false; track.style.opacity='1'; track.style.pointerEvents='auto';
+  autoTog.setAttribute('aria-checked','false');
+  applyPreview();
+  os.banner('<strong>Display reset</strong><span class="caption">68% · auto off</span>',{timeout:1600});
+ });
+ applyBtn.addEventListener('click', ()=>{
+  closeSheet();
+  os.banner(`<strong>Display saved · ${brightness}%</strong><span class="caption">· optics updated</span>`,{timeout:1800});
+ });
+ actions.append(resetBtn, applyBtn);
+
+ scroll.append(preview, sliderCard, h('div', {class:'sheet-section-label'}, 'Appearance'), appearCard, actions);
+ detailSheet.append(header, scroll);
+ stage.appendChild(os.cursor);
+ stage.appendChild(detailSheet);
+ requestAnimationFrame(applyPreview);
+ setTimeout(()=> back.focus({preventScroll:true}), 60);
+ hintbar.style.opacity='0'; hintbar.style.pointerEvents='none';
+}
+
+function closeSheet(){
+ if(!detailSheet.classList.contains('on')) return;
+ const out=detailSheet.animate([
+  {transform:'translateY(0) scale(1)', opacity:1, filter:'blur(0)'},
+  {transform:'translateY(18px) scale(0.98)', opacity:0, filter:'blur(6px)'}
+ ], {duration: os.state.reducedMotion?1:260, easing:'cubic-bezier(0.32,0.72,0,1)'});
+ out.finished.then(()=>{
+  detailSheet.classList.remove('on');
+  detailSheet.innerHTML='';
+  hintbar.style.opacity='';
+  hintbar.style.pointerEvents='';
+  stage.appendChild(os.cursor);
+  renderSettings(); // refresh main list values
+ });
+}
+os.on('back', closeSheet);
+
+// privacy lens sheet (second sheet optional — we reuse same sheet but with different content for demo)
+// We'll keep brightness as primary required; additional navigation to privacy sheet shows toggle list
+function openPrivacySheet(){
+ if(edgeState!=='normal') return;
+ detailSheet.innerHTML='';
+ detailSheet.classList.add('on');
+ detailSheet.setAttribute('aria-label','Lens permissions detail');
+ const header=h('div', {class:'sheet-header'});
+ const back=h('button', {class:'sheet-back', 'data-focusable':'', tabindex:'0', 'aria-label':'Back to Settings'});
+ back.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.2 6L8.2 12l6 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+ back.addEventListener('click', closeSheet);
+ const hTitle=h('div', {style:'flex:1;min-width:0'});
+ hTitle.innerHTML=`<div class="sheet-title">Lens permissions</div><div class="sheet-sub">Privacy · Camera & world sense</div>`;
+ const done=h('button', {class:'hdr-chip primary', 'data-focusable':'', tabindex:'0', 'aria-label':'Done'}, 'Done');
+ done.addEventListener('click', closeSheet);
+ header.append(back, hTitle, done);
+ const scroll=h('div', {class:'sheet-scroll'});
+ const intro=h('div', {class:'preview-card', style:'padding:12px'});
+ intro.innerHTML=`<div style="display:flex;gap:10px;align-items:center;position:relative;z-index:1"><span style="width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.08)">${iconSvg('privacy')}</span><div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--ink-100)">Apps using your lens</div><div style="font-size:11px;font-weight:500;color:var(--ink-60)">3 apps · review any time · no dead ends</div></div><span class="row-value acent " style="background:rgba(86,184,255,0.12);outline:1px solid rgba(86,184,255,0.18);color:var(--accent)">Active</span></div>`;
+ const list=h('div', {class:'sheet-card'});
+ const apps=[
+  {name:'Camera', sub:'Captures · Gallery · 12 MP', icon:iconSvg('cam'), on:s.camLens},
+  {name:'Maps', sub:'World sense · navigation', icon:iconSvg('loc'), on: s.location},
+  {name:'Assistant', sub:'Hey Prism · on-device', icon:iconSvg('optics'), on: s.mic},
+ ];
+ apps.forEach(a=>{
+  const row=h('div', {class:'sheet-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':`${a.name} lens access, ${a.on?'on':'off'}`});
+  row.innerHTML=`<div class="sheet-icon">${a.icon}</div><div class="sheet-main"><div class="row-title">${a.name}</div><div class="row-sub">${a.sub}</div></div>`;
+  const tog=makeToggle(a.on, `${a.name} lens`);
+  tog.addEventListener('togglechange', (e)=>{
+   if(a.name==='Camera') s.camLens=e.detail.on;
+   if(a.name==='Maps') s.location=e.detail.on;
+   if(a.name==='Assistant') s.mic=e.detail.on;
+  });
+  row.appendChild(tog);
+  row.addEventListener('click', ()=> tog.click());
+  row.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tog.click(); }});
+  list.append(row);
+ });
+ const note=h('div', {class:'caption', style:'text-align:center;color:var(--ink-40);font-size:11px;padding:4px 8px'});
+ note.textContent='Captures stay on-device until you share. Deny returns safely to Settings.';
+ const actions=h('div', {class:'sheet-actions'});
+ const allowAll=h('button', {class:'btn primary', 'data-focusable':'', tabindex:'0', 'aria-label':'Allow all lens access'}, 'Allow all');
+ const denyAll=h('button', {class:'btn ghost', 'data-focusable':'', tabindex:'0', 'aria-label':'Deny all'}, 'Deny all');
+ allowAll.addEventListener('click', ()=>{ s.camLens=s.location=s.mic=true; closeSheet(); os.banner('<strong>All lens access on</strong><span class="caption">3 apps · allowed</span>',{timeout:1800}); renderSettings(); });
+ denyAll.addEventListener('click', ()=>{ s.camLens=s.location=s.mic=false; closeSheet(); os.banner('<strong>Lens access paused</strong><span class="caption">safe · no capture dead ends</span>',{timeout:1800}); renderSettings(); });
+ actions.append(allowAll, denyAll);
+ scroll.append(intro, h('div', {class:'sheet-section-label'}, 'App access'), list, note, actions);
+ detailSheet.append(header, scroll);
+ stage.appendChild(os.cursor);
+ stage.appendChild(detailSheet);
+ setTimeout(()=> back.focus({preventScroll:true}), 60);
+ hintbar.style.opacity='0'; hintbar.style.pointerEvents='none';
+}
+
+let filterActive=false;
+
+function renderSettings(){
+ viewport.innerHTML='';
+ // header
+ const header=h('div', {class:'set-header'});
+ const left=h('div', {});
+ const title=h('div', {class:'set-title', html:`Settings`});
+ const subtitle=h('div', {class:'set-subtitle'});
+  subtitle.innerHTML=`<span class="dot ok" aria-hidden="true"></span> Prism OS 1.0 · <span class="tabular">${brightness}%</span> brightness`;
+ left.append(title, subtitle);
+ const acts=h('div', {class:'header-actions'});
+ const resetHdr=h('button', {class:'hdr-chip', 'data-focusable':'', tabindex:'0', 'aria-label':'Reset settings to defaults'}, 'Reset');
+ resetHdr.addEventListener('click', ()=>{
+  brightness=68; volume=72; s.worldDim=true; s.nightShift=false; s.haptics=true;
+  os.banner('<strong>Defaults restored</strong><span class="caption">optics · gestures · audio</span>',{timeout:1800});
+  renderSettings();
+ });
+ const doneHdr=h('button', {class:'hdr-chip primary', 'data-focusable':'', tabindex:'0', 'aria-label':'Done'}, 'Done');
+ doneHdr.addEventListener('click', ()=> os.banner('<strong>Settings saved</strong><span class="caption">all changes applied</span>',{timeout:1600}));
+ acts.append(resetHdr, doneHdr);
+ header.append(left, acts);
+ viewport.appendChild(header);
+
+ // search
+ const searchWrap=h('div', {class:'search-wrap'});
+ const search=h('input', {class:'search-field', type:'search', placeholder:'Search settings', 'aria-label':'Search settings', id:'searchInput', autocomplete:'off'});
+ search.value=searchQuery;
+ const sIcon=h('span', {class:'search-icon', 'aria-hidden':'true'}, '');
+ sIcon.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.2" stroke="white" stroke-opacity="0.7" stroke-width="1.6"/><path d="M15.2 15.2l4.2 4.2" stroke="white" stroke-opacity="0.7" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+ const sMeta=h('span', {class:'search-meta '}, `${viewport.querySelectorAll ? '' : ''} ⌘K`);
+ sMeta.textContent='⌘K';
+ sMeta.style.display=searchQuery? 'none':'inline-flex';
+ searchWrap.append(search, sIcon, sMeta);
+ viewport.appendChild(searchWrap);
+ search.addEventListener('input', ()=>{
+  searchQuery=search.value.trim().toLowerCase();
+  if(searchQuery.length>0){
+   // filter logic: if query yields no results, trigger empty visual inline? For now just re-render groups filtered
+   // For probe's empty chip, we will handle via edgeState, not search. Search filter just banners.
+   if(['zx','qqq','xyz'].some(x=> searchQuery.includes(x))){
+    // show inline empty? just banner
+    os.banner(`<strong>No results for “${search.value}”</strong><span class="caption">try Optics, Privacy</span>`,{timeout:1800});
+   }
+   filterActive=true;
+  } else {
+   filterActive=false;
+  }
+ });
+ search.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ search.value=''; searchQuery=''; filterActive=false; search.blur(); }});
+
+ // helpers to build groups
+ function buildGroup(label, countLabel, rows){
+  const g=h('div', {class:'group', role:'group', 'aria-label':label});
+  const head=h('div', {class:'group-head'});
+  head.innerHTML=`<span class="group-label">${label}</span><span class="group-count ">${countLabel}</span><span class="group-line" aria-hidden="true"></span>`;
+  const card=h('div', {class:'group-card'});
+  rows.forEach(r=> card.appendChild(r));
+  g.append(head, card);
+  return g;
+ }
+
+ // Optics
+ // brightness slider row + night shift toggle + world dim toggle + navigation to display detail
+ const opticsRows=[];
+ // nav row to detail
+ const displayNav=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Display brightness, 68 percent, tap for detail'});
+ displayNav.innerHTML=`<div class="row-icon accent">${iconSvg('sun')}</div><div class="row-main"><div class="row-title">Display</div><div class="row-sub">Brightness · appearance · lens tint</div></div><span class="row-value accent " id="mainBrightnessVal">${brightness}%</span><span class="row-chevron">${iconSvg('chevron')}</span>`;
+ displayNav.addEventListener('click', openBrightnessSheet);
+ displayNav.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openBrightnessSheet(); }});
+ opticsRows.push(displayNav);
+
+ // slider inline
+ const brightSliderRow=h('div', {class:'set-row slider-row', 'data-focusable':'', tabindex:'0', 'aria-label':'Brightness slider'});
+ const sliderHead=h('div', {class:'slider-head'});
+ sliderHead.innerHTML=`<div class="row-icon">${iconSvg('sun')}</div><div class="row-main"><div class="row-title">Brightness</div><div class="row-sub">World scrim opacity</div></div><span class="row-value accent " id="inlineBrightVal">${brightness}%</span>`;
+ const trackWrap2=h('div', {class:'slider-track-wrap'});
+ const track2=h('div', {class:'slider-track'});
+ const fill2=h('div', {class:'slider-fill', id:'inlineFill', style:`width:${brightness}%`});
+ const range2=h('input', {class:'range', type:'range', min:'8', max:'100', value:String(brightness), 'aria-label':'Brightness, 8 to 100 percent'});
+ range2.addEventListener('input', ()=>{
+  brightness=parseInt(range2.value,10);
+  fill2.style.width=brightness+'%';
+  document.getElementById('inlineBrightVal').textContent=brightness+'%';
+  const mainEl=document.getElementById('mainBrightnessVal'); if(mainEl) mainEl.textContent=brightness+'%';
+  // also update detail if open
+  const dVal=document.getElementById('sheetBrightVal'); if(dVal) dVal.innerHTML=brightness+'<small>%</small>';
+  const sVal=document.getElementById('sliderVal'); if(sVal) sVal.textContent=brightness+'%';
+  const st=document.getElementById('previewStage'); if(st) st.style.filter=`brightness(${0.62 + (brightness/100)*0.54})`;
+ });
+ range2.addEventListener('change', ()=> os.banner(`<strong>Brightness ${brightness}%</strong><span class="caption">· saved</span>`,{timeout:1400}));
+ track2.append(fill2, range2);
+ trackWrap2.append(track2);
+ brightSliderRow.append(sliderHead, trackWrap2, h('div', {class:'slider-minmax', html:'<span>Dim</span><span>Bright</span>'}));
+ // make the row not trigger navigation, but slider focusable
+ opticsRows.push(brightSliderRow);
+
+ const nightRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Night Shift, off, toggle'});
+ nightRow.innerHTML=`<div class="row-icon warm">${iconSvg('moon')}</div><div class="row-main"><div class="row-title">Night Shift</div><div class="row-sub">Warmer lens after sunset · 3200 K</div></div>`;
+ const nightTog=makeToggle(s.nightShift, 'Night Shift');
+ nightTog.addEventListener('togglechange', e=> s.nightShift=e.detail.on);
+ nightRow.appendChild(nightTog);
+ nightRow.addEventListener('click', ()=> nightTog.click());
+ nightRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); nightTog.click(); }});
+ opticsRows.push(nightRow);
+
+ const dimRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'World dim, on, toggle'});
+ dimRow.innerHTML=`<div class="row-icon" style="background:rgba(255,255,255,0.07)">${iconSvg('optics')}</div><div class="row-main"><div class="row-title">World dim</div><div class="row-sub">Scrim over world · translucent glass</div></div>`;
+ const dimTog=makeToggle(s.worldDim, 'World dim');
+ dimTog.addEventListener('togglechange', e=> s.worldDim=e.detail.on);
+ dimRow.appendChild(dimTog);
+ dimRow.addEventListener('click', ()=> dimTog.click());
+ dimRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); dimTog.click(); }});
+ opticsRows.push(dimRow);
+
+ viewport.appendChild(buildGroup('Optics', '4 controls', opticsRows));
+
+ // Gestures
+ const gestureRows=[];
+ const dwellRow=h('div', {class:'set-row slider-row', 'data-focusable':'', tabindex:'0', 'aria-label':'Dwell time slider'});
+ const dwellHead=h('div', {class:'slider-head'});
+ dwellHead.innerHTML=`<div class="row-icon purple">${iconSvg('gestures')}</div><div class="row-main"><div class="row-title">Dwell time</div><div class="row-sub">Gaze hold to activate ms</div></div><span class="row-value " id="dwellVal">${dwellMs} ms</span>`;
+ const dwellWrap=h('div', {class:'slider-track-wrap'});
+ const dwellTrack=h('div', {class:'slider-track'});
+ const dwellFill=h('div', {class:'slider-fill', style:`width:${((dwellMs-200)/300)*100}%`});
+ const dwellRange=h('input', {class:'range', type:'range', min:'200', max:'500', step:'10', value:String(dwellMs), 'aria-label':'Dwell time, 200 to 500 milliseconds'});
+ dwellRange.addEventListener('input', ()=>{
+  dwellMs=parseInt(dwellRange.value,10);
+  dwellFill.style.width=((dwellMs-200)/300)*100+'%';
+  document.getElementById('dwellVal').textContent=dwellMs+' ms';
+ });
+ dwellRange.addEventListener('change', ()=> os.banner(`<strong>Dwell ${dwellMs} ms</strong><span class="caption">prism-ease · saved</span>`,{timeout:1400}));
+ dwellTrack.append(dwellFill, dwellRange);
+ dwellWrap.append(dwellTrack);
+ dwellRow.append(dwellHead, dwellWrap, h('div', {class:'slider-minmax', html:'<span>200 ms</span><span>500 ms</span>'}));
+ gestureRows.push(dwellRow);
+
+ const hapticsRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Haptics, on, toggle'});
+ hapticsRow.innerHTML=`<div class="row-icon slate">${iconSvg('gestures')}</div><div class="row-main"><div class="row-title">Haptics</div><div class="row-sub">Temple taps · light pulse</div></div>`;
+ const hapTog=makeToggle(s.haptics, 'Haptics');
+ hapTog.addEventListener('togglechange', e=> s.haptics=e.detail.on);
+ hapticsRow.appendChild(hapTog);
+ hapticsRow.addEventListener('click', ()=> hapTog.click());
+ hapticsRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); hapTog.click(); }});
+ gestureRows.push(hapticsRow);
+
+ const templeRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Temple double-tap, on, toggle'});
+ templeRow.innerHTML=`<div class="row-icon">${iconSvg('gestures')}</div><div class="row-main"><div class="row-title">Temple double-tap</div><div class="row-sub">Tap temple to select · focus ring</div></div>`;
+ const templeTog=makeToggle(s.templeDouble, 'Temple double-tap');
+ templeTog.addEventListener('togglechange', e=> s.templeDouble=e.detail.on);
+ templeRow.appendChild(templeTog);
+ templeRow.addEventListener('click', ()=> templeTog.click());
+ templeRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); templeTog.click(); }});
+ gestureRows.push(templeRow);
+
+ viewport.appendChild(buildGroup('Gestures', '3 controls', gestureRows));
+
+ // Privacy
+ const privacyRows=[];
+ const lensNav=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Lens permissions, 3 apps allowed, tap for detail'});
+ lensNav.innerHTML=`<div class="row-icon ok">${iconSvg('privacy')}</div><div class="row-main"><div class="row-title">Lens permissions</div><div class="row-sub">3 apps · Camera, Maps, Assistant</div></div><span class="row-value ">Manage</span><span class="row-chevron">${iconSvg('chevron')}</span>`;
+ lensNav.addEventListener('click', openPrivacySheet);
+ lensNav.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openPrivacySheet(); }});
+ privacyRows.push(lensNav);
+
+ const micRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Microphone, on, toggle'});
+ micRow.innerHTML=`<div class="row-icon">${iconSvg('mic')}</div><div class="row-main"><div class="row-title">Microphone</div><div class="row-sub">Hey Prism · on-device</div></div>`;
+ const micTog=makeToggle(s.mic, 'Microphone');
+ micTog.addEventListener('togglechange', e=> s.mic=e.detail.on);
+ micRow.appendChild(micTog);
+ micRow.addEventListener('click', ()=> micTog.click());
+ micRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); micTog.click(); }});
+ privacyRows.push(micRow);
+
+ const locRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Location, on, toggle'});
+ locRow.innerHTML=`<div class="row-icon">${iconSvg('loc')}</div><div class="row-main"><div class="row-title">Location</div><div class="row-sub">Maps · nearby · precise once</div></div>`;
+ const locTog=makeToggle(s.location, 'Location');
+ locTog.addEventListener('togglechange', e=> s.location=e.detail.on);
+ locRow.appendChild(locTog);
+ locRow.addEventListener('click', ()=> locTog.click());
+ locRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); locTog.click(); }});
+ privacyRows.push(locRow);
+
+ viewport.appendChild(buildGroup('Privacy', '3 controls', privacyRows));
+
+ // Audio
+ const audioRows=[];
+ const volRow=h('div', {class:'set-row slider-row', 'data-focusable':'', tabindex:'0', 'aria-label':'Volume slider'});
+ const volHead=h('div', {class:'slider-head'});
+ volHead.innerHTML=`<div class="row-icon">${iconSvg('vol')}</div><div class="row-main"><div class="row-title">Volume</div><div class="row-sub">System · spatial mix</div></div><span class="row-value accent " id="volVal">${volume}</span>`;
+ const volWrap=h('div', {class:'slider-track-wrap'});
+ const volTrack=h('div', {class:'slider-track'});
+ const volFill=h('div', {class:'slider-fill', style:`width:${volume}%`});
+ const volRange=h('input', {class:'range', type:'range', min:'0', max:'100', value:String(volume), 'aria-label':'Volume, 0 to 100'});
+ volRange.addEventListener('input', ()=>{
+  volume=parseInt(volRange.value,10);
+  volFill.style.width=volume+'%';
+  document.getElementById('volVal').textContent=volume;
+ });
+ volRange.addEventListener('change', ()=> os.banner(`<strong>Volume ${volume}</strong><span class="caption">· saved</span>`,{timeout:1400}));
+ volTrack.append(volFill, volRange);
+ volWrap.append(volTrack);
+ volRow.append(volHead, volWrap, h('div', {class:'slider-minmax', html:'<span>Mute</span><span>Max</span>'}));
+ audioRows.push(volRow);
+
+ const monoRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Mono audio, off, toggle'});
+ monoRow.innerHTML=`<div class="row-icon">${iconSvg('audio')}</div><div class="row-main"><div class="row-title">Mono audio</div><div class="row-sub">Single channel · for one ear</div></div>`;
+ const monoTog=makeToggle(s.mono, 'Mono audio');
+ monoTog.addEventListener('togglechange', e=> s.mono=e.detail.on);
+ monoRow.appendChild(monoTog);
+ monoRow.addEventListener('click', ()=> monoTog.click());
+ monoRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); monoTog.click(); }});
+ audioRows.push(monoRow);
+
+ const spatialRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Spatial audio, on, toggle'});
+ spatialRow.innerHTML=`<div class="row-icon accent">${iconSvg('audio')}</div><div class="row-main"><div class="row-title">Spatial audio</div><div class="row-sub">Head-tracked · 3-D stage</div></div>`;
+ const spatialTog=makeToggle(s.spatial, 'Spatial audio');
+ spatialTog.addEventListener('togglechange', e=> s.spatial=e.detail.on);
+ spatialRow.appendChild(spatialTog);
+ spatialRow.addEventListener('click', ()=> spatialTog.click());
+ spatialRow.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); spatialTog.click(); }});
+ audioRows.push(spatialRow);
+
+ viewport.appendChild(buildGroup('Audio', '3 controls', audioRows));
+
+ // System
+ const systemRows=[];
+ const aboutRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'About Prism OS, version 1.0, tap for details'});
+ aboutRow.innerHTML=`<div class="row-icon slate">${iconSvg('system')}</div><div class="row-main"><div class="row-title">About</div><div class="row-sub">Prism OS 1.0 · 600×600 · 20° FOV</div></div><span class="row-value ">1.0</span><span class="row-chevron">${iconSvg('chevron')}</span>`;
+ aboutRow.addEventListener('click', ()=> os.banner('<strong>Prism OS 1.0</strong><span class="caption">600×600 · visionOS-class glass</span>',{timeout:1800}));
+ systemRows.push(aboutRow);
+
+ const storageRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Storage, 12.4 gigabytes used, tap to manage'});
+ storageRow.innerHTML=`<div class="row-icon">${iconSvg('system')}</div><div class="row-main"><div class="row-title">Storage</div><div class="row-sub">12.4 GB used · 51.6 GB free</div></div><span class="row-value ">12.4 GB</span><span class="row-chevron">${iconSvg('chevron')}</span>`;
+ storageRow.addEventListener('click', ()=> os.banner('<strong>Storage</strong><span class="caption">12.4 GB · Gallery 4.2 GB · System 3.1 GB</span>',{timeout:1800}));
+ systemRows.push(storageRow);
+
+ const resetRow=h('div', {class:'set-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Reset all settings, destructive'});
+ resetRow.innerHTML=`<div class="row-icon" style="background:rgba(255,93,93,0.14);outline:1px solid rgba(255,93,93,0.18);color:#ffb3b3"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5v6l3.5 2.1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.6 12a8.4 8.4 0 101.6-4.9" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M3 5v4.2h4.2" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="row-main"><div class="row-title" style="color:#ffb3b3">Reset</div><div class="row-sub">Erase all settings · no dead ends</div></div><span class="row-chevron" style="background:rgba(255,93,93,0.10);outline-color:rgba(255,93,93,0.18);color:#ffb3b3">${iconSvg('chevron')}</span>`;
+ resetRow.addEventListener('click', ()=>{
+  os.banner('<strong>Reset settings?</strong><span class="caption">hold to confirm · safe recovery</span>',{timeout:2000});
+  resetRow.animate([{transform:'scale(0.99)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ });
+ systemRows.push(resetRow);
+
+ viewport.appendChild(buildGroup('System', '3 items', systemRows));
+
+ // filtered empty hint (inline) if search yields zero groups? We'll simulate by hiding groups if searchQuery matches none
+ if(filterActive && searchQuery){
+  const q=searchQuery;
+  // naive: if query not in any title substring, show banner already; but also hide groups not matching
+  // We'll simply check each group card rows for title includes
+  const groups=viewport.querySelectorAll('.group');
+  let visibleGroups=0;
+  groups.forEach(g=>{
+   const titles=[...g.querySelectorAll('.row-title')].map(el=> el.textContent.toLowerCase());
+   const match=titles.some(t=> t.includes(q)) || g.querySelector('.group-label').textContent.toLowerCase().includes(q);
+   if(!match){ g.style.display='none'; } else { g.style.display=''; visibleGroups++; }
+  });
+  if(visibleGroups===0){
+   const emptyInline=h('div', {class:'card', style:'padding:18px;display:grid;gap:8px;justify-items:center;text-align:center;background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:18px;margin-top:2px'});
+   emptyInline.innerHTML=`<div style="width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.08)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6" stroke="white" stroke-opacity="0.88" stroke-width="1.6"/><path d="M15.2 15.2l4.3 4.3" stroke="white" stroke-opacity="0.88" stroke-width="1.6" stroke-linecap="round"/><path d="M8.2 9.6l5.6 2.8" stroke="white" stroke-opacity="0.6" stroke-width="1.2" stroke-linecap="round"/></svg></div><div style="font-size:14px;font-weight:700;color:var(--ink-100)">No results for “${search.value}”</div><div class="caption" style="color:var(--ink-60);font-size:11px;max-width:280px">Try Optics, Gestures, Privacy, Audio, or System. Tabular search stays on-device.</div><button class="hdr-chip primary" data-focusable tabindex="0" aria-label="Clear search">Clear</button>`;
+   emptyInline.querySelector('button').addEventListener('click', ()=>{ search.value=''; searchQuery=''; filterActive=false; renderSettings(); document.getElementById('searchInput')?.focus(); });
+   viewport.appendChild(emptyInline);
+  }
+ }
+
+ // keep cursor on top
+ stage.appendChild(os.cursor);
+ stage.appendChild(detailSheet);
+ stage.appendChild(stateLayer);
+ stage.appendChild(hintbar);
+}
+
+// edge states
+function setEdge(id){
+ edgeState=id;
+ edgeRow.querySelectorAll('.chip').forEach(c=> c.classList.toggle('active', c.dataset.state===id));
+ stateLayer.className='state-layer';
+ stateLayer.innerHTML='';
+ stateLayer.style.display='';
+ viewport.style.display='';
+ viewport.style.opacity='';
+ viewport.style.filter='';
+ viewport.style.pointerEvents='';
+ closeSheet();
+ hintbar.style.display='';
+ if(id==='normal'){
+  stateLayer.classList.remove('on','dim-on');
+  stateLayer.style.display='none';
+  viewport.style.display='flex';
+  renderSettings();
+  return;
+ }
+ if(id==='loading'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML=`
+   <div style="display:grid;gap:12px;padding-top:6px">
+    <div style="height:48px;border-radius:18px" class="skel"></div>
+    <div style="height:36px;border-radius:999px" class="skel"></div>
+    ${[1,2,3].map(()=>`<div class="skel" style="height:156px;border-radius:18px"></div>`).join('')}
+    <div style="display:grid;gap:8px">
+     <div class="skel" style="height:12px;width:68px"></div>
+     <div class="skel" style="height:64px;border-radius:14px"></div>
+     <div class="skel" style="height:64px;border-radius:14px"></div>
+    </div>
+   </div>
+  `;
+  return;
+ }
+ if(id==='empty'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML=`
+   <div class="state-card">
+    <div class="state-illus" aria-hidden="true">
+     <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6" stroke="white" stroke-opacity="0.88" stroke-width="1.6"/><path d="M15.2 15.2l4.3 4.3" stroke="white" stroke-opacity="0.88" stroke-width="1.6" stroke-linecap="round"/><path d="M8.2 9.6l5.6 2.8" stroke="white" stroke-opacity="0.6" stroke-width="1.2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="state-title">No results</div>
+    <div class="state-body">No settings match “night vision”. Try Optics, Gestures, or Privacy. Search is on-device and .</div>
+    <div class="state-actions">
+     <button class="btn primary" data-focusable tabindex="0" aria-label="Clear search, show all settings">Clear search</button>
+     <button class="btn ghost" data-focusable tabindex="0" aria-label="Show all settings">Show all</button>
+    </div>
+    <p class="caption" style="color:var(--ink-40);font-size:11px;margin-top:2px">Empty · 0 matches · no dead ends</p>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=> setEdge('normal'));
+  });
+  return;
+ }
+ if(id==='error'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML=`
+   <div class="state-card">
+    <div class="state-illus danger" aria-hidden="true">
+     <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.5L21.5 19H2.5L12 3.5z" stroke="#ff8a8a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.5v4.2" stroke="#ffb3b3" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.25" fill="#ffb3b3"/></svg>
+    </div>
+    <div class="state-title">Can’t load settings</div>
+    <div class="state-body">Prism couldn’t reach system settings. Your changes are safe — try again. No data was lost.</div>
+    <div class="state-actions">
+     <button class="btn primary" data-focusable tabindex="0" aria-label="Retry loading settings">Retry</button>
+     <button class="btn ghost" data-focusable tabindex="0" aria-label="Dismiss error, show cached settings">Use cached</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:4px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;position:relative">
+     <span class="dot bad" aria-hidden="true"></span><span class="caption" style="color:var(--ink-60)">Error PR-SET-503 · 9:41 AM</span>
+    </div>
+   </div>
+  `;
+  const retry=stateLayer.querySelector('.btn.primary');
+  retry.addEventListener('click', ()=>{
+   retry.textContent='Retrying…';
+   retry.setAttribute('disabled','true');
+   setTimeout(()=>{
+    setEdge('normal');
+    os.banner('<strong>Settings restored</strong><span class="caption">PR-SET-503 cleared</span>',{timeout:1800});
+   }, 900);
+  });
+  stateLayer.querySelector('.btn.ghost').addEventListener('click', ()=> setEdge('normal'));
+  return;
+ }
+ if(id==='offline'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML=`
+   <div class="state-card" style="position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 12%, rgba(86,184,255,0.08), transparent 60%);pointer-events:none"></div>
+    <div class="state-illus" aria-hidden="true">
+     <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M3.5 9.5a9 9 0 0117 0" stroke="white" stroke-opacity="0.9" stroke-width="1.6" stroke-linecap="round"/><path d="M6 12.5a6 6 0 0112 0" stroke="white" stroke-opacity="0.8" stroke-width="1.6" stroke-linecap="round"/><path d="M8.8 15.5a2.8 2.8 0 016.4 0" stroke="white" stroke-opacity="0.78" stroke-width="1.6" stroke-linecap="round"/><path d="M2 2l20 20" stroke="#ffc247" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </div>
+    <div class="state-title">You’re offline</div>
+    <div class="state-body">Settings need a connection to sync. Recent changes are queued and will apply when back online. No dead ends.</div>
+    <div style="width:100%;max-width:340px;display:grid;gap:10px;margin-top:4px;position:relative">
+     <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:12px 14px">
+      <span class="dot bad" aria-hidden="true"></span>
+      <span style="font-size:13px;font-weight:600;color:var(--ink-80)">No network · changes queued</span>
+      <span class="caption" style="margin-left:auto">offline</span>
+     </div>
+     <div style="display:flex;gap:10px;justify-content:center">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Retry connection">Retry</button>
+      <button class="btn" data-focusable tabindex="0" aria-label="Use offline settings">Use offline</button>
+     </div>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    if(b.textContent.includes('Retry')){
+     b.textContent='Retrying…';
+     setTimeout(()=>{ os.banner('<strong>Still offline</strong><span class="caption">changes stay queued</span>',{timeout:1800}); b.textContent='Retry'; }, 800);
+    } else { setEdge('normal'); os.banner('<strong>Offline mode</strong><span class="caption">queued · will sync later</span>',{timeout:1600}); }
+   });
+  });
+  return;
+ }
+ if(id==='permission'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML=`
+   <div class="state-card">
+    <div class="state-illus" aria-hidden="true">
+     <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="5" y="9.5" width="14" height="10" rx="2.4" stroke="white" stroke-opacity="0.9" stroke-width="1.6"/><path d="M8.5 9.5V7.8a3.5 3.5 0 017 0v1.7" stroke="white" stroke-width="1.5"/><circle cx="12" cy="14.5" r="1.35" fill="white"/><path d="M12 15.85v1.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <div class="state-title">Permission needed</div>
+    <div class="state-body">Prism needs system access to show Optics and Privacy. You can keep using the launcher without it — no dead ends.</div>
+    <div class="state-actions">
+     <button class="btn primary" data-focusable tabindex="0" aria-label="Allow access to settings">Allow access</button>
+     <button class="btn ghost" data-focusable tabindex="0" aria-label="Not now">Not now</button>
+    </div>
+    <p class="caption" style="margin-top:2px;color:var(--ink-40)">Settings → Privacy → Prism · System</p>
+    <div style="width:100%;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-top:4px;position:relative;text-align:left">
+     <span class="dot warn" aria-hidden="true"></span>
+     <span style="font-size:12px;font-weight:600;color:var(--ink-80)">System settings blocked</span>
+     <button class="chip" data-focusable tabindex="0" aria-label="Open system settings" style="margin-left:auto;height:28px">Open Settings</button>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    const t=b.textContent.trim();
+    if(t==='Allow access' || t==='Open Settings'){
+     b.textContent='Allowing…';
+     setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Access granted</strong><span class="caption">Optics & Privacy restored</span>',{timeout:1800}); }, 700);
+    } else if(t==='Not now'){
+     setEdge('normal');
+     os.banner('<strong>Continuing without access</strong><span class="caption">allow later in Privacy</span>',{timeout:1600});
+    }
+   });
+  });
+  return;
+ }
+}
+window.__setSettingsState=setEdge;
+
+// initial
+renderSettings();
+
+// swipe handling
+os.on('swipeleft', ()=>{
+ if(detailSheet.classList.contains('on')) return;
+ if(edgeState!=='normal') return;
+ // swipeleft advances? For settings, map to scroll
+ viewport.scrollBy({top:140, behavior:'smooth'});
+});
+os.on('swiperight', ()=>{
+ if(detailSheet.classList.contains('on')){ closeSheet(); return; }
+ if(edgeState!=='normal') return;
+ viewport.scrollBy({top:-140, behavior:'smooth'});
+});
+
+os.on('capture', ()=>{
+ if(edgeState==='normal' && !detailSheet.classList.contains('on')){
+  // capture quick feedback
+  os.banner('<strong>Shutter</strong><span class="caption">settings snapshot</span>',{timeout:1400});
+ }
+});
+
+console.log('Prism Settings ready — 600x600');
+</script>
+</body>
+</html>

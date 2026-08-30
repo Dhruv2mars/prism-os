@@ -1,0 +1,1324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Navigation</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+ /* ----- stage world ----- */
+ .stage{
+  background:
+   radial-gradient(120% 90% at 50% 14%, rgba(42,53,80,0.56) 0%, rgba(20,26,40,0.72) 36%, rgba(10,14,23,0.90) 70%),
+   radial-gradient(68% 48% at 78% 86%, rgba(86,184,255,0.10), transparent 56%),
+   rgba(6,10,16,0.76);
+ }
+ .stage-shell{
+  position:relative;
+  width:600px;height:600px;
+  display:grid;place-items:center;
+  flex:none;
+ }
+ /* DEV CHROME — fixed OUTSIDE .stage */
+ .dev-controls{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  display:flex;gap:6px;
+  z-index:1000;
+  justify-content:center;
+  flex-wrap:wrap;
+  pointer-events:none;
+  padding:8px 12px;
+  border-radius:var(--r-pill);
+  background:rgba(10,15,23,0.74);
+  outline:1px solid var(--stroke-glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.32);
+  max-width:92vw;
+ }
+ .stage .dev-controls{display:none !important}
+ .dev-controls .chip{
+  pointer-events:auto;
+  height:26px;padding:0 10px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  transition:background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+  border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+ }
+ .dev-controls .chip.active{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423;outline-color:transparent;
+ }
+ .dev-controls .chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .dev-controls .chip.gaze-focus{transform:scale(1.04)}
+
+ /* viewport */
+ .nav-viewport{
+  position:absolute;
+  inset:44px 0 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:10px 14px 12px 14px;
+  overflow:hidden;
+ }
+
+ /* mini map card — simulated gradient map with pins */
+ .map-card{
+  position:relative;
+  flex:0 0 188px;
+  border-radius:22px;
+  overflow:hidden;
+  background: var(--mat-glass);
+  backdrop-filter:var(--blur-glass);
+  -webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  box-shadow:0 18px 44px rgba(0,0,0,0.30), inset 0 1px 0 rgba(255,255,255,0.06);
+  display:flex;
+  flex-direction:column;
+  animation: rise-in 260ms var(--ease-prism) both;
+ }
+ .map-world{
+  position:absolute;inset:0;
+  background:
+   radial-gradient(120% 80% at 30% 10%, #6a8cc2 0%, #3d5a8a 22%, #2a3d5e 42%, #1c263e 62%, #0f1726 82%),
+   linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 44%),
+   #0e182c;
+  overflow:hidden;
+ }
+ /* street grid - subtle */
+ .map-world::before{
+  content:"";
+  position:absolute;inset:0;
+  background:
+   linear-gradient(90deg, transparent 0, transparent 31.2%, rgba(255,255,255,0.06) 31.4%, transparent 31.6%, transparent 49.8%, rgba(255,255,255,0.06) 50%, transparent 50.2%, transparent 68.4%, rgba(255,255,255,0.05) 68.6%, transparent 68.8%),
+   linear-gradient(0deg, transparent 0, transparent 22.8%, rgba(255,255,255,0.05) 23%, transparent 23.2%, transparent 54.6%, rgba(255,255,255,0.06) 54.8%, transparent 55%, transparent 78%, rgba(255,255,255,0.04) 78.2%, transparent 78.4%);
+  opacity:0.55;
+ }
+ .map-world::after{
+  content:"";
+  position:absolute;left:0;right:0;bottom:0;height:44%;
+  background: linear-gradient(180deg, transparent 0%, rgba(10,14,23,0.22) 100%);
+  pointer-events:none;
+ }
+ .map-header{
+  position:relative;
+  z-index:4;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;
+  padding:10px 10px 0 10px;
+ }
+ .route-summary{
+  display:inline-flex;align-items:center;gap:7px;
+  height:28px;padding:0 10px;
+  border-radius:999px;
+  background:rgba(0,0,0,0.42);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  outline:1px solid rgba(255,255,255,0.10);
+  color:var(--ink-80);
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  white-space:nowrap;
+ }
+  .route-summary strong{ color:var(--ink-100); font-variant-numeric:tabular-nums; font-weight:800 }
+ .route-summary .dot-mini{ width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px rgba(76,212,124,0.5); flex:none }
+ .eta-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  height:28px;padding:0 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  outline:1px solid rgba(255,255,255,0.10);
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  color:var(--ink-80);
+    font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+ }
+  .eta-pill strong{ color:var(--ink-100); font-variant-numeric:tabular-nums; font-size:13px; font-weight:800; letter-spacing:-0.02em }
+ .map-canvas{
+  position:absolute;inset:36px 0 14px 0;
+  z-index:3;
+ }
+ .map-pin{
+  position:absolute;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  transform:translate(-50%,-50%);
+  z-index:5;
+  pointer-events:none;
+ }
+ .map-pin .pin-dot{
+  width:14px;height:14px;border-radius:50%;
+  background:#fff;
+  outline:2px solid rgba(255,255,255,0.9);
+  box-shadow:0 2px 10px rgba(0,0,0,0.32), 0 0 0 4px rgba(255,255,255,0.12);
+  display:grid;place-items:center;
+ }
+ .map-pin .pin-dot.accent{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  outline-color:rgba(86,184,255,0.9);
+  box-shadow:0 2px 10px rgba(16,92,180,0.32), 0 0 0 4px rgba(86,184,255,0.18);
+ }
+ .map-pin .pin-dot.destination{
+  width:16px;height:16px;
+  background:#fff;
+  outline:2px solid #fff;
+  box-shadow:0 2px 12px rgba(0,0,0,0.34);
+ }
+ .map-pin .pin-dot.destination::after{
+  content:"";width:7px;height:7px;border-radius:50%;background:var(--accent-strong);
+ }
+ .pin-label{
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  color:var(--ink-100);
+  background:rgba(0,0,0,0.48);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  outline:1px solid rgba(255,255,255,0.10);
+  padding:3px 7px;border-radius:999px;
+  white-space:nowrap;
+  box-shadow:0 4px 12px rgba(0,0,0,0.18);
+ }
+ .you-dot{
+  position:absolute;
+  left:26%; top:62%;
+  transform:translate(-50%,-50%);
+  z-index:6;
+  width:18px;height:18px;
+  border-radius:50%;
+  background:#fff;
+  outline:2px solid #fff;
+  box-shadow:0 0 0 6px rgba(86,184,255,0.18), 0 0 16px rgba(86,184,255,0.42), 0 4px 14px rgba(0,0,0,0.32);
+  display:grid;place-items:center;
+  transition: left 320ms var(--ease-prism), top 320ms var(--ease-prism);
+ }
+ .you-dot::after{
+  content:"";width:8px;height:8px;border-radius:50%;
+  background:var(--accent-strong);
+  box-shadow:0 0 8px rgba(47,157,255,0.9);
+ }
+ .you-dot::before{
+  content:"";
+  position:absolute;inset:-10px;
+  border-radius:50%;
+  border:1px solid rgba(86,184,255,0.28);
+  animation: youPulse 1.6s var(--ease-prism) infinite;
+ }
+ @keyframes youPulse{0%{transform:scale(0.72);opacity:0.9}100%{transform:scale(1.18);opacity:0}}
+ /* progress bar at bottom of map */
+ .route-progress{
+  position:absolute;left:12px;right:12px;bottom:10px;
+  z-index:6;
+  height:8px;
+  background:rgba(0,0,0,0.38);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  outline:1px solid rgba(255,255,255,0.10);
+  border-radius:999px;
+  overflow:hidden;
+  display:flex;align-items:center;
+  padding:2px;
+ }
+ .route-progress-fill{
+  height:100%;
+  border-radius:999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-strong));
+  box-shadow:0 0 10px rgba(86,184,255,0.42);
+  transition: width 320ms var(--ease-prism);
+  position:relative;
+  overflow:hidden;
+ }
+ .route-progress-fill::after{
+  content:"";
+  position:absolute;inset:0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+  transform:translateX(-100%);
+  animation: glideSheen 1.2s var(--ease-prism) 1;
+  opacity:0.0;
+ }
+ .route-progress-fill.glide::after{
+  opacity:1;
+  animation: glideSheen 820ms var(--ease-prism) 1;
+ }
+ @keyframes glideSheen{
+  0%{transform:translateX(-100%)}
+  100%{transform:translateX(100%)}
+ }
+ .route-progress-meta{
+  position:absolute;left:0;right:0;bottom:20px;
+  display:flex;justify-content:space-between;
+  padding:0 14px;
+  font-size:11px;font-weight:600;letter-spacing:0.02em;color:var(--ink-60);
+    font-variant-numeric:tabular-nums;
+  pointer-events:none;
+  z-index:6;
+ }
+
+ /* next turn card — gaze focus primary */
+ .turn-card{
+  position:relative;
+  display:flex;align-items:center;gap:14px;
+  padding:14px 14px 14px 14px;
+  border-radius:22px;
+  background: var(--mat-raised);
+  backdrop-filter:var(--blur-glass);
+  -webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 18px 44px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 1px rgba(86,184,255,0.06) inset;
+  animation: rise-in 260ms var(--ease-prism) both;
+  cursor:pointer;
+  transition: transform var(--dur-base) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+ }
+ .turn-card.gaze-focus{
+  transform:scale(1.015) translateY(-1px);
+  outline-color:var(--stroke-focus);
+  box-shadow:0 20px 48px rgba(0,0,0,0.40), 0 0 0 2.5px rgba(86,184,255,0.16), 0 0 22px rgba(86,184,255,0.22);
+ }
+ .turn-card:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px }
+ .turn-card.rise-again{ animation: rise-in 280ms var(--ease-prism) both }
+ .arrow-box{
+  width:64px;height:64px;
+  border-radius:16px;
+  display:grid;place-items:center;
+  flex:none;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-strong) 100%);
+  box-shadow:0 8px 18px rgba(16,92,180,0.28), inset 0 1px 0 rgba(255,255,255,0.22);
+  position:relative;
+  overflow:hidden;
+ }
+ .arrow-box::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(255,255,255,0.14), transparent 54%);
+  pointer-events:none;
+ }
+ .arrow-box.arrive{
+  background: linear-gradient(180deg, var(--ok) 0%, #1a8a4a 100%);
+  box-shadow:0 8px 18px rgba(26,138,74,0.28), inset 0 1px 0 rgba(255,255,255,0.18);
+ }
+ .arrow-glyph{
+  width:34px;height:34px;
+  display:block;
+  color:#051423;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,0.18));
+ }
+ .arrow-box.arrive .arrow-glyph{ color:#fff }
+ .turn-main{
+  flex:1;
+  min-width:0;
+  display:flex;flex-direction:column;gap:3px;
+ }
+ .distance-row{
+  display:flex;align-items:baseline;gap:8px;
+  line-height:1;
+ }
+ .distance-val{
+  font-size:30px;
+  font-weight:800;
+  letter-spacing:-0.04em;
+  color:var(--ink-100);
+    font-variant-numeric:tabular-nums;
+  line-height:1;
+ }
+ .distance-unit{
+  font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-60);
+ }
+ .turn-street{
+  font-size:14px;font-weight:700;letter-spacing:-0.01em;color:var(--ink-80);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  line-height:1.1;
+ }
+ .turn-action{
+  font-size:11px;font-weight:600;letter-spacing:0.02em;color:var(--ink-60);
+  line-height:1;
+ }
+ .lane-hint{
+  display:flex;align-items:center;gap:6px;
+  margin-top:6px;
+ }
+ .lanes{
+  display:flex;gap:3px;align-items:flex-end;
+ }
+ .lane{
+  width:22px;height:14px;
+  border-radius:4px;
+  background:rgba(255,255,255,0.09);
+  outline:1px solid rgba(255,255,255,0.10);
+  position:relative;
+  display:grid;place-items:center;
+  overflow:hidden;
+ }
+ .lane.on{
+  background:rgba(86,184,255,0.16);
+  outline-color:rgba(86,184,255,0.28);
+ }
+ .lane.on::before{
+  content:"";
+  width:0;height:0;
+  border-left:4px solid transparent;
+  border-right:4px solid transparent;
+  border-bottom:6px solid var(--accent);
+  transform:translateY(1px);
+ }
+ .lane.dim::before{
+  content:"";
+  width:8px;height:2px;border-radius:999px;background:rgba(255,255,255,0.22);
+ }
+ .lane-hint-label{
+  font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-40);
+ }
+ .turn-meta{
+  display:flex;flex-direction:column;align-items:flex-end;gap:4px;
+  flex:none;
+  text-align:right;
+ }
+ .turn-eta{
+  display:inline-flex;flex-direction:column;align-items:flex-end;gap:1px;
+ }
+ .turn-eta .eta-val{
+    font-size:14px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-100);font-variant-numeric:tabular-nums;line-height:1;
+ }
+ .turn-eta .eta-label{
+    font-size:11px;font-weight:600;letter-spacing:0.02em;color:var(--ink-60);font-variant-numeric:tabular-nums;
+ }
+ .dir-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(86,184,255,0.14);
+  outline:1px solid rgba(86,184,255,0.18);
+  color:var(--accent);
+  font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;
+  padding:4px 7px;border-radius:999px;
+  line-height:1;
+ }
+
+ /* controls card */
+ .controls-card{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 10px;
+  border-radius:16px;
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  box-shadow:0 12px 28px rgba(0,0,0,0.24);
+  animation: rise-in 260ms var(--ease-prism) both;
+  animation-delay:80ms;
+  flex-wrap:wrap;
+ }
+ .controls-card .divider{ width:1px;height:22px;background:rgba(255,255,255,0.07);flex:none;margin:0 2px }
+ .ctrl-btn{
+  appearance:none;-webkit-appearance:none;
+  border:none;
+  display:inline-flex;align-items:center;gap:7px;
+  height:36px;padding:0 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  outline:1px solid rgba(255,255,255,0.08);
+  color:var(--ink-80);
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  cursor:pointer;
+  transition: transform var(--dur-base) var(--ease-prism), background var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
+  white-space:nowrap;
+ }
+ .ctrl-btn.primary{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423; outline-color:transparent;
+  box-shadow:0 6px 14px rgba(16,92,180,0.26);
+ }
+ .ctrl-btn.muted-on{
+  background:rgba(255,93,93,0.14); outline-color:rgba(255,93,93,0.22); color:#ffb3b3;
+ }
+ .ctrl-btn.gaze-focus{ transform:scale(1.04); outline-color:var(--stroke-focus); box-shadow:0 0 0 2px rgba(86,184,255,0.12) }
+ .ctrl-btn:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px }
+ .ctrl-btn:active{ transform:scale(0.96) }
+ .toll-row{
+  display:flex;align-items:center;gap:8px;
+  margin-left:auto;
+  background:rgba(255,255,255,0.06);
+  outline:1px solid rgba(255,255,255,0.07);
+  padding:6px 8px 6px 10px;
+  border-radius:999px;
+ }
+ .toll-label{ font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-60) }
+
+ /* upcoming strip */
+ .upcoming-wrap{
+  display:flex;flex-direction:column;gap:6px;
+  animation: rise-in 260ms var(--ease-prism) both;
+  animation-delay:120ms;
+ }
+ .upcoming-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2px;
+ }
+ .upcoming-title{ font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--ink-40) }
+  .upcoming-count{ font-size:11px;font-weight:600;color:var(--ink-40);font-variant-numeric:tabular-nums }
+ .upcoming-strip{
+  display:flex;gap:8px;
+  overflow-x:auto;overscroll-behavior-x:contain;
+  scrollbar-width:none;
+  padding:2px 1px;
+  scroll-snap-type:x proximity;
+ }
+ .upcoming-strip::-webkit-scrollbar{display:none}
+ .step-chip{
+  appearance:none;-webkit-appearance:none;
+  border:none;
+  flex:0 0 auto;
+  display:inline-flex;align-items:center;gap:8px;
+  height:36px;padding:0 10px 0 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.06);
+  outline:1px solid rgba(255,255,255,0.07);
+  color:var(--ink-80);
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  cursor:pointer;
+  transition: transform var(--dur-base) var(--ease-prism), background var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+  white-space:nowrap;
+  scroll-snap-align:start;
+ }
+ .step-chip.current{
+  background:linear-gradient(180deg, rgba(86,184,255,0.16), rgba(47,157,255,0.12));
+  outline-color:rgba(86,184,255,0.22);
+  color:var(--ink-100);
+  box-shadow:0 4px 14px rgba(16,92,180,0.14);
+ }
+ .step-chip.done{ opacity:0.52 }
+ .step-chip.gaze-focus{ transform:scale(1.04); outline-color:var(--stroke-focus) }
+ .step-chip:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px }
+ .step-icon{
+  width:22px;height:22px;border-radius:50%;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,0.08);
+  outline:1px solid rgba(255,255,255,0.08);
+  flex:none;
+ }
+ .step-chip.current .step-icon{ background:var(--accent-strong); color:#fff; outline-color:transparent }
+ .hint-row{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;
+  padding:2px 2px 0 2px;
+  font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);
+ }
+ .hint-row strong{ color:var(--ink-60); font-weight:700; text-transform:none; letter-spacing:0.02em; font-size:11px }
+ .hint-dot{ width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5);flex:none;display:inline-block }
+
+ /* state layer */
+ .state-layer{
+  position:absolute;
+  inset:44px 0 0 0;
+  z-index:520;
+  display:none;
+  overflow-y:auto;scrollbar-width:none;
+  padding:12px 14px 14px 14px;
+ }
+ .state-layer::-webkit-scrollbar{display:none}
+ .state-layer.on{ display:block; animation: rise-in 260ms var(--ease-prism) both }
+ .state-layer.dim-on{
+  display:grid;place-items:center;
+  padding:12px 14px 14px 14px;
+  background:transparent;
+  pointer-events:none;
+ }
+ .state-layer.dim-on .state-card{ pointer-events:auto }
+ .state-card{
+  width:100%;max-width:420px;
+  background:var(--mat-raised);
+  backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
+  outline:1px solid var(--stroke-glass);
+  border-radius:var(--r-lg);
+  padding:24px 20px 18px 20px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;
+  box-shadow:0 18px 44px rgba(0,0,0,0.36);
+  animation: rise-in 260ms var(--ease-prism) both;
+  position:relative;overflow:hidden;
+ }
+ .state-card::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(90% 60% at 50% 8%, rgba(86,184,255,0.08), transparent 62%);
+  pointer-events:none;
+ }
+ .state-illus{
+  width:64px;height:64px;border-radius:18px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,0.06);
+  outline:1px solid rgba(255,255,255,0.08);
+  margin-bottom:2px;position:relative;
+ }
+ .state-illus.danger{ background:rgba(255,93,93,0.10); outline-color:rgba(255,93,93,0.18) }
+ .state-illus.warn{ background:rgba(255,194,71,0.10); outline-color:rgba(255,194,71,0.18) }
+ .state-title{ font-size:18px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-100);line-height:1.1;position:relative }
+ .state-body{ font-size:13px;font-weight:500;color:var(--ink-60);line-height:1.45;max-width:300px;position:relative }
+ .state-actions{ display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px;position:relative }
+ .state-actions .btn{ min-height:36px;font-size:13px }
+ .skeleton{ border-radius:var(--r-sm); background: linear-gradient(100deg, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.06) 60%); background-size:200% 100%; animation: shimmer 1.2s linear infinite; }
+ button:focus-visible, [data-focusable]:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px }
+
+ @media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+   animation-duration:0.01ms !important;
+   animation-iteration-count:1 !important;
+   transition-duration:0.01ms !important;
+  }
+  .you-dot::before{ animation:none !important }
+  .route-progress-fill::after{ animation:none !important }
+ }
+</style>
+</head>
+<body>
+<div class="device">
+ <div class="stage-shell">
+  <div class="stage" data-stage></div>
+ </div>
+</div>
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+const stage = document.querySelector('[data-stage]');
+const device = document.querySelector('.device');
+const os = createOS(stage, { dwell:true, dwellMs:350 });
+stage.appendChild(os.statusbar('<span style="color:var(--ink-60);font-size:11px;letter-spacing:0.04em;font-weight:700">Navigation · 4.1 km</span>'));
+
+const h = (tag, attrs={}, ...children)=>{
+ const el=document.createElement(tag);
+ for(const [k,v] of Object.entries(attrs)){
+  if(k==='class') el.className=v;
+  else if(k==='html') el.innerHTML=v;
+  else if(v!==null && v!==undefined) el.setAttribute(k,v);
+ }
+ for(const c of children){
+  if(c==null) continue;
+  if(typeof c==='string') el.appendChild(document.createTextNode(c));
+  else el.appendChild(c);
+ }
+ return el;
+};
+
+// dev controls OUTSIDE stage
+const edgeRow = h('div', {class:'dev-controls', role:'toolbar', 'aria-label':'Navigation edge state controls'});
+const edgeStates = [
+ {id:'normal', label:'Normal'},
+ {id:'loading', label:'Loading'},
+ {id:'empty', label:'Empty'},
+ {id:'error', label:'Error'},
+ {id:'offline', label:'Offline'},
+ {id:'permission', label:'No location'},
+];
+edgeStates.forEach(s=>{
+ const b=h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Show ${s.label} state`, 'data-state':s.id}, s.label);
+ if(s.id==='normal') b.classList.add('active');
+ b.addEventListener('click', ()=> setEdge(s.id));
+ edgeRow.appendChild(b);
+});
+device.appendChild(edgeRow);
+
+// viewport
+const viewport = h('div', {class:'nav-viewport', id:'viewport'});
+const stateLayer = h('div', {class:'state-layer', id:'stateLayer', 'aria-live':'polite'});
+stage.append(viewport, stateLayer);
+
+// ---- route model ----
+const ROUTES = {
+ base: [
+  { id:0, action:'Turn left', street:'Valencia St', dist:'350 m', raw:350, eta:'2 min', lane:'left', dir:'left' },
+  { id:1, action:'Continue', street:'Valencia St', dist:'1.2 km', raw:1200, eta:'4 min', lane:'center', dir:'straight' },
+  { id:2, action:'Turn right', street:'Market St', dist:'420 m', raw:420, eta:'7 min', lane:'right', dir:'right' },
+  { id:3, action:'Arrive', street:'Embarcadero Ctr', dist:'0 m', raw:0, eta:'9 min', lane:'arrive', dir:'arrive' },
+ ],
+ toll: [
+  { id:0, action:'Turn left', street:'Valencia St', dist:'350 m', raw:350, eta:'2 min', lane:'left', dir:'left' },
+  { id:1, action:'Take ramp', street:'US-101 N', dist:'2.1 km', raw:2100, eta:'6 min', lane:'right', dir:'sharp-right' },
+  { id:2, action:'Exit 2A', street:'Embarcadero', dist:'620 m', raw:620, eta:'9 min', lane:'right', dir:'right' },
+  { id:3, action:'Arrive', street:'Embarcadero Ctr', dist:'0 m', raw:0, eta:'10 min', lane:'arrive', dir:'arrive' },
+ ]
+};
+
+let avoidTolls = false;
+let muted = false;
+let stepIndex = 0;
+let progress = 0.34; // 0-1
+let edgeState = 'normal';
+let autoProgressTimer = null;
+
+function currentRoute(){ return avoidTolls ? ROUTES.base : ROUTES.toll; }
+function totalDist(route){ return route.reduce((s,r)=> s + r.raw, 0) || 1; }
+function computeProgress(){
+ const route = currentRoute();
+ const tot = totalDist(route);
+ let passed = 0;
+ for(let i=0;i<stepIndex;i++) passed += route[i].raw;
+ // within current step, estimate 40% progressed visually (glide)
+ const curRaw = route[stepIndex]?.raw || 0;
+ if(curRaw>0 && stepIndex < route.length-1){
+  // show partial inside step based on progress fractional? We'll just add 0 for now, progress animates via timer
+ }
+ // derive progress as passed / tot, but clamped and adjusted to feel glanceable
+ // ensure progress bar shows meaningful movement
+ let p = passed / tot;
+ // if on first step, keep baseline 0.18 + stepIndex*? To make bar move perceptibly, we add intra-step drift via timer
+ return Math.max(0.06, Math.min(0.98, p + (stepIndex===0?0.18:0.06)));
+}
+
+// ---- map card ----
+const mapCard = h('div', {class:'map-card', id:'mapCard'});
+const mapWorld = h('div', {class:'map-world', 'aria-hidden':'true'});
+const mapHeader = h('div', {class:'map-header'});
+const routeSummary = h('div', {class:'route-summary ', id:'routeSummary'});
+const etaPill = h('div', {class:'eta-pill ', id:'etaPill'});
+mapHeader.append(routeSummary, etaPill);
+
+const mapCanvas = h('div', {class:'map-canvas', id:'mapCanvas', 'aria-hidden':'true'});
+// SVG route line
+mapCanvas.innerHTML = `
+ <svg viewBox="0 0 600 140" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+  <defs>
+   <linearGradient id="routeGrad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#56b8ff" stop-opacity="0.95"/>
+    <stop offset="100%" stop-color="#0b5ed7" stop-opacity="0.98"/>
+   </linearGradient>
+  </defs>
+  <!-- subtle street ghosts -->
+  <path d="M -10 108 L 620 108" stroke="rgba(255,255,255,0.07)" stroke-width="10" stroke-linecap="round"/>
+  <path d="M 182 -10 L 182 150" stroke="rgba(255,255,255,0.06)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M 410 -10 L 410 150" stroke="rgba(255,255,255,0.05)" stroke-width="9" stroke-linecap="round"/>
+  <!-- route -->
+  <path id="routePath" d="M 86 92 C 132 92, 148 46, 188 46 L 388 46 C 418 46, 430 78, 462 88 L 538 104" fill="none" stroke="url(#routeGrad)" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" opacity="0.98"/>
+  <path id="routePathGlow" d="M 86 92 C 132 92, 148 46, 188 46 L 388 46 C 418 46, 430 78, 462 88 L 538 104" fill="none" stroke="rgba(86,184,255,0.22)" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- dashed center -->
+  <path d="M 86 92 C 132 92, 148 46, 188 46 L 388 46 C 418 46, 430 78, 462 88 L 538 104" fill="none" stroke="rgba(255,255,255,0.72)" stroke-width="2" stroke-linecap="round" stroke-dasharray="8 8" opacity="0.9"/>
+ </svg>
+`;
+// pins
+const pinA = h('div', {class:'map-pin', style:'left:14%; top:66%;'});
+pinA.innerHTML = `<span class="pin-dot" aria-hidden="true"><svg width="8" height="8" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" fill="white"/></svg></span><span class="pin-label">You · Valencia</span>`;
+const pinB = h('div', {class:'map-pin', style:'left:31%; top:33%;'});
+pinB.innerHTML = `<span class="pin-dot accent" aria-hidden="true"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M12 5.5l2.2 4.4 4.8.7-3.5 3.4.8 4.8L12 16.6l-4.3 2.2.8-4.8L5 10.6l4.8-.7L12 5.5z" fill="white"/></svg></span><span class="pin-label" style="background:rgba(86,184,255,0.14);outline-color:rgba(86,184,255,0.22);color:#dff0ff">Next · Valencia St</span>`;
+const pinC = h('div', {class:'map-pin', style:'left:68%; top:33%;'});
+pinC.innerHTML = `<span class="pin-dot" aria-hidden="true" style="background:rgba(255,255,255,0.92);outline-color:rgba(255,255,255,0.92)"></span><span class="pin-label">Market St · 420 m</span>`;
+const pinD = h('div', {class:'map-pin', style:'left:90%; top:72%;'});
+pinD.innerHTML = `<span class="pin-dot destination" aria-hidden="true"></span><span class="pin-label">Ferry Building</span>`;
+
+const youDot = h('div', {class:'you-dot', id:'youDot', 'aria-hidden':'true'});
+
+const progressMeta = h('div', {class:'route-progress-meta ', id:'progressMeta'});
+const progressBar = h('div', {class:'route-progress', 'aria-hidden':'true'});
+const progressFill = h('div', {class:'route-progress-fill', id:'progressFill', style:'width:34%'});
+progressBar.appendChild(progressFill);
+
+mapCanvas.append(pinA, pinB, pinC, pinD, youDot);
+mapCard.append(mapWorld, mapHeader, mapCanvas, progressMeta, progressBar);
+
+// ---- turn card (gaze primary) ----
+const turnCard = h('div', {class:'turn-card', id:'turnCard', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':'Next turn, tap to advance'});
+const arrowBox = h('div', {class:'arrow-box', id:'arrowBox', 'aria-hidden':'true'});
+const arrowSvgWrap = h('div', {id:'arrowSvg'});
+arrowBox.appendChild(arrowSvgWrap);
+const turnMain = h('div', {class:'turn-main'});
+const turnMeta = h('div', {class:'turn-meta'});
+
+turnCard.append(arrowBox, turnMain, turnMeta);
+
+// ---- controls card ----
+const controlsCard = h('div', {class:'controls-card', id:'controlsCard'});
+const rerouteBtn = h('button', {class:'ctrl-btn primary', 'data-focusable':'', tabindex:'0', 'aria-label':'Reroute, find faster route'});
+rerouteBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 7.5l10 5-10 5V7.5z" fill="#051423"/><path d="M17 8.2c2.2 1.1 3.6 3.1 3.6 5.3 0 3.4-3.2 6.2-7.2 6.2-1.2 0-2.4-.26-3.4-.72" stroke="#051423" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.85"/><path d="M7 15.8c-2.2-1.1-3.6-3.1-3.6-5.3 0-3.4 3.2-6.2 7.2-6.2 1.2 0 2.4.26 3.4.72" stroke="white" stroke-opacity="0.9" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg> Reroute`;
+const muteBtn = h('button', {class:'ctrl-btn', 'data-focusable':'', tabindex:'0', 'aria-label':'Mute voice guidance, currently on'});
+muteBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5.2L7.4 8.2H4.2v7.6h3.2L11 18.8V5.2z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M14.6 9.2a4.2 4.2 0 010 5.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M16.4 7.6a6.6 6.6 0 010 8.8" stroke="white" stroke-opacity="0.9" stroke-width="1.4" stroke-linecap="round"/></svg> <span id="muteLabel">Voice on</span>`;
+const divider = h('span', {class:'divider', 'aria-hidden':'true'});
+const tollRow = h('div', {class:'toll-row'});
+const tollLabel = h('span', {class:'toll-label'}, 'Avoid tolls');
+const tollToggle = h('div', {class:'toggle', role:'switch', 'aria-checked':'false', 'aria-label':'Avoid tolls, off', tabindex:'0', 'data-focusable':''});
+tollRow.append(tollLabel, tollToggle);
+controlsCard.append(rerouteBtn, muteBtn, divider, tollRow);
+
+// ---- upcoming strip ----
+const upcomingWrap = h('div', {class:'upcoming-wrap', id:'upcomingWrap'});
+const upcomingHead = h('div', {class:'upcoming-head'});
+upcomingHead.innerHTML = `<span class="upcoming-title">Up next</span><span class="upcoming-count " id="upcomingCount">3 steps · 1.9 km</span>`;
+const upcomingStrip = h('div', {class:'upcoming-strip', id:'upcomingStrip', role:'list', 'aria-label':'Upcoming turns'});
+upcomingWrap.append(upcomingHead, upcomingStrip);
+
+const hintRow = h('div', {class:'hint-row', id:'hintRow'});
+
+viewport.append(mapCard, turnCard, controlsCard, upcomingWrap, hintRow);
+
+// ---- helpers ----
+function arrowFor(dir){
+ const base = `width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true"`;
+ const maps = {
+  'left': `<svg ${base}><path d="M13.2 5.2L6.8 12l6.4 6.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.8 12h11.4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  'right': `<svg ${base}><path d="M10.8 5.2L17.2 12l-6.4 6.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M17.2 12H5.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  'straight': `<svg ${base}><path d="M12 5.2v13.6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M12 5.2L7.6 9.6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 5.2l4.4 4.4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  'sharp-right': `<svg ${base}><path d="M8 7.2l8 5.2-8 5.4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 12.4h8.4" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.9"/></svg>`,
+  'arrive': `<svg ${base}><circle cx="12" cy="12" r="6.8" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v5l3 1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>`,
+ };
+ return maps[dir] || maps['straight'];
+}
+
+function renderMapHeader(){
+ const route = currentRoute();
+ const remaining = route.slice(stepIndex).reduce((s,r)=> s+r.raw, 0);
+ const km = remaining>=1000 ? (remaining/1000).toFixed(1)+' km' : remaining+' m';
+ const mins = route.slice(stepIndex).reduce((n,r)=> {
+  const m = parseInt(r.eta) || 0;
+  return n+m;
+ }, 0);
+ // derive remaining mins as sum but for last step show ~min; simpler: total from current step eta?
+ // We'll compute eta as now + mins
+ const now = new Date();
+ now.setMinutes(now.getMinutes() + mins);
+ const etaStr = now.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  routeSummary.innerHTML = `<span class="dot-mini" aria-hidden="true"></span> <span>Ferry Building</span> <span style="opacity:0.5">·</span> <strong class="tabular">${km}</strong>`;
+  etaPill.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.5" stroke="white" stroke-opacity="0.9" stroke-width="1.5"/><path d="M12 7.5v5l3 1.6" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> <span class="tabular" style="color:var(--ink-60);font-size:11px">ETA</span> <strong class="tabular">${etaStr}</strong> <span style="opacity:0.5">·</span> <span class="tabular" style="color:var(--ink-60)">${mins} min</span>`;
+  progressMeta.innerHTML = `<span>${stepIndex+1} of ${route.length} · ${route[stepIndex]?.street || 'Arrived'}</span><span class="tabular">${km} left</span>`;
+}
+
+function renderTurnCard(animate=true){
+ const route = currentRoute();
+ const step = route[stepIndex];
+ if(!step){
+  turnMain.innerHTML = `<div class="distance-row"><span class="distance-val ">Arrived</span></div><div class="turn-street">You’re here · Ferry Building</div><div class="turn-action">Trip complete · 4.1 km · 9 min</div>`;
+  arrowBox.className='arrow-box arrive';
+  arrowSvgWrap.innerHTML = arrowFor('arrive');
+  turnMeta.innerHTML = `<div class="turn-eta"><span class="eta-val ">Done</span><span class="eta-label">on time</span></div><span class="dir-badge" style="background:rgba(76,212,124,0.14);outline-color:rgba(76,212,124,0.22);color:var(--ok)">Arrived</span>`;
+  // disable reroute etc? keep
+  return;
+ }
+ const [distNum, distUnit] = step.dist.split(' ');
+ turnMain.innerHTML = `
+  <div class="distance-row">
+   <span class="distance-val ">${distNum}</span>
+   <span class="distance-unit">${distUnit}</span>
+   <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5);margin-left:4px;flex:none" aria-hidden="true"></span>
+   <span style="font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-60)">${step.eta}</span>
+  </div>
+  <div class="turn-street">${step.action} <span style="color:var(--ink-100)">· ${step.street}</span></div>
+  <div class="turn-action">${stepIndex===route.length-2 ? 'Then arrive at destination' : `Then ${route[stepIndex+1]?.action || ''} onto ${route[stepIndex+1]?.street || ''}`}</div>
+  <div class="lane-hint">
+   <div class="lanes" aria-hidden="true">
+    ${(() =>{
+     // lane hint logic
+     if(step.lane==='left') return `<span class="lane on"></span><span class="lane dim"></span><span class="lane dim"></span>`;
+     if(step.lane==='center') return `<span class="lane dim"></span><span class="lane on"></span><span class="lane dim"></span>`;
+     if(step.lane==='right') return `<span class="lane dim"></span><span class="lane dim"></span><span class="lane on"></span>`;
+     if(step.lane==='arrive') return `<span class="lane on"></span><span class="lane on"></span><span class="lane on"></span>`;
+     return `<span class="lane dim"></span><span class="lane on"></span><span class="lane dim"></span>`;
+    })()}
+   </div>
+   <span class="lane-hint-label">${step.lane==='arrive' ? 'All lanes' : step.lane==='left' ? 'Keep left · 2 lanes' : step.lane==='right' ? 'Keep right' : step.lane==='center' ? 'Stay center' : 'Stay in lane'}</span>
+  </div>
+ `;
+ turnMeta.innerHTML = `
+  <div class="turn-eta">
+   <span class="eta-val ">${step.eta}</span>
+   <span class="eta-label">to turn</span>
+  </div>
+  <span class="dir-badge">${step.dir==='arrive' ? 'Arrive' : step.dir==='straight' ? 'Straight' : step.dir}</span>
+ `;
+ arrowBox.className='arrow-box' + (step.dir==='arrive' ? ' arrive' : '');
+ arrowSvgWrap.innerHTML = arrowFor(step.dir);
+
+ // accessibility label
+ turnCard.setAttribute('aria-label', `${step.action} onto ${step.street} in ${step.dist}, ${step.eta} to turn, ${step.lane} lane. Tap to advance. Gaze focus primary.`);
+
+ if(animate && !os.state.reducedMotion){
+  turnCard.classList.remove('rise-again');
+  void turnCard.offsetWidth;
+  turnCard.classList.add('rise-again');
+  // delight: progress fill sheen
+  progressFill.classList.remove('glide');
+  void progressFill.offsetWidth;
+  progressFill.classList.add('glide');
+ }
+}
+
+function renderUpcoming(){
+ const route = currentRoute();
+ upcomingStrip.innerHTML='';
+ route.forEach((s,i)=>{
+  const chip = h('button', {class:'step-chip' + (i===stepIndex?' current': i<stepIndex?' done':''), 'data-focusable':'', tabindex:'0', role:'listitem', 'aria-label':`${s.action} onto ${s.street}, ${s.dist}, ${s.eta}`});
+  const iconSvg = s.dir==='left' ? '←' : s.dir==='right' ? '→' : s.dir==='straight' ? '↑' : s.dir==='sharp-right' ? '↗' : '◎';
+  // use svg-like glyph via text but ensure high contrast
+  chip.innerHTML = `
+   <span class="step-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="${s.dir==='left'?'M14 6l-6 6 6 6': s.dir==='right'?'M10 6l6 6-6 6': s.dir==='straight'?'M12 6v12M12 6l-4 4M12 6l4 4': s.dir==='sharp-right'?'M8 7l8 5-8 5':'M12 8a4 4 0 100 8 4 4 0 000-8z'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="tabular">${s.dist}</span>
+   <span style="opacity:0.9">${s.street}</span>
+   <span style="width:1px;height:14px;background:rgba(255,255,255,0.08);margin:0 1px" aria-hidden="true"></span>
+      <span class="tabular" style="color:var(--ink-60);font-size:11px">${s.eta}</span>
+  `;
+  if(i===stepIndex) chip.setAttribute('aria-current','step');
+  chip.addEventListener('click', ()=>{
+   if(edgeState!=='normal') return;
+   if(i===stepIndex){
+    advanceStep();
+   } else {
+    // jump to this step for demo
+    stepIndex = i;
+    syncAll(true);
+    os.banner(`<strong>${s.action} · ${s.street}</strong><span class="caption">${s.dist} · ${s.eta} · lane ${s.lane}</span>`,{timeout:2000});
+   }
+  });
+  upcomingStrip.appendChild(chip);
+ });
+ const remaining = route.slice(stepIndex).reduce((s,r)=> s+r.raw, 0);
+ const km = remaining>=1000 ? (remaining/1000).toFixed(1)+' km' : remaining+' m';
+ document.getElementById('upcomingCount').textContent = `${route.length - stepIndex} steps · ${km}`;
+}
+
+function renderProgress(){
+ const p = computeProgress();
+ progress = p;
+ progressFill.style.width = `${Math.round(p*100)}%`;
+ // move you-dot along route proportionally
+ // lerp between positions: start 14%66% to end 90%72% via intermediate
+ // simple path: use CSS left/top interpolation based on p
+ // map route roughly 0..1 corresponds to x 14->90, y transitions
+ // we'll approximate piecewise
+ const you = document.getElementById('youDot');
+ if(you){
+  // path points: p0 (14,66) -> p1 (31,33) -> p2 (68,33) -> p3 (90,72)
+  // split progress into segments
+  let x, y;
+  if(p < 0.30){
+   const t = p/0.30;
+   x = 14 + (31-14)*t;
+   y = 66 + (33-66)*t;
+  } else if(p < 0.62){
+   const t = (p-0.30)/0.32;
+   x = 31 + (68-31)*t;
+   y = 33;
+  } else {
+   const t = (p-0.62)/0.38;
+   x = 68 + (90-68)*t;
+   y = 33 + (72-33)*t;
+  }
+  you.style.left = `${x}%`;
+  you.style.top = `${y}%`;
+ }
+}
+
+function renderHintRow(){
+ const route = currentRoute();
+ const step = route[stepIndex];
+ if(!step || step.dir==='arrive'){
+    hintRow.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="hint-dot" aria-hidden="true" style="background:var(--ok);box-shadow:0 0 8px rgba(76,212,124,0.5)"></span><strong>Arrived in Ferry Building</strong></span><span class="tabular" style="color:var(--ink-60);letter-spacing:0.02em;text-transform:none;font-size:11px">tap card to restart</span>`;
+ } else {
+  hintRow.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="hint-dot" aria-hidden="true"></span><strong>Gaze + dwell 350 ms</strong><span style="color:var(--ink-60);letter-spacing:0.02em;text-transform:none;font-size:11px">on next turn</span></span><span style="display:flex;align-items:center;gap:6px">Scroll <span style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.08);display:grid;place-items:center;font-size:11px;color:var(--ink-60)">↕</span></span>`;
+ }
+}
+
+function syncAll(animate){
+ renderMapHeader();
+ renderTurnCard(animate);
+ renderUpcoming();
+ renderProgress();
+ renderHintRow();
+ updateMuteUI();
+ updateTollUI();
+}
+
+function advanceStep(){
+ const route = currentRoute();
+ if(stepIndex < route.length-1){
+  stepIndex++;
+  syncAll(true);
+  // haptic-like map pulse
+  if(!os.state.reducedMotion){
+   mapCard.animate([{transform:'scale(0.99)'},{transform:'scale(1)'}],{duration:260,easing:'cubic-bezier(0.32,0.72,0,1)'});
+  }
+  if(stepIndex===route.length-1){
+   os.banner(`<strong>Arrived · Embarcadero</strong><span class="caption">4.1 km · 9 min · route complete</span>`,{timeout:2800});
+  } else {
+   const s = route[stepIndex];
+   os.banner(`<strong>${s.action} · ${s.street}</strong><span class="caption">${s.dist} ahead · ${s.eta} · lane ${s.lane}</span>`,{timeout:2200});
+  }
+ } else {
+  // restart
+  stepIndex=0;
+  syncAll(true);
+  os.banner(`<strong>Restarted route</strong><span class="caption">Valencia St · 4.1 km · prism-ease glide</span>`,{timeout:2000});
+ }
+}
+
+// controls
+rerouteBtn.addEventListener('click', ()=>{
+ if(edgeState!=='normal' && edgeState!=='offline'){
+  os.banner(`<strong>Can’t reroute</strong><span class="caption">${edgeState==='error'?'PR-NAV-503 · try again':'unavailable in this state'}</span>`,{timeout:2000});
+  return;
+ }
+ if(edgeState==='offline'){
+  os.banner(`<strong>Offline · cached route</strong><span class="caption">reroute needs connection · using saved map</span>`,{timeout:2200});
+  return;
+ }
+ // delight: progress glide reset + new jitter
+ rerouteBtn.textContent='Rerouting…';
+ rerouteBtn.setAttribute('disabled','true');
+ mapCard.animate([{filter:'brightness(1)'},{filter:'brightness(1.06)'},{filter:'brightness(1)'}],{duration:420, easing:'cubic-bezier(0.32,0.72,0,1)'});
+ setTimeout(()=>{
+  // flip toll variant for demo or just shuffle progress
+  // occasionally flip avoidTolls effect
+  progress = 0.12;
+  progressFill.style.width='12%';
+  void progressFill.offsetWidth;
+  stepIndex = 0;
+  // small randomization of you-dot early
+  syncAll(true);
+  os.banner(`<strong>Rerouted · 38 sec faster</strong><span class="caption">avoid tolls ${avoidTolls?'on':'off'} · Market St kept</span>`,{timeout:2400});
+  rerouteBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 7.5l10 5-10 5V7.5z" fill="#051423"/><path d="M17 8.2c2.2 1.1 3.6 3.1 3.6 5.3 0 3.4-3.2 6.2-7.2 6.2-1.2 0-2.4-.26-3.4-.72" stroke="#051423" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.85"/><path d="M7 15.8c-2.2-1.1-3.6-3.1-3.6-5.3 0-3.4 3.2-6.2 7.2-6.2 1.2 0 2.4.26 3.4.72" stroke="white" stroke-opacity="0.9" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg> Reroute`;
+  rerouteBtn.removeAttribute('disabled');
+  // delight glide after short delay to show interpolation
+  setTimeout(()=>{
+   renderProgress();
+  }, 80);
+ }, 720);
+});
+
+function updateMuteUI(){
+ const label = document.getElementById('muteLabel');
+ if(muted){
+  muteBtn.classList.add('muted-on');
+  muteBtn.setAttribute('aria-label','Unmute voice guidance, currently muted');
+  if(label) label.textContent='Muted';
+  muteBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5.2L7.4 8.2H4.2v7.6h3.2L11 18.8V5.2z" stroke="#ffb3b3" stroke-width="1.5" stroke-linejoin="round"/><path d="M14.6 9.2l5 5.6" stroke="#ff5d5d" stroke-width="1.6" stroke-linecap="round"/><path d="M14.6 14.8l5-5.6" stroke="#ff5d5d" stroke-width="1.6" stroke-linecap="round"/></svg> <span id="muteLabel">Muted</span>`;
+ } else {
+  muteBtn.classList.remove('muted-on');
+  muteBtn.setAttribute('aria-label','Mute voice guidance, currently on');
+  if(label) label.textContent='Voice on';
+  muteBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5.2L7.4 8.2H4.2v7.6h3.2L11 18.8V5.2z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M14.6 9.2a4.2 4.2 0 010 5.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M16.4 7.6a6.6 6.6 0 010 8.8" stroke="white" stroke-opacity="0.9" stroke-width="1.4" stroke-linecap="round"/></svg> <span id="muteLabel">Voice on</span>`;
+ }
+}
+muteBtn.addEventListener('click', ()=>{
+ if(edgeState!=='normal' && edgeState!=='offline'){
+  os.banner(`<strong>Voice locked</strong><span class="caption">unavailable in this state</span>`,{timeout:1600});
+  return;
+ }
+ muted=!muted;
+ updateMuteUI();
+ os.banner(muted ? `<strong>Voice muted</strong><span class="caption">visual guidance stays ETA</span>` : `<strong>Voice on</strong><span class="caption">next turn spoken at 350 m</span>`,{timeout:1800});
+});
+
+function updateTollUI(){
+ tollToggle.setAttribute('aria-checked', String(avoidTolls));
+ tollToggle.setAttribute('aria-label', avoidTolls ? 'Avoid tolls, on' : 'Avoid tolls, off');
+}
+tollToggle.addEventListener('click', ()=>{
+ if(edgeState==='permission' || edgeState==='error'){
+  os.banner(`<strong>Route locked</strong><span class="caption">unavailable in this state</span>`,{timeout:1600});
+  return;
+ }
+ if(edgeState==='offline'){
+  os.banner(`<strong>Offline · cached</strong><span class="caption">toll preference saved · applies when online</span>`,{timeout:1800});
+  avoidTolls=!avoidTolls;
+  updateTollUI();
+  return;
+ }
+ avoidTolls=!avoidTolls;
+ updateTollUI();
+ // recompute progress + map header with slight delay for glide delight
+ const prev = progress;
+ // flash map
+ mapCard.animate([{filter:'brightness(1)'},{filter:'brightness(1.04)'},{filter:'brightness(1)'}],{duration:260,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ os.banner(avoidTolls ? `<strong>Avoid tolls on</strong><span class="caption">4.1 km · 9 min · Valencia → Market</span>` : `<strong>Avoid tolls off</strong><span class="caption">3.0 km · 10 min · via US-101 · toll $2.50</span>`,{timeout:2000});
+ // sync with progress glide
+ syncAll(true);
+ if(!os.state.reducedMotion){
+  progressFill.animate([{width: `${Math.round(prev*100)}%`},{width:`${Math.round(computeProgress()*100)}%`}],{duration:320,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ }
+});
+tollToggle.addEventListener('keydown', (e)=>{
+ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); tollToggle.click(); }
+});
+
+turnCard.addEventListener('click', (e)=>{
+ if(edgeState!=='normal') return;
+ // avoid triggering when focus via keyboard? still advance
+ advanceStep();
+});
+turnCard.addEventListener('keydown', (e)=>{
+ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); advanceStep(); }
+});
+
+// subtle auto drift for delight - every 4.2s nudge progress within step by 4%
+function startAutoDrift(){
+ stopAutoDrift();
+ autoProgressTimer = setInterval(()=>{
+  if(edgeState!=='normal' || os.state.reducedMotion) return;
+  // only drift if not arrived
+  const route = currentRoute();
+  if(stepIndex >= route.length-1) return;
+  // nudge you-dot a touch forward within step segment
+  const you = document.getElementById('youDot');
+  if(!you) return;
+  // tiny glide: adjust progressFill width by +1.2% then settle
+  const curW = parseFloat(progressFill.style.width) || 34;
+  const nextW = Math.min(92, curW + 0.9);
+  progressFill.style.width = `${nextW}%`;
+  // sheen on drift occasionally
+  if(Math.random()>0.5){
+   progressFill.classList.remove('glide');
+   void progressFill.offsetWidth;
+   progressFill.classList.add('glide');
+  }
+  setTimeout(()=>{
+   // settle back to true computed progress
+   renderProgress();
+  }, 1600);
+ }, 4200);
+}
+function stopAutoDrift(){ if(autoProgressTimer){ clearInterval(autoProgressTimer); autoProgressTimer=null; } }
+
+// initial render
+syncAll(false);
+startAutoDrift();
+
+// keyboard map scroll? stage scroll not needed - viewport fixed
+stage.addEventListener('keydown', (e)=>{
+ if(e.key==='ArrowDown'){
+  // advance step as temple swipe forward
+  if(edgeState==='normal') advanceStep();
+ }
+ if(e.key==='ArrowUp'){
+  if(edgeState==='normal' && stepIndex>0){
+   stepIndex--;
+   syncAll(true);
+  }
+ }
+});
+os.on('swipeleft', ()=>{
+ if(edgeState!=='normal') return;
+ advanceStep();
+});
+os.on('swiperight', ()=>{
+ if(edgeState!=='normal') return;
+ if(stepIndex>0){ stepIndex--; syncAll(true); }
+});
+os.on('capture', ()=>{
+ if(edgeState==='normal') advanceStep();
+});
+
+// ---- edge states ----
+function setEdge(id){
+ edgeState=id;
+ edgeRow.querySelectorAll('.chip').forEach(c=> c.classList.toggle('active', c.dataset.state===id));
+ stateLayer.className='state-layer';
+ stateLayer.innerHTML='';
+ stateLayer.style.display='';
+ viewport.style.display='';
+ viewport.style.opacity='';
+ viewport.style.filter='';
+ viewport.style.pointerEvents='';
+ stopAutoDrift();
+
+ if(id==='normal'){
+  stateLayer.classList.remove('on','dim-on');
+  stateLayer.style.display='none';
+  viewport.style.display='flex';
+  syncAll(false);
+  startAutoDrift();
+  return;
+ }
+
+ // hide viewport for most states except offline which shows cached overlay? spec says offline cached map designed -> we show special state with map preview
+ viewport.style.display='none';
+ stateLayer.classList.add('on');
+ stateLayer.style.display='block';
+
+ if(id==='loading'){
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:10px">
+    <div style="background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:22px;overflow:hidden;height:188px;padding:10px;display:grid;gap:10px;align-content:start">
+     <div style="display:flex;gap:8px">
+      <div class="skeleton" style="width:142px;height:28px;border-radius:999px"></div>
+      <div class="skeleton" style="width:96px;height:28px;border-radius:999px;margin-left:auto"></div>
+     </div>
+     <div style="flex:1;display:grid;place-items:center;padding:8px 0">
+      <div class="skeleton" style="width:92%;height:84px;border-radius:14px"></div>
+     </div>
+     <div class="skeleton" style="height:8px;border-radius:999px;width:92%"></div>
+    </div>
+    <div style="background:var(--mat-raised);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:22px;padding:14px;display:flex;gap:14px;align-items:center">
+     <div class="skeleton" style="width:64px;height:64px;border-radius:16px;flex:none"></div>
+     <div style="flex:1;display:grid;gap:8px">
+      <div class="skeleton" style="width:42%;height:22px;border-radius:8px"></div>
+      <div class="skeleton" style="width:68%;height:12px;border-radius:6px"></div>
+      <div class="skeleton" style="width:52%;height:10px;border-radius:6px"></div>
+      <div style="display:flex;gap:6px;margin-top:2px"><div class="skeleton" style="width:22px;height:14px;border-radius:4px"></div><div class="skeleton" style="width:22px;height:14px;border-radius:4px"></div><div class="skeleton" style="width:22px;height:14px;border-radius:4px"></div><div class="skeleton" style="width:92px;height:10px;border-radius:6px;margin-left:6px"></div></div>
+     </div>
+     <div style="display:grid;gap:6px;justify-items:end">
+      <div class="skeleton" style="width:48px;height:14px;border-radius:6px"></div>
+      <div class="skeleton" style="width:62px;height:16px;border-radius:999px"></div>
+     </div>
+    </div>
+    <div style="background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:16px;padding:10px;display:flex;gap:8px;align-items:center">
+     <div class="skeleton" style="width:88px;height:36px;border-radius:999px"></div>
+     <div class="skeleton" style="width:92px;height:36px;border-radius:999px"></div>
+     <div style="flex:1"></div>
+     <div class="skeleton" style="width:110px;height:32px;border-radius:999px"></div>
+    </div>
+    <div style="display:flex;gap:8px;overflow:hidden"><div class="skeleton" style="flex:0 0 128px;height:36px;border-radius:999px"></div><div class="skeleton" style="flex:0 0 128px;height:36px;border-radius:999px"></div><div class="skeleton" style="flex:0 0 128px;height:36px;border-radius:999px"></div></div>
+    <div class="caption" style="text-align:center;color:var(--ink-40);display:flex;align-items:center;justify-content:center;gap:6px"><span class="dot ok" style="width:6px;height:6px;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5)"></span>Loading route · shimmer 1.2s · prism-ease 260 ms</div>
+   </div>
+  `;
+  return;
+ }
+ if(id==='empty'){
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px;justify-items:center;padding:10px 0 0 0">
+    <div class="state-card">
+     <div class="state-illus" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M9 4.5l-5 2.2v11l5-2.2 5 2.2 5-2.2v-11l-5 2.2-5-2.2z" stroke="white" stroke-opacity="0.9" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 4.5v13.2M14 6.7v13" stroke="white" stroke-opacity="0.9" stroke-width="1.2"/><circle cx="12" cy="10.2" r="2.2" fill="white" stroke="white"/><path d="M7.2 13.8l2.8-2 2 1.4 2-1.4 2.8 2" stroke="white" stroke-opacity="0.18" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+     </div>
+     <div class="state-title">No route yet</div>
+     <div class="state-body">Choose a destination and Prism draws a translucent route over the world. Distance and ETA stay and glanceable at arm’s length.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Plan route to Ferry Building">Plan to Ferry Building</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Browse destinations">Browse</button>
+     </div>
+     <p class="caption" style="color:var(--ink-40);font-size:11px">Empty · pick a place · progress appears on route</p>
+    </div>
+    <div style="width:100%;max-width:420px;background:rgba(255,255,255,0.04);outline:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;justify-content:center">
+     <span class="dot ok" style="width:7px;height:7px;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5)"></span>
+     <span style="font-size:11px;font-weight:600;color:var(--ink-60)">Prism map · simulated gradient world</span>
+     <span class="caption" style="margin-left:auto">no pins yet</span>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    const t=b.textContent.trim();
+    if(t.includes('Plan')){
+     b.textContent='Planning…';
+     setTimeout(()=>{ setEdge('normal'); stepIndex=0; syncAll(true); os.banner('<strong>Route planned · 4.1 km</strong><span class="caption">Valencia St → Market St · ETA 9 min</span>',{timeout:2400}); }, 700);
+    } else {
+     os.banner('<strong>Destinations</strong><span class="caption">Ferry Building · Dolores Park · SFO · stub</span>',{timeout:1800});
+    }
+   });
+  });
+  return;
+ }
+ if(id==='error'){
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:10px;justify-items:center;padding:10px 0 0 0">
+    <div class="state-card" style="animation: sheet-in 320ms var(--ease-prism)">
+     <div class="state-illus danger" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.6L21.2 18.8H2.8L12 3.6z" stroke="#ff8a8a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.6v4.4" stroke="#ffb3b3" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.9" r="1.25" fill="#ffb3b3"/></svg>
+     </div>
+     <div class="state-title">Navigation unavailable</div>
+     <div class="state-body">Prism couldn’t fetch a live route. Your position stays on-device — try again or use the cached map. No dead ends.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Retry navigation" id="retryBtn">Retry</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Use cached map offline">Use cached map</button>
+     </div>
+     <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;width:100%;justify-content:center;position:relative">
+      <span class="dot bad" aria-hidden="true"></span><span class="caption " style="color:var(--ink-60)">PR-NAV-503 · ${new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})}</span><span class="caption" style="margin-left:auto;color:var(--ink-40)">tap Retry</span>
+     </div>
+     <p class="caption" style="color:var(--ink-40);position:relative;font-size:11px">Glass stays readable over the world.</p>
+    </div>
+   </div>
+  `;
+  const retryBtn = stateLayer.querySelector('#retryBtn');
+  retryBtn.addEventListener('click', ()=>{
+   retryBtn.textContent='Retrying…';
+   retryBtn.setAttribute('disabled','true');
+   const card = stateLayer.querySelector('.state-card');
+   card.animate([{opacity:1},{opacity:0.6}],{duration:200, easing:'ease-in'});
+   setTimeout(()=>{
+    setEdge('normal');
+    syncAll(true);
+    os.banner('<strong>Back online · route restored</strong><span class="caption">Valencia St · 350 m · 2 min</span>',{timeout:2200});
+   }, 900);
+  });
+  stateLayer.querySelectorAll('button')[1].addEventListener('click', ()=> setEdge('offline'));
+  return;
+ }
+ if(id==='offline'){
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px">
+    <div style="background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:22px;overflow:hidden;position:relative;height:188px;display:grid;place-items:center">
+     <div style="position:absolute;inset:0;background: radial-gradient(120% 80% at 30% 10%, #6a8cc2 0%, #3d5a8a 22%, #2a3d5e 42%, #1c263e 62%, #0f1726 82%);opacity:0.9"></div>
+     <div style="position:absolute;inset:0;background: repeating-linear-gradient(90deg, transparent 0 31%, rgba(255,255,255,0.04) 31% 32%, transparent 32% 50%, rgba(255,255,255,0.04) 50% 51%, transparent 51% 68%, rgba(255,255,255,0.03) 68% 69%, transparent 69% 100%), repeating-linear-gradient(0deg, transparent 0 23%, rgba(255,255,255,0.03) 23% 24%, transparent 24% 55%, rgba(255,255,255,0.04) 55% 56%, transparent 56% 100%);"></div>
+     <svg viewBox="0 0 600 140" preserveAspectRatio="none" style="position:absolute;inset:36px 0 14px 0;width:100%;height:104px;pointer-events:none;opacity:0.72">
+      <path d="M 86 92 C 132 92, 148 46, 188 46 L 388 46 C 418 46, 430 78, 462 88 L 538 104" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="10" stroke-linecap="round" stroke-dasharray="10 8"/>
+     </svg>
+     <div style="position:relative;z-index:2;background:rgba(10,15,23,0.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);outline:1px solid rgba(255,255,255,0.10);padding:10px 14px;border-radius:14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 22px rgba(0,0,0,0.32)">
+      <span style="width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,194,71,0.14);outline:1px solid rgba(255,194,71,0.22)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3.5 9.5a9 9 0 0117 0" stroke="#ffc247" stroke-width="1.6" stroke-linecap="round"/><path d="M6 12.5a6 6 0 0112 0" stroke="#ffc247" stroke-width="1.6" stroke-linecap="round"/><path d="M8.8 15.5a2.8 2.8 0 016.4 0" stroke="#ffc247" stroke-width="1.6" stroke-linecap="round"/><path d="M2 2l20 20" stroke="#ffc247" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+      <div style="text-align:left">
+       <div style="font-size:13px;font-weight:800;color:var(--ink-100)">Offline · cached map</div>
+       <div style="font-size:11px;font-weight:600;color:var(--ink-60)">Last updated today 8:14 AM · 4.1 km route saved</div>
+      </div>
+     </div>
+     <div style="position:absolute;left:12px;right:12px;bottom:10px;height:8px;background:rgba(0,0,0,0.32);outline:1px solid rgba(255,255,255,0.08);border-radius:999px;overflow:hidden;display:flex;align-items:center;padding:2px;z-index:2">
+      <div style="width:34%;height:100%;border-radius:999px;background:linear-gradient(90deg, rgba(86,184,255,0.5), rgba(47,157,255,0.5));"></div>
+     </div>
+    </div>
+    <div class="state-card" style="padding:18px 16px;gap:10px">
+     <div style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:12px 14px;position:relative">
+      <span class="dot warn" aria-hidden="true"></span>
+      <div style="flex:1;min-width:0">
+       <div style="font-size:13px;font-weight:700;color:var(--ink-80)">You’re offline</div>
+       <div style="font-size:11px;font-weight:500;color:var(--ink-60)">Voice guidance paused · reroute needs connection · cached route still guides.</div>
+      </div>
+      <span class="caption" style="background:rgba(255,194,71,0.14);outline:1px solid rgba(255,194,71,0.18);padding:4px 8px;border-radius:999px;font-size:11px">cached</span>
+     </div>
+     <div class="state-title" style="font-size:16px">Navigate with cached route?</div>
+     <div class="state-body">Continue with the last saved map. Turn-by-turn stays and glanceable, but live traffic is paused.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Continue offline with cached map">Continue offline</button>
+      <button class="btn" data-focusable tabindex="0" aria-label="Retry connection">Retry</button>
+     </div>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    const t=b.textContent.trim();
+    if(t.includes('Continue')){
+     setEdge('normal');
+     syncAll(true);
+     os.banner('<strong>Offline mode · cached</strong><span class="caption">4.1 km · voice paused · reroute disabled</span>',{timeout:2400});
+    } else {
+     b.textContent='Retrying…';
+     setTimeout(()=>{ b.textContent='Retry'; os.banner('<strong>Still offline</strong><span class="caption">check connection · cached route available</span>',{timeout:2000}); }, 800);
+    }
+   });
+  });
+  return;
+ }
+ if(id==='permission'){
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px;justify-items:center;padding:10px 0 0 0">
+    <div class="state-card">
+     <div class="state-illus warn" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.5l8.2 4.7v9.6L12 22.5 3.8 17.8V8.2L12 3.5z" stroke="white" stroke-opacity="0.92" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.2" stroke="white" stroke-width="1.6"/><path d="M12 6.5v2.8" stroke="white" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="15.8" r="1" fill="white"/><path d="M2 2l20 20" stroke="#ffc247" stroke-width="1.6" stroke-linecap="round"/></svg>
+     </div>
+     <div class="state-title">Location is off</div>
+     <div class="state-body">Prism needs location to show your dot, pins, and turn-by-turn. Your route stays private and never leaves the device without permission.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Allow location access">Allow location</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Not now">Not now</button>
+     </div>
+     <p class="caption" style="color:var(--ink-40);font-size:11px;position:relative">Settings → Privacy → Location · Prism</p>
+     <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;width:100%;justify-content:center;position:relative">
+      <span class="dot warn" aria-hidden="true"></span><span style="font-size:11px;font-weight:600;color:var(--ink-60)">Location blocked · map hidden</span>
+     </div>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    const t=b.textContent.trim();
+    if(t.includes('Allow')){
+     b.textContent='Allowing…';
+     setTimeout(()=>{ setEdge('normal'); syncAll(true); os.banner('<strong>Location on · route live</strong><span class="caption">dot updated · 350 m to Valencia St</span>',{timeout:2200}); }, 700);
+    } else {
+     setEdge('normal');
+     syncAll(false);
+     // keep map but show banner
+     os.banner('<strong>Continuing without location</strong><span class="caption">turn list still available · map dimmed</span>',{timeout:2200});
+    }
+   });
+  });
+  return;
+ }
+}
+window.__setNavState = setEdge;
+
+console.log('Prism Nav ready — 600x600 · gaze primary · progress glide');
+</script>
+</body>
+</html>

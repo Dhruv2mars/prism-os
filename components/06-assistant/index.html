@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Assistant</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+ /* stage glass — coherent with 02-home hero */
+ .stage{
+  background: radial-gradient(120% 90% at 50% 16%, rgba(42,53,80,0.55) 0%, rgba(20,26,40,0.72) 36%, rgba(10,14,23,0.90) 70%),
+        radial-gradient(70% 50% at 78% 86%, rgba(86,184,255,0.10), transparent 55%),
+        rgba(6,10,16,0.76);
+ }
+
+ /* shell centers stage, hosts chrome OUTSIDE stage */
+ .stage-shell{
+  position:relative;
+  width:600px;height:600px;
+  display:grid;place-items:center;
+  flex:none;
+ }
+ /* device chrome — edge state controls OUTSIDE stage (fixed, below stage) */
+ .dev-controls{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  display:flex;gap:6px;
+  z-index:1000;
+  justify-content:center;
+  flex-wrap:wrap;
+  pointer-events:none;
+  padding:8px 12px;
+  border-radius:var(--r-pill);
+  background:rgba(10,15,23,0.74);
+  outline:1px solid var(--stroke-glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.32);
+  max-width:92vw;
+ }
+ .dev-controls .chip{
+  pointer-events:auto;
+  height:26px;padding:0 10px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  transition:background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+  border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+ }
+ .dev-controls .chip.active{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423;outline-color:transparent;
+ }
+ .dev-controls .chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .dev-controls .chip.gaze-focus{transform:scale(1.06);box-shadow:0 0 0 2.5px var(--stroke-focus), 0 0 22px rgba(86,184,255,0.35)}
+ .stage .ctrl-row{display:none !important}
+
+ /* viewport — stage scroll lives here, orb floats above */
+ .assistant-viewport{
+  position:absolute;
+  inset:44px 0 0 0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+  padding:14px 16px 88px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+ }
+ .assistant-viewport::-webkit-scrollbar{display:none}
+
+ .view{display:none;flex-direction:column;gap:14px;animation:rise-in 260ms var(--ease-prism) both}
+ .view.active{display:flex}
+ /* motion overrides — keep sheet/wave within 200-320 prism-ease */
+ .sheet-in{animation:sheet-in 280ms var(--ease-prism) both !important}
+ .rise-in{animation:rise-in 260ms var(--ease-prism) both !important}
+
+ /* sheet */
+ .sheet{
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);
+  -webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  border-radius:var(--r-lg);
+  box-shadow:0 18px 44px rgba(0,0,0,0.34);
+  overflow:hidden;
+  position:relative;
+ }
+ .sheet.raised{background:var(--mat-raised)}
+ .sheet-header{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 16px 12px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  position:relative;
+ }
+ .sheet-header::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(120deg, rgba(255,255,255,0.06) 0%, transparent 44%);
+  pointer-events:none;
+ }
+ .mini-orb{
+  width:32px;height:32px;border-radius:50%;flex:none;
+  display:grid;place-items:center;
+  background:radial-gradient(38% 38% at 32% 28%, #ffffff 0%, #dff0ff 14%, #86c8ff 30%, #2f9dff 52%, #0b5ed7 78%);
+  box-shadow:0 4px 14px rgba(16,92,180,0.32), 0 0 0 1px rgba(255,255,255,0.14) inset;
+  position:relative;
+ }
+ .mini-orb.listening{
+  animation: orbBreathe 320ms var(--ease-prism) infinite alternate;
+ }
+ @keyframes orbBreathe{from{transform:scale(1);filter:brightness(1)}to{transform:scale(1.06);filter:brightness(1.08)}}
+ .sheet-title{font-size:14px;font-weight:700;letter-spacing:-0.01em;line-height:1;color:var(--ink-100)}
+ .sheet-sub{font-size:11px;font-weight:600;color:var(--ink-60);letter-spacing:0.02em;margin-top:2px;display:flex;align-items:center;gap:6px}
+ .live-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px rgba(76,212,124,0.7);display:inline-block;
+ }
+ .live-dot.pulse{animation:livePulse 1.2s ease-in-out infinite}
+ @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.45;transform:scale(0.85)}}
+ .live-dot.warn{background:var(--warn);box-shadow:0 0 10px rgba(255,194,71,0.6)}
+ .live-dot.bad{background:var(--danger);box-shadow:0 0 10px rgba(255,93,93,0.6)}
+ .live-dot.idle{background:var(--ink-20);box-shadow:none}
+
+ /* transcript */
+ .transcript{
+  display:flex;flex-direction:column;gap:10px;
+  padding:14px 16px 12px 16px;
+  min-height:118px;
+ }
+ .msg{
+  max-width:84%;
+  padding:10px 13px;
+  border-radius:18px;
+  font-size:13px;
+  font-weight:500;
+  line-height:1.45;
+  letter-spacing:0.01em;
+  position:relative;
+  word-break:break-word;
+  animation:rise-in 220ms var(--ease-prism) both;
+ }
+ .msg.user{
+  align-self:flex-end;
+  background:linear-gradient(180deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color:#04121f;
+  border-radius:18px 18px 4px 18px;
+  font-weight:600;
+  box-shadow:0 6px 18px rgba(16,92,180,0.24);
+ }
+ .msg.assistant{
+  align-self:flex-start;
+  background:rgba(255,255,255,0.08);
+  outline:1px solid rgba(255,255,255,0.08);
+  color:var(--ink-80);
+  border-radius:18px 18px 18px 4px;
+ }
+ .msg.assistant.streaming{
+  background:rgba(255,255,255,0.09);
+ }
+ .msg-meta{
+  font-size:11px;font-weight:600;color:var(--ink-40);letter-spacing:0.02em;margin-top:6px;display:flex;gap:6px;align-items:center;
+ }
+ .msg.user .msg-meta{color:rgba(4,18,31,0.62);justify-content:flex-end}
+ .word-reveal{
+  display:inline-block;
+  animation:blurWipe 320ms var(--ease-prism) both;
+ }
+ @keyframes blurWipe{
+  from{filter:blur(8px);opacity:0;transform:translateY(4px)}
+  to{filter:blur(0);opacity:1;transform:translateY(0)}
+ }
+ .cursor{
+  display:inline-block;width:2px;height:13px;
+  background:var(--accent-strong);
+  margin-left:2px;vertical-align:-2px;
+  border-radius:1px;
+  animation:cursorBlink 900ms steps(1) infinite;
+    font-variant-numeric:tabular-nums;
+ }
+ @keyframes cursorBlink{0%,50%{opacity:1}51%,100%{opacity:0}}
+
+ /* inline thinking bubble */
+ .thinking-inline{
+  align-self:flex-start;
+  display:inline-flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,0.07);
+  outline:1px solid rgba(255,255,255,0.07);
+  border-radius:18px 18px 18px 4px;
+  padding:10px 14px;
+  min-height:38px;
+ }
+ .thinking-dots{display:flex;gap:4px;align-items:center}
+ .thinking-dots i{
+  width:6px;height:6px;border-radius:50%;background:var(--ink-60);
+  animation:dotBounce 320ms var(--ease-prism) infinite alternate;
+ }
+ .thinking-dots i:nth-child(2){animation-delay:80ms}
+ .thinking-dots i:nth-child(3){animation-delay:160ms}
+ @keyframes dotBounce{
+  from{transform:translateY(0) scale(1);opacity:0.7}
+  to{transform:translateY(-3px) scale(1.08);opacity:1}
+ }
+ .thinking-label{font-size:11px;font-weight:600;color:var(--ink-60);letter-spacing:0.02em}
+
+ /* waveform — dimmed at rest (0.5) to reduce foci; full opacity when listening/streaming */
+ .waveform{
+  display:flex;align-items:center;gap:3px;
+  height:28px;
+  padding:0 2px;
+  opacity:0.5;
+  transition:opacity var(--dur-fast) var(--ease-prism);
+ }
+ .waveform.listening,.waveform.streaming{opacity:1}
+ .waveform i{
+  width:3px;border-radius:999px;
+  background:linear-gradient(180deg, #dff0ff 0%, var(--accent) 48%, var(--accent-strong) 100%);
+  height:8px;
+  transform-origin:center;
+  animation:wavePulse 280ms var(--ease-prism) infinite alternate;
+  opacity:0.96;
+ }
+ @keyframes wavePulse{
+  from{transform:scaleY(0.45);opacity:0.75}
+  to{transform:scaleY(1);opacity:1}
+ }
+ .waveform.idle i{animation-play-state:paused;opacity:0.45;transform:scaleY(0.5)}
+ .waveform.listening i{animation-duration:220ms}
+ .waveform.streaming i{animation-duration:260ms}
+ /* waveform bars heights staggered via inline --h but animated scaleY gives liveliness; also direct height variation via --h */
+ .waveform i{height:var(--h,10px)}
+
+ /* status strip below transcript */
+ .status-strip{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  margin:0 16px;
+  background:rgba(255,255,255,0.06);
+  outline:1px solid rgba(255,255,255,0.07);
+  border-radius:14px;
+  min-height:44px;
+ }
+ .status-strip .caption{font-size:11px;font-weight:600;color:var(--ink-60);letter-spacing:0.02em;line-height:1.3}
+ .status-strip strong{font-size:13px;font-weight:700;color:var(--ink-80)}
+
+ /* suggestion chips — dimmed at rest to reduce competing foci; only gaze-focused chip at full opacity */
+ .suggestions{
+  display:flex;gap:8px;flex-wrap:wrap;
+  padding:0 16px 16px 16px;
+ }
+ .suggestions .chip{
+  height:30px;padding:0 12px;
+  font-size:11px;font-weight:600;letter-spacing:0.01em;
+  opacity:0.68;
+  transition:transform var(--dur-base) var(--ease-prism), background var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism), opacity var(--dur-fast) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
+  cursor:pointer;
+ }
+ .suggestions .chip:hover{transform:translateY(-1px);opacity:1}
+ .suggestions .chip.gaze-focus{transform:scale(1.06);opacity:1;box-shadow:0 0 0 2.5px var(--stroke-focus), 0 0 22px rgba(86,184,255,0.35)}
+ .suggestions .chip:focus-visible{opacity:1}
+ .composer-hint{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 16px 14px 16px;
+  border-top:1px solid rgba(255,255,255,0.05);
+ }
+ .composer-hint .caption{color:var(--ink-40)}
+ /* header Clear — dim at rest to reduce foci */
+ .sheet-header .btn{
+  opacity:0.68;
+  transition:opacity var(--dur-fast) var(--ease-prism), transform var(--dur-base) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
+ }
+ .sheet-header .btn:hover,
+ .sheet-header .btn:focus-visible{opacity:1}
+ .sheet-header .btn.gaze-focus{opacity:1;transform:scale(1.06);box-shadow:0 0 0 2.5px var(--stroke-focus), 0 0 22px rgba(86,184,255,0.35)}
+ /* metaCard — hidden unless streaming to reduce 6→3 foci at rest */
+ #metaCard{
+  display:none;
+  opacity:0;
+  transition:opacity var(--dur-base) var(--ease-prism);
+ }
+ #metaCard.is-streaming{
+  display:flex;
+  opacity:1;
+ }
+
+ /* orb — 56px spec, coherent with 02-home gradient — primary focal at rest via stronger shadow */
+ .orb-wrap{
+  position:absolute;
+  bottom:14px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:420;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  animation:rise-in 380ms var(--ease-prism) both;
+  animation-delay:320ms;
+ }
+ .orb{
+  appearance:none;-webkit-appearance:none;
+  border:none;
+  width:56px;height:56px;
+  border-radius:50%;
+  background:radial-gradient(38% 38% at 32% 28%, #ffffff 0%, #dff0ff 14%, #86c8ff 30%, #2f9dff 52%, #0b5ed7 78%);
+  box-shadow:0 16px 40px rgba(16,92,180,0.52), 0 0 0 1px rgba(255,255,255,0.22) inset, 0 0 32px rgba(86,184,255,0.42), 0 8px 22px rgba(0,0,0,0.32);
+  display:grid;place-items:center;
+  cursor:pointer;
+  position:relative;
+  transition:transform 260ms var(--ease-prism), box-shadow 160ms var(--ease-prism), opacity 160ms var(--ease-prism);
+ }
+ .orb::before{
+  content:"";position:absolute;inset:-10px;border-radius:50%;
+  background:radial-gradient(circle, rgba(86,184,255,0.22) 0%, transparent 70%);
+  opacity:0;transition:opacity 260ms var(--ease-prism);pointer-events:none;
+ }
+ .orb.gaze-focus{transform:scale(1.06);box-shadow:0 14px 32px rgba(16,92,180,0.46), 0 0 0 2.5px var(--stroke-focus), 0 0 22px rgba(86,184,255,0.38)}
+ .orb.gaze-focus::before{opacity:1}
+ .orb:active{transform:scale(0.96)}
+ .orb.listening{
+  animation:orbListenPulse 320ms var(--ease-prism) infinite alternate;
+  box-shadow:0 14px 32px rgba(16,92,180,0.5), 0 0 0 2px rgba(86,184,255,0.9), 0 0 28px rgba(86,184,255,0.5);
+ }
+ @keyframes orbListenPulse{from{transform:scale(1)}to{transform:scale(1.07)}}
+ .orb svg{filter:drop-shadow(0 1px 6px rgba(0,0,0,0.22))}
+ .orb-label{
+  font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-40);white-space:nowrap;
+ }
+ .orb-hint{
+  position:absolute;bottom:72px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,0.44);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  outline:1px solid rgba(255,255,255,0.08);
+  color:var(--ink-60);font-size:10px;font-weight:600;letter-spacing:0.02em;
+  padding:5px 9px;border-radius:999px;white-space:nowrap;
+  opacity:0;translate:0 6px;
+  transition:opacity 260ms var(--ease-prism), translate 260ms var(--ease-prism);
+  pointer-events:none;
+ }
+ .orb-wrap:hover .orb-hint,
+ .orb.gaze-focus ~ .orb-hint{opacity:1;translate:0 0}
+ .orb-wrap:focus-within .orb-hint{opacity:1;translate:0 0}
+
+ /* edge state cards — designed, not defaulted */
+ .state-card{
+  background:var(--mat-raised);
+  backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
+  outline:1px solid var(--stroke-glass);
+  border-radius:var(--r-lg);
+  padding:26px 22px 20px 22px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;
+  box-shadow:0 18px 44px rgba(0,0,0,0.36);
+  min-height:320px;justify-content:center;
+  position:relative;overflow:hidden;
+ }
+ .state-card::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(90% 60% at 50% 10%, rgba(86,184,255,0.08), transparent 62%);
+  pointer-events:none;
+ }
+ .state-illus{
+  width:64px;height:64px;border-radius:20px;display:grid;place-items:center;
+  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.08);
+  position:relative;
+ }
+ .state-illus.danger{background:rgba(255,93,93,0.10);outline-color:rgba(255,93,93,0.18)}
+ .state-title{font-size:18px;font-weight:700;letter-spacing:-0.01em;color:var(--ink-100);position:relative}
+ .state-body{font-size:13px;font-weight:500;color:var(--ink-60);line-height:1.45;max-width:320px;position:relative}
+ .state-actions{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;justify-content:center;position:relative}
+ .queued-list{
+  width:100%;max-width:360px;display:grid;gap:8px;margin-top:2px;position:relative;text-align:left;
+ }
+ .queued-item{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:10px 12px;
+ }
+ .queued-item .caption{color:var(--ink-60);font-weight:600}
+ .queued-item strong{font-size:13px;color:var(--ink-80)}
+
+ /* loading skeleton inside sheet */
+ .sk-line{height:10px;border-radius:8px}
+ .sk-bubble{height:42px;border-radius:18px}
+
+ button:focus-visible, [data-focusable]:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+
+ @media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important}
+  .waveform i{animation:none}
+  .cursor{animation:none;opacity:1}
+ }
+</style>
+</head>
+<body>
+<div class="device">
+ <div class="stage-shell">
+  <div class="stage" data-stage></div>
+ </div>
+</div>
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+const stage = document.querySelector('[data-stage]');
+const device = document.querySelector('.device');
+const stageShell = document.querySelector('.stage-shell');
+const os = createOS(stage, { dwell: true, dwellMs: 350 });
+stage.appendChild(os.statusbar('<span class="caption" style="color:var(--ink-60);letter-spacing:0.04em">Assistant</span>'));
+
+const h = (tag, attrs={}, ...children)=>{
+ const el=document.createElement(tag);
+ for(const [k,v] of Object.entries(attrs)){
+  if(k==='class') el.className=v;
+  else if(k==='html') el.innerHTML=v;
+  else if(v!==null && v!==undefined) el.setAttribute(k,v);
+ }
+ for(const c of children){
+  if(c==null) continue;
+  if(typeof c==='string') el.appendChild(document.createTextNode(c));
+  else el.appendChild(c);
+ }
+ return el;
+};
+const $ = (s,r=stage)=> r.querySelector(s);
+const $$ = (s,r=stage)=> [...r.querySelectorAll(s)];
+
+// ---- dev controls OUTSIDE stage (fixed device chrome) ----
+const ctrlRow = h('div', {class:'dev-controls', role:'toolbar', 'aria-label':'Assistant state controls'});
+const states = [
+ {id:'normal', label:'Normal'},
+ {id:'loading', label:'Thinking'},
+ {id:'empty', label:'Empty'},
+ {id:'error', label:'Error'},
+ {id:'offline', label:'Offline'},
+ {id:'permission', label:'No mic'},
+];
+states.forEach(s=>{
+ const b=h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Show ${s.label} state`, 'data-state':s.id}, s.label);
+ if(s.id==='normal') b.classList.add('active');
+ b.addEventListener('click', ()=> setState(s.id));
+ ctrlRow.appendChild(b);
+});
+(device || stageShell).appendChild(ctrlRow);
+
+// ---- viewport ----
+const viewport = h('div', {class:'assistant-viewport', id:'viewport'});
+stage.appendChild(viewport);
+
+const viewNormal = h('div', {class:'view active', id:'view-normal', 'aria-label':'Assistant normal state'});
+const viewLoading = h('div', {class:'view', id:'view-loading', 'aria-label':'Loading thinking state'});
+const viewEmpty = h('div', {class:'view', id:'view-empty', 'aria-label':'Empty history'});
+const viewError = h('div', {class:'view', id:'view-error', 'aria-label':'Error state PR-AI-503'});
+const viewOffline = h('div', {class:'view', id:'view-offline', 'aria-label':'Offline queued'});
+const viewPermission = h('div', {class:'view', id:'view-permission', 'aria-label':'Permission denied'});
+viewport.append(viewNormal, viewLoading, viewEmpty, viewError, viewOffline, viewPermission);
+
+// ================= NORMAL VIEW — sheet + transcript =================
+const sheet = h('div', {class:'sheet raised sheet-in'});
+// header
+const sheetHeader = h('div', {class:'sheet-header'});
+const miniOrb = h('div', {class:'mini-orb', 'aria-hidden':'true', html:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="1.3" fill="white"/><path d="M12 5.2l1 2.6 2.6.35-2.6.38-1 2.6-1-2.6-2.6-.38 2.6-.35 1-2.6z" fill="white"/></svg>`});
+const headerText = h('div', {style:'flex:1;position:relative'});
+headerText.innerHTML = `<div class="sheet-title">Prism</div><div class="sheet-sub"><span class="live-dot idle" id="headerDot" aria-hidden="true"></span><span id="headerStatus">Ready · Tap orb or say “Hey Prism”</span></div>`;
+const headerAction = h('button', {class:'btn ghost', 'data-focusable':'', tabindex:'0', 'aria-label':'Clear conversation', style:'min-height:32px;padding:0 12px;font-size:13px;position:relative'}, 'Clear');
+sheetHeader.append(miniOrb, headerText, headerAction);
+sheet.appendChild(sheetHeader);
+
+// transcript
+const transcript = h('div', {class:'transcript', id:'transcript', role:'log', 'aria-live':'polite', 'aria-label':'Conversation transcript'});
+sheet.appendChild(transcript);
+
+// status strip — shows listening / thinking / streaming waveform context
+const statusStrip = h('div', {class:'status-strip', id:'statusStrip', 'aria-live':'polite'});
+// waveform element reused
+function buildWaveform(cls='idle'){
+ const w = h('div', {class:`waveform ${cls}`, 'aria-hidden':'true'});
+ const heights = [10,16,8,18,12,22,14,18,9,14,11,17];
+ heights.forEach((hh,i)=>{
+  const bar = h('i', {style:`--h:${hh}px;--i:${i}`});
+  bar.style.animationDelay = `${i*52}ms`;
+  w.appendChild(bar);
+ });
+ return w;
+}
+let waveform = buildWaveform('idle');
+let statusText = h('div', {style:'flex:1;display:flex;flex-direction:column;gap:2px'});
+statusText.innerHTML = `<strong style="font-size:13px">Prism is idle</strong><span class="caption">Ask anything — voice or tap</span>`;
+statusStrip.append(waveform, statusText);
+sheet.appendChild(statusStrip);
+
+// suggestions
+const suggestions = h('div', {class:'suggestions', role:'group', 'aria-label':'Suggestion chips'});
+const chipData = [
+ {label:'Summarize my day', prompt:'Summarize my day'},
+ {label:'Open my commute', prompt:'What\'s my commute?'},
+ {label:'Take a photo', prompt:'Take a photo'},
+ {label:'What’s on screen?', prompt:'What’s on screen?'},
+];
+chipData.forEach(c=>{
+ const chip = h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Ask: ${c.label}`}, c.label);
+ chip.addEventListener('click', ()=> handleQuickPrompt(c.prompt));
+ suggestions.appendChild(chip);
+});
+sheet.appendChild(suggestions);
+
+const composerHint = h('div', {class:'composer-hint'});
+composerHint.innerHTML = `<span class="caption">⌘ + voice · </span><span class="caption" style="color:var(--ink-60);font-weight:600">“Hey Prism”</span><span class="caption"> wakes anywhere</span><span style="width:3px;height:3px;border-radius:50%;background:var(--ink-20);display:inline-block;margin:0 4px"></span><span class="caption">Enter while orb focused</span>`;
+sheet.appendChild(composerHint);
+
+viewNormal.appendChild(sheet);
+
+// small secondary card under sheet — glanceable meta — hidden at rest, only visible while streaming (reduces competing foci)
+ const metaCard = h('div', {class:'sheet', id:'metaCard', style:'padding:12px 14px;align-items:center;gap:12px;animation:rise-in 260ms var(--ease-prism) both;animation-delay:120ms'});
+metaCard.innerHTML = `
+ <div style="width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.08);flex:none">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 7v5l3.2 1.9" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="7.5" stroke="white" stroke-opacity="0.9" stroke-width="1.5"/></svg>
+ </div>
+ <div style="flex:1">
+  <div style="font-size:13px;font-weight:700;color:var(--ink-80)">Voice & gaze ready</div>
+  <div class="caption" style="font-size:11px;color:var(--ink-60)">Gaze dwells 350 ms · “Hey Prism” anywhere</div>
+ </div>
+ <span class="caption " style="color:var(--ink-40)">600×600</span>
+`;
+viewNormal.appendChild(metaCard);
+
+// transcript helpers
+function addMessage(role, text, opts={}){
+ const el = h('div', {class:`msg ${role}`});
+ if(role==='assistant' && opts.streaming){
+  el.classList.add('streaming');
+ }
+ // text node with optional meta time
+ const time = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+ if(role==='user'){
+  el.textContent = text;
+  const meta = h('div', {class:'msg-meta '}, `${time} · you`);
+  el.appendChild(meta);
+ } else {
+  // for assistant we allow HTML streaming later; for static use text
+  if(opts.html){
+   el.innerHTML = opts.html;
+  } else {
+   el.textContent = text;
+  }
+  const meta = h('div', {class:'msg-meta '}, `Prism · ${time}`);
+  el.appendChild(meta);
+ }
+ transcript.appendChild(el);
+ // keep last visible inside sheet scroll viewport
+ requestAnimationFrame(()=> {
+  el.scrollIntoView({block:'nearest', behavior:'smooth'});
+  viewport.scrollTo({top: viewport.scrollHeight, behavior:'smooth'});
+ });
+ return el;
+}
+
+function seedTranscript(){
+ transcript.innerHTML = '';
+ addMessage('user','Hey Prism, what’s my morning look like?');
+ const a1 = addMessage('assistant','Good morning. 3 highlights — Standup at 9:30 in Prism Room, Deep Work 10–12, and your walk captured at 7:31 is ready in Gallery.');
+ // small delay for second exchange to showcase history
+ addMessage('user','And my commute?');
+ const a2 = addMessage('assistant','Light traffic — 18 min via 101. Weather 72° and bright. Want me to open Maps?');
+}
+seedTranscript();
+
+headerAction.addEventListener('click', ()=>{
+ transcript.innerHTML='';
+ const emptyHint = h('div', {class:'msg assistant', style:'max-width:100%;text-align:center;align-self:center;background:rgba(255,255,255,0.06)'}, 'Cleared — say “Hey Prism” to start a new thread.');
+ transcript.appendChild(emptyHint);
+ setAssistantState('idle');
+ os.banner('<strong>History cleared</strong><span class="caption">new thread ready</span>',{timeout:1800});
+});
+
+// assistant state machine for normal view
+let assistantPhase = 'idle'; // idle | listening | thinking | streaming
+let streamTimer = null;
+let listenTimer = null;
+let thinkTimer = null;
+
+function setAssistantState(phase){
+ assistantPhase = phase;
+ const dot = document.getElementById('headerDot');
+ const statusLabel = document.getElementById('headerStatus');
+ // mini orb listening pulse
+ miniOrb.classList.toggle('listening', phase==='listening');
+ // header dot
+ if(dot){
+  dot.className = 'live-dot ' + (phase==='listening' ? 'pulse' : phase==='thinking' ? 'warn' : phase==='streaming' ? 'ok' : 'idle');
+  if(phase==='listening') dot.style.background=''; // ok pulse via class
+ }
+ // status strip content
+ // rebuild waveform class
+ const newWaveClass = phase==='idle' ? 'idle' : phase==='listening' ? 'listening' : 'streaming';
+ waveform.className = `waveform ${newWaveClass}`;
+ // animate bars heights via JS for delight when listening/streaming
+ if(phase==='listening'){
+  statusText.innerHTML = `<strong style="font-size:13px;color:var(--ink-100)">Listening…</strong><span class="caption">“${pendingPrompt || 'Hey Prism'}” — I’m all ears</span>`;
+  statusLabel.textContent = 'Listening… speak now';
+  // randomize waveform heights to react to voice
+  animateWaveformVoice();
+ } else if(phase==='thinking'){
+  statusText.innerHTML = `<strong style="font-size:13px;color:var(--ink-100)">Prism is thinking…</strong><span class="caption">Finding context on device</span>`;
+  statusLabel.textContent = 'Thinking…';
+  stopWaveformVoice();
+ } else if(phase==='streaming'){
+  statusText.innerHTML = `<strong style="font-size:13px;color:var(--ink-100)">Replying…</strong><span class="caption">Streaming with blur wipe</span>`;
+  statusLabel.textContent = 'Replying…';
+ } else {
+  statusText.innerHTML = `<strong style="font-size:13px">Prism is idle</strong><span class="caption">Ask anything — voice or tap</span>`;
+  statusLabel.textContent = 'Ready · Tap orb or say “Hey Prism”';
+  stopWaveformVoice();
+ }
+ // orb visual
+  orb.classList.toggle('listening', phase==='listening');
+  orb.setAttribute('aria-label', phase==='listening' ? 'Listening — speak now' : phase==='thinking' ? 'Prism is thinking' : 'Assistant, say Hey Prism or tap to speak');
+  // metaCard only visible while streaming (reduces competing foci at rest)
+  const metaEl = document.getElementById('metaCard');
+  if(metaEl) metaEl.classList.toggle('is-streaming', phase==='streaming');
+}
+
+let voiceInterval = null;
+function animateWaveformVoice(){
+ stopWaveformVoice();
+ voiceInterval = setInterval(()=>{
+  [...waveform.children].forEach(bar=>{
+   const h = 6 + Math.random()*16;
+   bar.style.setProperty('--h', `${h}px`);
+   bar.style.height = `${h}px`;
+  });
+ }, 110);
+}
+function stopWaveformVoice(){
+ if(voiceInterval){ clearInterval(voiceInterval); voiceInterval=null; }
+}
+function animateWaveformStreamingTick(progress){
+ // subtle reaction to streaming words — lift a couple bars
+ [...waveform.children].forEach((bar,i)=>{
+  const base = 8 + (i%3)*4;
+  const lift = Math.sin((progress*0.4 + i)*1.2)*6;
+  const h = Math.max(6, base + lift + (Math.random()*4));
+  bar.style.height = `${h}px`;
+ });
+}
+
+let pendingPrompt = '';
+
+function handleQuickPrompt(prompt){
+ triggerAssistant(prompt);
+}
+function triggerAssistant(promptOverride){
+ // if permission or offline states are active, redirect
+ if(currentState==='permission'){
+  os.banner('<strong>Microphone blocked</strong><span class="caption">Allow access to speak</span>',{timeout:2200});
+  setState('permission');
+  return;
+ }
+ if(currentState==='offline'){
+  queuePrompt(promptOverride || 'Voice prompt');
+  return;
+ }
+ if(currentState!=='normal'){
+  setState('normal');
+  // slight delay then start
+  setTimeout(()=> triggerAssistant(promptOverride), 220);
+  return;
+ }
+ if(assistantPhase==='listening' || assistantPhase==='thinking' || assistantPhase==='streaming'){
+  // ignore double trigger but give feedback
+  os.banner('<strong>One moment</strong><span class="caption">Prism is busy — hang tight</span>',{timeout:1400});
+  return;
+ }
+ pendingPrompt = promptOverride || samplePrompt();
+ // 1) listening
+ setAssistantState('listening');
+ // show listening bubble? we add user bubble after listening phase ends
+ // pulse orb already
+ clearTimeout(listenTimer); clearTimeout(thinkTimer); clearTimeout(streamTimer);
+ listenTimer = setTimeout(()=>{
+  // 2) thinking — add user message now
+  addMessage('user', pendingPrompt);
+  setAssistantState('thinking');
+  // inline thinking bubble
+  const thinkingEl = h('div', {class:'thinking-inline', id:'thinkingBubble', 'aria-label':'Prism is thinking'});
+  thinkingEl.innerHTML = `<span class="thinking-dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="thinking-label">Prism is thinking…</span>`;
+  transcript.appendChild(thinkingEl);
+  viewport.scrollTo({top: viewport.scrollHeight, behavior:'smooth'});
+
+  thinkTimer = setTimeout(()=>{
+   thinkingEl.remove();
+   // 3) streaming
+   const response = responseFor(pendingPrompt);
+   const streamEl = addMessage('assistant','', {streaming:true});
+   // remove initial text, prepare for streaming
+   streamEl.childNodes[0] && streamEl.childNodes[0].remove ? streamEl.childNodes[0].remove() : null;
+   // keep meta but clear content holder
+   // create content holder before meta
+   const meta = streamEl.querySelector('.msg-meta');
+   const content = h('span', {class:'assistant-content'});
+   streamEl.insertBefore(content, meta);
+   // remove stray text node if any
+   // start streaming
+   setAssistantState('streaming');
+   streamWords(content, response, ()=>{
+    setAssistantState('idle');
+    pendingPrompt='';
+   });
+  }, 900);
+ }, 850);
+}
+
+function samplePrompt(){
+ const samples = [
+  'Summarize my day',
+  'What’s my commute?',
+  'Take a photo',
+  'What’s on screen?',
+ ];
+ return samples[Math.floor(Math.random()*samples.length)];
+}
+function responseFor(prompt){
+ const p = prompt.toLowerCase();
+ if(p.includes('summarize') || p.includes('morning') || p.includes('my day')){
+  return 'You have Standup at 9:30 in Prism Room, Deep Work 10–12, then Gallery exports at 14:00. Weather is 72° — bright and clear. Want me to open Maps for your 18-min commute?';
+ }
+ if(p.includes('commute') || p.includes('maps')){
+  return 'Light traffic via 101 — 18 min to downtown. Your lens is at 82% and AQI is 32. I can queue directions for offline if you want.';
+ }
+ if(p.includes('photo') || p.includes('capture')){
+  return 'Lens ready — say “capture” or tap the shutter. Your last photo at 8:14 is in Recents. Want me to open Camera now?';
+ }
+ if(p.includes('screen')){
+  return 'You’re looking at Prism — time, weather, launcher and the assistant orb. Gaze focuses cards, dwell 350 ms to open. Say “Hey Prism” anywhere to wake me.';
+ }
+ return 'Got it — I’m on it. I can summarize, navigate, or capture. Try “Hey Prism, open Maps” or pick a chip below.';
+}
+
+function streamWords(container, text, done){
+ const words = text.split(' ');
+ let idx = 0;
+ // waveform streaming reaction interval
+ let waveTick = null;
+ waveTick = setInterval(()=> animateWaveformStreamingTick(idx), 90);
+ function tick(){
+  if(idx <= words.length){
+   // build with blur wipe per word
+   container.innerHTML = words.slice(0, idx).map((w,i)=>{
+    const delay = (i*28) + 'ms';
+    return `<span class="word-reveal" style="animation-delay:${delay}">${w}</span>`;
+   }).join(' ') + (idx < words.length ? `<span class="cursor" aria-hidden="true"></span>` : '');
+   idx++;
+   viewport.scrollTo({top: viewport.scrollHeight, behavior:'smooth'});
+   streamTimer = setTimeout(tick, idx===1 ? 180 : 72);
+  } else {
+   clearInterval(waveTick);
+   // settle waveform
+   [...waveform.children].forEach((bar,i)=>{ bar.style.height = `${10 + (i%4)*3}px`; });
+   done && done();
+  }
+ }
+ tick();
+}
+
+// ================= ORB — 56px bottom center =================
+const orbWrap = h('div', {class:'orb-wrap'});
+const orb = h('button', {class:'orb', 'data-focusable':'', tabindex:'0', 'aria-label':'Assistant, say Hey Prism or tap to speak'});
+orb.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4.4c.35 0 1.1 1.35 1.35 3.05L14 12l-.65 4.55C13.1 18.25 12.35 19.6 12 19.6c-.35 0-1.1-1.35-1.35-3.05L10 12l.65-4.55C10.9 5.75 11.65 4.4 12 4.4z" fill="white" fill-opacity="0.96"/><path d="M9.2 7.2c.6-1.2 1.9-2 2.8-2M14.8 7.2c-.6-1.2-1.9-2-2.8-2M7.5 12c0 1.1 1.1 2.2 2.2 2.2M16.5 12c0 1.1-1.1 2.2-2.2 2.2" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/><circle cx="12" cy="12" r="1.2" fill="white"/></svg>`;
+const orbLabel = h('div', {class:'orb-label', 'aria-hidden':'true'}, 'Hey Prism');
+const orbHint = h('div', {class:'orb-hint', html:'Say “Hey Prism” · or tap · Enter'});
+orbWrap.append(orb, orbLabel, orbHint);
+stage.appendChild(orbWrap);
+
+orb.addEventListener('click', ()=> triggerAssistant());
+orb.addEventListener('keydown', (e)=>{
+ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); e.stopPropagation(); triggerAssistant(); }
+});
+
+// Hey Prism hotword — typed buffer or voice phrase
+let hotwordBuf = '';
+let hotwordTimer = null;
+document.addEventListener('keydown', (e)=>{
+ // avoid interfering when typing in hypothetical inputs; still allow hotword
+ const k = e.key.toLowerCase();
+ if(k.length===1 || k===' '){
+  hotwordBuf += k;
+  if(hotwordBuf.length>24) hotwordBuf = hotwordBuf.slice(-24);
+  clearTimeout(hotwordTimer);
+  hotwordTimer = setTimeout(()=> hotwordBuf='', 1400);
+  if(hotwordBuf.replace(/\s+/g,' ').includes('hey prism')){
+   hotwordBuf='';
+   // visual pulse on orb
+   orb.animate([{transform:'scale(1)'},{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:420,easing:'cubic-bezier(0.32,0.72,0,1)'});
+   triggerAssistant('Hey Prism');
+   os.banner('<strong>Hey Prism — listening</strong><span class="caption">wake phrase detected</span>',{timeout:1800});
+  }
+ }
+ // also quick key: h triggers demo (for probe manual) — not required but helpful
+ if(e.key==='h' && e.metaKey){ e.preventDefault(); triggerAssistant('Hey Prism'); }
+});
+
+// also listen to core bus for capture? not needed
+
+// ================= EDGE STATES =================
+// LOADING (thinking)
+viewLoading.innerHTML = `
+ <div class="sheet raised" style="padding:16px 16px 14px 16px;display:grid;gap:14px">
+  <div style="display:flex;align-items:center;gap:12px">
+   <div class="mini-orb listening" aria-hidden="true" style="width:32px;height:32px"></div>
+   <div style="flex:1;display:grid;gap:6px">
+    <div class="skeleton sk-line" style="width:92px;height:13px"></div>
+    <div class="skeleton sk-line" style="width:148px;height:10px"></div>
+   </div>
+   <span class="live-dot warn" aria-hidden="true" style="animation:livePulse 1s ease-in-out infinite"></span>
+  </div>
+  <div style="display:grid;gap:10px">
+   <div class="skeleton sk-bubble" style="width:78%;justify-self:end;opacity:0.22"></div>
+   <div style="display:flex;gap:10px;align-items:center;align-self:flex-start;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:18px 18px 18px 4px;padding:10px 14px">
+    <span class="thinking-dots" aria-hidden="true"><i style="background:var(--ink-40)"></i><i style="background:var(--ink-40)"></i><i style="background:var(--ink-40)"></i></span>
+    <span class="thinking-label">Prism is thinking…</span>
+   </div>
+   <div class="skeleton sk-line" style="width:66%;height:10px;opacity:0.45"></div>
+   <div class="skeleton sk-line" style="width:58%;height:10px;opacity:0.35"></div>
+  </div>
+  <div class="status-strip" style="margin:0">
+   <div class="waveform streaming" aria-hidden="true" style="opacity:0.85">
+    ${Array(12).fill(0).map((_,i)=>`<i style="--h:${8 + (i%4)*4}px;--i:${i};animation-delay:${i*60}ms;height:${8+(i%4)*4}px"></i>`).join('')}
+   </div>
+   <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--ink-80)">Thinking…</div><div class="caption" style="color:var(--ink-60)">Finding context on device</div></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+   <span class="skeleton" style="width:122px;height:30px;border-radius:999px"></span>
+   <span class="skeleton" style="width:96px;height:30px;border-radius:999px"></span>
+   <span class="skeleton" style="width:108px;height:30px;border-radius:999px"></span>
+  </div>
+ </div>
+ <div class="sheet" style="padding:12px 14px;display:flex;align-items:center;gap:10px;opacity:0.92">
+  <span class="dot warn" aria-hidden="true"></span>
+  <span style="font-size:13px;font-weight:600;color:var(--ink-80)">On-device · no network needed</span>
+  <span class="caption" style="margin-left:auto">thinking</span>
+ </div>
+`;
+
+// EMPTY
+viewEmpty.innerHTML = `
+ <div class="state-card">
+  <div class="state-illus" aria-hidden="true">
+   <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="4" y="6" width="16" height="11.5" rx="2.6" stroke="white" stroke-opacity="0.9" stroke-width="1.6"/><path d="M7 9h3M12.5 9h4M7 12.2h5M13.8 12.2h3.2" stroke="white" stroke-opacity="0.85" stroke-width="1.5" stroke-linecap="round"/><circle cx="18.5" cy="16.2" r="2.1" stroke="white" stroke-width="1.4"/><path d="M17.2 15l1.1 1.1 2-2" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="state-title">No history yet</div>
+  <div class="state-body">Your conversations with Prism appear here. Tap the orb or say “Hey Prism” to start — Prism keeps everything on device.</div>
+  <div class="state-actions">
+   <button class="btn primary" data-focusable tabindex="0" aria-label="Start a new conversation">Start conversation</button>
+   <button class="btn ghost" data-focusable tabindex="0" aria-label="See suggestions">Try suggestions</button>
+  </div>
+  <p class="caption" style="color:var(--ink-40);margin-top:2px">Voice wake works anywhere — even outside this app.</p>
+ </div>
+ <div class="sheet" style="padding:14px 16px;display:grid;gap:10px">
+  <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-60)">Try asking</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+   <button class="chip" data-focusable tabindex="0" aria-label="Try Summarize my day">Summarize my day</button>
+   <button class="chip" data-focusable tabindex="0" aria-label="Try What's on screen">What’s on screen?</button>
+   <button class="chip" data-focusable tabindex="0" aria-label="Try Take a photo">Take a photo</button>
+  </div>
+ </div>
+`;
+viewEmpty.querySelectorAll('button').forEach(b=>{
+ b.addEventListener('click', ()=>{
+  const t=b.textContent.trim();
+  if(t==='Start conversation'){
+   setState('normal');
+   setTimeout(()=> triggerAssistant('Hey Prism, start a conversation'), 280);
+  } else if(t==='Try suggestions'){
+   viewport.scrollTo({top:0, behavior:'smooth'});
+   os.banner('<strong>Suggestions ready</strong><span class="caption">pick a chip to begin</span>',{timeout:1800});
+  } else {
+   setState('normal');
+   setTimeout(()=> triggerAssistant(b.textContent.trim()), 260);
+  }
+ });
+});
+
+// ERROR PR-AI-503
+viewError.innerHTML = `
+ <div class="state-card">
+  <div class="state-illus danger" aria-hidden="true">
+   <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.8L20.6 18.2H3.4L12 3.8z" stroke="#ff8a8a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.4v4.4" stroke="#ffb3b3" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.25" fill="#ffb3b3"/></svg>
+  </div>
+  <div class="state-title">Prism can’t reply</div>
+  <div class="state-body">The assistant hit an error. Your transcript is safe — we’ll retry without losing context.</div>
+  <div class="state-actions">
+   <button class="btn primary" data-focusable tabindex="0" aria-label="Retry assistant request">Retry</button>
+   <button class="btn ghost" data-focusable tabindex="0" aria-label="Dismiss error">Dismiss</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;margin-top:2px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;position:relative">
+   <span class="dot bad" aria-hidden="true"></span><span class="caption " style="color:var(--ink-60)">PR-AI-503 · 9:41 AM · retry in 12s</span>
+  </div>
+  <p class="caption" style="color:var(--ink-40);position:relative">On-device fallback available offline.</p>
+ </div>
+ <div class="sheet" style="padding:12px 14px;display:flex;align-items:center;gap:10px;opacity:0.96">
+  <span class="dot bad" aria-hidden="true"></span>
+  <span style="font-size:13px;font-weight:600;color:var(--ink-80)">Last prompt saved</span>
+  <span class="caption" style="margin-left:auto">tap Retry</span>
+ </div>
+`;
+viewError.querySelectorAll('button').forEach(b=>{
+ b.addEventListener('click', ()=>{
+  if(b.textContent.trim()==='Retry'){
+   b.textContent='Retrying…';
+   setState('loading');
+   setTimeout(()=>{ setState('normal'); triggerAssistant('Retry last request'); b.textContent='Retry'; }, 1200);
+  } else {
+   setState('normal');
+   os.banner('<strong>Dismissed</strong><span class="caption">back to Prism</span>',{timeout:1800});
+  }
+ });
+});
+
+// OFFLINE (queued)
+viewOffline.innerHTML = `
+ <div class="state-card" style="min-height:360px">
+  <div class="state-illus" aria-hidden="true">
+   <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M3.6 9.6a9 9 0 0116.8 0" stroke="white" stroke-opacity="0.92" stroke-width="1.6" stroke-linecap="round"/><path d="M6.2 12.6a6 6 0 0111.6 0" stroke="white" stroke-opacity="0.82" stroke-width="1.6" stroke-linecap="round"/><path d="M9 15.6a2.8 2.8 0 016 0" stroke="white" stroke-opacity="0.78" stroke-width="1.6" stroke-linecap="round"/><path d="M2 2l20 20" stroke="#ffc247" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="18" r="1.25" fill="white"/></svg>
+  </div>
+  <div class="state-title">You’re offline</div>
+  <div class="state-body">Prism queued your prompt on device. It’ll send when you’re back online — no data lost.</div>
+  <div class="queued-list">
+   <div class="queued-item">
+    <span class="dot warn" aria-hidden="true"></span>
+    <div style="flex:1"><strong>Summarize my day</strong><div class="caption ">queued · 9:41 AM · on device</div></div>
+    <span class="caption" style="background:rgba(255,194,71,0.14);outline:1px solid rgba(255,194,71,0.22);padding:4px 8px;border-radius:999px;font-weight:700;color:var(--warn)">Queued</span>
+   </div>
+   <div class="queued-item" style="opacity:0.72">
+    <span class="dot" style="background:var(--ink-20)" aria-hidden="true"></span>
+    <div style="flex:1"><strong>What’s on screen?</strong><div class="caption ">queued · 9:40 AM</div></div>
+    <span class="caption">offline</span>
+   </div>
+  </div>
+  <div class="state-actions">
+   <button class="btn primary" data-focusable tabindex="0" aria-label="Retry when online">Retry when online</button>
+   <button class="btn" data-focusable tabindex="0" aria-label="Use offline assistant">Use offline</button>
+  </div>
+ </div>
+ <div class="status-strip" style="margin:0">
+  <span class="dot bad" aria-hidden="true"></span>
+  <span style="font-size:13px;font-weight:600;color:var(--ink-80)">No network · Prism queued 2 prompts</span>
+  <span class="caption " style="margin-left:auto">offline</span>
+ </div>
+`;
+let queuedPrompts = ['Summarize my day'];
+function queuePrompt(text){
+ queuedPrompts.push(text);
+ // update offline view if visible
+ const list = viewOffline.querySelector('.queued-list');
+ if(list){
+  const item = h('div', {class:'queued-item'});
+  item.innerHTML = `<span class="dot warn" aria-hidden="true"></span><div style="flex:1"><strong>${text}</strong><div class="caption ">queued · ${new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})} · on device</div></div><span class="caption" style="background:rgba(255,194,71,0.14);outline:1px solid rgba(255,194,71,0.22);padding:4px 8px;border-radius:999px;font-weight:700;color:var(--warn)">Queued</span>`;
+  list.prepend(item);
+  item.style.animation = 'rise-in 260ms var(--ease-prism) both';
+ }
+ setState('offline');
+ os.banner('<strong>Queued offline</strong><span class="caption">Prism will send when online</span>',{timeout:2200});
+}
+viewOffline.querySelectorAll('button').forEach(b=>{
+ b.addEventListener('click', ()=>{
+  if(b.textContent.includes('Retry')){
+   b.textContent='Retrying…';
+   setTimeout(()=>{ os.banner('<strong>Still offline</strong><span class="caption">check Wi-Fi · prism nearby</span>',{timeout:2200}); b.textContent='Retry when online'; }, 800);
+  } else {
+   setState('normal');
+   triggerAssistant('Answer offline if you can');
+   os.banner('<strong>Offline mode</strong><span class="caption">on-device answers only</span>',{timeout:2200});
+  }
+ });
+});
+
+// PERMISSION denied
+viewPermission.innerHTML = `
+ <div class="state-card">
+  <div class="state-illus" aria-hidden="true">
+   <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="9" y="4.5" width="6" height="11" rx="3" stroke="white" stroke-opacity="0.92" stroke-width="1.6"/><path d="M7 11a5 5 0 0010 0" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M12 15.5v3" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M9.5 18.5h5" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M3 3l18 18" stroke="#ff5d5d" stroke-width="1.7" stroke-linecap="round"/></svg>
+  </div>
+  <div class="state-title">Microphone blocked</div>
+  <div class="state-body">Prism needs mic access to hear “Hey Prism” and voice prompts. You can still tap the orb and use chips.</div>
+  <div class="state-actions">
+   <button class="btn primary" data-focusable tabindex="0" aria-label="Allow microphone access">Allow microphone</button>
+   <button class="btn ghost" data-focusable tabindex="0" aria-label="Continue without microphone">Not now</button>
+  </div>
+  <p class="caption" style="color:var(--ink-40);position:relative">Settings → Privacy → Microphone → Prism</p>
+  <div style="display:flex;align-items:center;gap:10px;margin-top:2px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;position:relative;width:100%;max-width:320px;justify-content:center">
+   <span class="dot bad" aria-hidden="true"></span><span class="caption" style="color:var(--ink-60)">Mic denied · tap still works</span>
+  </div>
+ </div>
+ <div class="sheet" style="padding:12px 14px;display:flex;align-items:center;gap:10px">
+  <span class="dot warn" aria-hidden="true"></span>
+  <span style="font-size:13px;font-weight:600;color:var(--ink-80)">Voice off — tap orb to chat</span>
+  <button class="chip" data-focusable tabindex="0" aria-label="Open Settings for microphone" style="margin-left:auto;height:28px">Open Settings</button>
+ </div>
+`;
+viewPermission.querySelectorAll('button').forEach(b=>{
+ const label=b.textContent.trim();
+ b.addEventListener('click', ()=>{
+  if(label==='Allow microphone' || label==='Open Settings'){
+   b.textContent='Allowing…';
+   setTimeout(()=>{
+    setState('normal');
+    setAssistantState('idle');
+    os.banner('<strong>Microphone allowed</strong><span class="caption">say “Hey Prism” to wake</span>',{timeout:2200});
+    b.textContent = label;
+   }, 700);
+  } else if(label==='Not now'){
+   setState('normal');
+   os.banner('<strong>Voice off</strong><span class="caption">tap orb or use chips</span>',{timeout:2200});
+  }
+ });
+});
+
+// ---- state switching ----
+let currentState='normal';
+function setState(id){
+ currentState=id;
+ [...document.querySelectorAll('.dev-controls .chip')].forEach(c=> c.classList.toggle('active', c.dataset.state===id));
+ $$('.view').forEach(v=> v.classList.toggle('active', v.id===`view-${id}`));
+ if(id!=='normal'){
+  // cancel any in-flight streaming when leaving normal
+  clearTimeout(listenTimer);clearTimeout(thinkTimer);clearTimeout(streamTimer);stopWaveformVoice();
+  assistantPhase='idle';
+ } else {
+  // restore idle visuals
+  setAssistantState('idle');
+ }
+ viewport.scrollTo({top:0, behavior:'smooth'});
+ os.emit('statechange',{id});
+}
+window.__setAssistantState = setState;
+window.__triggerAssistant = triggerAssistant;
+
+// gaze dwell: core already handles dwell clicks via bus focuschange
+// ensure swipe scroll for transcript? arrow keys already scroll viewport via core
+stage.addEventListener('keydown', (e)=>{
+ if(e.key==='ArrowDown') viewport.scrollBy({top:60, behavior:'smooth'});
+ if(e.key==='ArrowUp') viewport.scrollBy({top:-60, behavior:'smooth'});
+});
+os.on('swipeleft', ()=>{}); // no op but keeps bus alive
+os.on('capture', ()=>{
+ // capture from hardware also wakes assistant in this demo? not, just shows shutter
+ os.banner('<strong>Shutter</strong><span class="caption">capture saved · prism can describe it</span>',{timeout:1800});
+});
+
+console.log('Prism Assistant ready — 600x600');
+</script>
+</body>
+</html>

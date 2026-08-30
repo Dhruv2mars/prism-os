@@ -1,0 +1,1144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Notifications</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+ /* stage glass world */
+ .stage{
+  background:
+   radial-gradient(120% 90% at 50% 16%, rgba(42,53,80,0.54) 0%, rgba(20,26,40,0.72) 36%, rgba(10,14,23,0.88) 68%),
+   radial-gradient(68% 46% at 78% 88%, rgba(86,184,255,0.08), transparent 55%),
+   rgba(6,10,16,0.74);
+ }
+ .stage-shell{
+  position:relative;
+  width:600px; height:600px;
+  display:grid; place-items:center;
+  flex:none;
+ }
+ /* dev chrome — fixed OUTSIDE .stage, not inside stage screenshot */
+ .dev-controls{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  display:flex; gap:6px;
+  z-index:1000;
+  justify-content:center;
+  flex-wrap:wrap;
+  pointer-events:none;
+  padding:8px 12px;
+  border-radius:999px;
+  background: rgba(10,15,23,0.74);
+  outline:1px solid var(--stroke-glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.32);
+  max-width:92vw;
+ }
+ .stage .dev-controls{ display:none !important; }
+ .dev-controls .chip{
+  pointer-events:auto;
+  height:26px; padding:0 10px;
+  font-size:11px; font-weight:700; letter-spacing:0.02em;
+  border:none; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition: background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+ }
+ .dev-controls .chip.active{
+  background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423; outline-color:transparent;
+ }
+ .dev-controls .chip:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px; }
+ .dev-controls .chip.gaze-focus{ transform:scale(1.04); }
+
+ /* viewport — scrollable notif stack */
+ .notif-viewport{
+  position:absolute;
+  inset:44px 0 0 0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+  padding:10px 14px 74px 14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+ }
+ .notif-viewport::-webkit-scrollbar{ display:none; }
+
+ /* header */
+ .notif-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:10px;
+  padding:4px 2px 2px 2px;
+  animation: rise-in var(--dur-base) var(--ease-prism) both;
+ }
+ .notif-header-left{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+ .notif-title{
+  font-size:22px;
+  font-weight:800;
+  letter-spacing:-0.03em;
+  line-height:1;
+  color:var(--ink-100);
+  display:flex; align-items:baseline; gap:8px;
+ }
+ .notif-title-count{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.06em;
+  color:var(--ink-80);
+  background: rgba(255,255,255,0.07);
+  outline:1px solid rgba(255,255,255,0.07);
+  padding:4px 8px;
+  border-radius:999px;
+    font-variant-numeric:tabular-nums;
+  line-height:1;
+ }
+ .notif-subtitle{
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.04em;
+  color:var(--ink-60);
+  line-height:1;
+  display:flex; align-items:center; gap:6px;
+ }
+ .notif-subtitle .dot{ width:6px; height:6px; }
+ .notif-header-actions{ display:flex; gap:6px; align-items:center; flex:none; }
+ .header-chip{
+  appearance:none; -webkit-appearance:none;
+  border:none;
+  height:28px; padding:0 12px;
+  border-radius:999px;
+  font-size:11px; font-weight:700; letter-spacing:0.02em;
+  display:inline-flex; align-items:center; gap:6px;
+  cursor:pointer;
+  background: rgba(255,255,255,0.08);
+  outline:1px solid rgba(255,255,255,0.07);
+  color:var(--ink-80);
+  transition: transform var(--dur-base) var(--ease-prism), background var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), opacity var(--dur-fast) var(--ease-prism);
+ }
+ .header-chip.primary{ background: linear-gradient(180deg, var(--accent), var(--accent-strong)); color:#051423; outline-color:transparent; box-shadow:0 8px 18px rgba(16,92,180,0.28); }
+ .header-chip:disabled{ opacity:0.38; pointer-events:none; }
+ .header-chip.gaze-focus{ transform:scale(1.04); outline-color:var(--stroke-focus); }
+ .header-chip:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px; }
+
+ /* offline queued banner */
+ .offline-banner{
+  display:flex; align-items:center; gap:8px;
+  padding:8px 12px;
+  border-radius:12px;
+  background: rgba(255,194,71,0.12);
+  outline:1px solid rgba(255,194,71,0.18);
+  font-size:11px; font-weight:700; color:#ffe0a6;
+  letter-spacing:0.01em;
+  animation: banner-in var(--dur-base) var(--ease-prism);
+ }
+ .offline-banner .warn-dot{
+  width:7px; height:7px; border-radius:50%; background:var(--warn); box-shadow:0 0 8px rgba(255,194,71,0.6); flex:none;
+ }
+ .offline-banner .caption{ color:rgba(255,255,255,0.66); font-weight:600; }
+
+ /* groups */
+ .notif-group{
+  display:grid; gap:8px;
+  animation: rise-in var(--dur-base) var(--ease-prism) both;
+ }
+ .notif-group:nth-of-type(1){ animation-delay: 40ms; }
+ .notif-group:nth-of-type(2){ animation-delay: 90ms; }
+ .group-head{
+  display:flex; align-items:center; gap:8px;
+  padding:0 2px;
+ }
+ .group-label{
+  font-size:11px; font-weight:700;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--ink-60);
+ }
+ .group-count{
+  font-size:11px; font-weight:600;
+  color:var(--ink-40);
+    font-variant-numeric:tabular-nums;
+  letter-spacing:0.02em;
+ }
+ .group-line{ flex:1; height:1px; background: rgba(255,255,255,0.06); }
+ .group-list{ display:flex; flex-direction:column; gap:8px; }
+
+ /* notification card — banner pattern persistent */
+ .notif-card{
+  position:relative;
+  background: var(--mat-raised);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  border-radius:18px;
+  padding:12px 12px 12px 12px;
+  display:flex;
+  gap:10px;
+  cursor:pointer;
+  box-shadow:0 12px 28px rgba(0,0,0,0.26);
+  transition: transform var(--dur-base) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism), background var(--dur-fast) var(--ease-prism), opacity var(--dur-fast) var(--ease-prism);
+  animation: banner-in var(--dur-slow) var(--ease-prism) both;
+  will-change: transform;
+  overflow:hidden;
+ }
+ .notif-card::after{
+  content:""; position:absolute; inset:0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 44%);
+  pointer-events:none; border-radius:inherit;
+ }
+  .notif-card:hover{ transform: translateY(-1px); }
+  .notif-card.is-top:hover{ transform: scale(1.01) translateY(-1px) !important; }
+  /* primary focal at rest — single focal discipline (visionOS: one banner raised, others recessive) */
+  .notif-card.is-top{
+   transform: scale(1.01) !important;
+   box-shadow:0 16px 36px rgba(0,0,0,0.34), 0 0 0 1px rgba(255,255,255,0.04) inset !important;
+   opacity:1 !important;
+  }
+  .notif-card:not(.is-top){
+   opacity:0.92 !important;
+  }
+  /* parallax dim: when any card has gaze-focus, dim non-focused to 0.65 */
+  .notif-viewport:has(.notif-card.gaze-focus) .notif-card:not(.gaze-focus){
+   opacity:0.65 !important;
+  }
+  .group-list:has(.notif-card.gaze-focus) .notif-card:not(.gaze-focus){
+   opacity:0.65 !important;
+  }
+  .notif-viewport:has(.notif-card.gaze-focus) .notif-card.is-top:not(.gaze-focus){
+   opacity:0.65 !important;
+   transform: scale(1) !important;
+  }
+  .notif-card.gaze-focus{
+   transform: scale(1.04) translateY(-1px) !important;
+   outline:2.5px solid var(--stroke-focus);
+   outline-color: var(--stroke-focus);
+   box-shadow: 0 0 0 2.5px rgba(86,184,255,0.18), 0 18px 40px rgba(0,0,0,0.38), 0 0 28px rgba(86,184,255,0.30) !important;
+   opacity:1 !important;
+  }
+  .notif-card:active{ transform: scale(0.985); }
+  .notif-card.is-expanded{
+   padding-bottom:12px;
+  }
+ .notif-card.is-dismissing{ pointer-events:none; }
+ .notif-card.is-popping{
+  animation: popSettle 360ms var(--ease-prism);
+ }
+ @keyframes popSettle{
+  0%{ transform:scale(0.96); }
+  50%{ transform:scale(1.02); }
+  100%{ transform:scale(1); }
+ }
+
+ .notif-icon{
+  width:36px; height:36px;
+  border-radius:11px;
+  display:grid; place-items:center;
+  flex:none;
+  box-shadow:0 4px 14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.10);
+  outline:1px solid rgba(255,255,255,0.08);
+  position:relative; z-index:1;
+ }
+ .notif-icon svg{ width:18px; height:18px; display:block; }
+ .notif-icon.msg{ background: linear-gradient(180deg, #2f9dff 0%, #0b5ed7 100%); color:#fff; }
+ .notif-icon.capture{ background: linear-gradient(180deg, #2a3346 0%, #1a2230 100%); color:#fff; }
+ .notif-icon.system{ background: linear-gradient(180deg, #a58bff 0%, #6a4bff 100%); color:#fff; }
+ .notif-icon.warn{ background: linear-gradient(180deg, #ffc247 0%, #ff7a1a 100%); color:#1a0f00; }
+ .notif-icon.team{ background: linear-gradient(180deg, #7ee0a6 0%, #1e6b4a 100%); color:#fff; }
+
+ .notif-main{
+  flex:1; min-width:0;
+  display:flex; flex-direction:column; gap:3px;
+  position:relative; z-index:1;
+  padding-right:28px;
+ }
+ .notif-title-row{
+  display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+ }
+ .notif-name{
+  font-size:14px;
+  font-weight:700;
+  color:var(--ink-100);
+  letter-spacing:-0.01em;
+  line-height:1.15;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  flex:1;
+ }
+ .notif-time{
+  font-size:11px;
+  font-weight:600;
+  color:var(--ink-60);
+  letter-spacing:0.02em;
+    font-variant-numeric:tabular-nums;
+  flex:none;
+  white-space:nowrap;
+ }
+ .notif-body{
+  font-size:13px;
+  font-weight:500;
+  color:var(--ink-80);
+  line-height:1.38;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  overflow-wrap:break-word;
+ }
+ .is-expanded .notif-body{
+  -webkit-line-clamp:unset;
+ }
+ .notif-chiprow{
+  display:flex; gap:6px; flex-wrap:wrap;
+  margin-top:7px;
+ }
+ .notif-chip{
+  appearance:none; -webkit-appearance:none;
+  border:none;
+  display:inline-flex; align-items:center; gap:6px;
+  height:28px; padding:0 12px;
+  border-radius:999px;
+  background: rgba(255,255,255,0.08);
+  outline:1px solid rgba(255,255,255,0.07);
+  font-size:11px; font-weight:700; letter-spacing:0.01em;
+  color:var(--ink-80);
+  cursor:pointer;
+  transition: background var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
+  position:relative; z-index:2;
+ }
+ .notif-chip.primary{ background: linear-gradient(180deg, var(--accent), var(--accent-strong)); color:#051423; outline-color:transparent; box-shadow:0 8px 18px rgba(16,92,180,0.26); }
+ .notif-chip.ghost{ background: transparent; color:var(--ink-60); }
+ .notif-chip.gaze-focus{ transform:scale(1.04); outline-color:var(--stroke-focus); box-shadow:0 0 0 2px rgba(86,184,255,0.14), 0 0 14px rgba(86,184,255,0.22); }
+ .notif-chip:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px; }
+ .notif-chip:active{ transform:scale(0.96); }
+
+ .notif-dismiss{
+  position:absolute; top:10px; right:10px; z-index:2;
+  width:26px; height:26px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
+  color:var(--ink-60);
+  display:grid; place-items:center;
+  font-size:14px; font-weight:700; line-height:1;
+  cursor:pointer;
+  transition: background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), border-color var(--dur-fast) var(--ease-prism);
+ }
+ .notif-dismiss:hover{ background: rgba(255,255,255,0.10); color:var(--ink-80); border-color:rgba(255,255,255,0.12); }
+ .notif-dismiss.gaze-focus{ transform:scale(1.06); outline-color:var(--stroke-focus); color:var(--ink-100); background: rgba(255,255,255,0.12); }
+ .notif-dismiss:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px; }
+ .notif-dismiss:active{ transform:scale(0.92); }
+
+ /* expanded detail */
+ .notif-expanded{
+  display:none;
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  gap:8px;
+ }
+ .is-expanded .notif-expanded{ display:grid; }
+ .notif-preview{
+  display:flex; gap:10px; align-items:center;
+  background: rgba(255,255,255,0.05);
+  outline:1px solid rgba(255,255,255,0.06);
+  border-radius:12px;
+  padding:8px 10px;
+ }
+ .notif-thumb{
+  width:44px; height:44px;
+  border-radius:10px;
+  flex:none;
+  overflow:hidden;
+  outline:1px solid rgba(255,255,255,0.08);
+  display:grid; place-items:center;
+  background: linear-gradient(135deg,#ff8a6b 0%, #d4232a 100%);
+  box-shadow:0 6px 14px rgba(0,0,0,0.18);
+ }
+ .notif-preview-text{ flex:1; min-width:0; }
+ .notif-preview-title{ font-size:12px; font-weight:700; color:var(--ink-100); line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+ .notif-preview-sub{ font-size:11px; font-weight:500; color:var(--ink-60); letter-spacing:0.01em; margin-top:2px; }
+
+ /* swipe bg hint */
+ .notif-swipe-bg{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 18px;
+  background: linear-gradient(90deg, rgba(255,93,93,0.18) 0%, transparent 46%), linear-gradient(270deg, rgba(255,93,93,0.18) 0%, transparent 46%);
+  opacity:0; pointer-events:none;
+ }
+ .notif-swipe-bg span{ font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.42); }
+
+ /* undo bar — dependability */
+ .undo-bar{
+  position:absolute;
+  left:12px; right:12px; bottom:12px;
+  z-index:560;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:10px 12px 10px 14px;
+  border-radius:18px;
+  background: var(--mat-raised);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  box-shadow:0 16px 40px rgba(0,0,0,0.42), 0 1px 0 rgba(255,255,255,0.06) inset;
+  animation: rise-in var(--dur-base) var(--ease-prism);
+ }
+ .undo-bar.pulse{ animation: undoPulse 520ms var(--ease-prism); }
+ @keyframes undoPulse{
+  0%{ transform:scale(1); }
+  38%{ transform:scale(1.02); }
+  100%{ transform:scale(1); }
+ }
+ .undo-text{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+ .undo-title{ font-size:13px; font-weight:700; color:var(--ink-100); letter-spacing:-0.01em; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+ .undo-sub{ font-size:11px; font-weight:600; color:var(--ink-60); letter-spacing:0.01em; line-height:1; }
+ .undo-chip{
+  appearance:none; -webkit-appearance:none;
+  border:none;
+  height:32px; padding:0 14px;
+  border-radius:999px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423;
+  font-size:13px; font-weight:800; letter-spacing:-0.01em;
+  cursor:pointer;
+  box-shadow:0 8px 18px rgba(16,92,180,0.32);
+  transition: transform var(--dur-fast) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
+  flex:none;
+ }
+ .undo-chip.gaze-focus{ transform:scale(1.04); box-shadow:0 10px 22px rgba(16,92,180,0.42), 0 0 0 2px rgba(86,184,255,0.18); }
+ .undo-chip:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px; }
+ .undo-chip:active{ transform:scale(0.96); }
+
+ /* hint bar */
+ .hintbar{
+  position:absolute;
+  left:12px; right:12px; bottom:12px;
+  z-index:540;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:8px 10px;
+  border-radius:12px;
+  background: rgba(0,0,0,0.34);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  outline:1px solid rgba(255,255,255,0.06);
+  font-size:10px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;
+  color:var(--ink-60);
+  line-height:1;
+ }
+ .hintbar strong{ color:var(--ink-80); font-weight:700; letter-spacing:0.02em; text-transform:none; font-size:11px; }
+ .hintbar .mono-dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px rgba(86,184,255,0.6); flex:none; display:inline-block; }
+
+ /* state layer — edge states outside scroll */
+ .state-layer{
+  position:absolute;
+  inset:44px 0 0 0;
+  z-index:520;
+  display:none;
+  overflow-y:auto;
+  scrollbar-width:none;
+  padding:12px 14px 74px 14px;
+ }
+ .state-layer::-webkit-scrollbar{ display:none; }
+ .state-layer.on{ display:block; animation: rise-in var(--dur-base) var(--ease-prism); }
+ .state-layer.dim-on{
+  display:grid;
+  place-items:center;
+  padding:12px 14px 74px 14px;
+  background: transparent;
+  pointer-events:none;
+ }
+ .state-layer.dim-on .state-card{ pointer-events:auto; }
+ .state-card{
+  background: var(--mat-raised);
+  backdrop-filter: var(--blur-heavy);
+  -webkit-backdrop-filter: var(--blur-heavy);
+  outline:1px solid var(--stroke-glass);
+  border-radius: var(--r-lg);
+  padding:26px 20px 20px 20px;
+  display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px;
+  box-shadow:0 18px 44px rgba(0,0,0,0.36);
+  width:100%; max-width:420px;
+  margin:0 auto;
+  animation: rise-in var(--dur-base) var(--ease-prism) both;
+ }
+ .state-illus{
+  width:64px; height:64px;
+  border-radius:18px;
+  display:grid; place-items:center;
+  background: rgba(255,255,255,0.06);
+  outline:1px solid rgba(255,255,255,0.08);
+  margin-bottom:2px;
+ }
+ .state-title{ font-size:18px; font-weight:800; letter-spacing:-0.02em; color:var(--ink-100); line-height:1.1; }
+ .state-body{ font-size:13px; font-weight:500; color:var(--ink-60); line-height:1.45; max-width:300px; }
+ .state-actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:4px; }
+ .state-actions .btn{ min-height:36px; }
+ .state-skel-list{ display:grid; gap:8px; width:100%; max-width:520px; margin:18px auto 0 auto; }
+ .sk-notif{
+  background: var(--mat-glass);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  border-radius:18px;
+  padding:12px;
+  display:flex; gap:10px; align-items:flex-start;
+ }
+
+ /* focus ring */
+ button:focus-visible, [data-focusable]:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px; }
+
+ @media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+   animation-duration:0.01ms !important;
+   animation-iteration-count:1 !important;
+   transition-duration:0.01ms !important;
+  }
+ }
+</style>
+</head>
+<body>
+<div class="device">
+ <div class="stage-shell">
+  <div class="stage" data-stage></div>
+ </div>
+</div>
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+const stage = document.querySelector('[data-stage]');
+const device = document.querySelector('.device');
+const os = createOS(stage, { dwell: true, dwellMs: 350 });
+
+// statusbar
+stage.appendChild(os.statusbar('<span style="color:var(--ink-60);font-size:11px;letter-spacing:0.04em">Notifications · Center</span>'));
+
+// helpers
+const h = (tag, attrs={}, ...children)=>{
+ const el=document.createElement(tag);
+ for(const [k,v] of Object.entries(attrs)){
+  if(k==='class') el.className=v;
+  else if(k==='html') el.innerHTML=v;
+  else if(v!==null && v!==undefined) el.setAttribute(k,v);
+ }
+ for(const c of children){
+  if(c==null) continue;
+  if(typeof c==='string') el.appendChild(document.createTextNode(c));
+  else el.appendChild(c);
+ }
+ return el;
+};
+
+// dev controls — outside stage bounds fixed bottom, verified outside .stage
+const edgeRow = h('div', {class:'dev-controls', role:'toolbar', 'aria-label':'Edge state controls'});
+const edgeStates = [
+ {id:'normal', label:'Normal'},
+ {id:'empty', label:'Empty'},
+ {id:'loading', label:'Loading'},
+ {id:'error', label:'Error'},
+ {id:'offline', label:'Offline'},
+ {id:'permission', label:'No access'},
+];
+edgeStates.forEach(s=>{
+ const b=h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Show ${s.label} state`, 'data-state':s.id}, s.label);
+ if(s.id==='normal') b.classList.add('active');
+ b.addEventListener('click', ()=> setEdge(s.id));
+ edgeRow.appendChild(b);
+});
+(device).appendChild(edgeRow);
+
+// containers
+const viewport = h('div', {class:'notif-viewport', id:'viewport'});
+const stateLayer = h('div', {class:'state-layer', id:'stateLayer', 'aria-live':'polite'});
+const hintbar = h('div', {class:'hintbar', id:'hintbar'});
+hintbar.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="mono-dot" aria-hidden="true"></span><strong>Swipe ←→ dismiss</strong></span><span style="display:flex;align-items:center;gap:8px"><span>Tap expand · Esc top</span><span style="width:1px;height:10px;background:rgba(255,255,255,0.08)"></span><span style="display:flex;align-items:center;gap:6px">Hey Prism <span style="width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 30% 28%, #fff 0%, #d6ecff 14%, #56b8ff 36%, #0b5ed7 72%);display:inline-block;box-shadow:0 2px 8px rgba(86,184,255,0.4)"></span></span></span>`;
+stage.append(viewport, stateLayer, hintbar);
+
+// data model
+let notifications = [
+ { id:'n1', group:'Now', type:'msg', title:'Mara — Lens check', body:'Lens test at 4pm? I’ll bring the mount — need 20° FOV check on world layer.', time:'now', timeLabel:'now', chips:[{label:'Reply', primary:true, action:'reply'}, {label:'Dismiss', action:'dismiss'}], icon:'msg', expanded:false },
+ { id:'n2', group:'Now', type:'capture', title:'Capture saved', body:'12 MP · Golden Gate · 8:14 AM — saved to Gallery, auto-tagged “world”.', time:'7m', timeLabel:'7m ago', chips:[{label:'View', primary:true, action:'view'}, {label:'Dismiss', action:'dismiss'}], icon:'capture', expanded:false, preview:{title:'Golden Gate · 12 MP', sub:'Today · Gallery · 8:14', thumb:true} },
+ { id:'n3', group:'Now', type:'system', title:'System update ready', body:'Prism OS 26A · Restart to apply. New window chrome with scrim depth & tiled layout.', time:'18m', timeLabel:'18m ago', chips:[{label:'Restart', primary:true, action:'update'}, {label:'Later', action:'dismiss'}], icon:'system', expanded:false },
+ { id:'n4', group:'Earlier', type:'warn', title:'Lens temp elevated', body:'Brightness reduced to cool. Move to shade if it persists — thermal nominal.', time:'1h', timeLabel:'1h ago', chips:[{label:'Details', action:'details'}, {label:'Dismiss', action:'dismiss'}], icon:'warn', expanded:false },
+ { id:'n5', group:'Earlier', type:'team', title:'Prism Team · Build 26A', body:'Window chrome now respects scrim depth. 3 windows tiled — feedback welcome.', time:'2h', timeLabel:'2h ago', chips:[{label:'Open', primary:true, action:'open'}, {label:'Dismiss', action:'dismiss'}], icon:'team', expanded:false },
+];
+
+let dismissedStack = []; // for undo {data, index}
+let undoTimer = null;
+let undoBarEl = null;
+let edgeState = 'normal';
+
+// icon SVGs per type
+function iconSVG(type){
+ if(type==='msg') return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 8.5h11M6 12h8.5M6 15.5h5" stroke="white" stroke-width="1.9" stroke-linecap="round"/><rect x="3.5" y="4.5" width="17" height="13" rx="3.2" stroke="white" stroke-width="1.6"/></svg>`;
+ if(type==='capture') return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.2" y="7.2" width="17.6" height="11.2" rx="2.8" stroke="white" stroke-width="1.6"/><circle cx="12" cy="12.8" r="3.4" stroke="white" stroke-width="1.6"/><circle cx="12" cy="12.8" r="1.35" fill="white"/><path d="M8.2 7.2l1.2-1.7h5.2l1.2 1.7" stroke="white" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
+ if(type==='system') return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3.2" stroke="white" stroke-width="1.6"/><path d="M12 7.2v-1.7M12 18.5v-1.7M7.2 12H5.5M18.5 12h-1.7M8.1 8.1l-1.2-1.2M17.1 17.1l-1.2-1.2M15.9 8.1l1.2-1.2M6.9 17.1l1.2-1.2" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+ if(type==='warn') return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4.2L20.5 19H3.5L12 4.2z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9.2v4.4" stroke="white" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.2" fill="white"/></svg>`;
+ if(type==='team') return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4.2l1.35 3.18L16.8 8.7l-3.18 1.35L12 13.5l-1.35-3.45L7.2 8.7l3.45-1.32L12 4.2z" fill="white"/><path d="M17.2 11.2l.9 2.05 2.05.9-2.05.9-.9 2.05-.9-2.05-2.05-.9 2.05-.9.9-2.05z" fill="white" fill-opacity="0.95"/></svg>`;
+ return iconSVG('msg');
+}
+
+function render(){
+ viewport.innerHTML='';
+ // header
+ const header = h('div', {class:'notif-header'});
+ const left = h('div', {class:'notif-header-left'});
+ const titleRow = h('div', {class:'notif-title'});
+ titleRow.innerHTML = `Notifications <span class="notif-title-count " aria-label="${notifications.length} notifications">${notifications.length} new</span>`;
+ const subtitle = h('div', {class:'notif-subtitle'});
+ const nowCount = notifications.filter(n=>n.group==='Now').length;
+ const earlierCount = notifications.filter(n=>n.group==='Earlier').length;
+ subtitle.innerHTML = `<span class="dot ok" aria-hidden="true"></span><span>${nowCount} now · ${earlierCount} earlier</span><span style="margin-left:6px;color:var(--ink-40);font-weight:500">${new Date().toLocaleTimeString([],{hour:'numeric', minute:'2-digit'})}</span>`;
+ left.append(titleRow, subtitle);
+ const actions = h('div', {class:'notif-header-actions'});
+ const clearBtn = h('button', {class:'header-chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Clear all ${notifications.length} notifications`, id:'clearAll'});
+ clearBtn.textContent = 'Clear all';
+ if(notifications.length===0) clearBtn.setAttribute('disabled','true');
+ clearBtn.addEventListener('click', ()=>{
+  if(notifications.length===0) return;
+  // dismiss all with staggered anim pulse
+  const all = [...notifications];
+  all.forEach((n,i)=>{
+   setTimeout(()=> dismiss(n.id, 'left', true), i*80);
+  });
+  os.banner('<strong>All cleared</strong><span class="caption">notifications dismissed · undo available</span>',{timeout:2200});
+ });
+ const dndBtn = h('button', {class:'header-chip', 'data-focusable':'', tabindex:'0', 'aria-label':'Do Not Disturb off, tap to toggle'});
+ dndBtn.innerHTML = `<span class="dot warn" style="width:6px;height:6px;background:var(--ink-20);box-shadow:none"></span> Focus`;
+ let dndOn=false;
+ dndBtn.addEventListener('click', ()=>{
+  dndOn=!dndOn;
+  dndBtn.innerHTML = dndOn ? `<span class="dot ok" style="width:6px;height:6px;background:var(--accent)"></span> Focus on` : `<span class="dot warn" style="width:6px;height:6px;background:var(--ink-20);box-shadow:none"></span> Focus`;
+  dndBtn.style.background = dndOn ? 'rgba(86,184,255,0.14)' : '';
+  dndBtn.style.outlineColor = dndOn ? 'rgba(86,184,255,0.22)' : '';
+  dndBtn.style.color = dndOn ? 'var(--ink-100)' : '';
+  os.banner(dndOn ? '<strong>Focus — Do Not Disturb</strong><span class="caption">notifications silenced · banners hidden</span>' : '<strong>Focus off</strong><span class="caption">notifications will banner again</span>',{timeout:2000});
+ });
+ actions.append(clearBtn, dndBtn);
+ header.append(left, actions);
+ viewport.appendChild(header);
+
+ // offline banner when edgeState offline (also show when not normal but we handle via stateLayer dim. For normal offline we still show banner inside viewport if edgeState offline)
+ if(edgeState==='offline'){
+  const banner = h('div', {class:'offline-banner'});
+  banner.innerHTML = `<span class="warn-dot" aria-hidden="true"></span><span>Offline · 2 queued · will sync</span><span class="caption" style="margin-left:auto">queued</span><button class="notif-chip" data-focusable tabindex="0" aria-label="Retry sync" style="height:22px;padding:0 10px;font-size:10px;margin-left:4px">Retry</button>`;
+  banner.querySelector('button').addEventListener('click', ()=>{
+   banner.querySelector('button').textContent='Retrying…';
+   setTimeout(()=>{ os.banner('<strong>Still offline</strong><span class="caption">check world link · queued</span>',{timeout:2000}); banner.querySelector('button').textContent='Retry'; }, 900);
+  });
+  viewport.appendChild(banner);
+ }
+
+ // groups
+  const groups = ['Now','Earlier'];
+  let isFirstCard = true;
+  groups.forEach(groupName=>{
+   const groupNotifs = notifications.filter(n=>n.group===groupName);
+   // Even if empty, still show group header? Show only if has items OR no notifsOverall empty handled elsewhere. For Now/Earlier with zero items we still show empty group header with 0? Better show only if group has items or we are in normal with some. If group empty hide.
+   if(groupNotifs.length===0 && notifications.length>0) return;
+   if(notifications.length===0) return;
+   const group = h('div', {class:'notif-group'});
+   const head = h('div', {class:'group-head'});
+   head.innerHTML = `<span class="group-label">${groupName}</span><span class="group-count ">${groupNotifs.length}</span><span class="group-line" aria-hidden="true"></span><span class="caption" style="font-size:10px;color:var(--ink-40);letter-spacing:0.06em;text-transform:uppercase">priority</span>`;
+   const list = h('div', {class:'group-list', role:'list', 'aria-label':`${groupName} notifications`});
+   groupNotifs.forEach((n)=>{
+    const card = buildCard(n, isFirstCard);
+    isFirstCard = false;
+    list.appendChild(card);
+   });
+   group.append(head, list);
+   viewport.appendChild(group);
+  });
+
+ // if no notifications and edgeState normal, show subtle inline empty? But empty state is handled via setEdge. Still when cleared via Clear all, we should show inline empty placeholder? Use viewport empty hint.
+ if(notifications.length===0 && edgeState==='normal'){
+  const emptyInline = h('div', {class:'card', style:'padding:20px;display:grid;gap:8px;justify-items:center;text-align:center;background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:18px'});
+  emptyInline.innerHTML = `<div style="width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.08)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 6-4 8-6 10-2-2-6-4-6-10z" stroke="white" stroke-opacity="0.9" stroke-width="1.6"/><path d="M9 19a3 3 0 006 0" stroke="white" stroke-opacity="0.78" stroke-width="1.5" stroke-linecap="round"/></svg></div><div style="font-size:14px;font-weight:700;color:var(--ink-100)">All caught up</div><div class="caption" style="color:var(--ink-60);font-size:12px;max-width:280px">No new notifications — we’ll surface what needs your focus here.</div>`;
+  viewport.appendChild(emptyInline);
+ }
+
+ updateHintBar();
+}
+
+function buildCard(n, isTop){
+ const card = h('div', {class:'notif-card' + (n.expanded?' is-expanded':'') + (isTop?' is-top':''), 'data-focusable':'', tabindex:'0', role:'listitem', 'aria-label':`${n.title}, ${n.body} — ${n.timeLabel}`, 'data-id':n.id});
+ // swipe bg
+ const swipeBg = h('div', {class:'notif-swipe-bg', 'aria-hidden':'true', html:'<span>Dismiss</span><span>Dismiss</span>'});
+ card.appendChild(swipeBg);
+
+ const icon = h('div', {class:`notif-icon ${n.icon}`, 'aria-hidden':'true', html: iconSVG(n.type==='warn'?'warn': n.type==='capture'?'capture': n.type==='system'?'system': n.type==='team'?'team':'msg')});
+ // For capture/system we have specific icon class but keep mapping
+ if(n.icon==='warn') icon.className='notif-icon warn';
+ else if(n.icon==='capture') icon.className='notif-icon capture';
+ else if(n.icon==='system') icon.className='notif-icon system';
+ else if(n.icon==='team') icon.className='notif-icon team';
+ else icon.className='notif-icon msg';
+
+ const main = h('div', {class:'notif-main'});
+ const titleRow = h('div', {class:'notif-title-row'});
+ const name = h('div', {class:'notif-name'}, n.title);
+ const time = h('div', {class:'notif-time '}, n.time);
+ titleRow.append(name, time);
+ const body = h('div', {class:'notif-body'}, n.body);
+ const chipRow = h('div', {class:'notif-chiprow'});
+ n.chips.forEach(c=>{
+  const chip = h('button', {class:'notif-chip' + (c.primary?' primary':''), 'data-focusable':'', tabindex:'0', 'aria-label':`${c.label} ${n.title}`}, c.label);
+  chip.addEventListener('click', (e)=>{
+   e.stopPropagation();
+   handleChip(n.id, c.action);
+  });
+  chipRow.appendChild(chip);
+ });
+ main.append(titleRow, body, chipRow);
+
+ // expanded detail if needed
+ const expanded = h('div', {class:'notif-expanded'});
+ if(n.preview){
+  const preview = h('div', {class:'notif-preview'});
+  const thumb = h('div', {class:'notif-thumb', 'aria-hidden':'true'});
+  thumb.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="13" rx="2.4" stroke="white" stroke-width="1.6"/><circle cx="8.5" cy="10" r="1.5" fill="white"/><path d="M3 15.5l5-4.2 3.2 2.6 3.2-2.2 5.6 4.3" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const ptext = h('div', {class:'notif-preview-text'});
+  ptext.innerHTML = `<div class="notif-preview-title">${n.preview.title}</div><div class="notif-preview-sub">${n.preview.sub}</div>`;
+  preview.append(thumb, ptext);
+  expanded.appendChild(preview);
+  const detail = h('div', {class:'caption', style:'font-size:11px;color:var(--ink-60)'}, 'Tap View to open Gallery · space = capture · expanded with 12 MP');
+  expanded.appendChild(detail);
+ } else if(n.type==='warn'){
+  expanded.innerHTML = `<div style="background:rgba(255,194,71,0.10);outline:1px solid rgba(255,194,71,0.14);border-radius:12px;padding:10px 12px;display:flex;gap:8px;align-items:flex-start"><span style="width:7px;height:7px;border-radius:50%;background:var(--warn);box-shadow:0 0 8px rgba(255,194,71,0.6);margin-top:5px;flex:none"></span><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--ink-100)">Thermal nominal · 34°C</div><div style="font-size:11px;font-weight:500;color:var(--ink-60);margin-top:2px;line-height:1.35">Auto-dimmed to 82% brightness. Will restore when cool. No action needed.</div></div></div>`;
+ } else if(n.type==='system'){
+  expanded.innerHTML = `<div style="background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:10px 12px"><div style="font-size:12px;font-weight:700;color:var(--ink-100)">What’s new in 26A</div><div style="font-size:11px;color:var(--ink-60);margin-top:4px;line-height:1.4">· Window scrim depth & tiled layout<br>· Gaze dwell 350ms haptics<br>· Capture at 12 MP world layer</div></div>`;
+ } else {
+  expanded.innerHTML = `<div style="background:rgba(255,255,255,0.05);outline:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(180deg,#2f9dff,#0b5ed7);display:grid;place-items:center;color:#fff;font-weight:700;font-size:11px">M</div><div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--ink-80)">Mara is typing…</div><div style="font-size:11px;color:var(--ink-60)">Reply opens inline — no dead ends.</div></div></div>`;
+ }
+ main.appendChild(expanded);
+
+ const dismissBtn = h('button', {class:'notif-dismiss', 'data-focusable':'', tabindex:'0', 'aria-label':`Dismiss ${n.title} notification`}, '×');
+ dismissBtn.addEventListener('click', (e)=>{ e.stopPropagation(); dismiss(n.id, 'right'); });
+
+ card.append(icon, main, dismissBtn);
+
+ // tap to expand (card click)
+ card.addEventListener('click', (e)=>{
+  // if clicking chips handled above, this is card body
+  n.expanded = !n.expanded;
+  card.classList.toggle('is-expanded', n.expanded);
+  // subtle scale settle
+  if(!os.state.reducedMotion){
+   card.animate([
+    { transform: 'scale(1.025)' },
+    { transform: 'scale(1)' }
+   ], {duration:220, easing:'cubic-bezier(0.32,0.72,0,1)'});
+  }
+  // announce for accessibility
+  if(n.expanded) os.banner(`<strong>${n.title} expanded</strong><span class="caption">tap again to collapse</span>`,{timeout:1600});
+ });
+ card.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); card.click(); }
+  if(e.key==='Delete' || e.key==='Backspace'){ e.preventDefault(); dismiss(n.id, 'left'); }
+ });
+
+ // stagger animation delay based on index? Already group handles but we add per card
+ if(!os.state.reducedMotion){
+  card.style.animationDelay = `${Math.min(220, (isTop?0: 60))}ms`;
+ }
+
+ return card;
+}
+
+function handleChip(id, action){
+ const n = notifications.find(x=>x.id===id);
+ if(!n) return;
+ if(action==='dismiss'){
+  dismiss(id, 'left');
+ } else if(action==='reply'){
+  n.expanded = true;
+  render();
+  // focus expanded area? simulate reply input
+  os.banner('<strong>Reply — Mara</strong><span class="caption">inline reply · demo — no send</span>',{timeout:2000});
+  // highlight chip
+  setTimeout(()=>{
+   const card = viewport.querySelector(`[data-id="${id}"]`);
+   card?.classList.add('is-popping');
+   setTimeout(()=> card?.classList.remove('is-popping'), 360);
+  }, 30);
+ } else if(action==='view'){
+  os.banner('<strong>Gallery — Golden Gate</strong><span class="caption">12 MP · opened from notification</span>',{timeout:2000});
+  // optionally expand
+  n.expanded=true; render();
+ } else if(action==='update'){
+  os.banner('<strong>Restarting…</strong><span class="caption">Prism OS 26A · 12s remaining</span>',{timeout:2400});
+  dismiss(id,'left');
+ } else if(action==='details'){
+  n.expanded = !n.expanded; render();
+ } else if(action==='open'){
+  os.banner('<strong>Prism Team — opened</strong><span class="caption">demo surface</span>',{timeout:1800});
+ }
+}
+
+function dismiss(id, dir='left', silent=false){
+ const idx = notifications.findIndex(n=>n.id===id);
+ if(idx<0) return;
+ const data = notifications[idx];
+ const el = viewport.querySelector(`[data-id="${id}"]`);
+ if(!el){
+  // fallback sync
+  dismissedStack.push({data, index: idx});
+  notifications.splice(idx,1);
+  render();
+  if(!silent) showUndo(data);
+  updateHeaderAfter();
+  return;
+ }
+ el.classList.add('is-dismissing');
+ // store for undo
+ dismissedStack.push({data, index: idx});
+ if(dismissedStack.length>6) dismissedStack.shift();
+
+ const reduced = os.state.reducedMotion;
+ const delta = dir==='left' ? -1 : 1;
+ // rubber-band settle: slight overshoot opposite before exit
+ const anim = el.animate([
+  { transform: `translateX(0) scale(1)`, opacity:1, offset:0 },
+  { transform: `translateX(${delta*-8}px) scale(0.99)`, opacity:1, offset:0.18 },
+  { transform: `translateX(${delta*110}%) scale(0.96)`, opacity:0, offset:1 }
+ ], { duration: reduced?1: 280, easing: 'cubic-bezier(0.32,0.72,0,1)' });
+ anim.finished.then(()=>{
+  // remove from model
+  const i = notifications.findIndex(n=>n.id===id);
+  if(i>=0) notifications.splice(i,1);
+  render();
+  if(!silent) showUndo(data);
+  updateHeaderAfter();
+  // monoaudio cue placeholder (silent)
+  cue('dismiss');
+ }).catch(()=>{});
+ // hide undo if new dismiss cancels previous timer? Keep stack but show latest
+}
+
+function showUndo(data){
+ // clear previous
+ if(undoBarEl) undoBarEl.remove();
+ if(undoTimer) clearTimeout(undoTimer);
+ const bar = h('div', {class:'undo-bar pulse'});
+ bar.innerHTML = `
+  <div class="undo-text">
+   <div class="undo-title">${escapeHtml(data.title)} dismissed</div>
+   <div class="undo-sub">Swipe dismissed · undo restores</div>
+  </div>
+  <button class="undo-chip" data-focusable tabindex="0" aria-label="Undo dismiss ${escapeHtml(data.title)}">Undo</button>
+ `;
+ const undoBtn = bar.querySelector('button');
+ undoBtn.addEventListener('click', ()=>{
+  undoDismiss();
+ });
+ // allow gaze focus styling via core? Need to ensure data-focusable handled? Use class manually but core tracks via pointer. Add hover.
+ undoBtn.addEventListener('pointerenter', ()=> undoBtn.classList.add('gaze-focus'));
+ undoBtn.addEventListener('pointerleave', ()=> undoBtn.classList.remove('gaze-focus'));
+ stage.appendChild(bar);
+ undoBarEl = bar;
+ // hide hintbar while undo visible (undo replaces hint)
+ hintbar.style.opacity='0';
+ hintbar.style.pointerEvents='none';
+ // auto hide 4.2s
+ undoTimer = setTimeout(()=> hideUndo(), 4200);
+ // ensure cursor above
+ stage.appendChild(os.cursor);
+}
+
+function hideUndo(){
+ if(!undoBarEl) return;
+ const bar = undoBarEl;
+ const anim = bar.animate([
+  { transform:'translateY(0) scale(1)', opacity:1 },
+  { transform:'translateY(8px) scale(0.98)', opacity:0 }
+ ], {duration: os.state.reducedMotion?1:220, easing:'ease-in'});
+ anim.finished.then(()=>{
+  bar.remove();
+  if(undoBarEl===bar) undoBarEl=null;
+  hintbar.style.opacity='';
+  hintbar.style.pointerEvents='';
+ });
+}
+
+function undoDismiss(){
+ if(dismissedStack.length===0) return;
+ const {data, index} = dismissedStack.pop();
+ // restore at original index (clamp)
+ const at = Math.min(index, notifications.length);
+ notifications.splice(at, 0, {...data, expanded:false});
+ if(undoBarEl){
+  // animate undoBar out quickly
+  const bar=undoBarEl;
+  bar.style.pointerEvents='none';
+  bar.animate([{opacity:1},{opacity:0}],{duration:140}).finished.then(()=> bar.remove());
+  undoBarEl=null;
+ }
+ if(undoTimer){ clearTimeout(undoTimer); undoTimer=null; }
+ hintbar.style.opacity='';
+ hintbar.style.pointerEvents='';
+ render();
+ // delight pulse on restored card
+ requestAnimationFrame(()=>{
+  const el = viewport.querySelector(`[data-id="${data.id}"]`);
+  if(el && !os.state.reducedMotion){
+   el.classList.add('is-popping');
+   el.animate([
+    { transform:'scale(0.96)', boxShadow:'0 0 0 0 rgba(86,184,255,0)' },
+    { transform:'scale(1.025)', boxShadow:'0 0 0 2.5px rgba(86,184,255,0.22)' },
+    { transform:'scale(1)', boxShadow:'0 0 0 0 rgba(86,184,255,0)' }
+   ], {duration:520, easing:'cubic-bezier(0.32,0.72,0,1)'});
+   setTimeout(()=> el.classList.remove('is-popping'), 560);
+  }
+ });
+ os.banner('<strong>Restored</strong><span class="caption">notification back in list</span>',{timeout:1800});
+ cue('undo');
+ updateHeaderAfter();
+}
+
+function escapeHtml(s){
+ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function updateHeaderAfter(){
+ // no-op, render already did header, but ensure clear button disabled state refreshed on next render? Already
+}
+
+function updateHintBar(){
+ // keep hintbar visible unless undo
+ if(undoBarEl) return;
+ // already in DOM
+}
+
+function cue(type){
+ // mono audio cues placeholder — silent for probe, but announce via aria-live region if needed
+}
+
+// edge states
+function setEdge(id){
+ edgeState = id;
+ edgeRow.querySelectorAll('.chip').forEach(c=> c.classList.toggle('active', c.dataset.state===id));
+ // reset undo
+ if(undoBarEl){ undoBarEl.remove(); undoBarEl=null; }
+ if(undoTimer){ clearTimeout(undoTimer); undoTimer=null; }
+ hintbar.style.opacity=''; hintbar.style.pointerEvents='';
+ stateLayer.className='state-layer';
+ stateLayer.style.display='';
+ stateLayer.style.background='';
+ stateLayer.style.pointerEvents='';
+ viewport.style.display='';
+ viewport.style.opacity='';
+ viewport.style.filter='';
+ viewport.style.pointerEvents='';
+
+ if(id==='normal'){
+  stateLayer.classList.remove('on','dim-on');
+  stateLayer.style.display='none';
+  viewport.style.display='flex';
+  render();
+  return;
+ }
+ if(id==='empty'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px;justify-items:center;padding:28px 0 0 0">
+    <div class="state-card">
+     <div class="state-illus" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 6-4 8-6 10-2-2-6-4-6-10z" stroke="white" stroke-opacity="0.92" stroke-width="1.6"/><path d="M9 19a3 3 0 006 0" stroke="white" stroke-opacity="0.78" stroke-width="1.5" stroke-linecap="round"/><path d="M8 9.5l2 2 2-1.6 2 1.6 2-2" stroke="white" stroke-opacity="0.42" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+     </div>
+     <div class="state-title">All caught up</div>
+     <div class="state-body">No new notifications. We’ll surface what needs your focus here — messages, captures, and system alerts live in one calm stack.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Enable notifications">Enable notifications</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Dismiss empty state">Dismiss</button>
+     </div>
+     <p class="caption" style="color:var(--ink-40);font-size:11px">Humane empty · nothing missed</p>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    if(b.textContent.includes('Enable')){
+     b.textContent='Enabling…';
+     setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Notifications enabled</strong><span class="caption">we’ll banner important items</span>',{timeout:1800}); }, 700);
+    } else {
+     setEdge('normal');
+    }
+   });
+  });
+  return;
+ }
+ if(id==='loading'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="padding:4px 0 0 0;display:grid;gap:12px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;padding:0 2px;opacity:0.88">
+     <div style="display:grid;gap:6px"><div class="skeleton" style="width:142px;height:20px;border-radius:8px"></div><div class="skeleton" style="width:160px;height:10px;border-radius:6px"></div></div>
+     <div class="skeleton" style="width:78px;height:28px;border-radius:999px"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;padding:0 2px"><div class="skeleton" style="width:36px;height:10px;border-radius:999px"></div><div class="skeleton" style="width:52px;height:10px;border-radius:999px"></div><div style="flex:1;height:1px;background:rgba(255,255,255,0.06)"></div></div>
+    <div class="state-skel-list">
+     ${Array(4).fill(0).map((_,i)=>`
+      <div class="sk-notif" style="opacity:${1 - i*0.12}">
+       <div class="skeleton" style="width:36px;height:36px;border-radius:11px;flex:none"></div>
+       <div style="flex:1;display:grid;gap:8px">
+        <div style="display:flex;gap:8px;align-items:center"><div class="skeleton" style="flex:1;height:12px;border-radius:6px"></div><div class="skeleton" style="width:28px;height:10px;border-radius:6px"></div></div>
+        <div class="skeleton" style="width:92%;height:10px;border-radius:6px"></div>
+        <div class="skeleton" style="width:74%;height:10px;border-radius:6px"></div>
+        <div style="display:flex;gap:6px;margin-top:2px"><div class="skeleton" style="width:56px;height:26px;border-radius:999px"></div><div class="skeleton" style="width:68px;height:26px;border-radius:999px"></div></div>
+       </div>
+      </div>
+     `).join('')}
+    </div>
+    <div class="caption" style="text-align:center;color:var(--ink-40);display:flex;align-items:center;justify-content:center;gap:6px"><span class="dot ok" style="width:6px;height:6px;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5)"></span>Loading · shimmer 1.2s times</div>
+   </div>
+  `;
+  return;
+ }
+ if(id==='error'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:10px;justify-items:center;padding:18px 0 0 0">
+    <div class="state-card" style="animation: sheet-in var(--dur-slow) var(--ease-prism)">
+     <div class="state-illus" style="background:rgba(255,93,93,0.10);outline-color:rgba(255,93,93,0.18)" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.5L21.5 19H2.5L12 3.5z" stroke="#ff8a8a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.5v4.2" stroke="#ffb3b3" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.25" fill="#ffb3b3"/></svg>
+     </div>
+     <div class="state-title">Can’t load notifications</div>
+     <div class="state-body">Prism couldn’t reach the notification service. Your captures are safe — try again. No dead ends.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Retry loading notifications" id="retryBtn">Retry</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Dismiss error">Dismiss</button>
+     </div>
+     <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;width:100%;justify-content:center">
+      <span class="dot bad" aria-hidden="true"></span><span class="caption " style="color:var(--ink-60)">Error PR-NOTIF-503 · 9:41</span><span class="caption" style="margin-left:auto;color:var(--ink-40)">tap retry</span>
+     </div>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelector('#retryBtn').addEventListener('click', (e)=>{
+   const btn=e.currentTarget; btn.textContent='Retrying…'; btn.setAttribute('disabled','true');
+   // show skeleton inside card briefly
+   const cardBody=stateLayer.querySelector('.state-card');
+   const prev=cardBody.innerHTML;
+   cardBody.innerHTML = `<div style="display:grid;gap:10px;width:100%;justify-items:center;padding:8px 0"><div class="skeleton" style="width:64px;height:64px;border-radius:18px"></div><div class="skeleton" style="width:62%;height:16px;border-radius:8px"></div><div class="skeleton" style="width:78%;height:12px;border-radius:6px"></div><div class="skeleton" style="width:100%;height:56px;border-radius:12px;margin-top:6px"></div></div>`;
+   setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Notifications restored</strong><span class="caption">service back · 5 items</span>',{timeout:1800}); }, 1200);
+  });
+  stateLayer.querySelectorAll('button')[1].addEventListener('click', ()=> setEdge('normal'));
+  return;
+ }
+ if(id==='offline'){
+  // dim viewport but keep visible + overlay card
+  viewport.style.display='flex';
+  viewport.style.opacity='0.52';
+  viewport.style.filter='blur(1px)';
+  stateLayer.classList.add('dim-on');
+  stateLayer.style.display='grid';
+  stateLayer.innerHTML = `
+   <div class="state-card" style="animation: rise-in var(--dur-base) var(--ease-prism)">
+    <div class="state-illus" style="background:rgba(255,194,71,0.12);outline-color:rgba(255,194,71,0.18)" aria-hidden="true">
+     <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3.5 9.5a9 9 0 0117 0" stroke="white" stroke-opacity="0.92" stroke-width="1.6" stroke-linecap="round"/><path d="M6 12.5a6 6 0 0112 0" stroke="white" stroke-opacity="0.78" stroke-width="1.6" stroke-linecap="round"/><path d="M8.8 15.5a2.8 2.8 0 016.4 0" stroke="white" stroke-opacity="0.76" stroke-width="1.6" stroke-linecap="round"/><path d="M2 2l20 20" stroke="#ffc247" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17.8" r="1.25" fill="white"/></svg>
+    </div>
+    <div class="state-title">You’re offline</div>
+    <div class="state-body">Notifications keep their last state. 2 queued on device — they’ll sync when you’re back on the world layer.</div>
+    <div style="display:flex;gap:8px;width:100%;margin-top:2px">
+     <button class="btn primary" data-focusable tabindex="0" aria-label="Retry connection" style="flex:1">Retry</button>
+     <button class="btn" data-focusable tabindex="0" aria-label="Continue offline, keep cached notifications" style="flex:1">Use cached</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:8px 12px;width:100%;justify-content:center">
+     <span class="dot bad" aria-hidden="true"></span><span class="caption" style="color:var(--ink-60);font-size:12px;font-weight:700">No network · queued 2</span><span class="caption" style="margin-left:auto">offline</span>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    if(b.textContent.includes('Retry')){
+     b.textContent='Retrying…';
+     setTimeout(()=>{ os.banner('<strong>Still offline</strong><span class="caption">check Wi-Fi · queued will sync</span>',{timeout:2200}); b.textContent='Retry'; }, 900);
+    } else {
+     setEdge('normal');
+     os.banner('<strong>Offline mode</strong><span class="caption">cached notifications · 5 items</span>',{timeout:2000});
+    }
+   });
+  });
+  return;
+ }
+ if(id==='permission'){
+  viewport.style.display='flex';
+  viewport.style.opacity='0.46';
+  viewport.style.filter='blur(1.2px)';
+  stateLayer.classList.add('dim-on');
+  stateLayer.style.display='grid';
+  stateLayer.innerHTML = `
+   <div class="state-card">
+    <div class="state-illus" aria-hidden="true">
+     <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="5" y="9.5" width="14" height="10" rx="2.4" stroke="white" stroke-opacity="0.92" stroke-width="1.6"/><path d="M8.5 9.5V7.8a3.5 3.5 0 017 0v1.7" stroke="white" stroke-width="1.5"/><circle cx="12" cy="14.5" r="1.35" fill="white"/><path d="M12 15.85v1.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </div>
+    <div class="state-title">Permission needed</div>
+    <div class="state-body">Prism needs notification access to show banners over the world. Launcher stays usable without it — enable to see the stack.</div>
+    <div class="state-actions" style="width:100%">
+     <button class="btn primary" data-focusable tabindex="0" aria-label="Allow notifications" style="flex:1">Allow</button>
+     <button class="btn ghost" data-focusable tabindex="0" aria-label="Not now, dismiss permission prompt" style="flex:1">Not now</button>
+    </div>
+    <p class="caption" style="color:var(--ink-40)">Settings → Privacy → Prism · Notifications</p>
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:8px 12px;width:100%;justify-content:center">
+     <span class="dot warn" aria-hidden="true"></span><span class="caption" style="color:var(--ink-80);font-size:12px;font-weight:700">Notifications blocked</span>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    if(b.textContent.trim()==='Allow'){
+     b.textContent='Allowing…';
+     setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Notifications allowed</strong><span class="caption">banners will appear over world</span>',{timeout:1800}); }, 700);
+    } else {
+     setEdge('normal');
+     os.banner('<strong>Without notifications</strong><span class="caption">allow later in Settings</span>',{timeout:2000});
+    }
+   });
+  });
+  return;
+ }
+}
+
+// gestures + keys — use os bus (temple swipe, Esc, capture)
+os.on('swipeleft', ()=>{
+ if(edgeState!=='normal') return;
+ if(undoBarEl) { hideUndo(); return; }
+ const top = notifications[0];
+ if(top) dismiss(top.id, 'left');
+ else os.banner('<strong>No notification to dismiss</strong><span class="caption">stack empty</span>',{timeout:1500});
+});
+os.on('swiperight', ()=>{
+ if(edgeState!=='normal') return;
+ if(undoBarEl) { hideUndo(); return; }
+ const top = notifications[0];
+ if(top) dismiss(top.id, 'right');
+ else os.banner('<strong>Nothing to dismiss</strong><span class="caption">all caught up</span>',{timeout:1500});
+});
+os.on('back', ()=>{
+ if(undoBarEl){ hideUndo(); return; }
+ if(edgeState!=='normal'){ setEdge('normal'); return; }
+ const top = notifications[0];
+ if(top) dismiss(top.id, 'left');
+});
+os.on('capture', ()=>{
+ os.banner('<strong>Capture · notification snapshot</strong><span class="caption">600×600 · saved</span>',{timeout:1800});
+});
+
+// expose for probe
+window.__notif = { setEdge, dismiss: (id)=> dismiss(id,'left'), getState: ()=>({edgeState, count:notifications.length}) };
+
+// initial render
+render();
+console.log('Prism Notifications ready — 600x600');
+</script>
+</body>
+</html>

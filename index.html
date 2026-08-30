@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Shell</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+  .stage{
+    background: radial-gradient(120% 90% at 50% 16%, rgba(42,53,80,0.55) 0%, rgba(20,26,40,0.72) 36%, rgba(10,14,23,0.88) 68%),
+                radial-gradient(70% 50% at 78% 88%, rgba(86,184,255,0.09), transparent 55%),
+                rgba(6,10,16,0.74);
+  }
+  .stage-shell{ position:relative; width:600px; height:600px; display:grid; place-items:center; flex:none; }
+  .dev-controls{
+    position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+    display:flex; gap:6px; z-index:1000; flex-wrap:wrap; justify-content:center;
+    padding:8px 12px; border-radius:var(--r-pill);
+    background:rgba(10,15,23,0.74); outline:1px solid var(--stroke-glass);
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    box-shadow:0 8px 24px rgba(0,0,0,0.32); max-width:92vw; pointer-events:none;
+  }
+  .dev-controls .chip{ pointer-events:auto; height:26px; padding:0 10px; font-size:11px; font-weight:700; letter-spacing:0.02em; border:none; cursor:pointer; transition: background var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism); }
+  .dev-controls .chip.active{ background:linear-gradient(180deg,var(--accent),var(--accent-strong)); color:#051423; outline-color:transparent; }
+  .dev-controls .chip:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px; }
+  .dev-controls .chip.gaze-focus{ transform:scale(1.04); }
+  .stage .dev-controls{ display:none !important; }
+  .shell-viewport{ position:absolute; inset:44px 0 0 0; overflow-y:auto; scrollbar-width:none; padding:14px 14px 86px 14px; display:flex; flex-direction:column; gap:14px; }
+  .shell-viewport::-webkit-scrollbar{ display:none; }
+  .shell-hero{ background:var(--mat-glass); backdrop-filter:var(--blur-glass); -webkit-backdrop-filter:var(--blur-glass); outline:1px solid var(--stroke-glass); border-radius:var(--r-lg); padding:16px; box-shadow:0 18px 44px rgba(0,0,0,0.32); display:flex; align-items:center; gap:14px; animation: rise-in var(--dur-base) var(--ease-prism) both; }
+  .shell-hero-icon{ width:52px; height:52px; border-radius:14px; display:grid; place-items:center; background:linear-gradient(180deg,#56b8ff,#0b5ed7); color:#fff; flex:none; box-shadow:0 6px 18px rgba(16,92,180,0.32); }
+  .shell-title{ font-size:22px; font-weight:800; letter-spacing:-0.03em; line-height:1; }
+  .shell-sub{ font-size:11px; font-weight:600; letter-spacing:0.04em; color:var(--ink-60); }
+  .shell-time{ font-size:28px; font-weight:800; letter-spacing:-0.04em; font-variant-numeric:tabular-nums; margin-left:auto; text-align:right; line-height:1; }
+  .shell-time .ampm{ font-size:11px; font-weight:700; letter-spacing:0.06em; color:var(--ink-60); }
+  .grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; animation: rise-in var(--dur-base) var(--ease-prism) both; animation-delay:60ms; }
+  .app-btn{ appearance:none; border:none; background:var(--mat-glass); backdrop-filter:var(--blur-glass); -webkit-backdrop-filter:var(--blur-glass); outline:1px solid var(--stroke-glass); border-radius:18px; padding:12px 6px 10px 6px; display:flex; flex-direction:column; align-items:center; gap:8px; min-height:96px; cursor:pointer; position:relative; overflow:hidden; box-shadow:0 10px 28px rgba(0,0,0,0.28); transition: transform var(--dur-base) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism); text-align:center; }
+  .app-btn::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,0.06),transparent 46%); opacity:0; transition:opacity var(--dur-fast) var(--ease-prism); pointer-events:none; }
+  .app-btn.gaze-focus::after{ opacity:1; }
+  .app-btn:active{ transform:scale(0.98); }
+  .app-btn.gaze-focus{ transform:scale(1.05) translateY(-1px); outline-color:var(--stroke-focus); box-shadow:0 0 0 2px rgba(86,184,255,0.18), 0 16px 36px rgba(0,0,0,0.38), 0 0 22px rgba(86,184,255,0.22); }
+  .app-icon{ width:46px; height:46px; border-radius:13px; display:grid; place-items:center; flex:none; box-shadow:0 6px 18px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.10); outline:1px solid rgba(255,255,255,0.08); color:#fff; }
+  .app-label{ font-size:12px; font-weight:600; letter-spacing:0.01em; color:var(--ink-80); line-height:1; white-space:nowrap; }
+  .app-id{ font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-40); margin-top:-2px; }
+  .boot-layer{ position:absolute; inset:0; z-index:700; display:grid; place-items:center; background:#020407; animation: boot-out 260ms var(--ease-prism) 760ms forwards; }
+  .boot-logo{ display:flex; flex-direction:column; align-items:center; gap:16px; animation: rise-in var(--dur-base) var(--ease-prism) both; }
+  .boot-tri{ width:62px; height:62px; display:grid; place-items:center; }
+  .boot-caption{ font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-60); font-variant-numeric:tabular-nums; }
+  @keyframes boot-out{ to{ opacity:0; pointer-events:none; } }
+  .wm-iframe{ width:100%; height:100%; border:none; border-radius:var(--r-lg); background:#020407; }
+  .wm-layer-host{ background:rgba(4,7,11,0.42); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+  button:focus-visible,[data-focusable]:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce){ .boot-layer{ animation:none; } .boot-logo{ animation:none; } }
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="stage-shell"><div class="stage" data-stage></div></div>
+</div>
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+const stage = document.querySelector('[data-stage]');
+const device = document.querySelector('.device');
+const os = createOS(stage, { dwell:true, dwellMs:350 });
+stage.appendChild(os.statusbar());
+
+const apps = [
+  {id:'00', slug:'00-foundation', label:'Foundation', sub:'Tokens + glass', tint:'linear-gradient(180deg,#1e2a3a,#0c1424)', icon:'◈'},
+  {id:'01', slug:'01-boot', label:'Boot', sub:'Recovery', tint:'linear-gradient(180deg,#020407,#1a2332)', icon:'⬢'},
+  {id:'02', slug:'02-home', label:'Home', sub:'Launcher', tint:'linear-gradient(180deg,#2f9dff,#0b5ed7)', icon:'⌂'},
+  {id:'03', slug:'03-wm', label:'Windows', sub:'Manager', tint:'linear-gradient(180deg,#3a3d4a,#1c2230)', icon:'▭'},
+  {id:'04', slug:'04-gestures', label:'Gestures', sub:'Trainer', tint:'linear-gradient(180deg,#7ee0a6,#2a9d6a)', icon:'✋'},
+  {id:'05', slug:'05-notifications', label:'Notify', sub:'Inbox', tint:'linear-gradient(180deg,#56d0ff,#0a7bd6)', icon:'◉'},
+  {id:'06', slug:'06-assistant', label:'Assistant', sub:'Hey Prism', tint:'linear-gradient(180deg,#a58bff,#6a4bff)', icon:'✦'},
+  {id:'07', slug:'07-camera', label:'Camera', sub:'Lens 82%', tint:'linear-gradient(180deg,#3a3d4a,#1c2230)', icon:'◎'},
+  {id:'08', slug:'08-captions', label:'Captions', sub:'Live EN', tint:'linear-gradient(180deg,#ff9e6b,#e85d3a)', icon:'≡'},
+  {id:'09', slug:'09-nav', label:'Nav', sub:'Maps', tint:'linear-gradient(180deg,#7ee0a6,#2a9d6a)', icon:'⬤'},
+  {id:'10', slug:'10-messages', label:'Messages', sub:'2 unread', tint:'linear-gradient(180deg,#2f9dff,#0b5ed7)', icon:'✉'},
+  {id:'11', slug:'11-settings', label:'Settings', sub:'System', tint:'linear-gradient(180deg,#2b3242,#161c28)', icon:'⚙'},
+  {id:'12', slug:'12-webapps', label:'Web Apps', sub:'Platform', tint:'linear-gradient(180deg,#56d0ff,#0a7bd6)', icon:'⬡'},
+  {id:'13', slug:'13-a11y', label:'A11y', sub:'Scale + motion', tint:'linear-gradient(180deg,#a58bff,#3a2a8a)', icon:'♿'},
+  {id:'14', slug:'14-onboarding', label:'Onboard', sub:'Pairing', tint:'linear-gradient(180deg,#56b8ff,#0b5ed7)', icon:'→'},
+  {id:'15', slug:'15-hud', label:'HUD', sub:'Perf', tint:'linear-gradient(180deg,#2b3242,#0c1424)', icon:'▣'},
+];
+
+const viewport = document.createElement('div');
+viewport.className = 'shell-viewport stage-scroll';
+
+const hero = document.createElement('div');
+hero.className = 'shell-hero';
+const now=new Date();
+const hh = String(now.getHours()%12||12).padStart(2,'0'), mm=String(now.getMinutes()).padStart(2,'0'), am=now.getHours()<12?'AM':'PM';
+hero.innerHTML = `
+  <div class="shell-hero-icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3.5l6.2 10.8H5.8L12 3.5z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M6 11h7.5" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+  <div><div class="shell-title">Prism OS</div><div class="shell-sub tabular">16 pieces · gaze + keys · 600×600</div></div>
+  <div class="shell-time tabular" aria-live="polite" aria-label="Current time ${hh}:${mm} ${am}">${hh}<span style="opacity:0.7">:</span>${mm} <span class="ampm">${am}</span></div>
+`;
+viewport.appendChild(hero);
+
+const head = document.createElement('div');
+head.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:0 2px';
+head.innerHTML='<span style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-60)">All apps</span><span style="font-size:11px;font-weight:600;color:var(--ink-60)">Tab / arrows / gaze</span>';
+viewport.appendChild(head);
+
+const grid = document.createElement('div');
+grid.className='grid';
+grid.setAttribute('role','grid');
+grid.setAttribute('aria-label','Prism OS apps');
+apps.forEach(a=>{
+  const btn=document.createElement('button');
+  btn.className='app-btn';
+  btn.setAttribute('data-focusable','');
+  btn.setAttribute('tabindex','0');
+  btn.setAttribute('aria-label', `${a.label} — ${a.id} ${a.slug}, ${a.sub}`);
+  btn.innerHTML=`<span class="app-icon" style="background:${a.tint}" aria-hidden="true">${a.icon}</span><span class="app-label">${a.label}</span><span class="app-id">${a.id} · ${a.slug.slice(3)}</span>`;
+  btn.addEventListener('click', ()=> openApp(a));
+  grid.appendChild(btn);
+});
+viewport.appendChild(grid);
+
+const hint=document.createElement('div');
+hint.style.cssText='background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:8px;animation: rise-in var(--dur-base) var(--ease-prism) both;animation-delay:120ms';
+hint.innerHTML='<span class="dot ok" aria-hidden="true"></span><span style="font-size:11px;font-weight:600;color:var(--ink-80)">Gaze dwell 350ms or Enter to open · Esc to close · Space = capture</span>';
+viewport.appendChild(hint);
+
+stage.appendChild(viewport);
+
+// dev controls outside stage
+const ctrl=document.createElement('div');
+ctrl.className='dev-controls';
+ctrl.setAttribute('role','toolbar');
+ctrl.setAttribute('aria-label','Shell controls');
+[
+  {label:'Shell home', action:()=>{ closeAll(); viewport.scrollTo({top:0,behavior:'smooth'}); }},
+  {label:'Overview (Esc)', action:()=> os.emit('back',{})},
+  {label:'Probe shell', action:()=> window.open('/components/00-foundation/index.html','_blank')},
+].forEach(c=>{
+  const b=document.createElement('button');
+  b.className='chip'; b.setAttribute('data-focusable',''); b.setAttribute('tabindex','0'); b.setAttribute('aria-label',c.label);
+  b.textContent=c.label;
+  b.addEventListener('click', c.action);
+  ctrl.appendChild(b);
+});
+(device||document.body).appendChild(ctrl);
+
+// boot splash
+const boot=document.createElement('div');
+boot.className='boot-layer';
+boot.setAttribute('aria-label','Booting Prism OS');
+boot.innerHTML=`<div class="boot-logo"><div class="boot-tri"><svg width="62" height="62" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5l6.2 10.8H5.8L12 3.5z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M6 11h8" stroke="white" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="12" r="1.2" fill="white"/></svg></div><div class="boot-caption tabular">Prism OS · 600×600 · booting</div></div>`;
+stage.appendChild(boot);
+setTimeout(()=> boot.remove(), os.state.reducedMotion? 40: 1000);
+
+function closeAll(){
+  [...os.wm.stack].forEach(l=> os.wm.close(l.dataset.app));
+}
+
+function openApp(a){
+  const href=`/components/${a.slug}/index.html`;
+  // prefer iframe sheet for live demo; fallback to banner if blocked
+  os.wm.open(a.slug, (layer)=>{
+    layer.classList.add('wm-layer-host');
+    layer.style.cssText+=';display:grid;place-items:center;padding:10px;';
+    const card=document.createElement('div');
+    card.className='card raised sheet-in';
+    card.style.cssText='width:100%;max-width:560px;height:520px;display:flex;flex-direction:column;overflow:hidden;padding:0';
+    const bar=document.createElement('div');
+    bar.style.cssText='height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 12px;border-bottom:1px solid rgba(255,255,255,0.07);flex:none;background:linear-gradient(180deg,rgba(255,255,255,0.04),transparent)';
+    bar.innerHTML=`<span style="display:flex;align-items:center;gap:8px"><span style="width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:${a.tint};color:#fff;font-size:13px">${a.icon}</span><span style="font-weight:700;font-size:13px">${a.label}</span><span class="caption" style="color:var(--ink-60)">/${a.slug}</span></span><span style="display:flex;gap:6px"><button class="btn ghost" data-focusable aria-label="Open full page" style="min-height:28px;padding:0 10px;font-size:11px">Pop out</button><button class="btn" data-focusable aria-label="Close" style="min-height:28px;padding:0 10px;font-size:11px">Close</button></span>`;
+    const [pop, close]=bar.querySelectorAll('button');
+    pop.addEventListener('click', ()=> window.open(href,'_blank'));
+    close.addEventListener('click', ()=> os.wm.close(a.slug));
+    const frame=document.createElement('iframe');
+    frame.className='wm-iframe'; frame.src=href; frame.title=a.label; frame.setAttribute('loading','lazy');
+    frame.setAttribute('allow','');
+    card.append(bar, frame);
+    layer.appendChild(card);
+    layer.addEventListener('click', (e)=>{ if(e.target===layer) os.wm.close(a.slug); });
+  });
+}
+
+// keyboard: numbers 0-9 jump
+addEventListener('keydown', (e)=>{
+  if(e.key>='0' && e.key<='9'){
+    const idx = e.key==='0'? 9 : parseInt(e.key,10)-1;
+    const btn=grid.children[idx];
+    if(btn) btn.focus();
+  }
+});
+
+console.log('Prism shell ready — 16 apps via wm + gaze/keys');
+</script>
+</body>
+</html>

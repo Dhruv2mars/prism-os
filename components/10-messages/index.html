@@ -1,0 +1,1435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Messages</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+ .stage{
+  background:
+   radial-gradient(120% 90% at 50% 14%, rgba(42,53,80,0.56) 0%, rgba(20,26,40,0.72) 36%, rgba(10,14,23,0.90) 70%),
+   radial-gradient(70% 50% at 78% 88%, rgba(86,184,255,0.10), transparent 56%),
+   rgba(6,10,16,0.76);
+ }
+ .stage-shell{
+  position:relative;
+  width:600px;height:600px;
+  display:grid;place-items:center;
+  flex:none;
+ }
+ /* DEV CHROME — MUST be fixed OUTSIDE .stage */
+ .dev-controls{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  display:flex;gap:6px;
+  z-index:1000;
+  justify-content:center;
+  flex-wrap:wrap;
+  pointer-events:none;
+  padding:8px 12px;
+  border-radius:var(--r-pill);
+  background:rgba(10,15,23,0.74);
+  outline:1px solid var(--stroke-glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.32);
+  max-width:92vw;
+ }
+ .stage .dev-controls{display:none !important}
+ .dev-controls .chip{
+  pointer-events:auto;
+  height:26px;padding:0 10px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  transition:background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+  border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+ }
+ .dev-controls .chip.active{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423;outline-color:transparent;
+ }
+ .dev-controls .chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .dev-controls .chip.gaze-focus{transform:scale(1.04)}
+
+ /* viewport */
+ .msg-viewport{
+  position:absolute;
+  inset:44px 0 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:10px 14px 14px 14px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:none;
+ }
+ .msg-viewport::-webkit-scrollbar{display:none}
+
+ /* header */
+ .msg-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  animation: rise-in 260ms var(--ease-prism) both;
+ }
+ .msg-header-left{display:flex;flex-direction:column;gap:4px;min-width:0}
+ .msg-title{
+  font-size:22px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:var(--ink-100);
+  display:flex;align-items:baseline;gap:8px;
+ }
+ .msg-title-count{
+  font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--ink-80);
+  background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.07);
+    padding:4px 8px;border-radius:999px;font-variant-numeric:tabular-nums;line-height:1;
+ }
+ .msg-subtitle{
+  font-size:11px;font-weight:600;letter-spacing:0.04em;color:var(--ink-60);line-height:1;display:flex;align-items:center;gap:6px;
+ }
+ .msg-subtitle .dot{width:6px;height:6px}
+ .msg-header-actions{display:flex;gap:6px;align-items:center;flex:none}
+ .header-chip{
+  appearance:none;-webkit-appearance:none;border:none;
+  height:28px;padding:0 12px;border-radius:999px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.07);color:var(--ink-80);
+  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism), outline-color 160ms var(--ease-prism), color 160ms var(--ease-prism), opacity 160ms var(--ease-prism), box-shadow 160ms var(--ease-prism);
+ }
+ .header-chip.primary{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;outline-color:transparent;box-shadow:0 8px 18px rgba(16,92,180,0.28)}
+ .header-chip.gaze-focus{transform:scale(1.04);outline-color:var(--stroke-focus)}
+ .header-chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .header-chip:disabled{opacity:0.38;pointer-events:none}
+
+ /* filter segment */
+ .filter-row{
+  display:flex;align-items:center;gap:8px;
+  animation: rise-in 260ms var(--ease-prism) both;
+  animation-delay:40ms;
+ }
+ .segment{
+  display:inline-flex;gap:2px;padding:3px;border-radius:999px;
+  background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.07);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+ }
+ .seg-btn{
+  appearance:none;-webkit-appearance:none;border:none;
+  height:26px;padding:0 12px;border-radius:999px;
+  background:transparent;color:var(--ink-60);
+  font-size:11px;font-weight:700;letter-spacing:0.02em;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+  transition: background 160ms var(--ease-prism), color 160ms var(--ease-prism), transform 260ms var(--ease-prism), box-shadow 160ms var(--ease-prism);
+ }
+ .seg-btn[aria-pressed="true"]{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;box-shadow:0 6px 14px rgba(16,92,180,0.26);
+ }
+ .seg-btn.gaze-focus{transform:scale(1.04)}
+ .seg-btn:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+  .filter-meta{font-size:11px;font-weight:600;color:var(--ink-40);font-variant-numeric:tabular-nums;letter-spacing:0.02em;margin-left:auto}
+
+ /* thread list */
+ .thread-list{
+  display:flex;flex-direction:column;gap:8px;
+ }
+ .thread-group{
+  display:grid;gap:8px;
+  animation: rise-in 260ms var(--ease-prism) both;
+ }
+ .thread-group:nth-of-type(1){animation-delay:70ms}
+ .thread-group:nth-of-type(2){animation-delay:110ms}
+ .group-head{display:flex;align-items:center;gap:8px;padding:0 2px}
+ .group-label{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-60)}
+  .group-count{font-size:11px;font-weight:600;color:var(--ink-40);font-variant-numeric:tabular-nums}
+ .group-line{flex:1;height:1px;background:rgba(255,255,255,0.06)}
+
+ .thread-card{
+  position:relative;
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  border-radius:18px;
+  padding:12px;
+  display:flex;gap:11px;align-items:center;
+  cursor:pointer;
+  box-shadow:0 12px 28px rgba(0,0,0,0.24);
+  transition: transform 260ms var(--ease-prism), box-shadow 160ms var(--ease-prism), outline-color 160ms var(--ease-prism), background 160ms var(--ease-prism);
+  will-change:transform;
+  overflow:hidden;
+ }
+ .thread-card::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg, rgba(255,255,255,0.04), transparent 46%);
+  pointer-events:none;border-radius:inherit;
+ }
+ .thread-card:hover{transform:translateY(-1px)}
+ .thread-card.gaze-focus{
+  transform:scale(1.015) translateY(-1px);
+  outline-color:var(--stroke-focus);
+  box-shadow:0 0 0 2.5px rgba(86,184,255,0.16), 0 16px 36px rgba(0,0,0,0.34), 0 0 22px rgba(86,184,255,0.20);
+  background:var(--mat-raised);
+ }
+ .thread-card:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .thread-card:active{transform:scale(0.99)}
+ .thread-card.has-unread{
+  outline-color:rgba(86,184,255,0.18);
+  background:var(--mat-raised);
+ }
+ .thread-card.has-unread.gaze-focus{outline-color:var(--stroke-focus)}
+ .thread-card.is-focal{
+  outline:2px solid var(--stroke-focus) !important;
+  box-shadow:0 0 0 2.5px rgba(86,184,255,0.14), 0 18px 40px rgba(0,0,0,0.36);
+ }
+
+ .thread-avatar{
+  width:40px;height:40px;border-radius:13px;
+  display:grid;place-items:center;flex:none;
+  font-size:14px;font-weight:800;letter-spacing:-0.02em;color:#fff;
+  box-shadow:0 4px 14px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.16);
+  outline:1px solid rgba(255,255,255,0.08);
+  position:relative;z-index:1;
+ }
+ .thread-avatar.circle{border-radius:50%}
+ .thread-avatar.mara{background:linear-gradient(180deg, #3a8af0 0%, #0b5ed7 100%)}
+ .thread-avatar.prism{background:linear-gradient(180deg, #a58bff 0%, #6a4bff 100%)}
+ .thread-avatar.alex{background:linear-gradient(180deg, #4cd47c 0%, #1a8a4a 100%)}
+ .thread-avatar.jordan{background:linear-gradient(180deg, #ffb347 0%, #ff7a1a 100%);color:#1a0f00}
+ .thread-avatar.maya{background:linear-gradient(180deg, #ff8a6b 0%, #c63a2e 100%)}
+ .presence-dot{
+  position:absolute;right:-1px;bottom:-1px;
+  width:11px;height:11px;border-radius:50%;
+  background:var(--ok);outline:2px solid rgba(10,15,23,0.9);box-shadow:0 0 8px rgba(76,212,124,0.5);
+  display:none;
+ }
+ .thread-card.is-live .presence-dot{display:block}
+
+ .thread-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;position:relative;z-index:1}
+ .thread-topline{display:flex;align-items:baseline;gap:8px}
+ .thread-name{font-size:14px;font-weight:700;color:var(--ink-100);letter-spacing:-0.01em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+  .thread-time{font-size:11px;font-weight:600;color:var(--ink-60);letter-spacing:0.02em;font-variant-numeric:tabular-nums;flex:none;white-space:nowrap}
+ .thread-preview{font-size:13px;font-weight:500;color:var(--ink-80);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .thread-card.has-unread .thread-preview{color:var(--ink-100);font-weight:600}
+ .thread-subrow{display:flex;align-items:center;gap:6px;margin-top:1px}
+ .thread-typing{font-size:11px;font-weight:700;letter-spacing:0.02em;color:var(--accent)}
+  .thread-delivered{font-size:11px;font-weight:500;color:var(--ink-40);font-variant-numeric:tabular-nums;letter-spacing:0.01em}
+ .thread-badges{display:flex;align-items:center;gap:6px;flex:none;position:relative;z-index:1}
+ .unread-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:20px;height:20px;padding:0 6px;border-radius:999px;
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#04121f;
+    font-size:11px;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1;
+  box-shadow:0 4px 12px rgba(16,92,180,0.26);
+ }
+ .unread-badge.muted{background:rgba(255,255,255,0.14);color:var(--ink-80);box-shadow:none;outline:1px solid rgba(255,255,255,0.08)}
+ .thread-call{
+  appearance:none;-webkit-appearance:none;border:none;
+  width:30px;height:30px;border-radius:999px;
+  display:grid;place-items:center;flex:none;
+  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80);
+  cursor:pointer;
+  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism), outline-color 160ms var(--ease-prism);
+  position:relative;z-index:2;
+ }
+ .thread-call:hover{background:rgba(255,255,255,0.12)}
+ .thread-call.gaze-focus{transform:scale(1.08);outline-color:var(--stroke-focus);background:rgba(86,184,255,0.14);color:var(--ink-100)}
+ .thread-call:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .thread-card.gaze-focus .thread-call{outline-color:rgba(255,255,255,0.10)}
+
+ /* hint bar at bottom */
+ .hintbar{
+  position:absolute;left:12px;right:12px;bottom:12px;z-index:540;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:8px 10px;border-radius:12px;
+  background:rgba(0,0,0,0.38);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  outline:1px solid rgba(255,255,255,0.06);
+  font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-60);line-height:1;
+ }
+ .hintbar strong{color:var(--ink-80);font-weight:700;letter-spacing:0.02em;text-transform:none;font-size:11px}
+ .hintbar .mono-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.6);flex:none;display:inline-block}
+
+ /* conversation sheet */
+ .conv-sheet{
+  position:absolute;inset:44px 0 0 0;z-index:560;
+  display:none;flex-direction:column;
+  background:var(--mat-sheet);
+  backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
+  overflow:hidden;
+  box-shadow:0 -12px 40px rgba(0,0,0,0.32);
+ }
+ .conv-sheet.on{
+  display:flex;
+  animation: sheet-in 300ms var(--ease-prism) both;
+ }
+ @keyframes sheet-in{
+  from{transform:translateY(36px) scale(0.97);opacity:0;filter:blur(8px)}
+  to{transform:translateY(0) scale(1);opacity:1;filter:blur(0)}
+ }
+ .conv-header{
+  height:52px;flex:none;
+  display:flex;align-items:center;gap:10px;
+  padding:0 10px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  background:linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
+  position:relative;z-index:2;
+ }
+ .conv-back{
+  appearance:none;-webkit-appearance:none;border:none;
+  width:34px;height:34px;border-radius:999px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80);
+  cursor:pointer;
+  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism), outline-color 160ms var(--ease-prism);
+  flex:none;
+ }
+ .conv-back.gaze-focus{transform:scale(1.06);outline-color:var(--stroke-focus);background:rgba(255,255,255,0.12);color:var(--ink-100)}
+ .conv-back:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .conv-avatar{
+  width:32px;height:32px;border-radius:50%;display:grid;place-items:center;flex:none;
+  font-size:12px;font-weight:800;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.20);outline:1px solid rgba(255,255,255,0.08);
+ }
+ .conv-meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+ .conv-name{font-size:14px;font-weight:700;color:var(--ink-100);letter-spacing:-0.01em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .conv-status{font-size:11px;font-weight:600;color:var(--ink-60);letter-spacing:0.02em;line-height:1;display:flex;align-items:center;gap:5px}
+ .conv-status .dot-live{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px rgba(76,212,124,0.5);flex:none}
+ .conv-call-btn{
+  appearance:none;-webkit-appearance:none;border:none;
+  display:inline-flex;align-items:center;gap:7px;
+  height:34px;padding:0 14px;border-radius:999px;
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#04121f;
+  font-size:13px;font-weight:800;letter-spacing:-0.01em;cursor:pointer;
+  box-shadow:0 8px 18px rgba(16,92,180,0.28);
+  transition: transform 260ms var(--ease-prism), box-shadow 160ms var(--ease-prism), filter 160ms var(--ease-prism);
+  flex:none;
+ }
+ .conv-call-btn.gaze-focus{transform:scale(1.04);box-shadow:0 10px 22px rgba(16,92,180,0.38), 0 0 0 2px rgba(86,184,255,0.18)}
+ .conv-call-btn:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .conv-call-btn:active{transform:scale(0.97)}
+ .conv-call-btn.secondary{background:rgba(255,255,255,0.08);color:var(--ink-80);outline:1px solid rgba(255,255,255,0.08);box-shadow:none}
+
+ .conv-scroller{
+  flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;
+  padding:12px 12px 10px 12px;
+  display:flex;flex-direction:column;gap:10px;
+ }
+ .conv-scroller::-webkit-scrollbar{display:none}
+ .date-sep{
+  align-self:center;
+  display:inline-flex;align-items:center;gap:6px;
+  height:22px;padding:0 10px;border-radius:999px;
+  background:rgba(0,0,0,0.34);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  outline:1px solid rgba(255,255,255,0.06);
+  font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-60);
+  margin:2px 0;
+ }
+ .bubble-row{display:flex;flex-direction:column;gap:3px;max-width:78%;animation: rise-in 260ms var(--ease-prism) both}
+ .bubble-row.sent{align-self:flex-end;align-items:flex-end}
+ .bubble-row.recv{align-self:flex-start;align-items:flex-start}
+ .bubble-row.is-focal .bubble{outline:2px solid var(--stroke-focus);box-shadow:0 0 14px rgba(86,184,255,0.24)}
+ .bubble{
+  position:relative;
+  padding:10px 13px;
+  border-radius:18px;
+  font-size:14px;font-weight:500;line-height:1.38;letter-spacing:0.01em;
+  word-break:break-word;
+  box-shadow:0 6px 18px rgba(0,0,0,0.18);
+  transition: transform 260ms var(--ease-prism), outline-color 160ms var(--ease-prism), box-shadow 160ms var(--ease-prism);
+  max-width:100%;
+ }
+ .bubble.sent{
+  background:linear-gradient(180deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color:#04121f;
+  border-bottom-right-radius:6px;
+ }
+ .bubble.recv{
+  background:rgba(255,255,255,0.08);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  outline:1px solid rgba(255,255,255,0.10);
+  color:var(--ink-100);
+  border-bottom-left-radius:6px;
+ }
+ .bubble.photo{
+  padding:0;overflow:hidden;
+  background:transparent;outline:1px solid rgba(255,255,255,0.10);
+  border-radius:18px;box-shadow:0 8px 20px rgba(0,0,0,0.22);
+ }
+ .bubble.photo .photo-grad{
+  height:112px;
+  background:linear-gradient(135deg, #ff8a6b 0%, #d4232a 55%, #1a2a44 100%);
+  display:grid;place-items:center;position:relative;
+ }
+ .bubble.photo .photo-grad::after{
+  content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,255,255,0.06), transparent 42%);pointer-events:none;
+ }
+ .bubble.photo .photo-cap{
+  padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:rgba(255,255,255,0.06);backdrop-filter:blur(8px);
+ }
+ .bubble-meta{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:600;letter-spacing:0.02em;color:rgba(255,255,255,0.66);
+    font-variant-numeric:tabular-nums;line-height:1;
+  margin-top:1px;
+  padding:0 2px;
+ }
+ .bubble-row.recv .bubble-meta{color:var(--ink-60)}
+ .bubble-row.sent .bubble-meta{color:rgba(4,18,31,0.68);justify-content:flex-end}
+ .bubble-status{font-size:11px;font-weight:600;letter-spacing:0.02em;color:var(--ink-40)}
+ .bubble-row.sent .bubble-status{color:rgba(4,18,31,0.56)}
+
+ .composer{
+  flex:none;
+  padding:10px 10px 12px 10px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  background:var(--mat-raised);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  display:flex;flex-direction:column;gap:8px;
+ }
+ .reply-chips{
+  display:flex;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;
+  padding:2px 1px;
+ }
+ .reply-chips::-webkit-scrollbar{display:none}
+ .reply-chip{
+  appearance:none;-webkit-appearance:none;border:none;
+  display:inline-flex;align-items:center;gap:6px;
+  height:28px;padding:0 12px;border-radius:999px;
+  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.07);
+  color:var(--ink-80);font-size:11px;font-weight:700;letter-spacing:0.01em;white-space:nowrap;cursor:pointer;
+  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism), outline-color 160ms var(--ease-prism), color 160ms var(--ease-prism), box-shadow 160ms var(--ease-prism);
+  flex:none;
+ }
+ .reply-chip.primary{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;outline-color:transparent;box-shadow:0 6px 14px rgba(16,92,180,0.22)}
+ .reply-chip.gaze-focus{transform:scale(1.04);outline-color:var(--stroke-focus)}
+ .reply-chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .reply-chip:active{transform:scale(0.96)}
+ .composer-inputrow{
+  display:flex;align-items:center;gap:8px;
+ }
+ .composer-field{
+  flex:1;min-width:0;
+  height:36px;
+  display:flex;align-items:center;gap:8px;
+  padding:0 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);
+  color:var(--ink-60);font-size:13px;font-weight:500;letter-spacing:0.01em;
+ }
+ .composer-field .ph{opacity:0.72}
+ .composer-send{
+  appearance:none;-webkit-appearance:none;border:none;
+  width:36px;height:36px;border-radius:999px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,0.10);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-60);
+  cursor:pointer;flex:none;
+  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism);
+ }
+ .composer-send.primary{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;box-shadow:0 6px 14px rgba(16,92,180,0.22);outline-color:transparent}
+ .composer-send.gaze-focus{transform:scale(1.06)}
+ .composer-send:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+
+ /* call overlay */
+ .call-overlay{
+  position:absolute;inset:0;z-index:700;
+  display:none;place-items:center;
+  background:rgba(4,7,11,0.58);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  padding:14px;
+ }
+ .call-overlay.on{
+  display:grid;
+  animation: rise-in 260ms var(--ease-prism) both;
+ }
+ .call-card{
+  width:100%;max-width:480px;
+  background:var(--mat-raised);
+  backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
+  outline:1px solid var(--stroke-glass);
+  border-radius:var(--r-lg);
+  padding:22px 20px 18px 20px;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  box-shadow:0 24px 56px rgba(0,0,0,0.46), inset 0 1px 0 rgba(255,255,255,0.06);
+  text-align:center;
+  animation: sheet-in 300ms var(--ease-prism) both;
+  position:relative;overflow:hidden;
+ }
+ .call-card::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(90% 60% at 50% 8%, rgba(86,184,255,0.10), transparent 62%);
+  pointer-events:none;
+ }
+ .call-eyebrow{
+  font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-60);display:flex;align-items:center;gap:6px;
+ }
+ .call-eyebrow .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px rgba(76,212,124,0.6);flex:none;animation: livePulse 1.4s ease-in-out infinite}
+ @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.55;transform:scale(0.85)}}
+ .call-avatar-wrap{
+  position:relative;width:96px;height:96px;display:grid;place-items:center;
+ }
+ .call-avatar{
+  width:96px;height:96px;border-radius:50%;
+  display:grid;place-items:center;
+  font-size:30px;font-weight:800;letter-spacing:-0.02em;color:#fff;
+  background:linear-gradient(180deg, #3a8af0 0%, #0b5ed7 100%);
+  box-shadow:0 12px 28px rgba(0,0,0,0.32), 0 0 0 6px rgba(86,184,255,0.14), 0 0 18px rgba(86,184,255,0.18);
+  position:relative;z-index:1;
+ }
+ .call-avatar.prism{background:linear-gradient(180deg, #a58bff 0%, #6a4bff 100%)}
+ .call-avatar.alex{background:linear-gradient(180deg, #4cd47c 0%, #1a8a4a 100%)}
+ .call-avatar::after{
+  content:"";position:absolute;inset:-8px;border-radius:50%;
+  border:1px solid rgba(86,184,255,0.22);
+  animation: ringPulse 1.8s var(--ease-prism) infinite;
+ }
+ @keyframes ringPulse{0%{transform:scale(0.86);opacity:0.9}100%{transform:scale(1.18);opacity:0}}
+ .call-wave{
+  display:flex;align-items:center;gap:3px;height:22px;justify-content:center;
+ }
+ .call-wave i{
+  width:3px;border-radius:999px;background:linear-gradient(180deg, #dff0ff 0%, var(--accent) 50%, var(--accent-strong) 100%);
+  height:8px;animation: wavePulse 260ms var(--ease-prism) infinite alternate;
+ }
+ .call-wave.muted i{animation-play-state:paused;opacity:0.22;transform:scaleY(0.5);background:rgba(255,255,255,0.28)}
+ @keyframes wavePulse{from{transform:scaleY(0.5);opacity:0.72}to{transform:scaleY(1);opacity:1}}
+ .call-name{font-size:22px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-100);line-height:1}
+  .call-sub{font-size:11px;font-weight:600;letter-spacing:0.02em;color:var(--ink-60);font-variant-numeric:tabular-nums;line-height:1}
+  .call-duration{font-size:30px;font-weight:800;letter-spacing:-0.03em;color:var(--ink-100);font-variant-numeric:tabular-nums;line-height:1}
+ .call-duration-caption{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40)}
+ .call-controls{
+  display:flex;align-items:center;gap:12px;justify-content:center;
+  margin-top:4px;
+ }
+ .call-ctrl{
+  appearance:none;-webkit-appearance:none;border:none;
+  width:48px;height:48px;border-radius:50%;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80);
+  cursor:pointer;
+  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism), outline-color 160ms var(--ease-prism), color 160ms var(--ease-prism), box-shadow 160ms var(--ease-prism);
+ }
+ .call-ctrl.on{background:rgba(86,184,255,0.16);outline-color:rgba(86,184,255,0.22);color:var(--ink-100);box-shadow:0 6px 14px rgba(16,92,180,0.14)}
+ .call-ctrl.muted{background:rgba(255,93,93,0.16);outline-color:rgba(255,93,93,0.22);color:#ffb3b3}
+ .call-ctrl.gaze-focus{transform:scale(1.06);outline-color:var(--stroke-focus)}
+ .call-ctrl:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .call-ctrl.end{
+  width:64px;height:64px;
+  background:linear-gradient(180deg, #ff5d5d 0%, #d4232a 100%);color:#fff;
+  outline:1px solid rgba(255,255,255,0.14);box-shadow:0 10px 22px rgba(212,35,42,0.28);
+ }
+ .call-ctrl.end.gaze-focus{transform:scale(1.04);box-shadow:0 12px 26px rgba(212,35,42,0.36), 0 0 0 2px rgba(255,93,93,0.18)}
+ .call-ctrl:active{transform:scale(0.95)}
+
+ /* state layer */
+ .state-layer{
+  position:absolute;
+  inset:44px 0 0 0;
+  z-index:520;
+  display:none;
+  overflow-y:auto;scrollbar-width:none;
+  padding:12px 14px 14px 14px;
+ }
+ .state-layer::-webkit-scrollbar{display:none}
+ .state-layer.on{display:block;animation: rise-in 260ms var(--ease-prism) both}
+ .state-layer.dim-on{
+  display:grid;place-items:center;
+  padding:12px 14px 14px 14px;
+  background:transparent;
+  pointer-events:none;
+ }
+ .state-layer.dim-on .state-card{pointer-events:auto}
+ .state-card{
+  width:100%;max-width:420px;
+  background:var(--mat-raised);
+  backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
+  outline:1px solid var(--stroke-glass);
+  border-radius:var(--r-lg);
+  padding:24px 20px 18px 20px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;
+  box-shadow:0 18px 44px rgba(0,0,0,0.36);
+  animation: rise-in 260ms var(--ease-prism) both;
+  position:relative;overflow:hidden;
+ }
+ .state-card::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(90% 60% at 50% 8%, rgba(86,184,255,0.08), transparent 62%);
+  pointer-events:none;
+ }
+ .state-illus{
+  width:64px;height:64px;border-radius:18px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,0.06);
+  outline:1px solid rgba(255,255,255,0.08);
+  margin-bottom:2px;position:relative;
+ }
+ .state-illus.danger{background:rgba(255,93,93,0.10);outline-color:rgba(255,93,93,0.18)}
+ .state-illus.warn{background:rgba(255,194,71,0.10);outline-color:rgba(255,194,71,0.18)}
+ .state-title{font-size:18px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-100);line-height:1.1;position:relative}
+ .state-body{font-size:13px;font-weight:500;color:var(--ink-60);line-height:1.45;max-width:300px;position:relative}
+ .state-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px;position:relative}
+ .state-actions .btn{min-height:36px;font-size:13px}
+ .skeleton{border-radius:var(--r-sm);background: linear-gradient(100deg, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.06) 60%);background-size:200% 100%;animation: shimmer 1.2s linear infinite}
+ button:focus-visible, [data-focusable]:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+
+ @media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+   animation-duration:0.01ms !important;
+   animation-iteration-count:1 !important;
+   transition-duration:0.01ms !important;
+  }
+  .call-avatar::after{animation:none !important}
+  .call-wave i{animation:none !important}
+  .pulse-dot{animation:none !important}
+ }
+</style>
+</head>
+<body>
+<div class="device">
+ <div class="stage-shell">
+  <div class="stage" data-stage></div>
+ </div>
+</div>
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+const stage = document.querySelector('[data-stage]');
+const device = document.querySelector('.device');
+const os = createOS(stage, { dwell:true, dwellMs:350 });
+stage.appendChild(os.statusbar('<span style="color:var(--ink-60);font-size:11px;letter-spacing:0.04em;font-weight:700">Messages · Prism</span>'));
+
+const h = (tag, attrs={}, ...children)=>{
+ const el=document.createElement(tag);
+ for(const [k,v] of Object.entries(attrs)){
+  if(k==='class') el.className=v;
+  else if(k==='html') el.innerHTML=v;
+  else if(v!==null && v!==undefined) el.setAttribute(k,v);
+ }
+ for(const c of children){
+  if(c==null) continue;
+  if(typeof c==='string') el.appendChild(document.createTextNode(c));
+  else el.appendChild(c);
+ }
+ return el;
+};
+
+// dev controls OUTSIDE stage
+const edgeRow = h('div', {class:'dev-controls', role:'toolbar', 'aria-label':'Messages edge state controls'});
+const edgeStates = [
+ {id:'normal', label:'Normal'},
+ {id:'loading', label:'Loading'},
+ {id:'empty', label:'Empty'},
+ {id:'error', label:'Error'},
+ {id:'offline', label:'Offline'},
+ {id:'permission', label:'No access'},
+];
+edgeStates.forEach(s=>{
+ const b=h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Show ${s.label} state`, 'data-state':s.id}, s.label);
+ if(s.id==='normal') b.classList.add('active');
+ b.addEventListener('click', ()=> setEdge(s.id));
+ edgeRow.appendChild(b);
+});
+device.appendChild(edgeRow);
+
+// containers
+const viewport = h('div', {class:'msg-viewport', id:'viewport'});
+const stateLayer = h('div', {class:'state-layer', id:'stateLayer', 'aria-live':'polite'});
+const hintbar = h('div', {class:'hintbar', id:'hintbar'});
+hintbar.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="mono-dot" aria-hidden="true"></span><strong>Gaze dwell 350 ms</strong></span><span style="display:flex;align-items:center;gap:8px"><span>Tab cycle · Esc back</span><span style="width:1px;height:10px;background:rgba(255,255,255,0.08)"></span><span>Space capture</span></span>`;
+const convSheet = h('div', {class:'conv-sheet', id:'convSheet', role:'dialog', 'aria-modal':'true', 'aria-label':'Conversation'});
+const callOverlay = h('div', {class:'call-overlay', id:'callOverlay', role:'dialog', 'aria-modal':'true', 'aria-label':'Active call'});
+stage.append(viewport, stateLayer, hintbar, convSheet, callOverlay);
+
+// data
+let threads = [
+ { id:'mara', name:'Mara', avatar:'M', avatarClass:'mara circle', unread:2, time:'9:41', preview:'Lens test at 4pm? I’ll bring the mount — need 20° FOV check.', status:'Active now', live:true },
+ { id:'prism', name:'Prism Team', avatar:'P', avatarClass:'prism', unread:1, time:'9:12', preview:'Build 26A ready — window chrome now respects scrim depth.', status:'3 members · updated 18m ago', live:false },
+ { id:'alex', name:'Alex Rivera', avatar:'A', avatarClass:'alex circle', unread:0, time:'Yesterday', preview:'Nice shot · 12 MP · Golden Gate is fire.', status:'Delivered · Yesterday', live:false },
+ { id:'jordan', name:'Jordan · Group', avatar:'J', avatarClass:'jordan', unread:0, time:'Mon', preview:'Voice · 00:14 — Running 5 late, start without me.', status:'4 members', live:false },
+ { id:'maya', name:'Maya (Mom)', avatar:'M', avatarClass:'maya circle', unread:0, time:'Sun', preview:'You: Sent a photo — 12 MP · World layer looks great!', status:'Sun · 12 MP photo', live:false },
+];
+
+let messagesByThread = {
+ mara: [
+  { id:'m1', from:'mara', text:'Lens test at 4pm? I’ll bring the mount — need 20° FOV check on world layer.', time:'9:41', status:'Delivered' },
+  { id:'m2', from:'you', text:'Perfect. Let’s do world layer at 20°. I’ll bring the tripod.', time:'9:42', status:'Read' },
+  { id:'m3', from:'mara', kind:'photo', text:'Golden Gate · 12 MP', sub:'Today · 8:14 · Gallery · 12 MP', time:'9:43', status:'Delivered' },
+  { id:'m4', from:'you', text:'On my way — 2 min out. See you at the lab.', time:'9:44', status:'Read' },
+ ],
+ prism: [
+  { id:'p1', from:'prism', text:'Build 26A ready — window chrome now respects scrim depth & tiled layout.', time:'9:12', status:'Delivered' },
+  { id:'p2', from:'you', text:'Amazing work — scrim depth is chef’s kiss. 3 windows tiled perfectly.', time:'9:18', status:'Read' },
+  { id:'p3', from:'prism', text:'Next: gaze focus discipline on sheets + times.', time:'9:20', status:'Delivered' },
+ ],
+ alex: [
+  { id:'a1', from:'alex', text:'Nice shot · 12 MP · Golden Gate is fire. World layer crisp.', time:'Yesterday', status:'Read' },
+  { id:'a2', from:'you', text:'Thanks! Shot on Prism 12 MP · f/1.8 · world scrim helped.', time:'Yesterday', status:'Read' },
+ ],
+ jordan: [
+  { id:'j1', from:'jordan', text:'Running 5 late — start without me.', kind:'voice', time:'Mon', status:'Played' },
+  { id:'j2', from:'you', text:'👍 Got it. We’ll save you a seat.', time:'Mon', status:'Read' },
+ ],
+ maya: [
+  { id:'mm1', from:'you', kind:'photo', text:'Sunset · 12 MP', sub:'Sun · Gallery · 12 MP', time:'Sun', status:'Read' },
+  { id:'mm2', from:'maya', text:'World layer looks great! Love the glass so much.', time:'Sun', status:'Read' },
+ ],
+};
+
+let filterMode = 'all'; // all | unread
+let selectedThreadId = null;
+let edgeState = 'normal';
+let callState = null; // {threadId, start, duration, muted, speaker, timer}
+let focalBubbleId = null; // for gaze single focus
+
+const REPLY_SETS = {
+ mara: ['On my way · 2 min','Lens ready','👍 Got it','Send location'],
+ prism: ['Looks great','Mark read','👏','Thanks Team'],
+ alex: ['🔥','Thanks!','Send photo','Call you later'],
+ jordan: ['👍','No worries','On my way','Voice reply'],
+ maya: ['❤️','Love it','Call soon','Send more'],
+};
+
+function totalUnread(){
+ return threads.reduce((n,t)=> n+t.unread,0);
+}
+
+function renderInbox(){
+ viewport.innerHTML='';
+ // header
+ const header = h('div', {class:'msg-header'});
+ const left = h('div', {class:'msg-header-left'});
+ const title = h('div', {class:'msg-title'});
+ const unread = totalUnread();
+ title.innerHTML = `Messages <span class="msg-title-count " aria-label="${unread} unread conversations">${unread} unread</span>`;
+ const subtitle = h('div', {class:'msg-subtitle'});
+ const nowStr = new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  subtitle.innerHTML = `<span class="dot ok" aria-hidden="true"></span><span>${threads.length} threads</span><span style="margin-left:6px;color:var(--ink-40);font-weight:500" class="tabular">${nowStr}</span>`;
+ left.append(title, subtitle);
+ const actions = h('div', {class:'msg-header-actions'});
+ const newBtn = h('button', {class:'header-chip primary', 'data-focusable':'', tabindex:'0', 'aria-label':'New message'}, '＋ New');
+ newBtn.addEventListener('click', ()=>{
+  os.banner('<strong>New message — Mara</strong><span class="caption">composer opened · demo</span>',{timeout:1800});
+  openConversation('mara');
+ });
+ const unreadChip = h('button', {class:'header-chip', 'data-focusable':'', tabindex:'0', 'aria-label':'Mark all read'});
+ unreadChip.textContent = 'Mark read';
+ unreadChip.addEventListener('click', ()=>{
+  threads.forEach(t=> t.unread=0);
+  renderInbox();
+  os.banner('<strong>All read</strong><span class="caption">unread cleared badges 0</span>',{timeout:1800});
+ });
+ if(unread===0) unreadChip.setAttribute('disabled','true');
+ actions.append(newBtn, unreadChip);
+ header.append(left, actions);
+ viewport.appendChild(header);
+
+ // filter row
+ const filterRow = h('div', {class:'filter-row'});
+ const seg = h('div', {class:'segment', role:'tablist', 'aria-label':'Filter messages'});
+ const allBtn = h('button', {class:'seg-btn', role:'tab', 'data-focusable':'', tabindex:'0', 'aria-pressed': String(filterMode==='all'), 'aria-label':'Show all threads'});
+ allBtn.textContent = 'All';
+ const unreadBtn = h('button', {class:'seg-btn', role:'tab', 'data-focusable':'', tabindex:'0', 'aria-pressed': String(filterMode==='unread'), 'aria-label':'Show unread threads'});
+ unreadBtn.textContent = `Unread · ${unread}`;
+ allBtn.addEventListener('click', ()=>{ filterMode='all'; renderInbox(); });
+ unreadBtn.addEventListener('click', ()=>{ filterMode='unread'; renderInbox(); });
+ seg.append(allBtn, unreadBtn);
+ const meta = h('div', {class:'filter-meta '});
+ meta.textContent = filterMode==='unread' ? `${threads.filter(t=>t.unread>0).length} unread` : `${threads.length} threads`;
+ filterRow.append(seg, meta);
+ viewport.appendChild(filterRow);
+
+ // lists grouped by? We'll group Today vs Earlier for demo likeness
+ const visible = filterMode==='unread' ? threads.filter(t=>t.unread>0) : threads;
+ if(visible.length===0){
+  const emptyInline = h('div', {class:'card', style:'padding:18px;display:grid;gap:8px;justify-items:center;text-align:center;background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:18px;margin-top:4px'});
+  emptyInline.innerHTML = `<div style="width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.08)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="11" rx="2.4" stroke="white" stroke-opacity="0.88" stroke-width="1.6"/><path d="M7 8h8.5M7 11.2h5.5" stroke="white" stroke-opacity="0.72" stroke-width="1.5" stroke-linecap="round"/><circle cx="15" cy="8" r="1.4" stroke="white" stroke-width="1.4"/></svg></div><div style="font-size:14px;font-weight:700;color:var(--ink-100)">No unread threads</div><div class="caption" style="color:var(--ink-60);font-size:11px;max-width:280px">Filter shows only unread — switch to All to see 5 threads.</div><button class="header-chip primary" data-focusable tabindex="0" aria-label="Show all threads" style="margin-top:4px">Show All</button>`;
+  emptyInline.querySelector('button')?.addEventListener('click', ()=>{ filterMode='all'; renderInbox(); });
+  viewport.appendChild(emptyInline);
+  return;
+ }
+
+ // grouping for visual polish: pinned? Mara always top with unread, then groups
+ const groups = [
+  {label:'Today', items: visible.filter(t=> ['mara','prism'].includes(t.id))},
+  {label:'Earlier', items: visible.filter(t=> !['mara','prism'].includes(t.id))},
+ ].filter(g=> g.items.length>0);
+
+ // if filter unread, flatten to single group
+ const groupsToRender = filterMode==='unread' ? [{label:'Unread', items: visible}] : groups;
+
+ groupsToRender.forEach(g=>{
+  const grp = h('div', {class:'thread-group'});
+  const head = h('div', {class:'group-head'});
+  head.innerHTML = `<span class="group-label">${g.label}</span><span class="group-count ">${g.items.length}</span><span class="group-line" aria-hidden="true"></span><span class="caption" style="font-size:10px;color:var(--ink-40);letter-spacing:0.06em;text-transform:uppercase"></span>`;
+  const list = h('div', {class:'thread-list', role:'list', 'aria-label':`${g.label} conversations`});
+  g.items.forEach(th=>{
+   const card = buildThreadCard(th);
+   list.appendChild(card);
+  });
+  grp.append(head, list);
+  viewport.appendChild(grp);
+ });
+
+ // update hintbar visibility
+ hintbar.style.display='';
+}
+
+function buildThreadCard(th){
+ const hasUnread = th.unread>0;
+ const card = h('div', {class:'thread-card' + (hasUnread?' has-unread':'') + (th.live?' is-live':'') , 'data-focusable':'', tabindex:'0', role:'listitem', 'aria-label':`${th.name}, ${th.preview} — ${th.time}${hasUnread?`, ${th.unread} unread`:''}`, 'data-thread': th.id});
+ const avWrap = h('div', {style:'position:relative;flex:none;z-index:1'});
+ const av = h('div', {class:`thread-avatar ${th.avatarClass}`, 'aria-hidden':'true'}, th.avatar);
+ const pres = h('span', {class:'presence-dot', 'aria-hidden':'true'});
+ avWrap.append(av, pres);
+ const main = h('div', {class:'thread-main'});
+ const top = h('div', {class:'thread-topline'});
+ const name = h('div', {class:'thread-name'}, th.name);
+ const time = h('div', {class:'thread-time '}, th.time);
+ top.append(name, time);
+ const preview = h('div', {class:'thread-preview'}, th.preview);
+ const subrow = h('div', {class:'thread-subrow'});
+ if(hasUnread){
+  subrow.innerHTML = `<span class="thread-typing">● ${th.unread===2?'2 new · tap to read':'1 new'}</span><span class="thread-delivered " style="margin-left:auto">${th.status}</span>`;
+ } else {
+  // for delivered status
+  const deliveredIcon = th.id==='alex' || th.id==='maya' ? '✓✓ Read' : '✓ Delivered';
+  subrow.innerHTML = `<span class="thread-delivered ">${deliveredIcon} · ${th.status}</span>`;
+ }
+ main.append(top, preview, subrow);
+ const badges = h('div', {class:'thread-badges'});
+ if(hasUnread){
+  const badge = h('div', {class:'unread-badge ', 'aria-label':`${th.unread} unread`}, String(th.unread));
+  badges.appendChild(badge);
+ }
+ const callBtn = h('button', {class:'thread-call', 'data-focusable':'', tabindex:'0', 'aria-label':`Call ${th.name}`});
+ callBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.2 5.2l2.1 2.1-1.5 2.9a13 13 0 005.1 5.1L14.8 13.8l2.1 2.1-1.6 2.1c-.55.7-1.6.9-2.4.4A16.2 16.2 0 015.1 10.4c-.5-.8-.3-1.9.4-2.4L6.2 5.2z" stroke="white" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+ callBtn.addEventListener('click', (e)=>{
+  e.stopPropagation();
+  startCall(th.id);
+ });
+ badges.appendChild(callBtn);
+
+ card.append(avWrap, main, badges);
+ card.addEventListener('click', ()=>{
+  openConversation(th.id);
+ });
+ card.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); openConversation(th.id); }
+ });
+ return card;
+}
+
+function openConversation(threadId){
+ if(edgeState!=='normal') return;
+ const th = threads.find(t=>t.id===threadId);
+ if(!th) return;
+ selectedThreadId = threadId;
+ // mark focused thread for discipline
+ viewport.querySelectorAll('.thread-card').forEach(c=> c.classList.remove('is-focal'));
+ viewport.querySelector(`[data-thread="${threadId}"]`)?.classList.add('is-focal');
+ // build sheet
+ convSheet.innerHTML='';
+ convSheet.classList.add('on');
+ // header
+ const header = h('div', {class:'conv-header'});
+ const back = h('button', {class:'conv-back', 'data-focusable':'', tabindex:'0', 'aria-label':'Back to messages'});
+ back.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.2 6L8.2 12l6 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+ back.addEventListener('click', closeConversation);
+ const cav = h('div', {class:`conv-avatar ${th.avatarClass}`, 'aria-hidden':'true'}, th.avatar);
+ const meta = h('div', {class:'conv-meta'});
+ meta.innerHTML = `<div class="conv-name">${th.name}</div><div class="conv-status"><span class="dot-live" aria-hidden="true"></span><span>${th.live?'Active now · on device':'Last active '+th.time+''}</span></div>`;
+ const callBtn = h('button', {class:'conv-call-btn', 'data-focusable':'', tabindex:'0', 'aria-label':`Start call with ${th.name}`});
+ callBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.2 5.2l2.1 2.1-1.5 2.9a13 13 0 005.1 5.1L14.8 13.8l2.1 2.1-1.6 2.1c-.55.7-1.6.9-2.4.4A16.2 16.2 0 015.1 10.4c-.5-.8-.3-1.9.4-2.4L6.2 5.2z" fill="#04121f"/></svg> Call`;
+ callBtn.addEventListener('click', ()=> startCall(threadId));
+ header.append(back, cav, meta, callBtn);
+ // scroller
+ const scroller = h('div', {class:'conv-scroller', id:'convScroller', role:'log', 'aria-live':'polite', 'aria-label':`Conversation with ${th.name}`});
+ const dateSep = h('div', {class:'date-sep'});
+ dateSep.textContent = 'Today 9:41';
+ scroller.appendChild(dateSep);
+ const msgs = messagesByThread[threadId] || [];
+ msgs.forEach((m, idx)=>{
+  const row = buildBubbleRow(m, idx);
+  scroller.appendChild(row);
+ });
+ // composer
+ const composer = h('div', {class:'composer'});
+ const chips = h('div', {class:'reply-chips', role:'toolbar', 'aria-label':'Quick replies'});
+ const chipLabels = REPLY_SETS[threadId] || REPLY_SETS['mara'];
+ chipLabels.forEach((label, i)=>{
+  const chip = h('button', {class:'reply-chip' + (i===0?' primary':''), 'data-focusable':'', tabindex:'0', 'aria-label':`Quick reply: ${label}`}, label);
+  chip.addEventListener('click', ()=>{
+   sendQuickReply(label);
+  });
+  chips.appendChild(chip);
+ });
+ const inputRow = h('div', {class:'composer-inputrow'});
+ const field = h('div', {class:'composer-field', 'aria-hidden':'true'});
+ field.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 8.5h10M7 12h6.5" stroke="white" stroke-opacity="0.6" stroke-width="1.6" stroke-linecap="round"/></svg><span class="ph">Tap a chip to reply — no dead ends</span><span style="margin-left:auto;background:rgba(255,255,255,0.08);padding:3px 7px;border-radius:999px;font-size:10px;font-weight:700;color:var(--ink-40)">9:44</span>`;
+ const sendBtn = h('button', {class:'composer-send', 'data-focusable':'', tabindex:'0', 'aria-label':'Open dictation'});
+ sendBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 14a3 3 0 003-3V6a3 3 0 10-6 0v5a3 3 0 003 3z" stroke="white" stroke-width="1.5"/><path d="M19 10a7 7 0 01-14 0" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M12 17v3" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M9 20h6" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`;
+ sendBtn.addEventListener('click', ()=>{
+  // cycle to voice? just banner
+  os.banner('<strong>Dictation · on-device</strong><span class="caption">hold to talk</span>',{timeout:1600});
+  sendBtn.animate([{transform:'scale(0.96)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ });
+ inputRow.append(field, sendBtn);
+ composer.append(chips, inputRow);
+ convSheet.append(header, scroller, composer);
+ // ensure gaze cursor on top
+ stage.appendChild(os.cursor);
+ stage.appendChild(convSheet);
+ stage.appendChild(callOverlay);
+ // scroll to bottom after paint
+ requestAnimationFrame(()=>{
+  scroller.scrollTop = scroller.scrollHeight;
+ });
+ // mark unread as read after open with delight
+ if(th.unread>0){
+  setTimeout(()=>{
+   th.unread=0;
+   // update inbox badge in background without re-rendering sheets? We'll update header subtitle lazily
+   const titleCount = viewport.querySelector('.msg-title-count');
+   if(titleCount){
+    const u=totalUnread();
+    titleCount.textContent = `${u} unread`;
+    titleCount.setAttribute('aria-label', `${u} unread conversations`);
+   }
+   // also update thread card badge
+   const card = viewport.querySelector(`[data-thread="${threadId}"]`);
+   if(card){
+    card.classList.remove('has-unread');
+    const b = card.querySelector('.unread-badge');
+    if(b) b.remove();
+    const sub = card.querySelector('.thread-subrow');
+    if(sub) sub.innerHTML = `<span class="thread-delivered ">✓ Read · ${th.status}</span>`;
+   }
+  }, 480);
+ }
+ // trap focus: keep single focal — after open, focus back button
+ setTimeout(()=> back.focus({preventScroll:true}), 80);
+ hintbar.style.opacity='0';
+ hintbar.style.pointerEvents='none';
+ // swipe back handling
+ os.emit('focuschange', {el: back});
+}
+
+function closeConversation(){
+ if(!convSheet.classList.contains('on')) return;
+ if(callOverlay.classList.contains('on')) return; // don't close if call active? allow
+ const out = convSheet.animate([
+  {transform:'translateY(0) scale(1)', opacity:1, filter:'blur(0)'},
+  {transform:'translateY(18px) scale(0.98)', opacity:0, filter:'blur(6px)'}
+ ], {duration: os.state.reducedMotion?1:260, easing:'cubic-bezier(0.32,0.72,0,1)'});
+ out.finished.then(()=>{
+  convSheet.classList.remove('on');
+  convSheet.innerHTML='';
+  selectedThreadId=null;
+  focalBubbleId=null;
+  hintbar.style.opacity='';
+  hintbar.style.pointerEvents='';
+  // remove focal
+  viewport.querySelectorAll('.thread-card').forEach(c=> c.classList.remove('is-focal'));
+  renderInbox(); // refresh to show updated unread etc, but keep scroll? We'll just leave inbox as is without full rerender? We'll call render but preserve? For simplicity rerender
+  // ensure cursor top
+  stage.appendChild(os.cursor);
+ });
+}
+
+function buildBubbleRow(m, idx){
+ const isYou = m.from==='you';
+ const row = h('div', {class:`bubble-row ${isYou?'sent':'recv'}`, 'data-bubble': m.id, 'data-focusable':'', tabindex:'0', role:'listitem', 'aria-label':`${isYou?'You':'Contact'} at ${m.time}: ${m.text}`});
+ // handle focal click
+ row.addEventListener('click', ()=>{
+  // single focal discipline: only one bubble focal at a time
+  convSheet.querySelectorAll('.bubble-row').forEach(r=> r.classList.remove('is-focal'));
+  row.classList.add('is-focal');
+  focalBubbleId = m.id;
+  if(!isYou) os.banner(`<strong>${m.text.slice(0,28)}…</strong><span class="caption">tap again to unfocus ${m.time}</span>`,{timeout:1400});
+ });
+ row.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); row.click(); }
+ });
+ // stagger animation delay
+ if(!os.state.reducedMotion){
+  row.style.animationDelay = `${Math.min(120, idx*38)}ms`;
+ }
+ let bubble;
+ if(m.kind==='photo'){
+  bubble = h('div', {class:'bubble photo'});
+  const grad = h('div', {class:'photo-grad', 'aria-hidden':'true'});
+  grad.innerHTML = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="13" rx="2.4" stroke="white" stroke-opacity="0.92" stroke-width="1.6"/><circle cx="8.6" cy="10" r="1.5" fill="white"/><path d="M3 15.6l5-4.2 3.2 2.6 3.2-2.2 5.6 4.4" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const cap = h('div', {class:'photo-cap'});
+  cap.innerHTML = `<span style="font-size:11px;font-weight:700;color:var(--ink-100)">${m.text}</span><span class="caption" style="font-size:10px;color:var(--ink-60);background:rgba(0,0,0,0.28);padding:3px 7px;border-radius:999px">${m.sub}</span>`;
+  bubble.append(grad, cap);
+ } else if(m.kind==='voice'){
+  bubble = h('div', {class:'bubble recv'});
+  bubble.style.display='flex';
+  bubble.style.alignItems='center';
+  bubble.style.gap='8px';
+  bubble.style.padding='10px 12px';
+    bubble.innerHTML = `<span style="width:28px;height:28px;border-radius:50%;background:linear-gradient(180deg, #2f9dff, #0b5ed7);display:grid;place-items:center;color:#fff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 14a3 3 0 003-3V7a3 3 0 10-6 0v4a3 3 0 003 3z" stroke="white" stroke-width="1.6"/><path d="M19 11a7 7 0 01-14 0" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M12 18v2" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg></span><span style="flex:1;min-width:0"><span style="font-size:13px;font-weight:700;color:var(--ink-100)">Voice</span><span style="font-size:11px;color:var(--ink-60);margin-left:6px" class="tabular">00:14</span><span style="display:block;height:4px;background:rgba(255,255,255,0.10);border-radius:999px;margin-top:6px;position:relative;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:42%;background:var(--accent);border-radius:999px"></span></span></span><span style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:grid;place-items:center;color:var(--ink-80)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M8 5.5l8 7-8 7V5.5z" fill="white"/></svg></span>`;
+  // but for sent vs recv, ensure correct style; voice is recv in this data
+  if(isYou){
+   bubble.className='bubble sent';
+   bubble.style.background='linear-gradient(180deg, var(--accent), var(--accent-strong))';
+   bubble.style.color='#04121f';
+  }
+ } else {
+  bubble = h('div', {class:`bubble ${isYou?'sent':'recv'}`}, m.text);
+ }
+ row.appendChild(bubble);
+ const meta = h('div', {class:'bubble-meta'});
+ // time is , status small
+ meta.innerHTML = isYou
+    ? `<span class="tabular">${m.time}</span><span class="bubble-status">${m.status || 'Delivered'}</span><span style="width:3px;height:3px;border-radius:50%;background:rgba(4,18,31,0.28);display:inline-block"></span><span style="font-size:10px">✓✓</span>`
+    : `<span class="tabular">${m.time}</span><span class="bubble-status">${m.status || ''}</span>`;
+ row.appendChild(meta);
+ return row;
+}
+
+function sendQuickReply(label){
+ if(!selectedThreadId) return;
+ const th = threads.find(t=>t.id===selectedThreadId);
+ const msgs = messagesByThread[selectedThreadId];
+ const now = new Date();
+ const timeStr = now.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+ const newMsg = { id:'y'+Date.now(), from:'you', text: label.replace('·','').trim() || label, time: timeStr, status:'Sent' };
+ msgs.push(newMsg);
+ // also update thread preview
+ th.preview = `You: ${newMsg.text.slice(0,38)}`;
+ th.time = timeStr;
+ // re-render bubbles in sheet
+ const scroller = document.getElementById('convScroller');
+ if(scroller){
+  const row = buildBubbleRow(newMsg, msgs.length-1);
+  row.style.animation = 'rise-in 260ms var(--ease-prism) both';
+  scroller.appendChild(row);
+  // focal discipline: focus new bubble
+  scroller.querySelectorAll('.bubble-row').forEach(r=> r.classList.remove('is-focal'));
+  row.classList.add('is-focal');
+  focalBubbleId = newMsg.id;
+  scroller.scrollTo({top: scroller.scrollHeight, behavior:'smooth'});
+  // pop delight
+  if(!os.state.reducedMotion){
+   row.animate([{transform:'scale(0.96)', opacity:0},{transform:'scale(1)', opacity:1}],{duration:260,easing:'cubic-bezier(0.32,0.72,0,1)'});
+  }
+  // simulate reply after delay if Mara
+  if(selectedThreadId==='mara'){
+   setTimeout(()=>{
+    const reply = { id:'r'+Date.now(), from:'mara', text:'Love it — shipping that mount now. See you at 4.', time: new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}), status:'Delivered' };
+    msgs.push(reply);
+    const rRow = buildBubbleRow(reply, msgs.length-1);
+    scroller.appendChild(rRow);
+    scroller.scrollTo({top: scroller.scrollHeight, behavior:'smooth'});
+    if(!os.state.reducedMotion){
+     rRow.animate([{transform:'translateY(8px)', opacity:0},{transform:'translateY(0)', opacity:1}],{duration:300,easing:'cubic-bezier(0.32,0.72,0,1)'});
+    }
+    // subtle banner
+    os.banner('<strong>Mara replied</strong><span class="caption">prism-ease 260ms</span>',{timeout:1600});
+   }, 900);
+  }
+ }
+ os.banner(`<strong>Sent · ${label}</strong><span class="caption">delivered ${timeStr}</span>`,{timeout:1600});
+ // ensure composer chips still?
+}
+
+function startCall(threadId){
+ if(edgeState!=='normal'){
+  if(edgeState==='offline') os.banner('<strong>Offline · call queued</strong><span class="caption">will dial when back online</span>',{timeout:1800});
+  else if(edgeState==='permission') os.banner('<strong>Microphone blocked</strong><span class="caption">allow access to call</span>',{timeout:1800});
+  else os.banner('<strong>Calls unavailable</strong><span class="caption">try normal state</span>',{timeout:1600});
+  return;
+ }
+ if(callState && callState.timer){
+  os.banner('<strong>Already in call</strong><span class="caption">end current to start new</span>',{timeout:1600});
+  return;
+ }
+ const th = threads.find(t=>t.id===threadId) || threads[0];
+ callOverlay.innerHTML='';
+ callOverlay.classList.add('on');
+ // pause conversation? keep sheet behind but dim
+ if(convSheet.classList.contains('on')){
+  convSheet.style.filter='blur(2px)';
+  convSheet.style.opacity='0.72';
+ }
+ const card = h('div', {class:'call-card'});
+ const eyebrow = h('div', {class:'call-eyebrow'});
+ eyebrow.innerHTML = `<span class="pulse-dot" aria-hidden="true"></span><span>Prism call · end-to-end · on-device</span>`;
+ const avatarWrap = h('div', {class:'call-avatar-wrap'});
+ const avatar = h('div', {class:`call-avatar ${th.avatarClass}`, 'aria-hidden':'true'}, th.avatar);
+ avatarWrap.appendChild(avatar);
+ const wave = h('div', {class:'call-wave', id:'callWave', 'aria-hidden':'true'});
+ for(let i=0;i<7;i++){
+  const bar = h('i', {style:`height:${8+(i%3)*5}px;animation-delay:${i*42}ms`});
+  bar.style.height = `${8+(i%3)*5}px`;
+  wave.appendChild(bar);
+ }
+ const name = h('div', {class:'call-name'}, th.name);
+ const sub = h('div', {class:'call-sub'}, th.status);
+ const duration = h('div', {class:'call-duration ', id:'callDuration'}, '00:00');
+ const durCap = h('div', {class:'call-duration-caption'}, '· live duration');
+ const controls = h('div', {class:'call-controls'});
+ const muteBtn = h('button', {class:'call-ctrl', 'data-focusable':'', tabindex:'0', 'aria-label':'Mute microphone, currently unmuted', id:'muteBtn'});
+ muteBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="4.5" width="6" height="11" rx="3" stroke="white" stroke-width="1.6"/><path d="M7 11a5 5 0 0010 0" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M12 15.5v3" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M9.5 18.5h5" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+ const speakerBtn = h('button', {class:'call-ctrl', 'data-focusable':'', tabindex:'0', 'aria-label':'Speaker off, tap to enable', id:'speakerBtn'});
+ speakerBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5.5L7.2 8.2H4.2v7.6H4.2 H7.2L11 18.5V5.5z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.8 9.2a3.8 3.8 0 010 5.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M15.6 7.2a6.6 6.6 0 010 9.6" stroke="white" stroke-opacity="0.9" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+ const endBtn = h('button', {class:'call-ctrl end', 'data-focusable':'', tabindex:'0', 'aria-label':`End call with ${th.name}`});
+ endBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.2 5.2l2.1 2.1-1.5 2.9a13 13 0 005.1 5.1L14.8 13.8l2.1 2.1-1.6 2.1c-.55.7-1.6.9-2.4.4A16.2 16.2 0 015.1 10.4c-.5-.8-.3-1.9.4-2.4L6.2 5.2z" fill="white"/></svg>`;
+ controls.append(muteBtn, endBtn, speakerBtn);
+ const hint = h('div', {class:'caption', style:'color:var(--ink-40);font-size:10px;display:flex;align-items:center;gap:6px;justify-content:center'});
+ hint.innerHTML = `<span class="dot ok" style="width:6px;height:6px;background:var(--accent);box-shadow:0 0 6px rgba(86,184,255,0.5)"></span> Tab cycle · Esc end`;
+
+ card.append(eyebrow, avatarWrap, wave, name, sub, duration, durCap, controls, hint);
+ callOverlay.appendChild(card);
+ stage.appendChild(os.cursor);
+ // state
+ callState = { threadId: th.id, start: Date.now(), muted:false, speaker:false, timer:null };
+ // duration ticker
+ const updateDur = ()=>{
+  const secs = Math.floor((Date.now() - callState.start)/1000);
+  const mm = String(Math.floor(secs/60)).padStart(2,'0');
+  const ss = String(secs%60).padStart(2,'0');
+  const el = document.getElementById('callDuration');
+  if(el) el.textContent = `${mm}:${ss}`;
+ };
+ callState.timer = setInterval(updateDur, 500);
+ updateDur();
+ // wave idle jitter
+ let waveInterval = setInterval(()=>{
+  if(callState?.muted || !callOverlay.classList.contains('on')) return;
+  [...wave.children].forEach(b=>{
+   const h = 5 + Math.random()*12;
+   b.style.height = `${h}px`;
+  });
+ }, 140);
+ callState.waveInterval = waveInterval;
+
+ // controls
+ muteBtn.addEventListener('click', ()=>{
+  if(!callState) return;
+  callState.muted = !callState.muted;
+  muteBtn.classList.toggle('muted', callState.muted);
+  muteBtn.classList.toggle('on', false);
+  muteBtn.setAttribute('aria-label', callState.muted ? 'Unmute microphone, currently muted' : 'Mute microphone, currently unmuted');
+  muteBtn.innerHTML = callState.muted
+   ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="9" y="4.5" width="6" height="11" rx="3" stroke="#ffb3b3" stroke-width="1.6"/><path d="M7 11a5 5 0 0010 0" stroke="#ffb3b3" stroke-width="1.4" stroke-linecap="round"/><path d="M3 3l18 18" stroke="#ff5d5d" stroke-width="1.7" stroke-linecap="round"/><path d="M12 15.5v3" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>`
+   : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="9" y="4.5" width="6" height="11" rx="3" stroke="white" stroke-width="1.6"/><path d="M7 11a5 5 0 0010 0" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M12 15.5v3" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M9.5 18.5h5" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+  wave.classList.toggle('muted', callState.muted);
+  os.banner(callState.muted ? '<strong>Muted</strong><span class="caption">microphone off</span>' : '<strong>Mic on</strong><span class="caption">you’re live again</span>',{timeout:1600});
+  muteBtn.animate([{transform:'scale(0.94)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ });
+ speakerBtn.addEventListener('click', ()=>{
+  if(!callState) return;
+  callState.speaker = !callState.speaker;
+  speakerBtn.classList.toggle('on', callState.speaker);
+  speakerBtn.setAttribute('aria-label', callState.speaker ? 'Speaker on, tap to disable' : 'Speaker off, tap to enable');
+  speakerBtn.innerHTML = callState.speaker
+   ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M11 5.5L7.2 8.2H4.2v7.6H7.2L11 18.5V5.5z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.8 9.2a3.8 3.8 0 010 5.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M15.6 7.2a6.6 6.6 0 010 9.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M19 6v12" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>`
+   : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M11 5.5L7.2 8.2H4.2v7.6H7.2L11 18.5V5.5z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.8 9.2a3.8 3.8 0 010 5.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/><path d="M15.6 7.2a6.6 6.6 0 010 9.6" stroke="white" stroke-opacity="0.9" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+  os.banner(callState.speaker ? '<strong>Speaker on</strong><span class="caption">audio to world layer</span>' : '<strong>Speaker off</strong><span class="caption">ear-level routing</span>',{timeout:1600});
+ });
+ endBtn.addEventListener('click', endCall);
+ // allow Esc to end - handled globally
+ // focus end button for discipline single focal
+ setTimeout(()=> endBtn.focus({preventScroll:true}), 80);
+ os.banner(`<strong>Calling ${th.name}…</strong><span class="caption">connected 00:00</span>`,{timeout:1800});
+ hintbar.style.opacity='0';
+ hintbar.style.pointerEvents='none';
+}
+
+function endCall(){
+ if(!callState) return;
+ const th = threads.find(t=>t.id===callState.threadId);
+ clearInterval(callState.timer);
+ clearInterval(callState.waveInterval);
+ const durEl = document.getElementById('callDuration');
+ const final = durEl ? durEl.textContent : '00:00';
+ callState = null;
+ // animate out
+ const anim = callOverlay.animate([
+  {opacity:1, transform:'scale(1)', filter:'blur(0)'},
+  {opacity:0, transform:'scale(0.97)', filter:'blur(8px)'}
+ ], {duration: os.state.reducedMotion?1:260, easing:'cubic-bezier(0.32,0.72,0,1)'});
+ anim.finished.then(()=>{
+  callOverlay.classList.remove('on');
+  callOverlay.innerHTML='';
+  if(convSheet.classList.contains('on')){
+   convSheet.style.filter='';
+   convSheet.style.opacity='';
+  }
+  hintbar.style.opacity='';
+  hintbar.style.pointerEvents='';
+  // add call entry to thread preview?
+  if(th){
+   const callMsg = { id:'c'+Date.now(), from:'you', text:`Call ended · ${final}`, time: new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}), status:`Ended ${final}` };
+   messagesByThread[th.id].push(callMsg);
+   th.preview = `Call · ${final}`;
+   th.time = callMsg.time;
+   // if conversation open, append
+   const scroller = document.getElementById('convScroller');
+   if(scroller && selectedThreadId===th.id){
+    const row = buildBubbleRow(callMsg, messagesByThread[th.id].length-1);
+    row.querySelector('.bubble').style.background='rgba(255,255,255,0.06)';
+    row.querySelector('.bubble').style.color='var(--ink-60)';
+    row.querySelector('.bubble').style.outline='1px solid rgba(255,255,255,0.07)';
+    scroller.appendChild(row);
+    scroller.scrollTo({top: scroller.scrollHeight, behavior:'smooth'});
+   } else {
+    // refresh inbox preview
+    renderInbox();
+   }
+  }
+  os.banner(`<strong>Call ended · ${final}</strong><span class="caption">duration · safe landing</span>`,{timeout:2000});
+  stage.appendChild(os.cursor);
+ });
+}
+
+// edge states
+function setEdge(id){
+ edgeState = id;
+ edgeRow.querySelectorAll('.chip').forEach(c=> c.classList.toggle('active', c.dataset.state===id));
+ // reset call if switching away from normal
+ if(id!=='normal' && callState){
+  clearInterval(callState.timer); clearInterval(callState.waveInterval); callOverlay.classList.remove('on'); callOverlay.innerHTML=''; callState=null;
+ }
+ // close conversation sheet if leaving normal
+ if(id!=='normal' && convSheet.classList.contains('on')){
+  convSheet.classList.remove('on'); convSheet.innerHTML=''; selectedThreadId=null; convSheet.style.filter=''; convSheet.style.opacity='';
+ }
+ hintbar.style.opacity=''; hintbar.style.pointerEvents='';
+ stateLayer.className='state-layer';
+ stateLayer.innerHTML='';
+ stateLayer.style.display='';
+ stateLayer.style.background='';
+ stateLayer.style.pointerEvents='';
+ viewport.style.display='';
+ viewport.style.opacity='';
+ viewport.style.filter='';
+ viewport.style.pointerEvents='';
+
+ if(id==='normal'){
+  stateLayer.classList.remove('on','dim-on');
+  stateLayer.style.display='none';
+  viewport.style.display='flex';
+  renderInbox();
+  return;
+ }
+ if(id==='loading'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:10px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:10px;opacity:0.9">
+     <div style="display:grid;gap:6px"><div class="skeleton" style="width:118px;height:20px;border-radius:8px"></div><div class="skeleton" style="width:152px;height:10px;border-radius:6px"></div></div>
+     <div class="skeleton" style="width:84px;height:28px;border-radius:999px"></div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;padding:0 2px"><div class="skeleton" style="width:76px;height:26px;border-radius:999px"></div><div class="skeleton" style="width:84px;height:26px;border-radius:999px"></div><div style="flex:1"></div><div class="skeleton" style="width:92px;height:10px;border-radius:6px"></div></div>
+    <div style="display:grid;gap:8px">
+     ${Array(4).fill(0).map((_,i)=>`
+      <div style="background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:18px;padding:12px;display:flex;gap:11px;align-items:center;opacity:${1 - i*0.12}">
+       <div class="skeleton" style="width:40px;height:40px;border-radius:13px;flex:none"></div>
+       <div style="flex:1;display:grid;gap:8px">
+        <div style="display:flex;gap:8px;align-items:center"><div class="skeleton" style="flex:1;max-width:88px;height:12px;border-radius:6px"></div><div class="skeleton" style="width:28px;height:10px;border-radius:6px;margin-left:auto"></div></div>
+        <div class="skeleton" style="width:82%;height:10px;border-radius:6px"></div>
+        <div class="skeleton" style="width:52%;height:10px;border-radius:6px"></div>
+       </div>
+       <div class="skeleton" style="width:30px;height:30px;border-radius:999px;flex:none"></div>
+      </div>
+     `).join('')}
+    </div>
+    <div class="caption" style="text-align:center;color:var(--ink-40);display:flex;align-items:center;justify-content:center;gap:6px"><span class="dot ok" style="width:6px;height:6px;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5)"></span>Loading · shimmer 1.2s times</div>
+   </div>
+  `;
+  return;
+ }
+ if(id==='empty'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px;justify-items:center;padding:18px 0 0 0">
+    <div class="state-card">
+     <div class="state-illus" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="4.5" y="6" width="15" height="10.5" rx="2.6" stroke="white" stroke-opacity="0.92" stroke-width="1.6"/><path d="M7 9.2h7.5M7 12h4.2" stroke="white" stroke-opacity="0.72" stroke-width="1.5" stroke-linecap="round"/><path d="M4.5 12.8l4 4 6-3.6 5 3.6" stroke="white" stroke-opacity="0.14" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 17.2a3 3 0 006 0" stroke="white" stroke-opacity="0.78" stroke-width="1.4" stroke-linecap="round"/></svg>
+     </div>
+     <div class="state-title">No messages yet</div>
+     <div class="state-body">Start a conversation — Prism keeps threads in glass over the world. Mara’s lens check is one tap away. No inbox clutter.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Start new message">New message</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Dismiss empty state">Dismiss</button>
+     </div>
+     <p class="caption" style="color:var(--ink-40);font-size:11px">Humane empty times · 600×600</p>
+    </div>
+    <div style="width:100%;max-width:420px;background:rgba(255,255,255,0.04);outline:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;justify-content:center">
+     <span class="dot ok" style="width:7px;height:7px;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5)"></span>
+     <span style="font-size:11px;font-weight:600;color:var(--ink-60)">Prism glass · on-device</span>
+     <span class="caption" style="margin-left:auto">inbox 0</span>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    const t=b.textContent.trim();
+    if(t.includes('New')){
+     b.textContent='Opening…';
+     setTimeout(()=>{ setEdge('normal'); openConversation('mara'); os.banner('<strong>New thread — Mara</strong><span class="caption">composer ready · demo</span>',{timeout:1800}); }, 420);
+    } else {
+     setEdge('normal');
+    }
+   });
+  });
+  return;
+ }
+ if(id==='error'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:10px;justify-items:center;padding:18px 0 0 0">
+    <div class="state-card" style="animation: sheet-in 300ms var(--ease-prism)">
+     <div class="state-illus danger" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.5L21.2 19H2.8L12 3.5z" stroke="#ff8a8a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.4v4.4" stroke="#ffb3b3" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="17" r="1.25" fill="#ffb3b3"/></svg>
+     </div>
+     <div class="state-title">Can’t load messages</div>
+     <div class="state-body">Prism couldn’t reach Messages. Your threads are safe on-device — try again. Never a dead end.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Retry loading messages" id="retryBtn">Retry</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Dismiss error">Dismiss</button>
+     </div>
+     <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;width:100%;justify-content:center">
+      <span class="dot bad" aria-hidden="true"></span><span class="caption " style="color:var(--ink-60)">PR-MSG-503 · ${new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</span><span class="caption" style="margin-left:auto;color:var(--ink-40)">tap Retry</span>
+     </div>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelector('#retryBtn')?.addEventListener('click', (e)=>{
+   const btn=e.currentTarget; btn.textContent='Retrying…'; btn.setAttribute('disabled','true');
+   const card=stateLayer.querySelector('.state-card');
+   card.innerHTML = `<div style="display:grid;gap:10px;width:100%;justify-items:center;padding:8px 0"><div class="skeleton" style="width:64px;height:64px;border-radius:18px"></div><div class="skeleton" style="width:62%;height:16px;border-radius:8px"></div><div class="skeleton" style="width:78%;height:12px;border-radius:6px"></div><div class="skeleton" style="width:100%;height:56px;border-radius:12px;margin-top:6px"></div></div>`;
+   setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Messages restored</strong><span class="caption">5 threads</span>',{timeout:1800}); }, 1100);
+  });
+  stateLayer.querySelectorAll('button')[1]?.addEventListener('click', ()=> setEdge('normal'));
+  return;
+ }
+ if(id==='offline'){
+  viewport.style.display='flex';
+  viewport.style.opacity='0.52';
+  viewport.style.filter='blur(1px)';
+  stateLayer.classList.add('dim-on');
+  stateLayer.style.display='grid';
+  stateLayer.innerHTML = `
+   <div class="state-card" style="animation: rise-in 260ms var(--ease-prism)">
+    <div class="state-illus warn" aria-hidden="true">
+     <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M2.5 12.2a9.5 9.5 0 0111-7.1" stroke="white" stroke-opacity="0.92" stroke-width="1.6" stroke-linecap="round"/><path d="M21.5 11.8a9.5 9.5 0 01-5.2 7.9" stroke="white" stroke-opacity="0.55" stroke-width="1.6" stroke-linecap="round"/><path d="M3.2 15.8l-1 1.6 1.6-1 1 1.6-1.6-1.6" stroke="#ffc247" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.2 7.2l3 3-3 3" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="state-title">You’re offline</div>
+    <div class="state-body">2 messages queued · they’ll send when you’re back. Threads are readable — calls queue too.</div>
+    <div style="width:100%;display:grid;gap:8px;margin-top:2px;text-align:left">
+     <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 12px">
+      <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(180deg,#2f9dff,#0b5ed7);display:grid;place-items:center;color:#fff;font-weight:700;font-size:11px">M</div>
+            <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--ink-100)">Mara — queued</div><div style="font-size:11px;color:var(--ink-60)" class="tabular">On my way · 2 min — waiting</div></div>
+      <span class="dot warn" aria-hidden="true"></span>
+     </div>
+     <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 12px">
+      <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(180deg,#a58bff,#6a4bff);display:grid;place-items:center;color:#fff;font-weight:700;font-size:11px">P</div>
+            <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--ink-100)">Prism Team — queued</div><div style="font-size:11px;color:var(--ink-60)" class="tabular">Build 26A · thumbs up — waiting</div></div>
+      <span class="dot warn" aria-hidden="true"></span>
+     </div>
+    </div>
+    <div class="state-actions">
+     <button class="btn primary" data-focusable tabindex="0" aria-label="Retry sync queued messages">Retry sync</button>
+     <button class="btn ghost" data-focusable tabindex="0" aria-label="Dismiss offline">Dismiss</button>
+    </div>
+    <div class="caption" style="color:var(--ink-40);display:flex;align-items:center;gap:6px"><span class="dot warn" style="width:6px;height:6px;background:var(--warn)"></span>Queued · 2 waiting</div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    const t=b.textContent.trim();
+    if(t.includes('Retry')){
+     b.textContent='Retrying…';
+     setTimeout(()=>{ os.banner('<strong>Still offline</strong><span class="caption">queued · will auto-send</span>',{timeout:1800}); b.textContent='Retry sync'; }, 900);
+    } else {
+     setEdge('normal');
+    }
+   });
+  });
+  return;
+ }
+ if(id==='permission'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px;justify-items:center;padding:18px 0 0 0">
+    <div class="state-card">
+     <div class="state-illus" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="9" y="4.5" width="6" height="11" rx="3" stroke="white" stroke-opacity="0.92" stroke-width="1.6"/><path d="M7 11a5 5 0 0010 0" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M12 16v2.6" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M9.6 19.2h4.8" stroke="white" stroke-width="1.45" stroke-linecap="round"/><circle cx="12" cy="9.6" r="1.4" fill="white" fill-opacity="0.92"/><path d="M3 3l18 18" stroke="#ff5d5d" stroke-width="1.7" stroke-linecap="round"/></svg>
+     </div>
+     <div class="state-title">Messages need access</div>
+     <div class="state-body">Prism needs Contacts & Microphone to show threads and place calls. Enable in Settings — stays on-device.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Open Settings to allow access">Open Settings</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Not now">Not now</button>
+     </div>
+     <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;width:100%;justify-content:center">
+      <span class="dot bad" aria-hidden="true"></span><span class="caption" style="color:var(--ink-60)">Permission PR-MSG-401</span><span class="caption" style="margin-left:auto;color:var(--ink-40)">on-device</span>
+     </div>
+     <p class="caption" style="color:var(--ink-40);font-size:11px">Colorblind-safe · no red-only signals</p>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    const t=b.textContent.trim();
+    if(t.includes('Settings')){
+     b.textContent='Opening…';
+     setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Permission granted</strong><span class="caption">Contacts & Mic · 5 threads</span>',{timeout:1800}); }, 700);
+    } else {
+     setEdge('normal');
+    }
+   });
+  });
+  return;
+ }
+}
+
+// initial render
+renderInbox();
+
+// global back handling: Esc / swipe should close sheets/calls
+stage.addEventListener('keydown', (e)=>{
+ if(e.key==='Escape'){
+  if(callState){ e.preventDefault(); endCall(); return; }
+  if(convSheet.classList.contains('on')){ e.preventDefault(); closeConversation(); }
+ }
+});
+os.on('back', ()=>{
+ if(callState) endCall();
+ else if(convSheet.classList.contains('on')) closeConversation();
+});
+os.on('swipeleft', ()=>{
+ // in conversation, swipe left could be back? Keep consistent with nav: swipe left advances, but for messages swipe left dismiss? Instead map swipe right to back when in sheet
+});
+os.on('swiperight', ()=>{
+ if(callState) return;
+ if(convSheet.classList.contains('on')) closeConversation();
+});
+os.on('capture', ()=>{
+ // space capture as send? In conversation, capture maybe quick call?
+ if(callState) return;
+ if(convSheet.classList.contains('on') && selectedThreadId){
+  // capture as call
+  startCall(selectedThreadId);
+ } else if(!convSheet.classList.contains('on')){
+  // open Mara
+  openConversation('mara');
+ }
+});
+
+// ensure cursor stays above overlays
+const keepCursorTop = ()=> stage.appendChild(os.cursor);
+stage.addEventListener('pointermove', keepCursorTop);
+os.on('focuschange', keepCursorTop);
+</script>
+</body>
+</html>

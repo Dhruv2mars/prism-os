@@ -1,0 +1,1223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Live Captions</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+ /* stage glass — translucent scrim over world, coherent with 05/06/07 */
+ .stage{
+  background:
+   radial-gradient(120% 90% at 50% 16%, rgba(42,53,80,0.56) 0%, rgba(20,26,40,0.72) 36%, rgba(10,14,23,0.90) 70%),
+   radial-gradient(70% 52% at 78% 86%, rgba(86,184,255,0.10), transparent 58%),
+   rgba(6,10,16,0.76);
+ }
+ .stage-shell{
+  position:relative;
+  width:600px;height:600px;
+  display:grid;place-items:center;
+  flex:none;
+ }
+ /* DEV CHROME — MUST be fixed OUTSIDE .stage */
+ .dev-controls{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  display:flex;gap:6px;
+  z-index:1000;
+  justify-content:center;
+  flex-wrap:wrap;
+  pointer-events:none;
+  padding:8px 12px;
+  border-radius:var(--r-pill);
+  background:rgba(10,15,23,0.74);
+  outline:1px solid var(--stroke-glass);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.32);
+  max-width:92vw;
+ }
+ .stage .dev-controls{display:none !important}
+ .dev-controls .chip{
+  pointer-events:auto;
+  height:26px;padding:0 10px;
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  transition:background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+  border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+ }
+ .dev-controls .chip.active{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423;outline-color:transparent;
+ }
+ .dev-controls .chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .dev-controls .chip.gaze-focus{transform:scale(1.04)}
+
+ /* viewport */
+ .cap-viewport{
+  position:absolute;
+  inset:44px 0 0 0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:10px 14px 12px 14px;
+  overflow:hidden;
+ }
+
+ /* header bar — live badge + timer + lang */
+ .cap-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  animation: rise-in 260ms var(--ease-prism) both;
+ }
+ .cap-header-left{
+  display:flex;align-items:center;gap:8px;flex:1;min-width:0;
+ }
+ .live-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  height:28px;padding:0 10px;
+  border-radius:999px;
+  background:rgba(0,0,0,0.44);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  outline:1px solid rgba(255,255,255,0.08);
+  color:var(--ink-80);
+  font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  white-space:nowrap;
+ }
+ .live-pill .dot-live{
+  width:7px;height:7px;border-radius:50%;flex:none;
+  background:var(--accent-strong);
+  box-shadow:0 0 10px rgba(86,184,255,0.6);
+  animation: livePulse 1.4s ease-in-out infinite;
+ }
+ .live-pill .dot-live.paused{
+  background:var(--ink-40);
+  box-shadow:none;
+  animation:none;
+  opacity:0.6;
+ }
+ .live-pill .dot-live.muted{
+  background:var(--warn);
+  box-shadow:0 0 8px rgba(255,194,71,0.45);
+  animation:none;
+ }
+ .live-pill .dot-live.offline{
+  background:var(--ink-20);
+  box-shadow:none;
+  animation:none;
+ }
+ @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.55;transform:scale(0.82)}}
+ .timer-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  height:28px;padding:0 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.07);
+  outline:1px solid rgba(255,255,255,0.07);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  color:var(--ink-100);
+    font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+ }
+ .timer-pill .timer-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px rgba(76,212,124,0.5);flex:none;
+ }
+ .timer-pill.paused .timer-dot{ background:var(--ink-40); box-shadow:none }
+ .cap-header-right{
+  display:flex;align-items:center;gap:6px;flex:none;
+ }
+ .lang-chip{
+  appearance:none;-webkit-appearance:none;
+  border:none;
+  display:inline-flex;align-items:center;gap:6px;
+  height:28px;padding:0 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  outline:1px solid rgba(255,255,255,0.08);
+  color:var(--ink-80);
+  font-size:11px;font-weight:700;letter-spacing:0.02em;
+  cursor:pointer;
+  transition: transform var(--dur-base) var(--ease-prism), background var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+ }
+ .lang-chip.gaze-focus{ transform:scale(1.04); outline-color:var(--stroke-focus) }
+ .lang-chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+
+ /* transcript area */
+ .transcript-wrap{
+  position:relative;
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border-radius:18px;
+  background:var(--mat-glass);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  box-shadow:0 18px 44px rgba(0,0,0,0.28);
+ }
+ .transcript-scroller{
+  flex:1;
+  overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:none;
+  padding:12px 12px 10px 12px;
+  display:flex;flex-direction:column;gap:10px;
+  scroll-behavior:smooth;
+ }
+ .transcript-scroller::-webkit-scrollbar{display:none}
+ .transcript-fade{
+  position:absolute;left:0;right:0;height:14px;pointer-events:none;z-index:2;
+ }
+ .transcript-fade.top{top:0;background:linear-gradient(180deg, rgba(18,26,38,0.22), transparent);border-radius:18px 18px 0 0}
+ .transcript-fade.bottom{bottom:0;background:linear-gradient(0deg, rgba(18,26,38,0.18), transparent);border-radius:0 0 18px 18px}
+
+ .cap-line{
+  position:relative;
+  background:rgba(255,255,255,0.05);
+  outline:1px solid rgba(255,255,255,0.06);
+  border-radius:16px;
+  padding:10px 12px 10px 12px;
+  display:flex;flex-direction:column;gap:6px;
+  transition: background 260ms var(--ease-prism), outline-color 260ms var(--ease-prism), transform 260ms var(--ease-prism), box-shadow 260ms var(--ease-prism);
+  animation: rise-in 260ms var(--ease-prism) both;
+  overflow:hidden;
+ }
+ .cap-line.current{
+  background:var(--mat-raised);
+  outline-color:rgba(86,184,255,0.22);
+  box-shadow:0 8px 22px rgba(0,0,0,0.18), 0 0 0 1px rgba(86,184,255,0.08) inset;
+  transform: translateY(0);
+ }
+ .cap-line.current::before{
+  content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:999px;
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  box-shadow:0 0 10px rgba(86,184,255,0.45);
+ }
+ .line-head{
+  display:flex;align-items:center;gap:8px;
+ }
+ .speaker-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  height:22px;padding:0 8px;
+  border-radius:999px;
+  font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;
+  flex:none;
+ }
+ .speaker-pill.mara{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423;
+  box-shadow:0 4px 12px rgba(16,92,180,0.22);
+ }
+ .speaker-pill.you{
+  background:rgba(255,255,255,0.12);
+  outline:1px solid rgba(255,255,255,0.10);
+  color:var(--ink-80);
+ }
+ .line-meta{
+  display:flex;align-items:center;gap:6px;
+  margin-left:auto;
+  font-size:10px;font-weight:600;color:var(--ink-40);letter-spacing:0.02em;
+    font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+ }
+ .line-meta .meta-dot{
+  width:4px;height:4px;border-radius:50%;background:var(--ink-20);flex:none;
+ }
+ .line-current-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--accent-strong);
+  background:var(--accent-wash);
+  outline:1px solid rgba(86,184,255,0.18);
+  padding:2px 6px;border-radius:999px;
+  margin-left:6px;
+ }
+ .line-current-badge .cb-dot{width:5px;height:5px;border-radius:50%;background:var(--accent-strong);box-shadow:0 0 6px rgba(86,184,255,0.5);flex:none;animation:livePulse 1.2s ease-in-out infinite}
+ .line-text{
+  font-size:13px;font-weight:500;line-height:1.45;letter-spacing:0.01em;color:var(--ink-80);
+  word-break:break-word;
+ }
+ .cap-line.current .line-text{color:var(--ink-100)}
+ .word{
+  display:inline-block;
+  margin-right:0.22em;
+  animation: blurWipe 320ms var(--ease-prism) both;
+  will-change: filter, opacity, transform;
+ }
+ @keyframes blurWipe{
+  from{filter:blur(8px);opacity:0;transform:translateY(4px)}
+  to{filter:blur(0);opacity:1;transform:translateY(0)}
+ }
+ .word.pending{
+  filter:blur(6px);opacity:0;transform:translateY(4px);
+ }
+ .word.highlight{
+  background:var(--accent-wash);
+  outline:1px solid rgba(86,184,255,0.18);
+  border-radius:6px;
+  padding:0 2px;
+  margin:0 1px;
+  color:var(--ink-100);
+  font-weight:600;
+  box-shadow:0 0 10px rgba(86,184,255,0.12);
+ }
+ .line-caret{
+  display:inline-block;width:2px;height:13px;background:var(--accent-strong);border-radius:1px;
+  vertical-align:-2px;margin-left:2px;
+  animation: caretBlink 900ms steps(1) infinite;
+ }
+ @keyframes caretBlink{0%,50%{opacity:1}51%,100%{opacity:0}}
+ .line-foot{
+  display:flex;align-items:center;gap:6px;
+  padding-top:2px;
+ }
+ .line-confidence{
+  height:3px;flex:1;max-width:92px;
+  border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;
+ }
+ .line-confidence i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg, var(--accent), var(--accent-strong));width:var(--w, 88%);transition:width 320ms var(--ease-prism)}
+ .line-foot .caption{font-size:10px;font-weight:600;color:var(--ink-40);letter-spacing:0.02em}
+
+ /* controls card */
+ .controls-card{
+  display:flex;flex-direction:column;gap:10px;
+  background:var(--mat-raised);
+  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
+  outline:1px solid var(--stroke-glass);
+  border-radius:18px;
+  padding:12px 12px 12px 12px;
+  box-shadow:0 16px 36px rgba(0,0,0,0.28);
+  animation: rise-in 260ms var(--ease-prism) both;
+  animation-delay:80ms;
+ }
+ .controls-top{
+  display:flex;align-items:center;gap:10px;
+ }
+ .waveform{
+  display:flex;align-items:center;gap:3px;
+  height:28px;padding:0 2px;
+  flex:1;
+  min-width:0;
+ }
+ .waveform i{
+  width:3px;border-radius:999px;
+  background:linear-gradient(180deg, #dff0ff 0%, var(--accent) 48%, var(--accent-strong) 100%);
+  height:var(--h,10px);
+  transform-origin:center;
+  animation: wavePulse 280ms var(--ease-prism) infinite alternate;
+  opacity:0.96;
+ }
+ @keyframes wavePulse{
+  from{transform:scaleY(0.45);opacity:0.72}
+  to{transform:scaleY(1);opacity:1}
+ }
+ .waveform.idle i{animation-play-state:paused;opacity:0.38;transform:scaleY(0.5)}
+ .waveform.muted i{animation-play-state:paused;opacity:0.22;transform:scaleY(0.35);background:rgba(255,255,255,0.26)}
+ .waveform.paused i{animation-play-state:paused;opacity:0.40;transform:scaleY(0.45)}
+ .waveform.streaming i{animation-duration:260ms}
+ .controls-actions{
+  display:flex;align-items:center;gap:8px;flex:none;
+ }
+ .icon-btn{
+  appearance:none;-webkit-appearance:none;
+  border:none;
+  width:36px;height:36px;
+  border-radius:999px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,0.08);
+  outline:1px solid rgba(255,255,255,0.08);
+  color:var(--ink-80);
+  cursor:pointer;
+  transition: transform var(--dur-base) var(--ease-prism), background var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
+  flex:none;
+ }
+ .icon-btn.primary{
+  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#051423;outline-color:transparent;
+  box-shadow:0 8px 18px rgba(16,92,180,0.26);
+ }
+ .icon-btn.danger{
+  background:rgba(255,93,93,0.14);outline-color:rgba(255,93,93,0.22);color:#ffb3b3;
+ }
+ .icon-btn.active{
+  background:rgba(86,184,255,0.16);outline-color:rgba(86,184,255,0.24);color:var(--ink-100);
+ }
+ .icon-btn.gaze-focus{transform:scale(1.06);outline-color:var(--stroke-focus);box-shadow:0 0 0 2px rgba(86,184,255,0.12), 0 0 14px rgba(86,184,255,0.18)}
+ .icon-btn:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+ .icon-btn:active{transform:scale(0.96)}
+ .icon-btn:disabled{opacity:0.44;pointer-events:none}
+ .controls-divider{width:1px;height:22px;background:rgba(255,255,255,0.07);flex:none;margin:0 2px}
+ .controls-bottom{
+  display:flex;align-items:center;gap:8px;
+  flex-wrap:wrap;
+ }
+ .controls-bottom .caption{font-size:11px;font-weight:600;color:var(--ink-60);letter-spacing:0.02em}
+ .controls-bottom strong{font-size:13px;font-weight:700;color:var(--ink-80)}
+ .mini-stat{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);
+  padding:5px 8px;border-radius:999px;
+  font-size:10px;font-weight:600;color:var(--ink-60);letter-spacing:0.02em;
+ }
+  .mini-stat strong{font-size:11px;color:var(--ink-80);font-variant-numeric:tabular-nums}
+ .chips-row{
+  display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;
+ }
+ .chips-row .chip{
+  height:26px;padding:0 10px;font-size:11px;font-weight:600;letter-spacing:0.01em;
+  background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.07);
+  border:none;cursor:pointer;transition: transform var(--dur-base) var(--ease-prism), background var(--dur-fast) var(--ease-prism);
+ }
+ .chips-row .chip.active{background:linear-gradient(180deg,var(--accent),var(--accent-strong));color:#051423;outline-color:transparent}
+ .chips-row .chip.gaze-focus{transform:scale(1.04)}
+ .hint-row{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:2px 2px 0 2px;
+  font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);
+ }
+ .hint-row strong{color:var(--ink-60);font-weight:700;text-transform:none;letter-spacing:0.02em;font-size:11px}
+ .hint-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5);flex:none;display:inline-block}
+
+ /* state layer — edge states */
+ .state-layer{
+  position:absolute;
+  inset:44px 0 0 0;
+  z-index:520;
+  display:none;
+  overflow-y:auto;scrollbar-width:none;
+  padding:12px 14px 14px 14px;
+ }
+ .state-layer::-webkit-scrollbar{display:none}
+ .state-layer.on{display:block;animation: rise-in 260ms var(--ease-prism) both}
+ .state-layer.dim-on{
+  display:grid;place-items:center;
+  padding:12px 14px 14px 14px;
+  background:transparent;
+  pointer-events:none;
+ }
+ .state-layer.dim-on .state-card{pointer-events:auto}
+ .state-card{
+  width:100%;max-width:420px;
+  background:var(--mat-raised);
+  backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
+  outline:1px solid var(--stroke-glass);
+  border-radius:var(--r-lg);
+  padding:24px 20px 18px 20px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;
+  box-shadow:0 18px 44px rgba(0,0,0,0.36);
+  animation: rise-in 260ms var(--ease-prism) both;
+  position:relative;overflow:hidden;
+ }
+ .state-card::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(90% 60% at 50% 8%, rgba(86,184,255,0.08), transparent 62%);
+  pointer-events:none;
+ }
+ .state-illus{
+  width:64px;height:64px;border-radius:18px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,0.06);
+  outline:1px solid rgba(255,255,255,0.08);
+  margin-bottom:2px;position:relative;
+ }
+ .state-illus.danger{background:rgba(255,93,93,0.10);outline-color:rgba(255,93,93,0.18)}
+ .state-illus.warn{background:rgba(255,194,71,0.10);outline-color:rgba(255,194,71,0.18)}
+ .state-title{font-size:18px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-100);line-height:1.1;position:relative}
+ .state-body{font-size:13px;font-weight:500;color:var(--ink-60);line-height:1.45;max-width:300px;position:relative}
+ .state-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px;position:relative}
+ .state-actions .btn{min-height:36px;font-size:13px}
+ .queued-list{
+  width:100%;max-width:360px;display:grid;gap:8px;margin-top:2px;position:relative;text-align:left;
+ }
+ .queued-item{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:10px 12px;
+ }
+ .skel-list{ display:grid; gap:8px; width:100%; max-width:520px; margin:0 auto }
+ .sk-line{height:10px;border-radius:8px}
+ .sk-bubble{height:72px;border-radius:16px}
+ .sk-header{display:flex;gap:8px;align-items:center}
+ button:focus-visible, [data-focusable]:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
+
+ @media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+   animation-duration:0.01ms !important;
+   animation-iteration-count:1 !important;
+   transition-duration:0.01ms !important;
+  }
+  .waveform i{animation:none !important}
+  .live-pill .dot-live{animation:none !important}
+  .line-caret{animation:none !important;opacity:1}
+ }
+</style>
+</head>
+<body>
+<div class="device">
+ <div class="stage-shell">
+  <div class="stage" data-stage></div>
+ </div>
+</div>
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+const stage = document.querySelector('[data-stage]');
+const device = document.querySelector('.device');
+const os = createOS(stage, { dwell:true, dwellMs:350 });
+stage.appendChild(os.statusbar('<span style="color:var(--ink-60);font-size:11px;letter-spacing:0.04em;font-weight:700">Captions · Live</span>'));
+
+const h = (tag, attrs={}, ...children)=>{
+ const el=document.createElement(tag);
+ for(const [k,v] of Object.entries(attrs)){
+  if(k==='class') el.className=v;
+  else if(k==='html') el.innerHTML=v;
+  else if(v!==null && v!==undefined) el.setAttribute(k,v);
+ }
+ for(const c of children){
+  if(c==null) continue;
+  if(typeof c==='string') el.appendChild(document.createTextNode(c));
+  else el.appendChild(c);
+ }
+ return el;
+};
+
+// dev controls OUTSIDE stage
+const edgeRow = h('div', {class:'dev-controls', role:'toolbar', 'aria-label':'Captions edge state controls'});
+const edgeStates = [
+ {id:'normal', label:'Normal'},
+ {id:'loading', label:'Loading'},
+ {id:'empty', label:'Empty'},
+ {id:'error', label:'Error'},
+ {id:'offline', label:'Offline'},
+ {id:'permission', label:'No mic'},
+];
+edgeStates.forEach(s=>{
+ const b=h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Show ${s.label} state`, 'data-state':s.id}, s.label);
+ if(s.id==='normal') b.classList.add('active');
+ b.addEventListener('click', ()=> setEdge(s.id));
+ edgeRow.appendChild(b);
+});
+device.appendChild(edgeRow);
+
+// viewport
+const viewport = h('div', {class:'cap-viewport', id:'viewport'});
+const stateLayer = h('div', {class:'state-layer', id:'stateLayer', 'aria-live':'polite'});
+stage.append(viewport, stateLayer);
+
+// header
+const capHeader = h('div', {class:'cap-header'});
+const headerLeft = h('div', {class:'cap-header-left'});
+const livePill = h('div', {class:'live-pill', id:'livePill', 'aria-live':'polite'});
+livePill.innerHTML = `<span class="dot-live" aria-hidden="true"></span><span class="tabular" style="font-variant-numeric:tabular-nums">Live</span><span style="opacity:0.55">·</span><span id="badgeLang">English</span><span style="opacity:0.55">·</span><span style="color:var(--ink-60)">on-device</span>`;
+const timerPill = h('div', {class:'timer-pill ', id:'timerPill'});
+timerPill.innerHTML = `<span class="timer-dot" aria-hidden="true"></span><span id="timerText" class="tabular">00:00</span>`;
+headerLeft.append(livePill, timerPill);
+
+const headerRight = h('div', {class:'cap-header-right'});
+const langChip = h('button', {class:'lang-chip', 'data-focusable':'', tabindex:'0', 'aria-label':'Language English, tap to change', id:'langChip'});
+langChip.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5a8.5 8.5 0 100 17 8.5 8.5 0 000-17z" stroke="white" stroke-opacity="0.9" stroke-width="1.5"/><path d="M3.8 12h16.4M12 3.5c1.6 2.2 2.4 4.7 2.4 8.5s-.8 6.3-2.4 8.5M12 3.5c-1.6 2.2-2.4 4.7-2.4 8.5s.8 6.3 2.4 8.5" stroke="white" stroke-opacity="0.72" stroke-width="1.3"/><path d="M4.6 8.2h14.8M4.6 15.8h14.8" stroke="white" stroke-opacity="0.48" stroke-width="1.2"/></svg> <span id="langChipLabel">English</span> <span style="opacity:0.5">▾</span>`;
+headerRight.appendChild(langChip);
+
+// transcript
+const transcriptWrap = h('div', {class:'transcript-wrap', id:'transcriptWrap'});
+const scroller = h('div', {class:'transcript-scroller', id:'scroller', role:'log', 'aria-live':'polite', 'aria-label':'Live captions transcript'});
+const fadeTop = h('div', {class:'transcript-fade top', 'aria-hidden':'true'});
+const fadeBot = h('div', {class:'transcript-fade bottom', 'aria-hidden':'true'});
+transcriptWrap.append(scroller, fadeTop, fadeBot);
+
+// controls card
+const controlsCard = h('div', {class:'controls-card', id:'controlsCard'});
+const controlsTop = h('div', {class:'controls-top'});
+const waveform = h('div', {class:'waveform streaming', id:'waveform', 'aria-hidden':'true'});
+for(let i=0;i<12;i++){
+ const bar = h('i', {style:`--h:${8 + (i%4)*4}px`});
+ bar.style.height = `${8 + (i%4)*4}px`;
+ bar.style.animationDelay = `${i*54}ms`;
+ waveform.appendChild(bar);
+}
+const controlsActions = h('div', {class:'controls-actions'});
+const muteBtn = h('button', {class:'icon-btn', 'data-focusable':'', tabindex:'0', 'aria-label':'Mute microphone', id:'muteBtn'});
+muteBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="4.5" width="6" height="11" rx="3" stroke="white" stroke-width="1.6"/><path d="M7 11a5 5 0 0010 0" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M12 15.5v3" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M9.5 18.5h5" stroke="white" stroke-width="1.45" stroke-linecap="round"/></svg>`;
+const pauseBtn = h('button', {class:'icon-btn primary', 'data-focusable':'', tabindex:'0', 'aria-label':'Pause captions', id:'pauseBtn'});
+pauseBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="7" y="5.5" width="3.2" height="13" rx="1.2" fill="#051423"/><rect x="13.8" y="5.5" width="3.2" height="13" rx="1.2" fill="#051423"/></svg>`;
+controlsActions.append(muteBtn, pauseBtn);
+
+controlsTop.append(waveform, controlsActions);
+
+const controlsBottom = h('div', {class:'controls-bottom'});
+const bottomLeft = h('div', {style:'display:flex;align-items:center;gap:8px;flex-wrap:wrap'});
+const confidenceStat = h('div', {class:'mini-stat'});
+confidenceStat.innerHTML = `<span class="dot ok" style="width:6px;height:6px;background:var(--ok);box-shadow:0 0 6px rgba(76,212,124,0.5)"></span> <span class="caption">Confidence</span> <strong class="tabular" id="confidenceVal">96%</strong>`;
+const wordsStat = h('div', {class:'mini-stat'});
+wordsStat.innerHTML = `<span class="caption " id="wordsStat">42 words</span><span style="opacity:0.5">·</span><span class="caption">on-device</span>`;
+bottomLeft.append(confidenceStat, wordsStat);
+
+const chipsRow = h('div', {class:'chips-row'});
+const copyBtn = h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':'Copy transcript'}, 'Copy');
+const clearBtn = h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':'Clear transcript'}, 'Clear');
+chipsRow.append(copyBtn, clearBtn);
+controlsBottom.append(bottomLeft, chipsRow);
+
+controlsCard.append(controlsTop, controlsBottom);
+
+const hintRow = h('div', {class:'hint-row', id:'hintRow'});
+hintRow.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="hint-dot" aria-hidden="true"></span><strong>Gaze + dwell 350 ms</strong></span><span><span class="tabular" style="color:var(--ink-60);letter-spacing:0.02em;text-transform:none;font-size:11px">Wave reacts to voice</span></span><span style="display:flex;align-items:center;gap:6px">Scroll <span style="width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,0.08);display:grid;place-items:center;font-size:10px;color:var(--ink-60)">↕</span></span>`;
+
+viewport.append(capHeader, transcriptWrap, controlsCard, hintRow);
+capHeader.prepend(headerLeft);
+capHeader.appendChild(headerRight);
+
+// state
+const LANGUAGES = ['English','Español','Français','日本語'];
+let currentLangIdx = 0;
+let isMuted = false;
+let isPaused = false;
+let isLive = true;
+let elapsedSec = 0;
+let timerId = null;
+let streamTimers = [];
+let currentLineIdx = -1;
+let currentWordIdx = 0;
+let totalWords = 0;
+let edgeState = 'normal';
+
+const SCRIPT = [
+ {speaker:'MARA', text:'Hey — can you hear me? Captions are running on-device right now.'},
+ {speaker:'YOU', text:"Yeah, loud and clear. The word-by-word reveal feels instant."},
+ {speaker:'MARA', text:'We’re at 600 by 600 — highlight stays on the current line while the wave reacts to voice.'},
+ {speaker:'YOU', text:'Keep going. I want to see pause, mute, and the language switch.'},
+ {speaker:'MARA', text:'Prism’s blur wipe makes each new word glide in. No bounce — just prism ease.'},
+ {speaker:'MARA', text:'On-device · private timer. Tap pause or mute any time.'},
+];
+
+let streamedLines = []; // array of {speaker, words:[], timeStr}
+let lineEls = [];
+
+function fmtTime(d){
+ return d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+}
+function fmtTimer(s){
+ const mm = String(Math.floor(s/60)).padStart(2,'0');
+ const ss = String(s%60).padStart(2,'0');
+ return `${mm}:${ss}`;
+}
+
+function startTimer(){
+ if(timerId) clearInterval(timerId);
+ timerId = setInterval(()=>{
+  if(isPaused || edgeState!=='normal' || isMuted && !isLive){ /* timer still ticks when live but muted? spec says waveform+mute/pause controls - timer continues on mute but pauses on pause. We'll pause only on isPaused */ }
+  if(isPaused || edgeState!=='normal') return;
+  elapsedSec++;
+  document.getElementById('timerText').textContent = fmtTimer(elapsedSec);
+ }, 1000);
+}
+function stopTimer(){
+ if(timerId){ clearInterval(timerId); timerId=null; }
+}
+
+function buildLineEl(entry, idx, isCurrent){
+ const line = h('div', {class: 'cap-line' + (isCurrent?' current':''), 'data-idx': String(idx), tabindex:'0', 'data-focusable':'', 'aria-label': `${entry.speaker} at ${entry.timeStr}: ${entry.words.join(' ')}`});
+ const head = h('div', {class:'line-head'});
+ const pill = h('div', {class:`speaker-pill ${entry.speaker==='MARA'?'mara':'you'}`}, entry.speaker);
+ const meta = h('div', {class:'line-meta'});
+  meta.innerHTML = `<span class="tabular">${entry.timeStr}</span><span class="meta-dot" aria-hidden="true"></span><span class="tabular">${entry.words.length} words</span>`;
+ if(isCurrent){
+  const badge = h('span', {class:'line-current-badge'});
+  badge.innerHTML = `<span class="cb-dot" aria-hidden="true"></span>Live`;
+  meta.appendChild(badge);
+ }
+ head.append(pill, meta);
+
+ const textWrap = h('div', {class:'line-text', id:`line-text-${idx}`});
+ // words will be filled progressively
+ entry.words.forEach((w, wi)=>{
+  const span = h('span', {class:'word' + (wi >= entry.revealed ? ' pending' : '')});
+  span.textContent = w;
+  if(wi < entry.revealed){
+   // already revealed — show with highlight if isCurrent and last word? highlight current word?
+   if(isCurrent && wi === entry.revealed-1){
+    span.classList.add('highlight');
+   }
+  }
+  textWrap.appendChild(span);
+  // add space via margin; no extra text node needed because .word margin handles spacing, but we need to preserve spaces - handled via margin-right
+ });
+ if(isCurrent && entry.revealed < entry.words.length){
+  const caret = h('span', {class:'line-caret', 'aria-hidden':'true'});
+  textWrap.appendChild(caret);
+ }
+
+ const foot = h('div', {class:'line-foot'});
+ const confWrap = h('div', {class:'line-confidence', 'aria-hidden':'true'});
+ const confFill = h('i', {style:`--w:${entry.confidence}%`});
+ // confidence shown only for current? but show for all subtle
+ confWrap.appendChild(confFill);
+ const footCap = h('span', {class:'caption'}, entry.speaker==='MARA' ? 'Mara · on-device' : 'You · mic');
+ foot.append(confWrap, footCap);
+
+ line.append(head, textWrap, foot);
+ return line;
+}
+
+function renderAll(){
+ scroller.innerHTML='';
+ lineEls = [];
+ streamedLines.forEach((entry, idx)=>{
+  const isCurrent = idx===currentLineIdx;
+  const el = buildLineEl(entry, idx, isCurrent);
+  scroller.appendChild(el);
+  lineEls.push(el);
+ });
+ // auto scroll to current
+ requestAnimationFrame(()=>{
+  const cur = lineEls[currentLineIdx];
+  if(cur){
+   cur.scrollIntoView({block:'nearest', behavior:'smooth'});
+  } else {
+   scroller.scrollTo({top: scroller.scrollHeight, behavior:'smooth'});
+  }
+ });
+ // update stats
+ totalWords = streamedLines.reduce((n,e)=> n + e.words.length, 0);
+ document.getElementById('wordsStat').textContent = `${totalWords} words`;
+ // confidence overall average of current line or last?
+ const cur = streamedLines[currentLineIdx];
+ if(cur) document.getElementById('confidenceVal').textContent = `${cur.confidence}%`;
+}
+
+function initTranscript(){
+ streamedLines = [];
+ currentLineIdx = -1;
+ currentWordIdx = 0;
+ elapsedSec = 0;
+ document.getElementById('timerText').textContent = fmtTimer(0);
+ totalWords = 0;
+ // we start streaming after short delay
+}
+
+function startNextLine(){
+ if(isPaused || edgeState!=='normal' || isMuted && false) return; // muted still streams but wave muted; we keep streaming unless paused
+ if(isPaused) return;
+ currentLineIdx++;
+ if(currentLineIdx >= SCRIPT.length){
+  // loop by appending new synthesized line or restart
+  // add a follow-up synthesis to keep feeling live
+  const extra = [
+   {speaker:'YOU', text:'That highlight on the current line makes it glanceable at arm’s length.'},
+   {speaker:'MARA', text:'Exactly — one focal element, timer, and glass that reads over the world.'},
+  ];
+  const pick = extra[Math.floor(Math.random()*extra.length)];
+  SCRIPT.push(pick);
+ }
+ const src = SCRIPT[currentLineIdx];
+ const entry = {
+  speaker: src.speaker,
+  words: src.text.split(' '),
+  revealed: 0,
+  timeStr: fmtTime(new Date()),
+  confidence: 92 + Math.floor(Math.random()*6),
+ };
+ streamedLines.push(entry);
+ // keep last 6 lines max for 600x600 readability (avoid overflow)
+ if(streamedLines.length>6){
+  streamedLines.shift();
+  currentLineIdx = streamedLines.length-1;
+ }
+ renderAll();
+ // after line element rise-in, start word reveal
+ revealWordsStep();
+}
+
+function revealWordsStep(){
+ if(isPaused || edgeState!=='normal'){
+  // retry after pause
+  if(edgeState==='normal' && !isPaused){
+   const t = setTimeout(revealWordsStep, 120);
+   streamTimers.push(t);
+  }
+  return;
+ }
+ const entry = streamedLines[currentLineIdx];
+ if(!entry) return;
+ if(entry.revealed < entry.words.length){
+  entry.revealed++;
+  renderAll();
+  // haptic-like wave jitter
+  jitterWaveform(entry.revealed);
+  const delay = entry.revealed===1 ? 180 : 72 + Math.random()*34;
+  const t = setTimeout(revealWordsStep, delay);
+  streamTimers.push(t);
+ } else {
+  // line done — pause briefly then next line
+  const t = setTimeout(()=>{
+   startNextLine();
+  }, 900);
+  streamTimers.push(t);
+ }
+}
+
+function jitterWaveform(progress){
+ if(isPaused || isMuted) return;
+ [...waveform.children].forEach((bar,i)=>{
+  const base = 8 + (i%4)*5;
+  const lift = Math.sin((progress*0.35 + i)*1.1)*6;
+  const rnd = Math.random()*4;
+  const h = Math.max(6, base + lift + rnd);
+  bar.style.height = `${h}px`;
+  bar.style.setProperty('--h', `${h}px`);
+ });
+}
+
+function stopStreaming(){
+ streamTimers.forEach(t=> clearTimeout(t));
+ streamTimers=[];
+}
+
+function startStreaming(){
+ stopStreaming();
+ if(edgeState!=='normal') return;
+ if(streamedLines.length===0){
+  const t = setTimeout(startNextLine, 420);
+  streamTimers.push(t);
+ } else {
+  revealWordsStep();
+ }
+}
+
+// waveform voice interval when live and not paused/muted
+let waveInterval=null;
+function startWaveIdle(){
+ stopWaveIdle();
+ waveInterval=setInterval(()=>{
+  if(isPaused || isMuted || edgeState!=='normal'){
+   return;
+  }
+  [...waveform.children].forEach(bar=>{
+   const h = 6 + Math.random()*16;
+   bar.style.height = `${h}px`;
+  });
+ }, 130);
+}
+function stopWaveIdle(){ if(waveInterval){ clearInterval(waveInterval); waveInterval=null; } }
+
+function updateLivePill(){
+ const dot = livePill.querySelector('.dot-live');
+ dot.className='dot-live';
+ if(edgeState==='offline'){ dot.classList.add('offline'); livePill.querySelector('#badgeLang').textContent = LANGUAGES[currentLangIdx]; }
+ else if(edgeState==='permission'){ dot.classList.add('offline'); }
+ else if(edgeState==='error'){ dot.style.background='var(--danger)'; dot.style.boxShadow='0 0 8px rgba(255,93,93,0.5)'; }
+ else {
+  if(isPaused) dot.classList.add('paused');
+  else if(isMuted) dot.classList.add('muted');
+ }
+ // timer pill paused state
+ const tp = document.getElementById('timerPill');
+ tp.classList.toggle('paused', isPaused);
+}
+
+function updatePauseBtn(){
+ if(isPaused){
+  pauseBtn.classList.remove('primary');
+  pauseBtn.classList.add('active');
+  pauseBtn.setAttribute('aria-label','Resume captions');
+  pauseBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 6.2l10 5.8-10 5.8V6.2z" fill="currentColor"/></svg>`;
+  waveform.className='waveform paused';
+ } else {
+  pauseBtn.classList.add('primary');
+  pauseBtn.classList.remove('active');
+  pauseBtn.setAttribute('aria-label','Pause captions');
+  pauseBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="7" y="5.5" width="3.2" height="13" rx="1.2" fill="#051423"/><rect x="13.8" y="5.5" width="3.2" height="13" rx="1.2" fill="#051423"/></svg>`;
+  waveform.className= isMuted ? 'waveform muted' : 'waveform streaming';
+ }
+ updateLivePill();
+}
+
+function updateMuteBtn(){
+ if(isMuted){
+  muteBtn.classList.add('danger');
+  muteBtn.setAttribute('aria-label','Unmute microphone');
+  muteBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="4.5" width="6" height="11" rx="3" stroke="#ffb3b3" stroke-width="1.6"/><path d="M7 11a5 5 0 0010 0" stroke="#ffb3b3" stroke-width="1.35" stroke-linecap="round"/><path d="M3 3l18 18" stroke="#ff5d5d" stroke-width="1.7" stroke-linecap="round"/><path d="M12 15.5v3" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M9.5 18.5h5" stroke="white" stroke-width="1.45" stroke-linecap="round"/></svg>`;
+  waveform.className='waveform muted';
+ } else {
+  muteBtn.classList.remove('danger');
+  muteBtn.setAttribute('aria-label','Mute microphone');
+  muteBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="4.5" width="6" height="11" rx="3" stroke="white" stroke-width="1.6"/><path d="M7 11a5 5 0 0010 0" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M12 15.5v3" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M9.5 18.5h5" stroke="white" stroke-width="1.45" stroke-linecap="round"/></svg>`;
+  waveform.className = isPaused ? 'waveform paused' : 'waveform streaming';
+ }
+ updateLivePill();
+}
+
+// interactions
+muteBtn.addEventListener('click', ()=>{
+ if(edgeState!=='normal'){
+  if(edgeState==='permission'){
+   os.banner('<strong>Microphone blocked</strong><span class="caption">Allow access to unmute</span>',{timeout:1800});
+  } else {
+   os.banner('<strong>Captions paused</strong><span class="caption">unavailable in this state</span>',{timeout:1600});
+  }
+  return;
+ }
+ isMuted=!isMuted;
+ updateMuteBtn();
+ os.banner(isMuted ? '<strong>Microphone muted</strong><span class="caption">waveform paused · still on-device</span>' : '<strong>Microphone on</strong><span class="caption">live captions resumed</span>',{timeout:1800});
+ if(!isMuted && !isPaused){
+  // resume wave idle
+  startWaveIdle();
+ }
+});
+
+pauseBtn.addEventListener('click', ()=>{
+ if(edgeState!=='normal'){
+  os.banner('<strong>Captions unavailable</strong><span class="caption">retry when normal</span>',{timeout:1600});
+  return;
+ }
+ isPaused=!isPaused;
+ updatePauseBtn();
+ if(isPaused){
+  stopStreaming();
+  os.banner('<strong>Paused · 00:'+fmtTimer(elapsedSec).split(':')[1]+'</strong><span class="caption">captions frozen · tap resume</span>',{timeout:1800});
+  stopWaveIdle();
+ } else {
+  os.banner('<strong>Resumed · Live</strong><span class="caption">streaming word by word</span>',{timeout:1800});
+  startWaveIdle();
+  revealWordsStep();
+ }
+});
+
+langChip.addEventListener('click', ()=>{
+ if(edgeState!=='normal' && edgeState!=='offline'){
+  os.banner('<strong>Language locked</strong><span class="caption">unavailable in this state</span>',{timeout:1600});
+  return;
+ }
+ currentLangIdx = (currentLangIdx+1)%LANGUAGES.length;
+ const lang = LANGUAGES[currentLangIdx];
+ document.getElementById('badgeLang').textContent = lang;
+ document.getElementById('langChipLabel').textContent = lang;
+ langChip.setAttribute('aria-label', `Language ${lang}, tap to change`);
+ // subtle badge pulse
+ livePill.animate([{transform:'scale(0.98)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(0.32,0.72,0,1)'});
+ os.banner(`<strong>Language · ${lang}</strong><span class="caption">Live · on-device · switched</span>`,{timeout:1800});
+ // if switching language, maybe reset streaming text to show translation flavor? append a line
+ if(edgeState==='normal' && !isPaused){
+  // push a translated line teaser
+  const tease = lang==='Español' ? 'Cambiado a Español — transcripción en vivo.' : lang==='Français' ? 'Passé en Français — transcription en direct.' : lang==='日本語' ? '日本語に切り替え — ライブ文字起こし中。' : 'Switched to English — live transcription.';
+  const entry = {speaker:'MARA', words: tease.split(' '), revealed:0, timeStr: fmtTime(new Date()), confidence: 96};
+  // insert as next line after current finishes? For delight, show immediately as new line
+  streamedLines.push(entry);
+  if(streamedLines.length>6) streamedLines.shift();
+  currentLineIdx = streamedLines.length-1;
+  entry.revealed = 0;
+  renderAll();
+  stopStreaming();
+  // start revealing this teaser
+  const t = setTimeout(revealWordsStep, 120);
+  streamTimers.push(t);
+ }
+});
+
+copyBtn.addEventListener('click', ()=>{
+ const text = streamedLines.map(e=> `${e.speaker}: ${e.words.join(' ')}`).join('\n');
+ if(!text.trim()){
+  os.banner('<strong>Nothing to copy</strong><span class="caption">no captions yet</span>',{timeout:1600});
+  return;
+ }
+ // try clipboard, but fallback to banner
+ if(navigator.clipboard){
+  navigator.clipboard.writeText(text).then(()=>{
+   os.banner('<strong>Copied transcript</strong><span class="caption">on-device · private</span>',{timeout:1800});
+  }).catch(()=>{
+   os.banner('<strong>Transcript ready</strong><span class="caption">copy stub · kept on device</span>',{timeout:1800});
+  });
+ } else {
+  os.banner('<strong>Transcript ready</strong><span class="caption">copy stub · kept on device</span>',{timeout:1800});
+ }
+ copyBtn.animate([{transform:'scale(0.96)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(0.32,0.72,0,1)'});
+});
+clearBtn.addEventListener('click', ()=>{
+ if(streamedLines.length===0){
+  os.banner('<strong>Already clear</strong><span class="caption">no captions to clear</span>',{timeout:1400});
+  return;
+ }
+ streamedLines=[];
+ currentLineIdx=-1;
+ renderAll();
+ os.banner('<strong>Cleared</strong><span class="caption">transcript reset · live continues</span>',{timeout:1800});
+ // restart after clear if not paused
+ if(!isPaused && edgeState==='normal'){
+  stopStreaming();
+  const t=setTimeout(startNextLine, 600);
+  streamTimers.push(t);
+ }
+});
+
+// keyboard mirrors — Space = pause toggle when focused? Core already maps space to capture; we add Esc to resume? Use core bus
+os.on('capture', ()=>{
+ // capture button acts as pause/resume in this demo when normal
+ if(edgeState==='normal'){
+  pauseBtn.click();
+ }
+});
+stage.addEventListener('keydown', (e)=>{
+ if(e.key==='ArrowDown') scroller.scrollBy({top:60, behavior:'smooth'});
+ if(e.key==='ArrowUp') scroller.scrollBy({top:-60, behavior:'smooth'});
+});
+
+// edge states
+function setEdge(id){
+ edgeState=id;
+ edgeRow.querySelectorAll('.chip').forEach(c=> c.classList.toggle('active', c.dataset.state===id));
+ // reset streaming timers when leaving normal
+ if(id!=='normal'){
+  stopStreaming();
+  stopTimer();
+  stopWaveIdle();
+  isPaused=false;
+  // update visuals to paused/idle
+ } else {
+  // restore normal
+  viewport.style.display='flex';
+  viewport.style.opacity='';
+  viewport.style.filter='';
+  viewport.style.pointerEvents='';
+  stateLayer.className='state-layer';
+  stateLayer.innerHTML='';
+  stateLayer.style.display='none';
+  // reset mute/pause states? keep mute, but reset paused
+  isPaused=false;
+  updatePauseBtn();
+  updateMuteBtn();
+  updateLivePill();
+  if(streamedLines.length===0) initTranscript();
+  startTimer();
+  startWaveIdle();
+  startStreaming();
+  return;
+ }
+
+ stateLayer.className='state-layer';
+ stateLayer.innerHTML='';
+ stateLayer.style.display='';
+ viewport.style.display='';
+ viewport.style.opacity='';
+ viewport.style.filter='';
+ viewport.style.pointerEvents='';
+
+ if(id==='loading'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:10px">
+    <div style="display:flex;align-items:center;gap:8px;opacity:0.9">
+     <div class="skeleton" style="width:146px;height:28px;border-radius:999px"></div>
+     <div class="skeleton" style="width:72px;height:28px;border-radius:999px"></div>
+     <div class="skeleton" style="width:96px;height:28px;border-radius:999px;margin-left:auto"></div>
+    </div>
+    <div class="skeleton" style="width:100%;height:18px;border-radius:12px;opacity:0.0"></div>
+    <div class="skel-list">
+     ${Array(3).fill(0).map((_,i)=>`
+      <div style="background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:16px;padding:12px;display:grid;gap:10px;opacity:${1 - i*0.14}">
+       <div style="display:flex;gap:8px;align-items:center">
+        <div class="skeleton" style="width:52px;height:22px;border-radius:999px"></div>
+        <div class="skeleton" style="width:64px;height:10px;border-radius:6px;margin-left:auto"></div>
+       </div>
+       <div class="skeleton sk-line" style="width:92%;height:11px"></div>
+       <div class="skeleton sk-line" style="width:78%;height:11px"></div>
+       <div class="skeleton sk-line" style="width:62%;height:10px;opacity:0.9"></div>
+       <div style="display:flex;gap:6px;margin-top:2px"><div class="skeleton" style="width:68px;height:3px;border-radius:999px"></div><div class="skeleton" style="width:48px;height:10px;border-radius:6px"></div></div>
+      </div>
+     `).join('')}
+    </div>
+    <div style="background:var(--mat-raised);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);outline:1px solid var(--stroke-glass);border-radius:18px;padding:12px;display:grid;gap:10px;opacity:0.92">
+     <div style="display:flex;gap:8px;align-items:center">
+      <div style="flex:1;display:flex;gap:3px;align-items:center">
+       ${Array(12).fill(0).map((_,i)=>`<span class="skeleton" style="width:3px;height:${8 + (i%4)*4}px;border-radius:999px;display:inline-block"></span>`).join('')}
+      </div>
+      <div class="skeleton" style="width:36px;height:36px;border-radius:999px"></div>
+      <div class="skeleton" style="width:36px;height:36px;border-radius:999px"></div>
+     </div>
+     <div style="display:flex;gap:8px"><div class="skeleton" style="width:92px;height:22px;border-radius:999px"></div><div class="skeleton" style="width:72px;height:22px;border-radius:999px"></div><div style="flex:1"></div><div class="skeleton" style="width:54px;height:26px;border-radius:999px"></div><div class="skeleton" style="width:52px;height:26px;border-radius:999px"></div></div>
+    </div>
+    <div class="caption" style="text-align:center;color:var(--ink-40);display:flex;align-items:center;justify-content:center;gap:6px"><span class="dot ok" style="width:6px;height:6px;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5)"></span>Loading · shimmer 1.2s · on-device engine</div>
+   </div>
+  `;
+  return;
+ }
+ if(id==='empty'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:12px;justify-items:center;padding:18px 0 0 0">
+    <div class="state-card">
+     <div class="state-illus" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="9" y="5" width="6" height="11" rx="3" stroke="white" stroke-opacity="0.92" stroke-width="1.6"/><path d="M7 11.2a5 5 0 0010 0" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M12 16v2.6" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M9.6 19.2h4.8" stroke="white" stroke-width="1.45" stroke-linecap="round"/><circle cx="12" cy="9.6" r="1.4" fill="white" fill-opacity="0.92"/><path d="M8 7.2l2 1.8 2-1.4 2 1.4 2-1.8" stroke="white" stroke-opacity="0.22" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+     </div>
+     <div class="state-title">No captions yet</div>
+     <div class="state-body">Start speaking and your words will stream here — word by word, on-device. Prism keeps audio private and shows MARA and YOU with a live highlight.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Start live captions">Start captions</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="See how captions work">How it works</button>
+     </div>
+     <p class="caption" style="color:var(--ink-40);font-size:11px">Humane empty · nothing recorded until you start</p>
+    </div>
+    <div style="width:100%;max-width:420px;background:rgba(255,255,255,0.04);outline:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;justify-content:center">
+     <span class="dot ok" style="width:7px;height:7px;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5)"></span>
+     <span style="font-size:11px;font-weight:600;color:var(--ink-60)">On-device · Live · English</span>
+     <span class="caption" style="margin-left:auto">waveform idle</span>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    const t=b.textContent.trim();
+    if(t.includes('Start')){
+     b.textContent='Starting…';
+     setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Listening · English</strong><span class="caption">say something to see blur wipe</span>',{timeout:1800}); }, 700);
+    } else {
+     os.banner('<strong>Captions stream on-device</strong><span class="caption">word-by-word · MARA / YOU timer</span>',{timeout:2000});
+    }
+   });
+  });
+  return;
+ }
+ if(id==='error'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:10px;justify-items:center;padding:18px 0 0 0">
+    <div class="state-card" style="animation: sheet-in 320ms var(--ease-prism)">
+     <div class="state-illus danger" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.6L21.2 18.8H2.8L12 3.6z" stroke="#ff8a8a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.6v4.4" stroke="#ffb3b3" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.9" r="1.25" fill="#ffb3b3"/></svg>
+     </div>
+     <div class="state-title">Captions unavailable</div>
+     <div class="state-body">Live captions hit a hiccup starting the on-device engine. Your audio never left the device — try again. No dead ends.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Retry live captions" id="retryBtn">Retry</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Dismiss error">Dismiss</button>
+     </div>
+     <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;width:100%;justify-content:center;position:relative">
+      <span class="dot bad" aria-hidden="true"></span><span class="caption " style="color:var(--ink-60)">PR-CAP-503 · ${fmtTime(new Date())}</span><span class="caption" style="margin-left:auto;color:var(--ink-40)">tap Retry</span>
+     </div>
+     <p class="caption" style="color:var(--ink-40);position:relative">On-device fallback stays ready.</p>
+    </div>
+   </div>
+  `;
+  const retryBtn = stateLayer.querySelector('#retryBtn');
+  retryBtn.addEventListener('click', ()=>{
+   retryBtn.textContent='Retrying…';
+   retryBtn.setAttribute('disabled','true');
+   const card = stateLayer.querySelector('.state-card');
+   card.innerHTML = `<div style="display:grid;gap:10px;width:100%;justify-items:center;padding:8px 0"><div class="skeleton" style="width:64px;height:64px;border-radius:18px"></div><div class="skeleton" style="width:62%;height:16px;border-radius:8px"></div><div class="skeleton" style="width:78%;height:12px;border-radius:6px"></div><div class="skeleton" style="width:100%;height:56px;border-radius:12px;margin-top:6px"></div></div>`;
+   setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Captions restored</strong><span class="caption">PR-CAP-503 cleared · streaming</span>',{timeout:2000}); }, 1100);
+  });
+  stateLayer.querySelectorAll('button')[1].addEventListener('click', ()=> setEdge('normal'));
+  return;
+ }
+ if(id==='offline'){
+  viewport.style.display='flex';
+  viewport.style.opacity='0.52';
+  viewport.style.filter='blur(1px)';
+  viewport.style.pointerEvents='none';
+  stateLayer.classList.add('dim-on');
+  stateLayer.style.display='grid';
+  stateLayer.innerHTML = `
+   <div class="state-card" style="animation: rise-in 260ms var(--ease-prism)">
+    <div class="state-illus warn" aria-hidden="true">
+     <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3.6 9.6a9 9 0 0116.8 0" stroke="white" stroke-opacity="0.92" stroke-width="1.6" stroke-linecap="round"/><path d="M6.2 12.6a6 6 0 0111.6 0" stroke="white" stroke-opacity="0.82" stroke-width="1.6" stroke-linecap="round"/><path d="M9 15.6a2.8 2.8 0 016 0" stroke="white" stroke-opacity="0.78" stroke-width="1.6" stroke-linecap="round"/><path d="M2 2l20 20" stroke="#ffc247" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="18" r="1.15" fill="white"/></svg>
+    </div>
+    <div class="state-title">You’re offline</div>
+    <div class="state-body">Captions are queued on device and will resume streaming when you reconnect — nothing lost. Waveform pauses.</div>
+    <div class="queued-list">
+     <div class="queued-item">
+      <span class="dot warn" style="width:7px;height:7px;background:var(--warn);box-shadow:0 0 8px rgba(255,194,71,0.6)" aria-hidden="true"></span>
+      <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--ink-100)">MARA · “We’ll resume …”</div><div class="caption " style="color:var(--ink-60)">queued · 9:41 AM · on-device</div></div>
+      <span class="caption" style="background:rgba(255,194,71,0.14);outline:1px solid rgba(255,194,71,0.22);padding:4px 8px;border-radius:999px;font-weight:700;color:var(--warn)">Queued</span>
+     </div>
+     <div class="queued-item" style="opacity:0.82">
+      <span class="dot" style="width:7px;height:7px;background:var(--ink-20)" aria-hidden="true"></span>
+      <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--ink-80)">YOU · “Keep going …”</div><div class="caption " style="color:var(--ink-60)">queued · 9:40 AM</div></div>
+      <span class="caption">offline</span>
+     </div>
+    </div>
+    <div class="state-actions">
+     <button class="btn primary" data-focusable tabindex="0" aria-label="Retry when online">Retry when online</button>
+     <button class="btn" data-focusable tabindex="0" aria-label="Use on-device captions offline">Use on-device</button>
+    </div>
+    <p class="caption" style="color:var(--ink-40);position:relative">Queued segments keep times.</p>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   b.addEventListener('click', ()=>{
+    if(b.textContent.includes('Retry')){
+     b.textContent='Retrying…';
+     setTimeout(()=>{ os.banner('<strong>Still offline</strong><span class="caption">check link · queued</span>',{timeout:2000}); b.textContent='Retry when online'; }, 800);
+    } else {
+     setEdge('normal');
+     os.banner('<strong>On-device captions</strong><span class="caption">continuing without network</span>',{timeout:2000});
+    }
+   });
+  });
+  return;
+ }
+ if(id==='permission'){
+  viewport.style.display='none';
+  stateLayer.classList.add('on');
+  stateLayer.style.display='block';
+  stateLayer.innerHTML = `
+   <div style="display:grid;gap:10px;justify-items:center;padding:18px 0 0 0">
+    <div class="state-card">
+     <div class="state-illus" aria-hidden="true">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="9" y="5" width="6" height="11" rx="3" stroke="white" stroke-opacity="0.92" stroke-width="1.6"/><path d="M7 11.2a5 5 0 0010 0" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M12 16v2.6" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M9.6 19.2h4.8" stroke="white" stroke-width="1.45" stroke-linecap="round"/><path d="M3 3l18 18" stroke="#ff5d5d" stroke-width="1.7" stroke-linecap="round"/></svg>
+     </div>
+     <div class="state-title">Microphone blocked</div>
+     <div class="state-body">Prism needs mic access to generate live captions on-device. Your past transcript stays private on this glass — tap to allow.</div>
+     <div class="state-actions">
+      <button class="btn primary" data-focusable tabindex="0" aria-label="Allow microphone access">Allow microphone</button>
+      <button class="btn ghost" data-focusable tabindex="0" aria-label="Continue without microphone">Not now</button>
+     </div>
+     <p class="caption" style="color:var(--ink-40);position:relative">Settings → Privacy → Microphone → Prism</p>
+     <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px;width:100%;max-width:320px;justify-content:center;position:relative">
+      <span class="dot bad" aria-hidden="true"></span><span class="caption" style="color:var(--ink-60)">Mic denied · captions paused</span><span class="caption" style="margin-left:auto;color:var(--ink-40)">on-device</span>
+     </div>
+    </div>
+    <div style="width:100%;max-width:420px;background:rgba(255,255,255,0.04);outline:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;justify-content:center">
+     <span style="font-size:11px;font-weight:600;color:var(--ink-60)">Past transcript still readable</span>
+     <span class="caption" style="margin-left:auto">${streamedLines.length} lines</span>
+    </div>
+   </div>
+  `;
+  stateLayer.querySelectorAll('button').forEach(b=>{
+   const label=b.textContent.trim();
+   b.addEventListener('click', ()=>{
+    if(label.includes('Allow')){
+     b.textContent='Allowing…';
+     setTimeout(()=>{
+      setEdge('normal');
+      os.banner('<strong>Microphone allowed</strong><span class="caption">live captions resumed</span>',{timeout:2000});
+     }, 700);
+    } else {
+     setEdge('normal');
+     os.banner('<strong>Voice off</strong><span class="caption">captions remain paused</span>',{timeout:1800});
+    }
+   });
+  });
+  return;
+ }
+}
+window.__setCaptionsEdge = setEdge;
+
+// init
+initTranscript();
+startTimer();
+startWaveIdle();
+// delay to let stage paint
+setTimeout(()=> startStreaming(), 520);
+
+console.log('Prism Captions ready — 600x600');
+</script>
+</body>
+</html>
