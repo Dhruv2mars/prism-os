@@ -40,6 +40,7 @@ const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta n
     <span class="tab" style="color:#8b93a7;font-size:13px;font-variant-numeric:tabular-nums">${esc(P.updated)} UTC · wave ${P.wave}</span>
   </header>
   <p style="color:#8b93a7;margin:0 0 18px;font-size:14px">${esc(P.tagline)}</p>
+  <p style="margin:0 0 18px;font-size:13px"><a href="${esc(P.repo)}" style="color:#56b8ff;text-decoration:none;border-bottom:1px solid rgba(86,184,255,.4)">${esc(P.repo)}</a> · live demo served from <span class="tab" style="color:#8b93a7">/components/&lt;id&gt;/index.html</span></p>
   <div style="height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:26px">
     <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2f9dff,#56b8ff);transition:width .5s"></div>
   </div>

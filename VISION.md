@@ -1,5 +1,7 @@
 # Prism OS
 
+**The operating system for smart glasses.**
+
 A spatial operating system for monocular smart-glasses displays (Meta Ray-Ban Display class hardware), built as a high-fidelity browser simulator. Target quality bar: Apple visionOS and Meta Horizon OS. Not "inspired by" — competitive with.
 
 ## Hardware model (fixed)
