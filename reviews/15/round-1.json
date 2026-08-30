@@ -1,0 +1,153 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T06:46:12.788Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/15-hud/index.html",
+    "report": "reviews/probe-verify-15-hud/report.json",
+    "stage": "reviews/probe-verify-15-hud/stage.png",
+    "full": "reviews/probe-verify-15-hud/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 19,
+    "focusablesInStage": 13,
+    "focusablesInStageMax": 13,
+    "focusablesPerState": {
+      "normal": 13,
+      "loading": 0,
+      "empty": 2,
+      "error": 2,
+      "offline": 3,
+      "permission": 3
+    },
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Performance HUD",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 13,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 55,105-745,795 (690x690 at 2x, 600 logical), ctrlRow fixed bottom18 left50% translateX-50% gap13px first row 20px second row 52px wrap, .stage .dev-controls display none !important, stage.png + stage-normal2.png contain zero pill chrome; full.png shows chips only in outside gap 13px below stage, hasInside false, pos fixed bottom 18px",
+    "audit": {
+      "distinctSizesStage": [10, 11, 14, 44],
+      "distinctSizesCardNodes": [10, 11, 14, 44],
+      "distinctSizesHero": [10, 11, 14, 44],
+      "distinctMetricSizes": [10, 11, 14, 20],
+      "hasTabular": true,
+      "tabularCount": 25,
+      "tabularVariant": "tabular-nums",
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms (under 200ms floor)",
+      "durSlow": "380ms (over 320ms spec)",
+      "motionSample": "hero rise-in 260ms var(--ease-prism) both, metric rise-in 260ms 40/70/100/130 stagger, histo 260ms 160delay, sim 260ms 180delay, spark-poly transition d 260ms stroke 260ms opacity 260ms + drop-shadow, transform 260ms outline160 background160, barPulse 420ms var(--ease-prism) over 320, shimmerMove 1.4s ease-in-out infinite, shimmer 1.2s linear infinite (design-system skeleton), banner-in 380ms (over), dwell-ring 350ms linear, progress not present, hero/thermal/stress brightness flash 320/520 linear",
+      "scroll": "hud-viewport absolute inset44 0 0 0 flex col gap10 pad10 12 84 overflow-y auto contain scrollbar none; hero flex none stretch, grid 2x2 flex none, histo flex none, sim flex none, stage 600x600 overflow hidden, content 865h vs 600h requires scroll correct, viewport scrolls not page",
+      "materialSample": "stage background radial 120%90% at 50%14% rgba42,53,80 0.56->rgba20,26,40 0.72->rgba10,14,23 0.90 + wash 68%46% at 78%86% rgba86,184,255 0.09 over rgba6,10,16 0.76 synthetic, not live passthrough blur saturate1.6 rim light; hero var(--mat-raised) 160deg rgba28,38,54 0.88->rgba14,21,32 0.92 + backdrop saturate1.4 blur34px + outline1.5 rgba86,184,255 0.14 + shadow 18/44 + ::after radial 86,184,255 0.08 sheen, metric var(--mat-glass) blur22 stroke0.12, Horizon flat #1e1e1e 1px #333 no blur",
+      "focus": "totalFocusables 19 (6 dev chips outside fixed +13 in-stage at normal), in-stage 13: fpsSparkWrap scrubbable [data-focusable], 4 metric-card divs [data-focusable] tabindex0 role button, loadRow div + 2 seg Low/High aria-pressed, thermalRow div + thermalBtn 94w, battRow div + toggle switch aria-checked, stress-btn. At rest normal2-stage.png shows hero +4 metrics equal glass blur22 same stroke0.12 shadow12/28 no dim, histo 12 bars equal weight, sim 2 rows + toggle + stress all same chrome, no single hero dim 0.42 as visionOS, gaze-focus only transient scale1.01 + stroke-focus 2.5px bloom 22px on hover, not persistent. Probe gaze-stage.png shows metric hover subtle scale1.01 but 4 cards still equal. Vs ideal 3-4 focusables.",
+      "captureInteractions": "load Low/High seg click toggles aria-pressed + loadSub Low 90 target vs High 60 + fps jitter 58/90 + banner 1400ms (verified load-high-stage.png fps 62/60), thermal cycle Nominal->Warn->Bad via #thermalBtn 94w + thermalRow click cycles order nominal/warn/bad + heroDot dot-thermal ok/warn/bad + throttle-pill warn/bad or ok hidden + temp 38->52->68C + miniBars 3 headroom + banner 1600ms (thermal-warn/bad-stage.png verified Warn 52C Mild Bad 68C Active), battery drain toggle via #battRow/#battToggle aria-checked false->true + battRowSub Off82->On + bat История drain -0.42%/s 900ms interval + banner (batt-drain-stage.png On), stress #stressBtn disabled+ Stressed… 4200ms + hero flash brightness1.08 320ms + grid flash 0.96 520ms + fps drop ~28 + histo bad red + banner Recovered (stress-stage.png verified 28 FPS red), scrub fpsSpark crosshair hover -> line1px accent 0.9 +8dot bloom + tip tabular -age s (scrub-stage.png verified line at 50% + tip 87 FPS), keyboard Space os.on capture triggers stress, Tab cycles 13 focusables with gaze-focus 900ms",
+      "devLeaks": "statusbar span Performance · Live · tabular literal token visible 11/700 0.04em ink-60 at top 44h in every state (visible in normal2-stage.png 12:17 PM row), spark-axis last 30s · 86-91 FPS target 90 FPS · prism-ease 260ms leaks engineering easing string 10/600 0.06em ink-40, sim-head prism-ease · 260ms duplicate, empty Offline uses stale 2m ago · tabular literal, empty 600x600 stage · tabular pending literal, shimmer not leaked outside except design-system skeleton linear"
+    },
+    "captures": [
+      "/tmp/probe15/normal/full.png",
+      "/tmp/probe15/normal/stage.png",
+      "/tmp/probe15/normal2-stage.png",
+      "/tmp/probe15/normal2-full.png",
+      "/tmp/probe15/loading-stage.png",
+      "/tmp/probe15/loading-full.png",
+      "/tmp/probe15/empty-stage.png",
+      "/tmp/probe15/empty-full.png",
+      "/tmp/probe15/error-stage.png",
+      "/tmp/probe15/error-full.png",
+      "/tmp/probe15/offline-stage.png",
+      "/tmp/probe15/offline-full.png",
+      "/tmp/probe15/permission-stage.png",
+      "/tmp/probe15/permission-full.png",
+      "/tmp/probe15/gaze-stage.png",
+      "/tmp/probe15/gaze-full.png",
+      "/tmp/probe15/scrub-stage.png",
+      "/tmp/probe15/thermal-warn-stage.png",
+      "/tmp/probe15/thermal-bad-stage.png",
+      "/tmp/probe15/load-high-stage.png",
+      "/tmp/probe15/batt-drain-stage.png",
+      "/tmp/probe15/stress-stage.png",
+      "/tmp/probe15/audit.json",
+      "reviews/probe-verify-15-hud/stage.png",
+      "reviews/probe-verify-15-hud/full.png",
+      "reviews/probe-verify-15-hud/report.json"
+    ],
+    "verification": "Fresh context, no builder notes read. Evidence = rendered output only. Probe via bun tools/probe.mjs http://localhost:4310/components/15-hud/index.html /tmp/probe15/normal (report 600x600 true, console0 pageErrors0 failedReqs0 focusable19 unlabeled0 subTen0 lowAlpha0 reducedMotion true) + deep playwright audit via evaluate + click of 6 .dev-controls .chip[data-state=normal/loading/empty/error/offline/permission] outside stage fixed gap13 no overlap each wait650ms + stage screenshot + evaluate viewport/stateLayer/display/tabular/motion/material/focus + interactions verified: thermal cycle 3 states nominal/warn/bad with throttle pill and miniBars, load Low->High 90->60 FPS, battery drain toggle On/Off -0.42%/s, stress 4200ms drop to 28 FPS histo red bad, scrub fpsSpark crosshair line+dot+tip tabular -s, Space capture stress, Tab 13 cycle. Chips outside stage fixed verified via evaluate. Blind side-by-side vs visionOS diagnostics and Horizon HUD as System A/B/C scored 1-10 per VISION 9 criteria, winners picked, only then revealed ours."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Diagnostics / Performance HUD (visionOS 26 Metrics overlay + Instruments spatial): Single centered glass HUD 420w anchored to world, not stage synthetic gradient — live passthrough blur saturate1.6 28-34px + rim light 0.05 + 2-layer depth shadow, stage scrims read as glass over world. Statusbar 44h time tabular 11/600 + battery 82% dot ok, no dev token. Hero is exactly one glass card var(--mat-raised) blur34 outline1px hairline 0.12 22r with FPS 44/800 -0.04em tabular as sole 44pt focal, p95 11/600 0.02em tabular + delta 10/700 uppercase as secondary, thermal dot 8 bloom 0.6 + label 11/700 0.10em uppercase Nominal, throttle pill hidden at ok (opacity0 translateY -4) not competing, spark 34h with 6 dashed grid 0.07 and scrub crosshair that reveals 11/700 tip -s only on gaze hover, axis single line last 30s · 86-91 FPS 11/600 0.06em tabular + target 90 FPS 11/700 no easing string. Metrics are 2 not 4 (Mem 20/800 + batt/thermal collapsed), each card 18r glass but non-hero dimmed to 0.42 until gaze, focus ring 2.5px stroke-focus 22px bloom persistent on hero only, others hidden. Histogram is 12 bars but height 40 not 52 with avg 11.1ms max 18.4ms mono legend only on detail tap, not always-on three legends. Sim controls hidden behind Developer toggle, not always-on sim-card with 5 rows crowding hero. Motion 260ms prism-ease 0.32,0.72,0,1 interruptible both, dwell ring 350ms linear 2px accent on scrub, no infinite shimmer, no barPulse beyond 320. Typography SF stack 3 sizes max per card 44/11/10 tabular only on numbers, no literal tabular or prism-ease strings. Glance <1s hero FPS -> p95 -> scrub.",
+    "System B": "Horizon OS Performance HUD (Quest 3 Horizon Monitor v74): Flat opaque panel #1e1e1e 12r 1px #2f2f2f border 0 8/16 shadow, no backdrop-filter, world flat #121212 charcoal no wash, stage opaque not scrim. Statusbar 44h opaque #0f0f0f Performance 14/700 white + time 12/500. HUD viewport 600x600 flat list: hero flat grey #2a2a2a 12r with FPS 32/700 white + FPS 12/600 grey, spark polyline flat #007aff 1.5px no drop-shadow, grid solid 1px #333 no dash, no scrub line/dot/tip, axis 10/600 flat grey target 90 FPS. Grid 2x2 flat cards 48h #2a2a2a 8r 1px #333, icons 22 flat tint no gradient, values 18/700, subs 11/500 ink 0.58 low, no sparks in cards or single spark none scrub. Histogram flat bars #007aff 4r with 12 equal flat height 40h, legend 10/600 flat grey with 3 dots flat blue/yellow/red. Sim controls flat seg Low/High 28h flat grey 11/600 with hard edge, thermal toggle flat grey, battery switch flat toggle grey, stress flat red #ff3b3b 36h linear, hintbar flat bottom 10/600 uppercase 0.32 ink + 2 phrases on one line. Motion linear 350-450ms slide + 400ms fade not prism-ease, not interruptible, shimmer not present, barPulse bounce abuse 500ms. Edge states: loading spinner + Loading... 14/500 centered no skeleton, error red text Something wrong flat + Retry grey, empty centered text No metrics flat, offline snackbar Offline queuing overlapping hintbar, permission system opaque dialog #1e1e1e with Allow/Not now. Focus 13+ equal flats no dim, weak 1px blue ring competes, glance needs ~2.8s, dwell none. Typography 4 equal weights 10/11/14/32 no tabular, no hierarchy.",
+    "System C": "Artifact under review (Prism 15-hud components/15-hud/index.html:1-1264): stage 600x600 stage background radial 120%90 at 50%14% rgba42,53,80 0.56->20,26,40 0.72->10,14,23 0.90 + wash 68%46% at 78%86% rgba86,184,255 0.09 over rgba6,10,16 0.76 synthetic not live world; stage-shell 600 grid place-items center. Statusbar 44h Performance · Live · tabular 11/700 0.04em ink-60 literal token visible every state + time tabular + dot ok + battery 82%. Viewport hud-viewport inset44 0 0 0 flex col gap10 pad10 12 84 auto 865h vs 600 requires scroll. Hero hero-card 22r var(--mat-raised) blur34 outline1.5 rgba86,184,255 0.14 shadow18/44 + ::after radial 86,184,255 0.08 sheen: top Thermal · Nominal 11/700 0.10em + throttle-pill ok hidden opacity0 vs warn/bad Mild/Active 10/800 0.06em, main 44/800 -0.04em FPS tabular + unit 14/700 0.06em ink-40 + p95 11/600 tabular 11.1ms frame p95 13.2ms + delta 10/700 good/warn/bad · stable 90 Hz, spark-wrap 34h rgba255,255,255 0.04 outline0.06 10r + svg 100x34 poly 1.8 accent drop-shadow 0 0 6 + grid 6 dashed 0.07 + scrub line 1px accent0.9 8px bloom + dot 8 + tip 11/700 tabular -s + axis last 30s · 86-91 FPS tabular + target 90 FPS · prism-ease 260ms leak. Grid 2x2 metric-card 18r var(--mat-glass) blur22 stroke0.12 shadow12/28 + rise-in 260ms 40/70/100/130 stagger + gaze-focus scale1.01 bloom transient: Memory 20/800 tabular 412MB heap low + mini spark 26h, Battery 82% live drain off, Latency 18ms p95 glass 22ms, Thermal 39°C nominal + 3 miniBars 8+18v headroom glass. Histo histo-card 18r glass: head 11/700 uppercase + stats 10/600 tabular 11.1 avg 18.4 max + bars 12x 52h rgba86,184,255 0.18 + inner gradient blue/warn/red 4r + legend 10/600 uppercase 3 dots. Sim sim-card 18r glass: head Simulate 11/700 0.08em ink-40 + prism-ease 260ms leak + grid 2 + rows 14r 0.05 Load Low 90 target seg Low/High 11/700 26h 999r, Thermal Nominal 38C seg Nominal 94w dot ok, battRow + toggle 52x32 off + stress-btn 40h gradient red #ff7a7a->#ff3b3b 13/800 + hint stress drops 28 FPS 4s 11/600. Hintbar 12r rgba0,0,0 0.38 blur12 10/600 uppercase ink-60 strong 11/700: Scrub graph · dwell 350ms + Tab cycle · Space stress · 260 ms two phrases. State-layer 44 0 0 0 520 with normal flex vs loading 0.22 blur2 + on card skeleton 3x 12/10 32/22 + shimmerMove 1.4 infinite + Probe shimmer 1.2s, empty hidden viewport + card No metrics yet + 2 btns, error 0.28 blur1 danger 0.14/0.28 PR-PERF-503 +2 btns, offline dim-on 0.88 cached 2m offline cached from 2m ago + warn card + stale pill, permission 0.24 blur2 lock + Allow/Not now. Dev chrome 6 chips outside fixed bottom18 left50% 999r 8/12 rgba10,15,23 0.74 blur16 active gradient, no overlap verified gap13."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 10,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 10
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 4,
+      "motion": 5,
+      "typography": 5,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 5,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 5,
+      "typography": 4,
+      "edgeStates": 7,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 83,
+    "horizonOS": 44,
+    "ours": 52
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (83)",
+    "ours (52)",
+    "horizonOS (44)"
+  ],
+  "biggestGap": "Typography + Glanceability — leaked engineering tokens in user-facing strings: expected visionOS clean optical hierarchy (SF stack 3 sizes max per card 44/11/10, tabular-nums only on numbers via font-variant-numeric, no literal tokens). Got components/15-hud/index.html:416 statusbar innerHTML Performance · Live · tabular literal visible at 44h in every state (normal2-stage.png top 0-44px 11/700 0.04em ink-60) + :495 spark-axis target 90 FPS · prism-ease 260ms literal + :578 sim-head prism-ease · 260ms literal exposing cubic-bezier(0.32,0.72,0,1) implementation detail, forcing re-parse and breaking <1s glance. Distinct stage sizes 10,11,14,44 =4 vs spec 3 per card, hero mixes 44/14/11/10, metric mixes 20/11/10, horizon flat 4 sizes equal. Fix: remove all literal tabular and prism-ease strings, keep tabular via CSS only, keep axis as tabular 86-91 FPS + target 90 FPS 11/600/700.",
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 83/90, B=Horizon 44/90, C=ours 52/90: ours second overall, loses 9/9 criteria so not first or tied-first and gaps>0 => fail per VISION Critic protocol 5. Evidence = self-probed 2026-08-27T06:46:12Z via bun tools/probe.mjs + deep playwright evaluate + 22 captures (normal2/loading/empty/error/offline/permission + gaze/scrub/thermal-warn+bad/load-high/batt-drain/stress at 600x600 true, console0 pageErrors0 failedReqs0 focusable19 total 13 in-stage unlabeled0 subTen0 lowAlpha0 reducedMotion true, chipsOutsideStage true gap13 fixed bottom18 no overlap). Per-criterion: 1 Glance A9 B5 C5: A <1s hero 44 FPS -> p95 11ms -> scrub; C needs ~1.9s hero 44 + p95 11 + 10 delta + 4 metric cards 20/11 + histo 12 bars + sim 5 controls + axis leaks prism-ease + hintbar 2 phrases compete before reading FPS; leaked tokens force re-parse. 2 Focus A10 B5 C4 (worst besides typo): A exactly one hero bloom others dim 0.42 hairline 56; C 13 equal glasses same blur22 stroke0.12 none dimmed, probe gaze-stage.png shows 4 metric cards same weight, hero not isolated, gaze-focus only scale1.01 transient not persistent. 3 Material A9 B4 C6: C honors tokens mat-raised blur34 mat-glass blur22 stroke0.12 sheen but world synthetic gradient 0.76 not live passthrough saturate1.6 rim; Horizon opaque. 4 Motion A9 B5 C5: C prism-ease 0.32,0.72,0,1 durBase260 ok but durSlow380 over 320 + barPulse420 over + shimmerMove1.4 infinite + shimmer1.2 linear infinite in loading decorative not interruptible, Horizon linear350-500 bounce. 5 Typography A9 B5 C4 (biggestGap): literal tabular + prism-ease leaks +4 sizes vs 3 spec as above vs Horizon 4 equal. 6 Edge A9 B5 C7: C ships 5 states glass rise-in (loading skeleton shimmer 1.4, empty start sampling 2btns, error PR-PERF-503 danger 0.14, offline dim-on cached 2m stale+Retry, permission Allow) not defaulted but loading infinite over spec. 7 Depend A9 B6 C7: all retries recover (error Retry->normal View cached->offline, offline Use cached->normal, permission Allow/Not now, empty Sampling700ms, stress disabled state) but no aria-live on stress. 8 Access A9 B5 C6: tabular 25 els, reducedMotion true, lowAlpha0 subTen0 dwell350 hintbar 10/600 but hintbar 10px 0.42 2 phrases cramped + tab vs scrub competing. 9 Delight A10 B4 C6: scrub line1px accent0.9 +8dot bloom + tip -s earned, thermal miniBars 3 headroom, stress brightness flash 320ms earned but hint leaks dilute; Horizon none.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (52 vs 83), 9/9 criteria lost, verdict fail."
+}

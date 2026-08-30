@@ -1,0 +1,145 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T06:26:53.962Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/11-settings/index.html",
+    "report": "reviews/probe-verify-11-settings/report.json",
+    "stage": "reviews/probe-verify-11-settings/stage.png",
+    "full": "reviews/probe-verify-11-settings/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 36,
+    "focusablesInStage": 30,
+    "unlabeledIconButtons": [],
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Settings",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 13,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 55,105-745,795 (690x690 at 2x, 600 logical 600x600), ctrl 200,808-600,882 (400x74), gap 13px, overlap false, position fixed bottom 18px left50% translateX-50%, .stage .dev-controls display none !important, stage.png + stage-normal.png contain zero pill chrome; full.png shows chips only in outside gap 13px below stage. Probe via bun tools/probe.mjs http://localhost:4310/components/11-settings/index.html (stage 600x600 true, console 0 pageErrors 0 failedReqs 0 focusable36 unlabeled0 subTen0 lowAlpha0 reducedMotion true). Edge states via playwright click of .dev-controls .chip[data-state] each then wait 700ms + stage screenshot. Detail sheets via click Display + Lens permissions rows + Escape.",
+    "audit": {
+      "distinctSizesStage": [10, 11, 13, 14, 16, 22],
+      "distinctSizesStageWithFractional": [10, 11, 13, 13.3333, 14, 16, 22],
+      "distinctSizesCardNodes": [11, 13, 14],
+      "hasTabular": true,
+      "tabularVariant": "tabular-nums",
+      "tabularLiteralLeaks": 4,
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms",
+      "durSlow": "300ms (sheet-in) + 380ms banner not present but sheet 300 near limit",
+      "motionSample": "set-header rise-in 260ms var(--ease-prism) both, search-wrap 260ms 30ms delay, .group rise-in 260ms 50/80/110/140/170ms stagger, group-card 18r + blur-glass + stroke-glass + shadow 12/28 + sheen ::after 0.04, set-row hover rgba255,255,255 0.04 160ms + active scale 0.99 260ms, gaze-focus rgba86,184,255 0.08 + outline 2px stroke-focus offset -2, slider thumb 22w 2px border shadow 0_2_8_rgba0,0,0,0.32 + 0_0_0_4_rgba86,184,255,0.12 active scale 1.06, detail-sheet sheet-in 300ms var(--ease-prism) translateY 36->0 scale 0.97->1 blur 8->0, close WAAPI 260ms translateY 0->18 scale 1->0.98 blur 0->6, shimmer 1.2s linear infinite, reducedMotion @media collapses to 0.01ms",
+      "scroll": "set-viewport absolute inset 44px 0 0 0 flex col gap10 pad 10 12 14 14 overflow-y auto overscroll contain scrollbar none, content sh 1392 ch 556 overflow 836px -> 2.5 viewports scroll, 5 groups (Optics 4 controls, Gestures 3, Privacy 3, Audio 3, System 3) = 16 rows + 3 inline sliders (Brightness 136h + Dwell 135h + Volume 135h), each group-card 18r with 2-4 rows stacked, hitbar fixed 12 12 12 bottom overlaps scroll",
+      "materialSample": "stage background radial 120%90% at 50%14% rgba42,53,80 0.56 -> rgba20,26,40 0.72 -> rgba10,14,23 0.90 + wash 68%46% at 78%86% rgba86,184,255 0.09 over rgba6,10,16 0.76 (opaque charcoal 0.76 not passthrough live), group-card var(--mat-glass) + backdrop saturate + blur-glass + outline 1px var(--stroke-glass) + shadow 0_12_28_rgba0,0,0,0.22 + card sheen none, row-icon 32w 10r 0.07 outline + accent gradients (accent->accent-strong blue, warm #ffb347->#ff7a1a, ok #4cd47c->#1a8a4a, purple #a58bff->#6a4bff, slate #2b3242->#161c28), slider track 6h 0.10 outline 0.06 + fill gradient accent + thumb 22w white + bloom 4px 0.12, hintbar rgba0,0,0 0.38 blur12 outline 0.06, detail-sheet var(--mat-sheet) blur-heavy shadow 0_-12_40_rgba0,0,0,0.32, preview-card var(--mat-glass) blur-glass 18r sheen 0.04 linear 180deg, preview-stage radial 120%90% at 50%20% rgba42,53,80 0.9 -> rgba20,26,40 0.96 -> rgba10,14,23 1 112h + glass 78% 64h var(--mat-glass) blur-glass",
+      "focus": "focusableCount 36 total (6 dev chips outside + 30 in-stage: hdr Reset + Done 28h, search-field 36h, Display nav, Brightness slider range 22w, Night Shift toggle 59x36, World dim toggle, Dwell range, Haptics toggle, Temple toggle, Lens nav, Mic toggle, Location toggle, Volume range, Mono toggle, Spatial toggle, About, Storage, Reset). At rest probe stage.png zero dimmed, 5 groups equal saliency same mat-glass+shadow, header primary Done gradient + Reset ghost competing, group heads count pills 10/700 tabular + line 1px 0.06 same weight across, slider thumbs 22px + rows 56-65h same card weight. Gaze not unmistakable: sweep 20 steps gave .gaze-focus rgba0.08 + outline 2px transient only on hover, no persistent halo idle, no dim others to 0.38. Tab order 30 stops to reach System Reset requires ~15 Tabs through 3 sliders + toggles each with row+toggle double focusables.",
+      "edgeStatesVerified": "normal (stage.png 5 groups 16 rows 3 sliders), loading skeleton 5 blocks shimmer 1.2s + 4 skeleton cards 156h 18r + caption, empty state-card 64 illu + No results + prism glass pill + Clear search / Show all, error danger triangle 28 + Can't load settings + Retry + Use cached + PR-SET-503, offline centered state-card queued 2 rows dim + No network · changes queued + Retry / Use offline, permission lock 28 + Permission needed + Allow access / Not now + Open Settings chip + System settings blocked, detail Display sheet (preview 112h brightness % + slider 8-100 + auto-bright toggle disabled track 0.42 + Appearance + Lens tint), detail Privacy sheet (3 apps Camera/Maps/Assistant toggles + Active pill), search empty inline card when no match with Try Optics etc",
+      "devChromeLeakTokens": [
+        "components/11-settings/index.html:709 `Prism OS 1.0 · <span class=\"tabular\">68%</span> brightness · tabular` literal",
+        "components/11-settings/index.html:775 `World scrim opacity · tabular` literal",
+        "components/11-settings/index.html:822 `Gaze hold to activate · tabular ms` literal",
+        "components/11-settings/index.html:890 `System · spatial mix · tabular` literal"
+      ]
+    },
+    "captures": [
+      "reviews/probe-verify-11-settings/stage.png",
+      "reviews/probe-verify-11-settings/full.png",
+      "reviews/probe-11-round1/stage.png",
+      "reviews/probe-11-round1/full.png",
+      "reviews/probe-11-round1/11-edge-normal.png",
+      "reviews/probe-11-round1/11-edge-loading.png",
+      "reviews/probe-11-round1/11-edge-empty.png",
+      "reviews/probe-11-round1/11-edge-error.png",
+      "reviews/probe-11-round1/11-edge-offline.png",
+      "reviews/probe-11-round1/11-edge-no-access.png",
+      "reviews/probe-11-round1/11-detail-display.png",
+      "reviews/probe-11-round1/11-detail-privacy.png"
+    ],
+    "verification": "Fresh context, no builder notes read. Probe via bun tools/probe.mjs http://localhost:4310/components/11-settings/index.html (reviews/probe-verify-11-settings/report.json stage 600x600 true, console0 pageErrors0 failedReqs0 focusable36 unlabeled0 subTen0 lowAlpha0 reducedMotion true, probedAt 2026-08-27T06:00:34.039Z + second 2026-08-27T06:26:53.962Z). Secondary playwright script exercised height overflow (sh 1392 ch 556), distinctSizes via getComputedStyle, tabular leaks via TreeWalker + innerText, focusables via [data-focusable],button,input, edge chips click each + detail sheets Display/Privacy + captures 10 screenshots at 800x900@2x, stageBottom gap 13 overlap false chips fixed outside verified."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Settings (visionOS 26 Settings, 600x600 spatial): Single column grouped table over live passthrough (saturate 1.6 blur 28-34 + rim light, not synthetic charcoal). Statusbar 44h time + battery + muted dot only, no subtitle duplication. Header 'Settings' 22/800 -0.03 SF Pro Display + subtitle single line 11/600 ink-60 with time tabular only via font-variant-numeric — never literal token string. Search field 36h 999r 14/400 placeholder ink-40 + single ⌘K 10/700 pill right, blur8 glass. Groups are 3-4 max visible at rest (Optics, Gestures, Privacy) with 18r cards saturate1.4 blur22 + stroke 0.12 + feathered shadow 12/28 + ::after sheen 0.04, each head single label 11/700 0.12em uppercase ink-60 + count 10/700 ink-40 + 1px line 0.06 — no pill competing. Rows 56h icon 32r 10r continuity 5.5 with muted 0.07 outline or single accent gradient per group, title 14/600 ink-100 + sub 11/400 ink-60 1-line, value 11/600 tabular accent 999r, chevron 20r 0.06 subtle only on nav rows, toggle 51x31 native switch with 2.5px focus ring. Exactly one slider per viewport focus: brightness or dwell, not three stacked (Brightness lives in Display detail, dwell in Gestures detail). At any moment exactly one row is focal: others dim to 0.42, focal scales 1.02 + 2.5px stroke-focus + 22px bloom + 350ms dwell prism-ease interruptible by look-away reverse 180ms. Tapping Display pushes detail sheet var(--mat-sheet) 0.82 blur34 sliding 260ms prism-ease over passthrough with header back 34 + Done gradient + preview 112h live scrim filter tied to actual world dim + single slider 6h fill accent + auto toggle that disables track to 0.42 without literal duplication. Scroll is not needed for glance: viewport gap10 + peek 2.5 cards with depth scale 0.96 + blur falloff, single exchange peeking. Motion all 260ms prism-ease, no infinite shimmer beyond loading skeleton 1.2s tied to fetch, reduced-motion collapses to 160ms crossfade. At arm's length <1s glance: title -> search -> first group label -> first row icon -> done. Typography 3 sizes per card max (22/14/11/10), SF Pro Text 0.01 tracking, tabular only via class. Edge states are native sheets over passthrough with one 64 illustration + one CTA. Delight is one earned moment: display brightness preview glass reflects actual world dim value no extra pulse.",
+    "System B": "Horizon OS settings (Quest 3 v74 Horizon Home Settings): Flat opaque panels #1e1e1e 12r, 1px #333 border, shadow 8px, no backdrop-filter, no glass, no sheen. Header 'Settings' 18/700 flat + right Reset flat grey 26h + Done flat blue 26h no gradient, subtitle 12/600 flat 'Prism OS 1.0 · 68% brightness'. Search 36h flat #2a2a2a 8r + magnifier flat, group heads flat uppercase 11/700 ink-60 + count pill flat grey 11/600 + line #333. Group cards flat opaque 12r with rows 56h icon 28r flat tint, title 14/600 flat, sub 11/400 flat 0.42 low contrast, value flat grey pill, chevron flat 16r arrow, toggle flat 44x26 grey track blue knob #3a8af0 flat no bloom. All 5 groups (Optics 4 + Gestures 3 + Privacy 3 + Audio 3 + System 3) same opaque weight, visible at once with 836px scroll no peeking, no dim. Three sliders stacked inline (Brightness + Dwell + Volume) same 6h track flat #333 fill flat blue thumb 20 flat circle no bloom. Tap Display opens opaque panel #252525 sliding linear 350ms with 20px bounce not prism-ease, not interruptible, preview block flat grey 100h + slider flat, appearance rows flat. Motion linear 350-500ms slide overshoot, no reduced-motion beyond instant cut, shimmer flat grey bars. Focus has 30+ equal cards + toggles + sliders competing, weak 1px blue ring on many elements not unmistakable, no halo bloom. Glance needs ~2.5s, typography 4 sizes flat no hierarchy, tabular via flat font but no literal leak. Edge states flat: loading three grey bars, empty centered text 'No results' 16/600 no illustration deep, error red text flat, offline snackbar 40h overlapping list, permission opaque dialog flat. No delight beyond flat.",
+    "System C": "Artifact under review (Prism 11-settings, components/11-settings/index.html:8-1169): 600x600 stage shell centered, stage background synthetic triple-radial 120%90% at 50%14% rgba42,53,80 0.56 -> rgba20,26,40 0.72 -> rgba10,14,23 0.90 + wash 68%46% at 78%86% rgba86,184,255 0.09 over rgba6,10,16 0.76 (opaque charcoal 0.76 not live passthrough). Statusbar 44h 'Settings · Prism' 11/700 0.04em ink-60 + battery 82% + green dot. Set-viewport absolute inset 44 0 0 0 flex col gap10 pad 10 12 14 14 overflow-y auto overscroll contain scrollbar none, sh 1392 ch 556 overflow 836. Header rise-in 260ms: title 22/800 -0.03 ink-100 'Settings' + subtitle 11/600 0.04em ink-60 'Prism OS 1.0 · 68% brightness · tabular' literal at 709-711 + header actions Reset 28h ghost 0.08 outline + Done 28h gradient accent->accent-strong 999r shadow 8/18. Search-wrap 260ms 30ms delay: search-field 36h 999r 13/500 ink-80 0.06 outline blur8 pl 34 'Search settings' ink-40 placeholder + sIcon 16 magnifier 0.7 + meta pill 22h 10/700 0.06em uppercase ink-60 '⌘K' 0.06. Groups 5x rise-in 50/80/110/140/170: head 11/700 0.12em uppercase ink-60 + count 10/700 0.06em uppercase ink-40 999r 0.06 + line 1px 0.06, card var(--mat-glass) blur-glass + stroke-glass + 18r + shadow 12/28 stacked. Optics 4 controls: Display nav 56h accent icon sun 32 10r gradient + title 'Display' 14/700 + sub 'Brightness · appearance · lens tint' 11/500 + value 68% accent 11/700 999r + chevron 20r + click opens detailSheet; Brightness slider-row 136h icon 32 10r + 'Brightness' 14/700 + sub 'World scrim opacity · tabular' literal at 775 + inline value 68% accent 999r + track 28h 6h 0.10 fill gradient accent 68% + range 22w thumb white bloom 4px 0.12 + minmax 'Dim' 'Bright' 10/700 0.06em uppercase ink-40; Night Shift 65h warm icon moon + toggle 59x36; World dim 65h icon optics + toggle. Gestures 3: Dwell slider-row 135h purple icon + 'Dwell time' + sub 'Gaze hold to activate · tabular ms' literal 822 + 350 ms tabular value + track 28h fill ((350-200)/300)*100% + minmax 200/500 + banner; Haptics 65h slate + toggle; Temple double-tap 65h + toggle. Privacy 3: Lens permissions nav 64h ok icon + '3 apps · Camera, Maps, Assistant' + Manage pill + chevron opens privacy sheet; Mic 65h mic icon + toggle; Location 65h loc icon + toggle. Audio 3 controls: Volume slider-row icon vol + 'Volume' + sub 'System · spatial mix · tabular' literal 890 + 72 value + track fill 72% + Mute/Max; Mono audio toggle; Spatial audio accent toggle. System 3: About 64h slate system icon + 'Prism OS 1.0 · 600×600 · 20° FOV' + 1.0 chevron; Storage + 12.4 GB; Reset destructive red 0.14 bg #ffb3b3. Hintbar absolute 12 12 12 12r rgba0,0,0 0.38 blur12 outline 0.06 10/600 0.06em uppercase ink-60 with strong 11/700 'Gaze dwell 350 ms' + dot accent bloom + 'Tab cycle · Esc back' two phrases. DetailSheet absolute inset 44 0 0 0 var(--mat-sheet) blur-heavy hidden then on sheet-in 300ms with header 52h border 0.07 back 34 0.08 + title 14/800 + sub 11/600 + Done gradient, scroll flex1 pad14 gap14, preview-card mat-glass 18r sheen 0.04 with preview-top 'Brightness' 11/700 0.08em + val 22/800 tabular 68% + preview-stage 112h radial scrim + glass 78% 64h 16r mat-glass blur-glass filter brightness(0.62 + b/100*0.54) + opacity 0.72 + b/100*0.28, sliderCard 18r sheet-card with slider 14pad + track opacity 0.42 when auto on + auto-row 52h sun icon + toggle + appearance rows + actions Reset/Apply 38h. Privacy sheet similar 3 toggle rows + intro card radial 0.08 + note caption 11 ink-40. StateLayer absolute inset 44 0 0 0 dim-on when edge active: loading 4 skeletons shimmer 1.2s + 156h blocks + 12/68/64/64 blocks; empty state-card 420w blur-heavy 24/18 pad radial 0.08 + illu 64 18r 0.06 + title 18/800 + body 13/500 + Clear search / Show all + caption 11 ink-40; error danger illu 64 warn 0.18 + Can't load + Retry/Use cached + PR-SET-503 11 tabular; offline dim 0.52 + No network + Retry/Use offline; permission lock + Permission needed + Allow access / Not now + Open Settings chip + System settings blocked 14r. Dev chrome 400x74 gap13 fixed outside no overlap verified."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 4,
+      "motion": 5,
+      "typography": 5,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 4,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 6,
+      "typography": 4,
+      "edgeStates": 7,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 5
+    }
+  },
+  "totals": {
+    "visionOS": 81,
+    "horizonOS": 44,
+    "ours": 47
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (81)",
+    "ours (47)",
+    "horizonOS (44)"
+  ],
+  "biggestGap": "Typography dev-token leak — literal string 'tabular' shipped as user-facing content in 4 subsystem labels: expected visionOS optical hierarchy (SF Pro Display 22/800 + Text 14/600 + 11/500 + 10/700, tabular variant via font-variant-numeric tabular-nums only, subtitle reads 'Prism OS 1.0 · 68% brightness' + time tabular, row sub reads 'World scrim opacity' never '· tabular'). Got components/11-settings/index.html:710 `subtitle.innerHTML = '... brightness · tabular'` renders 'brightness · tabular' visible reviews/probe-11-round1/stage.png top 199px; :775 `World scrim opacity · tabular` visible mid 408px; :822 `Gaze hold to activate · tabular ms` visible 718px; :890 `System · spatial mix · tabular` visible 1268px. visionOS would never ship variable names; forces ~1.6s re-parse (is 'tabular' a mode? filter?). Fix: delete all 4 literal ' · tabular'/' · tabular ms' strings, keep class=\"tabular\" for tabular-nums styling only, audit grep 'tabular' count 4 -> 0 literal, limit subtitle to 'Prism OS 1.0 · 68% brightness' + percent tabular-nums class.",
+  "gaps": {
+    "glanceability": "Expected <1s extraction: visionOS shows title + search + 3 groups peeking 2.5 cards depth 0.96 blur falloff, single exchange peeking, subtitle single line time tabular. Got dense infinite scroll: header 22 title + 11 pill 'Prism OS 1.0 · 68% brightness · tabular' literal duplicate + Reset/Done 28h competing + search 36h + ⌘K pill + 5 groups (Optics 4 + Gestures 3 + Privacy 3 + Audio 3 + System 3 =16 rows) stacked gap10 sh 1392 needs 836px scroll (2.5 viewports), each group head same 11/700 + count 10 tabular + line 0.06 no peeking, each card 18r same mat-glass intensity, 3 sliders inline (Brightness 136h + Dwell 135h + Volume 135h) stacked competing for glance. visionOS would peek 2.5 cards max with depth, not 5 full opaque stacks. Needs ~2.4s to find World dim toggle at 590px below fold. Fix: move 2 sliders into detail sheets (only detail keeps them), limit viewport to 3 groups max peeking + depth falloff, single primary Done only.",
+    "focusDiscipline": "Expected exactly one obvious focal element per moment with unmistakable halo (dot + 3px halo + 2.5px stroke-focus + 22px bloom + 350ms dwell prism-ease, others dim to 0.38): visionOS single hero row or single sheet. Got 36 focusables (30 in-stage + 6 dev chips outside) with 30-stop tab order: header Reset 61w + Done 57w + search-field 662w + Display nav 662w 64h + Brightness range 634w 32h nested inside slider-row focusable 662w (double focusable row+input), Night toggle 59x36 nested inside set-row focusable double, same for World dim, Dwell range nested inside slider-row double, Haptics/Temple/Mic/Location/Spatial/Mono toggles nested double, Lens nav, Volume nested double, About/Storage/Reset navs. At rest reviews/probe-11-round1/11-edge-normal.png zero elements dimmed, 5 cards equal mat-glass+blur22+shadow, +Done gradient same weight as value pills 11/700 accent, gaze-focus only via hover rgba0.08 + outline 2px transient not idle halo, sweep 20 steps gave no persistent bloom. Tab requires ~15 presses to reach System Reset at 1190px. Fix: remove [data-focusable] from slider-row containers (make only input focusable), remove row-level focusable where toggle present, dim non-focused groups to 0.42, make gaze-focus persistent bloom default dim others.",
+    "materialHonesty": "Expected scrim reads as glass over live world (saturate 1.6 blur28 rim light + feathered shadow 12/28 on passthrough, translucency 0.82): visionOS. Got stage synthetic triple-radial #060a10 0.76 wash (index.html:9-14) opaque charcoal, group-card mat-glass blur-glass reads as dark opaque panel 0.88-0.92 not translucent glass; no live world texture, wash adds 0.09 blue synthetic not depth. Detail sheet mat-sheet blur-heavy almost opaque 0.96 slides over same synthetic, not glass-over-world; preview-stage radial 0.9->1.0 opaque demo well built but glass opacity tied to brightness still sits on charcoal. Horizon flat #1e1e1e no blur at all. Fix: lower stage wash to 0.42, lower card opacity to 0.82, replace charcoal base with live world video if available, reduce shadow 24/56 to hairline + 18/44 only, keep preview glass 0.72->1.0 transition earned.",
+    "motion": "Expected 200-300ms prism-ease cubic-bezier(0.32,0.72,0,1) interruptible by look-away reverse 180ms, no infinite decorative cost: visionOS. Got rise-in 260ms correct for header/search/groups (50/80/110/140/170 stagger good), but sheet-in 300ms at upper limit borderline + close WAAPI 260ms correct + thumb active scale 1.06 160ms correct, yet group stagger creates 5 sequential pops 170ms total attention cost on first load, search-wrap 30ms delay adds layering but header + 5 groups = 6 sequential reveals vs visionOS 2-3 peeking max. Shimmer 1.2s linear infinite on loading skeletons acceptable tied to fetch but not interruptible, hintbar no dim. Overall acceptable but not interruptible stagger + sheet 300 near limit keeps from 9. Fix: clamp sheet to 260ms, collapse group stagger to 0/40/80 max 3 groups peeking, ensure all WAAPI with reverse on back, remove stagger after first paint.",
+    "typography": "Expected SF-Pro-class 3 sizes max per card (22/14/11/10), tabular-nums via class only, tracking -0.015: visionOS. Got 6 distinct sizes stage [10,11,13,14,16,22] vs spec 3 per card; card itself 11/700 head + 14/700 title + 11/500 sub + 11/700 value 999r + 10/700 minmax -> 4 sizes per card but 11 vs 14 diff 3px weak hierarchy at arm length (name 14 vs sub 11 barely distinct with 0.01 tracking). Literal 'tabular' leaks in 4 UI strings forces user to parse dev token as content (see biggestGap) at 710/775/822/890. Hintbar crams 2 phrases 10 uppercase 'Gaze dwell 350 ms · Tab cycle · Esc back' competing with header, group-count 10 tabular pill same visual as value pill competing. Horizon 4 sizes flat no leak but weak. Fix: see biggestGap delete literals, reduce sizes to 22/14/11/10 only, remove hintbar second phrase to one, group-count plain 10 without pill or move to aria.",
+    "edgeStates": "Expected all 6 states designed but humane copy without token leaks, single illustration + one CTA with safe recovery: visionOS. Got all 6 verified strong vs earlier waves: loading 4 skeletons shimmer + 156h blocks, empty state-card 64 illu 18r + 'No results' 18/800 + body 13/500 + Clear search / Show all + caption 11 ink-40 good, error danger triangle 28 + 'Can't load settings' + Retry -> banner 'Settings restored · PR-SET-503 cleared' + Use cached + code 11 tabular badge, offline dim 0.52 blur1 + queued 2 + Retry -> 'Still offline' banner + Use offline, permission lock + 'Permission needed' + Allow access -> 'Access granted' + Not now -> 'Continuing without access' + Open Settings chip + System settings blocked 14r, plus 2 detail sheets Display/Privacy + search inline empty with 'Try Optics, Gestures...' and Clear button — strongest piece but still leaks '· tabular' in empty subtitle when off? Not here, but offline/permission copy 'queued · tabular' not present unlike messages, yet hintbar persists over edge dim (should hide). VisionOS sheets have finer spacing + single CTA hierarchy. Score 7 vs 9.",
+    "dependability": "Expected any failure lands safe recoverable no dead ends, queued actions banner: visionOS. Got generally safe: empty Clear search -> setEdge normal + render, error Retry -> 'Retrying…' disabled then setEdge normal + banner restored, offline Retry -> 'Still offline' banner safe, permission Allow -> 'Access granted' banner normal, detail Display Apply -> closeSheet + banner 'Display saved · 68%' + render refresh, Reset -> 'Defaults restored' banner safe, search Esc clears. Gap: offline detail sheet open then edge Switch to offline dims viewport but sheet remains on with hidden hintbar opacity 0 (index.html:626) — sheet still interactive while offline banner says queued, tap Apply while offline still closes to normal via closeSheet render without queued banner mismatch. Also storage tap banner '12.4 GB · Gallery...' flat not actionable but safe. Horizon has more dead ends (filter empty no CTA). Score 6 vs 9.",
+    "accessibility": "Expected 44px min targets, AA contrast 4.5:1, reduced-motion, colorblind-safe, single focus order: visionOS 44-56, 2.5px ring, tabular-nums. Got unlabeled 0 good, reducedMotion true via @media 0.01ms, subTen 0, lowAlpha 0 per probe, hidden 0, title correct, focus-visible 2.5px stroke-focus correct on all. Gaps: hit targets fail 22w thumb <44 height (range 32h but thumb 22 circle), row-chevron 20r <24 min, hdr-chip 28h <32 recommended, hintbar 10px uppercase at bottom low contrast ink-60 on rgba0,0,0 0.38 outline 0.06 borderline AA, row-value 11/700 ink-60 on 0.06 outline borderline, tab order 36 foci requires ~15-18 Tabs to reach System Reset at 1190px (each row double focusable) — excessive stops, slider thumb focus ring not enlarged (2px offset vs spec 2.5), presence dot 6px same as warn. VisionOS passes all with 51x31 toggle + 22w thumb + 44 row. Score 5 vs 9.",
+    "delight": "Expected one earned signature moment serving function, not decorative infinite cost: visionOS subtle brightness preview + parallax world blur. Got preview stage 112h with filter brightness(0.62 + b/100*0.54) + glass opacity 0.72->1.0 tied to slider value (index.html:525-535) — earned, interactive, reflects actual world scrim opacity, updates live via input + auto mode dims track 0.42, good. But multiple competing group rise-ins 5 sequential + sheet-in 300 + shimmer infinite on loading not earned (decorative), plus 3 duplicate slider UI (inline + detail) attention cost. Reset destructive red icon + chevron red bloom earned but same red as error not distinct. Horizon flat no delight. Score 5 vs 9 because preview is closest to earned but burdened by duplicate inline sliders and literal token noise defeats polish."
+  },
+  "reason": "FAIL vs platform bar (VISION 9). Blind A/B/C revealed A=visionOS 81/90, B=HorizonOS 44/90, C=ours 47/90: ours second overall narrowly above Horizon, loses 9/9 criteria so not first or tied-first and gaps>0 => fail per VISION Critic protocol 5. Evidence = self-probed 2026-08-27T06:26:53.962Z via bun tools/probe.mjs (stage 600x600 true, console0 pageErrors0 failedReqs0 focusable36 unlabeled0 subTen0 lowAlpha0 reducedMotion true, chipsOutside true gap13 overlap false, stageChromeClean verified) + 10 captures (stage.png/full.png + 11-edge-normal/loading/empty/error/offline/no-access + 11-detail-display/privacy) at 800x900@2x. Per-criterion: Glance A9 B5 C4: A <1s peeking 2.5 cards; C needs ~2.4s dense 5 groups 16 rows 836 overflow 3 sliders. Focus A9 B5 C4: A exactly one focal dim 0.38 + bloom; C 36 focusables 30 in-stage nested slider-row double focusables zero dim no persistent halo. Material A9 B4 C6: C tokens correct but synthetic charcoal 0.76 not passthrough live. Motion A9 B5 C6: C correct ease 260 but 5 stagger pops + sheet 300 near limit + shimmer infinite. Typography A9 B5 C4: 6 sizes vs 3 spec + 4 literal tabular leaks (710,775,822,890) — see biggestGap. Edge A9 B5 C7: all 6 states designed strongest yet hintbar overlaps dim + duplicate inline. Dependability A9 B6 C6: offline sheet vs viewport mismatch. Accessibility A9 B5 C5: 22w thumb 20r chevron 28h chips <44, 36 tab stops, ink-60 borderline. Delight A9 B4 C5: brightness preview earned but burdened by duplicate sliders + token noise. Fix biggestGap single grep delete ' · tabular' 4 lines to remove literal.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (47 vs 81), 9/9 criteria lost, verdict fail."
+}

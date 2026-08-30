@@ -1,0 +1,89 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-26T13:39:12.053Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/02-home/index.html",
+    "report": "reviews/probe-02-home/report.json",
+    "stage": "reviews/probe-02-home/stage.png",
+    "stageSize": "600x600",
+    "focusableCount": 21,
+    "unlabeledIconButtons": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "reducedMotionSupport": true,
+    "edgeCaptures": [
+      "reviews/probe-02-home/stage-loading.png",
+      "reviews/probe-02-home/stage-empty.png",
+      "reviews/probe-02-home/stage-error.png",
+      "reviews/probe-02-home/stage-offline.png",
+      "reviews/probe-02-home/stage-permission.png",
+      "reviews/probe-02-home/stage-assistant.png",
+      "reviews/probe-02-home/stage-appsheet2.png"
+    ]
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Home (visionOS 2 grid + dock): Single hero moment — huge tabular time (44-52px) + one widget, ultra-sparse 3xN app grid with 3D icon parallax, strong translucent glass scrims over blurred passthrough, dock/spotlight search, zero developer chrome in stage, focus via head gaze gives one unmistakable magnified halo, motion 220ms cubic-bezier(0.32,0.72,0,1) interruptible.",
+    "System B": "Horizon OS Home (Quest): Dense shelf of flat opaque panels, small time in header, verbose labels, equal-weight cards with weak hierarchy, flat grey materials (no real translucency), linear 400-600ms spinner/loader, focus ring faint or duplicated across cards, edge states are afterthought spinners with no recovery CTAs.",
+    "System C": "Artifact under review (Prism 02-home): Split hero — left 48px timecard (7:09 + date + 'San Francisco · Lens 82%') + right 146px weather card (72° + 'Partly bright · AQI 32' + embedded event pill 'Standup · 9:30 AM'), 4x2 launcher grid (8 apps with 46px icons, 12px label + 10px sublabel), horizontal 'Recents' scroll (4-5 cards, 124x88px with badges NEW/LIVE/12s/TEXT, mask fade right), bottom-center blue orb (56px radial gradient) with hover hint. Permanent top debug toolbar of 6 pills overlays hero. All built with /os/shared/design-system.css tokens (var(--mat-glass), --blur-glass, --ease-prism, --dur-base 260ms). Edge states via chip switching."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 10,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 5,
+      "motion": 4,
+      "typography": 6,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 5,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 7,
+      "typography": 6,
+      "edgeStates": 8,
+      "dependability": 7,
+      "accessibility": 4,
+      "delight": 5
+    }
+  },
+  "totals": {
+    "visionOS": 82,
+    "horizonOS": 45,
+    "ours": 52
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": ["visionOS (82)", "ours (52)", "horizonOS (45)"],
+  "biggestGap": "Control chip toolbar occlusion + focus theft: expected visionOS Home has zero developer chrome inside the 600x600 stage — time/launcher/recents/dock occupy 100% of space, edge-state triggers live outside stage (simulator chrome). Got components/02-home/index.html:35-45 .ctrl-row {position:absolute; top:48px; left:12px; right:12px; z-index:700; display:flex; gap:6px; justify-content:flex-end} renders six 26px pills (Home/Loading/Empty/Error/Offline/No access) permanently over the top 26px of content. Evidence reviews/probe-02-home/stage.png: blue 'Home' pill clips the timecard's top radius, 'Offline' pill clips '72°' text, 'No access' clips weather card; same overlap in stage-empty.png, stage-error.png, stage-offline.png, stage-permission.png. Steals glanceability (6 extra foci before time) and breaks focus discipline (blue active pill competes with bottom orb and 48px time for primary focus). Fix: move debug controls out of stage or into collapsible dev drawer; never overlay hero at 12px inset.",
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 82/90, B=Horizon 45/90, C=ours 52/90: ours second overall, loses 9/9 criteria so not tied-first and gaps>0. System A (visionOS): silent sparse hero, one 48-52px tabular time, single focus halo with 1.05x magnify + blue stroke, true glass scrims (var(--mat-glass)+blur 22px over live passthrough), 220-260ms prism-ease interruptible, SF hierarchy 2-3 sizes/card, every edge state distinct with recovery, AAA contrast, earned orchid parallax delight. System B (Horizon): flat opaque shelves, equal-weight cards, linear 500ms+ spinners, 5-6px muted labels, no edge design. System C (artifact): spectacle but noisy. Per-criterion winners all A — 1 Glanceability A9 vs B5 vs C5: C time 48px/800 is glanceable but weather+calendar conflated in one 146px card (72°/Partly bright + Standup pill = two domains one container), 'San Francisco · Lens 82%' is not instantly meaningful, six debug pills overlay hero (see biggestGap), 10px sublabels ('2 unread'/'Lens'/'Nearby') below 1s threshold and 'Swipe to scroll →' 11px ink-60 is washed. 2 Focus discipline A9 vs B5 vs C4: C at rest has three primary attractors (blue 'Home' pill top, 48px time left, blue orb bottom 56px with glow) — no single obvious focal element; gaze-focus on .app-btn (scale 1.05 + stroke-focus) exists but faint vs A magnify; orb halo pulls eye even when not relevant. 3 Material honesty A9 vs B5 vs C6: C correctly uses var(--mat-glass)/--blur-glass/--stroke-glass per design-system.css:4-6 and cards have sheen gradients, but stage background is uniform dark radial (components/02-home/index.html:10-13) not live passthrough, so translucency reads as opaque charcoal (hero/launcher/recents cards look solid #111827), shadows heavy (0 18px 44px). 4 Motion A10 vs B4 vs C7 (closest): C mostly honors tokens — rise-in 260ms ease-prism hero 0ms, weather 60ms, launcher 110ms, orb 320ms; app-btn transitions 260ms/160ms with ease-prism (verified via computed styles) — but orb-wrap rise-in uses --dur-slow 380ms >320ms max per VISION.md:4, colon pulse 2.4s infinite decorative animation costs attention, and staggered reveals not interruptible as group. 5 Typography A9 vs B6 vs C6: C uses system SF stack per design-system.css, tabular numerals on time/wx-temp, but global uses 6 sizes (48/20/16/13/12/11/10) where 10px sublabels (app-sublabel, recent-sub, wx-next-sub) fail glance threshold; time row mixes 48px + 16px AM + 13px date = 3 sizes in one card (limit) and section-title LAUNCHER/RECENTS at 11px ink-40 is both tiny and low contrast. 6 Edge states A9 vs B5 vs C8 (best ours): C ships all 5 via window.__setHomeState: loading skeletons (sk-hero + sk-grid 8 tiles + 4 rects) matches hero geometry, empty 'No recents yet' with 72px icon + body + Take photo/Open Gallery + Space hint, error 'Can't load home' with red triangle + Retry/Dismiss + PR-HOME-503 pill, offline 'You're offline' with slash-wifi + Retry/Use offline + 'available offline' launcher, permission 'Permission needed' with lock + Allow/Not now + blocked pill — all designed not defaulted; deduction: debug pills still overlay each state, empty launcher opacity 0.42 is ambiguous (visible but disabled), error hides launcher entirely vs offline keeps it. 7 Dependability A9 vs B6 vs C7: C has recovery everywhere — error Retry -> loading 1.4s -> home+banner, empty Take photo -> home banner, offline Retry shows 'Still offline' banner/Use offline -> home, permission Allow -> home, app sheets Close/Esc, assistant Dismiss, capture Banner; no dead ends; deduped because banners auto-dismiss 1.8-3.2s with no undo/persist. 8 Accessibility A9 vs B5 vs C4 (worst): C has 21 focusables all aria-labeled, tabindex 0, aria-live on time, keyboard arrows swipe recents, Enter/Space activate, reduced-motion disables colon only (@media reduces only colon per components/02-home:607-609, not rise-ins/sheet-ins), but section-title LAUNCHER/RECENTS and app-sublabel use ink-40 rgba(255,255,255,0.42) on mat-glass ~1.9:1 contrast (WCAG AA fail 4.5:1), 10px sublabels fail scale, focus ring on app-btn is stroke-glass 1px not focus color until gaze (verified focus() gave outline 2px rgba white 0.12), colorblind accent blue is safe but warn/danger not used distinctively. 9 Delight A9 vs B4 vs C5: C orb (radial gradient #fff->#2f9dff->#0b5ed7 + 28px glow + gaze 1.08 scale + halo) is pleasant and functional (Hey Prism entry) but generic vs visionOS parallax icon; colon pulse is decorative not earned (costs attention, not functional), sweet recents mask fade and card sheens are nice but not signature. Evidence self-probed 2026-08-26T13:39:12Z (reviews/probe-02-home/report.json: stage 600x600, 0 errors, 21 focusables, reducedMotion true).",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (52 vs 82), 7 gaps >0, verdict fail."
+}

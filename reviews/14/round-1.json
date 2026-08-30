@@ -1,0 +1,146 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T06:42:45.244Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/14-onboarding/index.html",
+    "report": "reviews/probe-14-round1/report.json",
+    "stage": "reviews/probe-14-round1/stage.png",
+    "full": "reviews/probe-14-round1/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 17,
+    "focusablesInStage": 7,
+    "focusablesInStageMax": 13,
+    "focusablesPerStep": {
+      "s0_welcome": 7,
+      "s1_permissions": 13,
+      "s2_pair": 8,
+      "s3_calibration": 9,
+      "s4_done": 7
+    },
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Onboarding",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 45,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 100,100-700,700 (600x600 logical, 2x 1200), ctrlRow fixed bottom18 left50% translateX-50% gap 45px, .stage .dev-controls display none !important, stage.png + stage-normal.png + stage-s0..s4.png contain zero pill chrome; full.png shows chips only in outside gap 45px below stage",
+    "audit": {
+      "distinctSizesStage": [10, 11, 12, 13, 14, 16, 17, 19],
+      "distinctSizesCardNodes": [10, 11, 12, 13, 14, 16, 17, 19],
+      "distinctStepperSizes": [11, 13],
+      "hasTabular": true,
+      "tabularVariant": "tabular-nums",
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms (under 200ms floor)",
+      "durSlow": "380ms (over 320ms spec)",
+      "motionSample": "stepper rise-in 260ms var(--ease-prism) both, flow-card rise-in 260ms 50ms delay, step-view active sheet-in 380ms var(--ease-prism) both (over 320), bt-dot btPulse 1.4s var(--ease-prism) infinite, bt-dot.scanning btPulse 1.0s infinite, shutter 160ms transforms, shimmer 1.2s linear infinite, shimmerMove 1.4s ease-in-out infinite, banner-in 380ms (over), successPulse 520ms, dwell-ring 350ms linear, progressFill width 380ms, dot-step all 260ms",
+      "scroll": "onboard-viewport inset 44px 0 0 0, flex column gap10 padding 12 14 74 14, overflow-y auto overscroll contain scrollbar none; flow-card min-height 396 flex1, stage 600x600 overflow hidden, viewport scrolls not page, correct",
+      "materialSample": "stage background radial 120%90% at 50%14% rgba42,53,80 0.56->rgba20,26,40 0.72->rgba10,14,23 0.90 + wash 70%50% at 78%88% rgba86,184,255 0.09 over rgba6,10,16 0.76, no live passthrough blur; flow-card var(--mat-raised) linear 160deg rgba28,38,54 0.88->rgba14,21,32 0.92 + backdrop saturate1.4 blur22px + outline1.5px rgba86,184,255 0.14 + shadow 0 18/44 rgba0,0,0 0.34 + ::after radial 86,184,255 0.06 sheen, step-icon var(--mat-glass) blur22 + stroke0.12; not live world blur saturate1.6 rim light; Horizon flat #1e1e1e 1px #333 no blur",
+      "focus": "totalFocusables 17 (10 dev chips outside + 7 in-stage at welcome), per-step in-stage: s0 7 (5 dots 7px + Skip 11/600 + CTA 13/700), s1 13 (5 dots + 3 perm-row divs + 3 perm-allow 11/700 28h + Skip + CTA disabled 0/3), s2 8 (5 dots + Refresh 11/700 + Can’t find phone ghost 12/600 + CTA Pairing… disabled), s3 9 (5 dots + 3 targets 64r 1.01 outline + Continue disabled), s4 7 (5 dots + Review ghost + Enter Prism primary). At rest welcome stage-s0.png shows 4 competing foci: 5 dots equal 7 vs 20 active weight + step-icon 28r + illus 96h + title 19/800 + CTA 40h gradient, no dimming of non-hero, shutter halo opacity0 resting only gaze-focus scale1.04; perms view stage-s1.png worst: 3 perm-rows rgba255,255,255 0.05 14r + 36icon + 14title +11sub +28 Allow all same glass 0.06 blur illusion; gaze sweep 700ms to dots gives transient scale1.15 but not persistent single hero as visionOS bloom. Vs ideal 3-4 focusables.",
+      "captureInteractions": "welcome CTA Get started -> goTo(1) smooth scroll, Skip -> goTo(4) + banner Skipped setup, perms Allow toggles (3x 160ms scale 0.96) banner Allowed/Blocked +4 syncViews disabled CTA 0/3, perm-row click delegates to Allow, s1 CTA Continue gated if !camera -> setEdge permission else goTo2, pair Refresh regenerates 6-digit code tabular with 180ms scale + banner Code refreshed, Can’t find phone? -> setEdge offline, CTA Pairing… scanning-> found after 2600 timeout auto banner Phone paired + is-success pulse 520ms, found-> goTo3, failed/offline-> Retry scanning, calibration 3 targets click each adds done + 260ms scale + banner Calibration done + is-success then autoAdvance goTo4 after 900ms, CTA Calib disabled until 3/3, Done Enter Prism pulse 520ms + banner Welcome to Prism, Review->goTo0, back Esc -> setEdge normal or goTo-1, swipeleft advanced gated with banners Hold each dot / Allow permissions / Pairing required, swiperight back, Space capture clicks primary CTA of current step via os.on capture, dotsWrap tablist 5 dots clickable goTo(i) active 20w accent vs 7w idle, progressFill width (current+1)/5*100% 380ms"
+    },
+    "captures": [
+      "reviews/probe-14-round1/stage.png",
+      "reviews/probe-14-round1/full.png",
+      "reviews/probe-14-round1/stage-normal.png",
+      "reviews/probe-14-round1/full-normal.png",
+      "reviews/probe-14-round1/stage-s0.png",
+      "reviews/probe-14-round1/full-s0.png",
+      "reviews/probe-14-round1/stage-s1.png",
+      "reviews/probe-14-round1/full-s1.png",
+      "reviews/probe-14-round1/stage-s2.png",
+      "reviews/probe-14-round1/full-s2.png",
+      "reviews/probe-14-round1/stage-s3.png",
+      "reviews/probe-14-round1/full-s3.png",
+      "reviews/probe-14-round1/stage-s4.png",
+      "reviews/probe-14-round1/full-s4.png",
+      "reviews/probe-14-round1/stage-loading.png",
+      "reviews/probe-14-round1/full-loading.png",
+      "reviews/probe-14-round1/stage-error.png",
+      "reviews/probe-14-round1/full-error.png",
+      "reviews/probe-14-round1/stage-offline.png",
+      "reviews/probe-14-round1/full-offline.png",
+      "reviews/probe-14-round1/stage-permission.png",
+      "reviews/probe-14-round1/full-permission.png",
+      "reviews/probe-14-round1/audit.json"
+    ],
+    "verification": "Fresh context, no builder notes read. Probe via bun tools/probe.mjs http://localhost:4310/components/14-onboarding/index.html reviews/probe-14-round1 + deep audit via playwright evaluate + click of 10 .dev-controls .chip[data-state=normal/s0/s1/s2/s3/s4/loading/error/offline/permission] outside stage fixed gap45 no overlap each wait700ms + stage screenshot + evaluate viewport/stateLayer/display/tabular/motion/material/focus. Interactions verified: perms toggles, pairing auto 2600ms found + refresh, calibration 3 dots, done, swipeleft/swiperight, Esc back, Space capture, dots tablist. Chips outside stage fixed verified via evaluate. Blind side-by-side vs visionOS Setup and Horizon Onboarding as System A/B/C scored 1-10 per VISION 9 criteria, winners picked, only then revealed ours."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Setup (visionOS 26 / iOS 26 Onboarding spatial): Single centered glass sheet 420w 22r over true live passthrough (saturate 1.6 blur 28-34 + rim light 0.05), not synthetic gradient. Top meta is 11/700 0.04em ink-60 with live clock + battery 82% tabular, no dev chrome. Stepper is ultra-light: single 11/700 kicker Step 2 of 5 light weight + 13/700 title, progress is 2.5h hairline 0.08 track with accent gradient 0.9 opacity, dots are 6px idle 0.14 vs 18px active accent with 8px bloom, never 7 vs 20 harsh. Hero is exactly one glass card 396h var(--mat-raised) blur22 but over real world, with 64r illustration 68h subtle 0.04 fill + 1px hairline, title 20/800 -0.02em, body 13/500 1.45em ink-60 max 360w, note 11/600 0.01em single line. Primary CTA is single 44h pill accent gradient with 10/22 shadow, neighbors dimmed to 0.42 until gaze, skip is text 11/600 dim. Perms step uses 2 rows not 3, icons 28r not 36, titles 13/700 vs 14/700, rows 0.06 glass with 1.5x hover lift only near gaze, not always-on. Pair step: QR 96r not 112, code digits 15 tabular with 28x32 pill not 17/30x36, BT dot pulse 1.2s ease-out once not infinite 1.4s loop, searching status single pill 11/600. Calibration: 3 dots 56 not 64, hairline 1.2 + inner 4 white dot, dwell 350ms shows thin ring 1.4s linear that interrupts on look-away reverse 180ms, not always visible hint hold 350ms below. Motion 240-280ms prism-ease interruptible, shimmer none infinite, sheet-in 260 both. At arm's length <1s glance: stepper kicker -> title -> primary pill -> done. Exactly one bloom at rest.",
+    "System B": "Horizon OS Onboarding (Quest 3 Horizon Setup v74 / Meta Horizon mobile pairing): Flat opaque panel #1e1e1e 12r 1px #2f2f2f border 0 8/16 shadow, no backdrop-filter, over flat #121212 world no wash. Statusbar 44h opaque #0f0f0f with Setup·Prism 12/600 + time + battery, divider 1px #2a2a2a. Stepper is header 44h with Setup · Prism 14/700 + right 1-5 dots flat grey 6 vs 10 active flat blue #007aff no bloom, progress bar not present. Viewport is panel 600x600 with 1px outlines, not glass scrim. Welcome illus is flat grey card 80h with white line icon 24 no depth, title 18/700, body 13/500 with 3 size weights 12/13/14 mixed, note 10/600 with dot but low contrast 0.32. Primary CTA 36h flat blue #007aff no gradient, secondary Skip flat grey 12/600 hard edge. Permissions: 3 flat rows 48h #2a2a2a 8r 1px #333, icons 32 flat purple/green/grey no gradient, titles 14/700, subs 11/500 ink-60 but flat opacity 0.58 low, Allow buttons 28h flat grey 11/600 with toggle switch not pill, no gaze scaling. Pair: left QR 96 white with hard grid 7x7 2px cells no accent, middle phone illustration flat, right code flat #2a2a2a 10r 14/700 not tabular, BT dot flat 24 no pulse, status pill flat grey Searching. Calibration: 3 flat targets 64r 2px white border #444, inner 20 white dot hard, no halo, hint hold 350ms always visible 10/600 uppercase with low alpha 0.38 fails. Motion linear 350-500ms slide or 400ms fade, not prism-ease, not interruptible, countdown flash 400ms opaque flash not veil, banner slide 500ms linear bounce abuse. Edge states: loading spinner + Loading... 14/500 centered with no skeleton, error red text Something wrong flat with Retry grey, offline snackbar Offline queuing overlapping hintbar, permission system opaque dialog #1e1e1e with Allow/Not now, no glass card. Focus 7-9 equal flats no depth, glance needs ~2.8s, dwell ring none. Typography 4 equal weights 10/11/12/13 no tabular.",
+    "System C": "Artifact under review (Prism 14-onboarding components/14-onboarding/index.html:8-1324): stage-shell 600x600 stage background radial 120%90 at 50%14 rgba42,53,80 0.56->rgba20,26,40 0.72->rgba10,14,23 0.90 + wash 70%50 at 78%88 rgba86,184,255 0.09 over rgba6,10,16 0.76 synthetic, not live passthrough; stage-shell grid place-items center flex none, device fixed inset0. Statusbar 44h Setup·Prism 11/700 0.04em ink-60 + time tabular + battery 82% dot ok. Viewport onboard-viewport absolute inset44 0 0 0 flex col gap10 pad12 14 74 overflow-y auto contain scrollbar none. Stepper flex between left step-icon 28r10 glass blur22 stroke0.12 + step-kicker 11/700 0.12em uppercase ink-40 + step-title-top 13/700 ink-80 + right dotsWrap 5 dot-step 7h 999r rgba255,255,255 0.14 outline0.05 vs active 20w accent 0.38 bloom vs done 0.52; progressWrap 2.5h track 0.08 999r + fill gradient accent->strong 0.4 shadow width (current+1)/5*100% 380ms. Flow-card flex1 min396 glass var(--mat-raised) blur22 outline1.5 rgba86,184,255 0.14 26r pad16 shadow18/44 + ::after radial 86,184,255 0.06 + success is-success green 0.28 outline + pulse 520ms. Views: welcome illus 96h 16r 0.04 fill + SVG 320x88 with lens+phone+dot caption 10/700 0.08em 0.38, copy-title 19/800 -0.02em, copy-body 13/500 1.45 360w with strong 80, copy-note 11/600 0.01em +5dot accent, actionRow Skip 11/600 + primary Get started 13/700 40h gradient flex1 + hint ⌘ 10/600; perms illus 88h + 3 perm-row 14r 0.05 glass 12pad 36icon gradient camera mic location + perm-title14/700 perm-sub11/500 + perm-allow 11/700 28h 999r 0.08 vs on green gradient; pair illus 88h QR/phone/bt/code + pairLayout 112+1fr grid + qr-card 112 16r white shadow + qr-grid 7x7 2.5gap accent + bt-dot 28 pulse 1.4infinite vs scanning 1.0 + pair-header 14/700+11/600 tabular + pair-status scanning/found/error + code-row 14r 0.05 + 6 digits 30x36 10r 17/800 tabular; calibration illus 88h 3 dots caption + copy 16/800 title +12 body + targets flex gap18 64r 0.06 outline 1.0 tick rings + done accent 0.14 bloom + dwell-hint 10/700 uppercase 0.06em hidden until gaze-focus opacity1 + status 11/600 dot; done illus green 0.08 + copy 19 + badges 11/700 + Review ghost + Enter Prism 44h. Edge layers state-layer absolute inset44 z520 display none vs on block rise-in vs dim-on grid place-center + blur1px viewport 0.42: loading on with skeleton 92+14+10+28 + progress-mini 4h shimmerMove 1.4 infinite + code-skeleton 6x30x36 shimmer 1.2 linear, error dim-on danger 64illu + title18/800 body13 retry/dismiss, offline warn 64 illu retry/skip, permission danger camera denied Allow/Continue without. Hintbar absolute 12 12 12 z540 flex between Dwell 350=select + Tab Esc Space 10/600 0.06em uppercase ink-60 strong80. Gaze cursor white dot10 +halo + dwell-ring 350ms linear, Tab cycle, Esc back, swipeleft/right gated. Chips outside stage fixed verified."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 10,
+      "materialHonesty": 9,
+      "motion": 10,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 4,
+      "motion": 5,
+      "typography": 5,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 5,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 6,
+      "typography": 5,
+      "edgeStates": 7,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 5
+    }
+  },
+  "totals": {
+    "visionOS": 83,
+    "horizonOS": 44,
+    "ours": 51
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (83)",
+    "ours (51)",
+    "horizonOS (44)"
+  ],
+  "biggestGap": "Focus discipline — exactly one obvious focal element per moment, gaze focus unmistakable: expected visionOS single hero primary CTA 44h accent gradient with persistent 16px bloom + neighbors dimmed to 0.42 + hairline reticle 56 1px, others hidden until gaze, 3-4 focusables max. Got components/14-onboarding/index.html:649-670 perms view at reviews/probe-14-round1/stage-s1.png + stage-s2/s3: 13 concurrent foci — 5 dot-step 7 vs 20w active + 3 perm-row 0.05 glass 14r 12pad 36icon + 3 perm-allow 11/700 28h 999r equal weight + Skip 11/600 + CTA 0/3 granted disabled 0.56 opacity + illus caption 10/700, no dimming, probe focusablesInStage 13 vs ideal 3, gaze-focus only transient scale1.04/scale1.15 not persistent bloom, shutter halo opacity0 at rest. Result glance needs ~1.9s not <1s, violates VISION 2.",
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 83/90, B=Horizon 44/90, C=ours 51/90: ours second overall, loses 9/9 criteria so not first or tied-first and gaps>0 => fail per VISION Critic protocol 5. Evidence = self-probed 2026-08-27T06:42:45Z via bun tools/probe.mjs + deep evaluate + 22 captures (stage.png/stage-normal/s0-s4/loading/error/offline/permission + full each) at 600x600 true, console0 pageErrors0 failedReqs0 focusable17 total 13 max in-stage unlabeled0 subTen0 lowAlpha0 reducedMotion true, chipsOutsideStage true gap45px overlap false. Per-criterion: 1 Glanceability A9 B5 C5: A <1s stepper kicker->title->single CTA bloom; C needs ~1.9s: Welcome has stepper 11/700 + title 13 + 5 dots 7/20 + illus 96 with 4 captions 10 + copy 19 +13 +11 + Skip 11 + CTA 13 + ⌘ hint 10 + hintbar 10 all competing before reading setup 2min; perms s1 adds 3 rows 14/11 + 3 Allows + disabled CTA 0/3. 2 Focus A10 B5 C4 (biggestGap): A exactly one bloom hero, others 0.42, hairline 56 1px; C 13 equal glasses same blur22 stroke0.12 shadow none dimmed, halo only hover scale1.04, 5 dots equal weight vs primary. 3 Material A9 B4 C6: C honors tokens var(--mat-raised) blur22 stroke0.12 sheen but world synthetic gradient 0.76 charcoal not live passthrough saturate1.6 rim light; Horizon flat #1e1e1e no blur. 4 Motion A10 B5 C6: C prism-ease 0.32,0.72,0,1 durBase260 ok but durSlow380 over 320 + sheet-in380 over + btPulse 1.4 infinite + shimmer 1.2 linear infinite decorative not interruptible + shimmerMove 1.4, B linear 400-500 bounce. 5 Typography A9 B5 C5: SF stack correct tabular-nums true on code 17/30x36 pair header time but distinct sizes 10,11,12,13,14,16,17,19 =8 vs 3 per card spec, stepper 11/13 + copy 19/13/11 + perms 14/11 + pair 14/11/17 + calib targets 11/16 mix, Horizon 4 sizes equal. 6 Edge A9 B5 C7: C ships loading skeleton + error PR-PAIR-503 danger + offline warn + permission cam blocked all glass rise-in not default, but loading has 0 focusables no CTA and no true empty state (onboarding has no empty), Horizon spinner flat. 7 Dependability A9 B6 C7: C retry/dismiss/skip/esc back gated swipeleft banners Hold each dot/Allow permissions/Pairing required + capture selects primary, no dead end but gated CTAs block advance without skip, Horizon snackbar overlap. 8 Accessibility A9 B5 C6: C reducedMotion true media query zeroes to 0.01ms, focus-visible 2.5px stroke, unlabeled0 subTen0 lowAlpha0 contrast ink-100 on 0.76 scrim passes, accent cyan colorblind-safe vs red/green, but no mono-audio cues, text scale not verified, dwell 350 hint present but small 10. 9 Delight A9 B4 C5: C successPulse 520 + bt found green + calibration done autoAdvance 900 + is-success glow are decorative multi-moments not single earned serving function; A single persona shimmer earns calibration.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (51 vs 83), 9/9 criteria lost, verdict fail."
+}

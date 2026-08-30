@@ -1,0 +1,101 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-26T16:02:08.225Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/02-home/index.html",
+    "report": "reviews/probe-02-home/report.json",
+    "stage": "reviews/probe-02-home/stage.png",
+    "stageFull": "reviews/probe-02-home/full-round2.png",
+    "stageSize": "600x600",
+    "focusableCount": 21,
+    "unlabeledIconButtons": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "reducedMotionSupport": true,
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 45,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "stage.png boundingBox 600x600 contains zero dev chrome; dev-controls intersects stage = false; .stage .ctrl-row display:none !important; verified via evaluate boundingBox top 840 > stage bottom 795",
+    "edgeCaptures": [
+      "reviews/probe-02-home/stage-loading-round2.png",
+      "reviews/probe-02-home/stage-empty-round2.png",
+      "reviews/probe-02-home/stage-error-round2.png",
+      "reviews/probe-02-home/stage-offline-round2.png",
+      "reviews/probe-02-home/stage-permission-round2.png",
+      "reviews/probe-02-home/stage-home-round2.png",
+      "reviews/probe-02-home/stage-round2-final.png"
+    ],
+    "edgeVerification": "Clicked each dev-controls chip outside stage via page.click (Home/Loading/Empty/Error/Offline/No access) -> window.__setHomeState() toggled .view.active correctly; all 6 states captured with 600ms wait; no console errors",
+    "auditNotes": "Probe audit 15:58 UTC: stagePresent true, subTenPxTextCount 0, lowAlphaTextCount 0, hiddenFocusables 0, title Prism OS - Home"
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Home (visionOS 2): Single hero moment — enormous tabular time (52px, -0.04 tracking, tabular-nums) with generous negative space, one widget (calendar OR weather, never both conflated), ultra-sparse 3-column icon grid with desaturated icons that tint only on focus, true glass scrims (var(--mat-glass) + blur 22px over live passthrough world, not synthetic radial) with edge sheen, dock + spotlight as secondary focus, zero dev chrome in 600x600, focus = single magnified halo (scale 1.08 + stroke-focus 2.5px + bloom) unmistakable at 1m, motion 220-260ms cubic-bezier(0.32,0.72,0,1) interruptible, no bounce, stagger <80ms.",
+    "System B": "Horizon OS Home (Quest Horizon Home): Dense shelf of flat opaque panels (#1e1e1e, no backdrop-filter), small time 22px in header, verbose labels 13-14px equal weight, flat grey materials with heavy drop shadows, no translucency over passthrough, linear 400-600ms ease-in-out spinners for loading, weak focus ring (1px grey, duplicated across cards), edge states are centered spinners with no illustration and no recovery CTA, accessibility afterthought, no delight moment.",
+    "System C": "Artifact under review (Prism 02-home round-2 after chip fix): Split hero inside 600x600 stage — left hero-timecard (flex 1.28, 48px time tabular + 13px date + 'San Francisco · Lens 82%' 13px/500 ink-60, min-h 118px, var(--mat-glass)/--blur-glass) + right hero-weather 146px (wx-icon 32px + 20px 72° + 11px 'Partly bright · AQI 32' + embedded event pill 'Standup · 9:30 AM · in 18 min' inside same card), section-head Launcher (11px uppercase 0.14em 'Launcher·8 apps') + 4x2 launcher grid (gap10px, 8 .app-btn 98px, 46px gradient icons t-messages etc, 12px label 600 + 11px sublabel 500), recents wrap (horizontal scroll 124x88 cards with 58px thumb + badge NEW/LIVE/12s/TEXT, mask fade 88% right, 'Swipe to scroll →' 11px ink-60), bottom-center orb-wrap (50px radial #fff→#0b5ed7, glow halo inset -8px, opacity 0.94, rise 380ms) + orb-hint 'Say Hey Prism'. Dev chrome now OUTSIDE stage: .dev-controls fixed bottom 18px, left 50% translateX -50%, gap6px, 26px chips (Home/Loading/Empty/Error/Offline/No access) with .chip.active blue gradient, pointer-events none container, verified intersects stage false (gap 45px). Edge states via chip switching: loading skeletons (shimmer 1.2s), empty state-card (72px illus + 'No recents yet' + Take photo/Open Gallery), error (triangle + Retry/Dismiss + PR-HOME-503), offline (wifi-slash + Retry/Use offline + launcher opacity1), permission (lock + Allow/Not now/Open Settings + dot warn). All tokens via /os/shared/design-system.css (--mat-glass linear-gradient 18,26,38 0.78 etc, --blur-glass saturate1.4 blur22, --ease-prism, --dur-base 260ms/--dur-fast 160ms/--dur-slow 380ms)."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 10,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 5,
+      "motion": 4,
+      "typography": 6,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 6,
+      "focusDiscipline": 5,
+      "materialHonesty": 6,
+      "motion": 7,
+      "typography": 6,
+      "edgeStates": 8,
+      "dependability": 7,
+      "accessibility": 5,
+      "delight": 5
+    }
+  },
+  "totals": {
+    "visionOS": 82,
+    "horizonOS": 45,
+    "ours": 54
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (82)",
+    "ours (54)",
+    "horizonOS (45)"
+  ],
+  "biggestGap": "Focus discipline — multiple primary attractors at rest (expected: visionOS has exactly ONE obvious focal element: huge time or single haloed app, everything else muted until gaze dwell; got: components/02-home/index.html:117-127 .hero-time 48px/800 tabular + 93-109 .hero-timecard 118px + 306-313 .app-icon 46px 8 high-chroma gradients (.t-messages #2f9dff, .t-maps #2a9d6a, .t-assistant #6a4bff, .t-music #d4235a etc) + 462-480 .orb 50px radial #fff→#0b5ed7 at opacity 0.94 with 0 0 14px bloom and 8px halo all visible simultaneously in 600x600. Evidence reviews/probe-02-home/stage-round2-final.png: time, first launcher row, and orb all compete equally — no single focal element. Gaze focus exists (.app-btn.gaze-focus scale1.05 + stroke-focus + 22px bloom per 301-304) but requires JS dwell class; hover via mouse adds no gaze-focus (verified evaluate: hover app-btn classList lacks gaze-focus, transform none, outlineColor rgba255,255,255,0.12), so unmistakable vs visionOS magnify. Fix: make time the sole at-rest hero — dim orb base to 0.78 and hide halo until dwell/gaze-focus, desaturate launcher icons 40% and restore saturation only on gaze, increase hero gap 14→22px and launcher opacity 0.96→ mute, so one focus emerges. Side gap also: .orb-wrap animation 380ms (--dur-slow) exceeds VISION 200-320ms limit.)",
+  "reason": "FAIL vs platform bar. Fresh rendered-only critic, chips-outside fix verified, still not platform-competitive. Blind A/B/C: A=visionOS 82/90, B=Horizon 45/90, C=ours 54/90 (+2 vs round-1 52, chips overlay fix worth ~+2). Ours second overall, loses 9/9 criteria so not tied-first and gaps>0 => fail. Per-criterion: 1 Glanceability A9 B5 C6: C now CLEAN stage (reviews/probe-02-home/stage-round2-final.png shows hero fully visible, no pill clipping; verified intersects false, gap 45px) so +1 vs round-1, but still loses: hero-time 48px is glanceable but weather+calendar conflated in one 146px card (72°/Partly bright + Standup pill = two domains one container) vs A single widget; 'San Francisco · Lens 82%' 13px/500 ink-60 not instantly meaningful; launcher 8 apps 12px label + 11px sublabel ('2 unread'/'Lens'/'Nearby') at 11px ink-60 borders 1s threshold; 'Swipe to scroll →' 11px ink-60 washed vs A large touch targets. 2 Focus discipline A9 B5 C5 (+1 but still 4 short): C at rest has THREE primary attractors (48px time left, 4x2 saturated 46px icons center, 50px luminous orb bottom with glow) vs A one; orb opacity 0.94 with 14px bloom competes even when irrelevant; .app-btn.gaze-focus not unmistakable (hover does not add class, dwell 350ms required, faint vs A 1.08 magnify). Evidence gaze-hover gauge: transform none, outline rgba255,255,255,0.12 until JS fires. 3 Material honesty A9 B5 C6: C correctly uses var(--mat-glass) linear-gradient 18,26,38 0.78 + backdrop blur22 per os/shared/design-system.css:26,33 and card sheens, but stage background is synthetic radial (components/02-home/index.html:10-13 radial 120%90% at 50%18% rgba42,53,80 0.55 etc on rgba6,10,16 0.72) not live passthrough, so translucency reads as opaque charcoal (cards look solid #111827), heavy shadows 0 18px44px rgba0,0,0,0.32 vs A feathered glass. 4 Motion A10 B4 C7 (closest): C Honors tokens — rise-in 260ms ease-prism hero 0ms, weather 60ms, launcher 110ms, orb expected 220-320 but got 380ms (--dur-slow) for orb-wrap and banner (os/shared/design-system.css:59) exceeding spec, so not perfect; transitions 260/160 ease-prism verified via computed transition. Interruptible yes. No bounce. 5 Typography A9 B6 C6: SF stack correct (-apple-system per os/shared/design-system.css:45), tabular numerals on 48px time (components/02-home/index.html:120-124 font-variant tabular-nums), but hierarchy sprawls: 48px/800 time, 20px wx-temp 700, 13px date 600, 12px app-label 600, 11px app-sublabel 500, 11px section-title 700 0.14em uppercase, 11px recent 700 vs A 3 sizes/card max optical. Ink contrasts ok (audit lowAlpha 0) but 11px ink-60 sublabels marginal at 20deg FOV. 6 Edge states A9 B5 C8 (best ours): C now passes probe click verification — all 5 states distinct, recovered: loading skeletons (shimmer 1.2s linear), empty 'No recents yet' with illus 72px + Take photo/Open Gallery CTAs + Tip Space, error 'Can’t load home' triangle red 10% + Retry/Dismiss + PR-HOME-503, offline 'You’re offline' wifi-slash + Retry/Use offline + dot bad + launcher available, permission lock + Allow/Not now/Open Settings + dot warn. Each reachable via outside chips (verified click Home→Loading→Empty→Error→Offline→No access with __setHomeState), no console errors. Still loses to A because A edge states feel native sheet-in 260ms over passthrough with haptics; C skeletons use same mat-glass but thumb gradients generic. 7 Dependability A9 B6 C7: C any path recovers — error Retry -> loading 1400ms -> banner 'Back online', offline Retry shows banner 'Still offline', permission Allow -> banner 'Access granted', Esc closes wm, no dead ends (verified). But missing retry jitter/backoff indication, offline scrim (.offline-scrin position absolute inset44) exists but unused (offline uses view-card not scrim) — minor inconsistency. 8 Accessibility A9 B5 C5 (+1 vs round-1 4): reduced-motion supported (media query present, colonPulse paused per 632-634, audit true), all 21 focusables have aria-label (unlabeled 0), focus ring 2.5px stroke-focus, Tab order logical (Next event → 8 apps → 5 recents → orb → 6 outside chips). Still loses: chip height 26px (components/02-home/index.html:66 height26) and permission chip 28px violate 44px target (design-system chip 30px but dev chips smaller), 11px ink-60 text below WCAG AA at glass opacity, colorblind-safe accent vs danger red ok but dot warn #ffc247 low contrast on glass, no text-scale test provided. 9 Delight A9 B4 C5: C has orbital moment (50px radial gradient #fff→#0b5ed7 + sheath halo + colonPulse 2.4s breathing) but not earned — orb glows at rest costing focus, does not serve glanceability; rise-in stagger 0/60/110/160/320ms is pleasant but generic vs A orchid parallax that signals depth. Earned delight would be time colon breathing serving glance or recents mask revealing swipe affordance functionally — currently 'Swipe to scroll →' is static.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (54 vs 82), 9/9 criteria lost, verdict fail."
+}

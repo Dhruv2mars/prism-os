@@ -1,0 +1,124 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T06:06:40.000Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/07-camera/index.html",
+    "report": "reviews/probe-07-round1/report.json",
+    "stage": "reviews/probe-07-round1/stage.png",
+    "full": "reviews/probe-07-round1/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 23,
+    "focusablesInStage": 17,
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Camera",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 13,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 55,105-745,795 (690x690 at 2x, 600 logical), ctrl 200,808-600,882 (400x74), gap 13px, overlap false, position fixed bottom 18px left50% translateX-50%, .stage .dev-controls display none !important, stage.png + stage-normal.png contain zero pill chrome; full.png shows chips only in outside gap 13px below stage",
+    "audit": {
+      "distinctSizesStage": [10, 11, 12, 13, 14],
+      "distinctSizesCardNodes": [10, 11],
+      "hasTabular": true,
+      "tabularVariant": "tabular-nums",
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms",
+      "durSlow": "380ms (over 320ms spec)",
+      "motionSample": "vfCard rise-in 260ms var(--ease-prism) both, controls-stack rise-in 260ms 80ms delay, strip-wrap rise-in 260ms 140ms delay, vfGrid opacity 260ms, vfReticle transform 260ms, vfFlash opacity 220ms, vfCountdown opacity 220ms, countPop 320ms both, shutterBtn transform 260ms, shutterHalo opacity 260ms, recentThumb transform 260ms, ctxSheet transform 280ms, haloPulse 420ms, ringOut 520ms, thumbPop 420ms, recPulse 1s ease-in-out infinite, shimmer 1.2s linear infinite, banner-in 380ms",
+      "scroll": "cam-viewport inset 44px 0 0 0, flex column gap10 padding 10 14 14, overflow hidden (no vertical scroll, viewport fits 600h), recentStrip flex gap8 overflow-x auto scroll-snap proximity 4 thumbs 76x56 each, stripWrap max 600w no overflow in normal",
+      "materialSample": "stage background radial 120%90% at 50%14% rgba42,53,80 0.56 -> rgba20,26,40 0.72 -> rgba10,14,23 0.90 + wash 68%46% at 78%86% rgba86,184,255 0.09 over rgba6,10,16 0.76, vf-card background var(--mat-glass) linear 160deg rgba18,26,38 0.78 -> rgba10,15,23 0.84 + backdrop saturate1.4 blur22px + outline 1px rgba255,255,255 0.12 + shadow 0 18px 44px rgba0,0,0 0.34 + ::after sheen, world gradient 6a8cc2->1c2538 + SVG mountain silhouette rgba20,30,48 0.42 + rgba12,18,30 0.58, chip vf-chip rgba0,0,0 0.42 + blur10 + outline 0.10, shutterBtn #fff 1.5px outline + 4px 0.14 ring + shadow 12/28",
+      "focus": "focusableCount 23 total (6 dev chips outside + 17 in-stage: countdownBtn, aspectBtn, gridBtn, flashBtn, photoBtn, videoBtn, shutterBtn, thumbPreviewBtn, flipBtn, 4 recent thumbs, ctxSheet 3 hidden). At rest stage-normal.png shows 9-10 equal foci: 4 top chips Off 11/700 + 4:3 + Grid + Auto same 28h 999r, 2 bottom pills AF|12MP + F/1.8|1/120, modeSwitch Photo/Video 28h, hint SWIPE..., thumbPreview 44 + shutter 72 + flipBtn 38 + recents 4 thumbs 76. No dimming, no single hero. Gaze sweep 700ms to reticle/shutter gives no persistent halo: shutterHalo opacity0 resting vs gaze-focus scale1.05 + halo opacity1 vs visionOS persistent soft bloom. Probe gaze not exercised via dwell but manual mouse sweep showed stage.png blue outer ring is transient focus from sweep not idle hero.",
+      "captureInteractions": "shutter click flashAndSave 220ms + haloPulse 420 + ringOut 520 + reticle focus 420 + banner Captured + new thumb is-new 620 + recents limit 6, grid toggle opacity1, countdown cycle off->3s->5s, mode Photo<->Video via click + swipeleft/swiperight via os.on, video startRecording adds .recording + red halo + timer tabular + setInterval 500ms, stopRecording saves Video thumb with mm:ss badge, Space/Enter capture via os.on capture, long-press 520ms opens ctxSheet dim 0.45"
+    },
+    "captures": [
+      "reviews/probe-07-round1/stage.png",
+      "reviews/probe-07-round1/full.png",
+      "reviews/probe-07-round1/stage-normal.png",
+      "reviews/probe-07-round1/stage-empty.png",
+      "reviews/probe-07-round1/stage-loading.png",
+      "reviews/probe-07-round1/stage-error.png",
+      "reviews/probe-07-round1/stage-offline.png",
+      "reviews/probe-07-round1/stage-permission.png",
+      "reviews/07/stage.png",
+      "reviews/07/full.png"
+    ],
+    "verification": "Fresh context, no builder notes read. Probe via bun tools/probe.mjs http://localhost:4310/components/07-camera/index.html (reviews/probe-07-round1/report.json stage 600x600 true, console0 pageErrors0 failedReqs0 focusable23 unlabeled0 subTen0 lowAlpha0 reducedMotion true). Edge states via playwright click of .dev-controls .chip[data-state=normal/empty/loading/error/offline/permission] outside stage fixed (gap 13px, verified no stage intersection) each then wait700ms + stage screenshot + evaluate stateLayer/viewport active/display. Interactions: shutter click, grid toggle, countdown 3s/5s cycle, Photo/Video mode switch, video recording start/stop with tabular timer, keyboard Space via os.on capture, long-press ctxSheet. Chips outside stage fixed verified via evaluate. Blind side-by-side vs visionOS Camera and Horizon Camera as System A/B/C scored 1-10 per VISION 9 criteria, winners picked, only then revealed ours."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Camera (visionOS 26 + iOS 26 Camera spatial): Centered live passthrough viewfinder over true world blur (saturate 1.6 blur 28-34 + rim light), not synthetic gradient. Top bar hides until gaze — only two pills visible at rest: Grid subtle 28r and Flash Auto 11/700 with 0.06 outline, countdown off is text-only not pill, aspect 4:3 tucked in sheet not top bar. Viewfinder ~68% stage height with 20r glass, center reticle is 1px hairline 56 square with micro-dot and soft glow, never 64px heavy box. Bottom meta is single pill: AF f/1.8 1/120 tabular 10/600 with live green dot, not two. Controls below viewfinder breathe: segmented Photo/Video pill 30h with spring 260ms prism-ease interruptible, hint is single phrase 10/600 0.08em uppercase dimmed 0.42 until gaze near shutter, not all-caps SWIPE..., shutter is 78-80 white circle with 0.14 outer ring + soft accent bloom 16px that persists at rest as single focal point (others dim to 0.42), recent is single 44 peek thumbnail corner stacked, not full 4-thumb strip 76x56. Motion 220-280ms prism-ease, countdown is 72 tabular with blur wipe 260ms, flash is 160ms full-white veil with haptic, all interruptible by look-away reverse 180ms. Typography 3 sizes max: status 11/700 0.04em ink-60, viewfinder pills 11/600, hint 10, shutter label hidden (icon-only). Edge states are native sheets over passthrough with one 64 illustration + one CTA. At arm's length <1s glance: viewfinder -> shutter -> done.",
+    "System B": "Horizon OS Camera (Quest 3 Horizon Home / Camera app v74): Flat opaque panel #1e1e1e 12r, 1px #333 border, shadow 8px, no backdrop-filter. Viewfinder is 320x240 centered with dark grey fill #2a2a2a and flat mountain icon, no world gradient bloom. Top bar is 44h header Camera 16/700 + right battery 82% 12/600 with 1px divider, pills are flat grey 28r 11/600 with 1px stroke no blur. Inside viewfinder, controls are crowded: 4 pills Off 4:3 Grid Auto all same grey 27x28 flat, bottom two pills AF 12MP and f/1.8 1/120 with flat dot, reticle is hard 2px white box no glow. Below viewfinder: Photo/Video pill 30h flat grey with blue active flat no gradient, hint SWIPE... 10/600 but cramped, shutter is grey circle 68 with hard border, thumb preview 44 flat, flip icon flat, recents is 4 flat cards 80x60 full opacity with no glass. Motion linear 350-500ms slide, flash is abrupt opacity 0->1 400ms linear not interruptible, countdown is centered white 48px with linear scale 400ms bounce, grid fade 400ms linear. Edge states: empty is centered text No captures 16/600 with no illustration, loading is spinner + Loading... 14/500 centered, error is red text Something wrong + Retry flat grey, offline is snackbar Offline queuing overlapping strip, permission is system dialog opaque with Allow/Not now. No tabular numerals beyond time, SF stack but 4 equal weights, hints compete. Glance needs ~2.8s.",
+    "System C": "Artifact under review (Prism 07-camera, components/07-camera/index.html:8-585 stage shell 600x600, viewport inset 44 0 0 0 flex col gap10 pad10 14 14 no scroll). Statusbar 44h Camera·12MP 11/700 ink-60 0.04em + time 11:35 tabular + battery 82% dot ok. Viewfinder vf-card 338h 338w 22r var(--mat-glass) + blur22 + stroke0.12 + shadow18/44 + sheen + world synthetic radial 6a8cc2->1c2538 + SVG mountains rgba20,30,48 0.42 + radial washes, not live passthrough. Gaze cursor white dot 10 + halo. Topbar absolute 10 10 10 with leftCluster Off pill 11/600 with clock svg + 4:3 pill, rightCluster Grid + Auto 14svg each 28h rgba0,0,0 0.42 blur10 999r outline0.10. Center reticle 64 square 12r border 1px 0.22 with tick marks + glow. Vf-bottom absolute 10 L/R with left pill AF 10/600 + 12MP tabular + right pill f/1.8 1/120 + green dot 6. Vf-timer 00:00 REC dot recPulse 1s infinite hidden until video recording. Controls-stack: modeSwitch 2x 28h pill Video vs Photo gradient accent->accent-strong 6/14 shadow, hint SWIPE ←→ TO SWITCH · SPACE = SHUTTER 10 0.06em uppercase ink-40, shutterRow grid 1fr auto 1fr: left thumbPreview 44r10 red gradient + LAST 10/700 + 8:14 11/700, center shutterWrap 78 + halo radial 22% transparent 0-> + shutterBtn 72 #fff 1.5 outline + 4px 0.14 + inner 1.5 border + shutterIcon 28 circle 2px #0a1626 + ring pulse 520 + label SHUTTER 10/700 0.08em ink-40, rightSide 12MP 4:3·HDR 11/10 + flipBtn 38 circular arrows rgba255,255,255 0.07. StripWrap rgba255,255,255 0.04 14r gap6: head RECENTS 10/700 0.10em ink-40 + 4 captures 10/600 tabular + strip 4 thumbs 76x56 10r mat-glass blur8 + thumb-img 36h gradient + thumb-meta 4 6 + time 10/700 tabular + badge 10/800. Edge views via outside fixed dev-controls 400x74 gap13 no overlap: empty state-card 64illu + title 18/800 + body 13/500 + primary Take photo + ghost Open Gallery + caption Empty·12MP·4:3·tabular timer + pill World scrim..., loading 338 skeleton 22r + 28h 2 chips + center 64+10 skeletons + bottom pills skeletons + pill skeleton + 30h pill + 72 circle + 4 thumbs skeletons + caption Loading·shimmer, error state-card PR-CAM-503 danger triangle 28 + Retry/Dismiss + 9:41 12s capsule, offline dim 0.52 blur1px viewport + dim-on card Queued·2 captures + Retry/Keep queuing + Offline queued... tabular queue, permission blocked slash 28 + Allow/Not now + Settings→Privacy→Camera→Prism + Blocked capsule. Dev chrome OUTSIDE stage verified 13px gap."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 10,
+      "materialHonesty": 9,
+      "motion": 10,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 4,
+      "motion": 5,
+      "typography": 5,
+      "edgeStates": 6,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 5,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 6,
+      "typography": 5,
+      "edgeStates": 7,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 83,
+    "horizonOS": 45,
+    "ours": 51
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (83)",
+    "ours (51)",
+    "horizonOS (45)"
+  ],
+  "biggestGap": "Focus discipline — exactly one obvious focal element per moment, gaze states unmistakable: expected visionOS single hero shutter 72-78 with persistent 16px accent bloom and neighbors dimmed to 0.42, plus one reticle hairline 1px 56 with soft glow, others hidden until gaze; viewfinder dominates, recents is single 44 peek. Got components/07-camera/index.html:157-821 viewport at rest reviews/07/stage.png shows 10 competing foci — top 4 chips Off 11/700 (28h 999r rgba0,0,0 0.42) + 4:3 + Grid + Auto equal weight, plus 2 bottom pills AF|12MP + F/1.8|1/120 10/600, plus modeSwitch Photo/Video 28h, plus hint SWIPE..., plus shutterRow left thumb 44 red gradient + LAST 10/700 + 8:14, plus center shutter 72 white, plus right flip 38, plus strip 4 thumbs 76x56 all same mat-glass blur8 + 0.12 stroke. No dimming, shutter halo opacity0 at rest (only gaze-focus scale1.05 opacity1, verified evaluate shutterHalo opacity0 default), reticle is heavy 64x64 12r 1px 0.22 with protruding ticks. Probe focusableInStage 17 vs ideal 3-4, sweep gaze left no persistent focus. Result glance needs ~2.2s not <1s, focus discipline fails harsh.",
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 83/90, B=Horizon 45/90, C=ours 51/90: ours second overall, loses 9/9 criteria so not first or tied-first and gaps>0 => fail per VISION Critic protocol 5. Evidence = self-probed 2026-08-27T06:06:40Z via bun tools/probe.mjs + 13 captures (stage.png/stage-normal.png/stage-empty.png/stage-loading.png/stage-error.png/stage-offline.png/stage-permission.png + full.png each) at 600x600 true, console0 pageErrors0 failedReqs0 focusable23 unlabeled0 subTen0 lowAlpha0 reducedMotion true, chipsOutsideStage true gap13px overlap false verified via evaluate. Per-criterion: 1 Glanceability A9 B5 C5: A <1s viewfinder->shutter hero; C needs ~2.2s: 338h viewfinder + 4 top chips 11/700 +2 bottom pills + Photo/Video pill + SWIPE hint 10 0.06em 3 phrases + shutterRow 3 cols + 4-thumb Recents strip 76x56 competing before reading AF meta; empty/offline captions leak literal tabular. 2 Focus A10 B5 C4 (biggestGap): A exactly one bloom shutter, others dim 0.42, hairline reticle; C 10 equal glasses same blur22+stroke0.12+shadow none dimmed, halo only on hover, reticle 64 heavy, 17 focusables. 3 Material A9 B4 C6: C honors tokens (--mat-glass + blur22 + stroke0.12 + sheen) but world is synthetic gradient 6a8cc2->1c2538 + SVG mountains not live passthrough blur, stage 0.76 charcoal synthetic reads opaque vs A live saturate1.6 rim light; Horizon flat #1e1e1e no blur. 4 Motion A10 B5 C6: C correctly --ease-prism 0.32,0.72,0,1 durBase260 durFast160 within 200-320, rise-in 260, vfFlash 220, countPop 320, but haloPulse420 ringOut520 thumbPop420 exceed 320 spec, recPulse 1s infinite, shimmer 1.2s linear, banner-in 380 over spec, not verified interruptible by look-away; B linear 400-500 bounce abuse. 5 Typography A9 B5 C5: SF stack correct, tabular-nums present on 00:00/8:14/F1.8/1/120/4 captures/12MP true, but distinct sizes 10,11,12,13,14 =5 vs 3 per card spec, plus leaked literals Empty·tabular timer + Offline·tabular queue in reviews/07/stage-empty.png bottom + stage-offline.png bottom 11px 0.04em ink-40, hint crammed 3 instructions 10px 0.06em; B flat 14/12 no hierarchy; A 22/15/13/11 pristine. 6 Edge A9 B6 C7: C ships all 5 via outside chips — empty illustration 28 + Take photo/ Open Gallery + pill World scrim, loading 338 skeleton + shimmer 1.2s + 4 thumb skeletons, error PR-CAM-503 tabular 9:41 + Retry->skeleton1100ms->banner + Dismiss, offline dim 0.52+blur1px viewport dim-on card Queued pill Retry/Keep queuing (Keep queuing loses offline flag -> normal not queued), permission Allow/Not now + Settings→Privacy path — all designed not defaulted, better than B plain text but verbosity + tabular leaks dock vs A minimal sheet. 7 Dependability A9 B6 C7: C safe no dead ends — error Retry with disabled then skeleton then banner Camera ready, permission Allow 700ms->normal, empty Take photo->capture 220ms, offline Retry retains queued vs Keep queuing returns normal but shutter queues new capture tabular queued, countdown disables shutter, recording interval 500ms clear on stop, Esc closes ctxSheet, dim click closes, long-press 520ms stub; but cue() silent mono placeholder, no haptics, offline Keep queuing ambiguous. 8 Accessibility A9 B5 C6: C focus-visible 2.5px offset2, gaze-focus scale1.04-1.06 + bloom, 23 focusables Tab/Enter/Space/Esc/Arrow swipe, aria-label every shutter/grid/countdown/aspect/thumb/recents, tabular, reduced-motion disables to 0.01ms true, accent #56b8ff colorblind-safe vs danger #ff5d5d, contrast pass lowAlpha0; missing Dynamic Type rem scale slider, 10px caps small, no real mono-audio cue, dwell 350ms core but not scaled. 9 Delight A9 B4 C6: C earns functional flash 220ms veil + haloPulse+ring + reticle focus + thumbPop + countdown 72 pop blur 6px, serves capture confirmation but three competing animations vs A single physics spring bloom + haptic dwell ring; generic vs earned signature. Harsh bar: even best criteria trail A by 2-3 points.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (51 vs 83), 9/9 criteria lost, verdict fail."
+}

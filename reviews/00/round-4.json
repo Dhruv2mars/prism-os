@@ -1,0 +1,45 @@
+{
+  "verdict": "fail",
+  "blind": {
+    "A": "visionOS",
+    "B": "horizonOS",
+    "C": "ours"
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 10,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 10,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 6,
+      "focusDiscipline": 7,
+      "materialHonesty": 6,
+      "motion": 6,
+      "typography": 7,
+      "edgeStates": 7,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 5
+    },
+    "ours": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 7,
+      "motion": 7,
+      "typography": 7,
+      "edgeStates": 8,
+      "dependability": 7,
+      "accessibility": 5,
+      "delight": 4
+    }
+  },
+  "biggestGap": "Glanceability + Focus discipline: specimen still dense catalog requiring vertical scroll (probe scrollHeight 795 > clientHeight 556) with 5 sections (Materials/Type scale two cards/Accent & States/Controls/Motion) and 13 focusables inside stage (+6 Lab chips outside) vs VISION.md 1 — meaning in <1s, one obvious focal element. visionOS isolates one material token per card with breathing room, no scroll at 600x600. stage.png shows bottom 'CONTROLS' truncated at edge, confirming overflow; gaze cursor tiny 10px white dot barely visible over type card, no expansion/parallax vs visionOS hover 1.04 scale + blue ring. Not unmistakable single focus.",
+  "reason": "FAIL vs platform bar. Blind scoring as System A/B/C before reveal — A=visionOS 83/90, B=horizonOS 57/90, C=ours 55/90: ours last overall, loses to visionOS on all 9 criteria so not tied-first and gaps>0, fails harsh Pass rule 'Good enough is fail'. Evidence = fresh probe 2026-08-26T15:38:59Z (reviews/00/round-4/{stage,full}.png + report.json): stage 600x600 clean (0 console errors, 0 failedReqs, 19 focusables total, reducedMotion true via prefers-reduced-motion, hiddenFocusables 0, stagePresent true). System A (visionOS): isolates one primitive per card, saturate(1.4) blur vibrancy over real world, single focal element with parallax, motions interruptible spring 240-280ms cubic-bezier(0.32,0.72,0,1). System B (HorizonOS): busier, flatter, saturated primitives, okay but gamified, more focusables, less subtle materials. System C (ours): After fixer, material distinction improved (mat-glass var(--mat-glass)+22px blur 0.78, raised var(--mat-raised)+34px 0.88, sunken 0.66+10px — verified backdropFilter distinct, distinct from prior flat) and typography now max 3 per card (type-card 44/30/17 and 22/14/11, tabular 9:41, SF stack) fixing prior 4-size violation — +2pts each; motion tokens now compliant 220/260/300 inside 200-320 spec + var(--ease-prism) everywhere (was 160/380 violation) — rise-in 260ms, banner-in 300ms correct, but not interruptible springs, shimmer 1.2s infinite decorative cost; edge states FIXED 1->8: 5 layers inside stage (loading skeleton+shimmer, empty humane illustration Create first/Learn more, error red wash banner PR-FOUND-503 Retry/Dismiss, offline dim-world scrim 0.52+2px blur Use offline, permission lock Allow/Not now/Open Settings) all with recovery to specimen via window.__setFoundationVariant — verified lab-bar 6 chips (Specimen active blue, Loading/Empty/Error/Offline/No access) outside stage at -94px on shell (labInStage false, labInShell true) so full.png shows controls but stage.png alone is bare specimen — penalized vs builder rule 'control row inside showcase' ideally inside .stage; dependability 4->7 now each error has safe return banner, no dead ends, banners dismissible; accessibility stays 5 (only reducedMotion, no text-scale slider, caption 11px at ink-40 0.42 low contrast < WCAG, no mono-audio cues vs visionOS Dynamic Type+contrast 9); delight 3->4 waveguide sheen (stage::after radial) + tap scale but no earned signature moment vs visionOS sheen 9; Glanceability 4->5 still catalog crammed, scrollHeight 795>556 requires temple swipe / scroll, 1s meaning fails vs visionOS card isolation, full.png shows Lab bar + stage crammed, stage.png bottom cut at ACCENT & STATES; Focus 6->5 more focusables (13 inside +6 outside =19 vs prior 8) gaze halo tiny dot centered over type demo barely visible, raised card blue ring visible only on hover, no unmistakable single focus; Material 6->7 distinct but still dark gradient panels opaque over simulated world radial, not translucent vibrancy; Biggest gap is glanceability+focus — dense catalog vs isolated specimen, single focal element required."
+}

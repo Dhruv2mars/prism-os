@@ -1,0 +1,45 @@
+{
+    "verdict": "fail",
+    "blind": {
+        "A": "visionOS",
+        "B": "HorizonOS",
+        "C": "ours"
+    },
+    "scores": {
+        "visionOS": {
+            "glanceability": 9,
+            "focusDiscipline": 10,
+            "materialHonesty": 9,
+            "motion": 10,
+            "typography": 9,
+            "edgeStates": 9,
+            "dependability": 9,
+            "accessibility": 9,
+            "delight": 9
+        },
+        "horizonOS": {
+            "glanceability": 6,
+            "focusDiscipline": 5,
+            "materialHonesty": 6,
+            "motion": 5,
+            "typography": 6,
+            "edgeStates": 6,
+            "dependability": 7,
+            "accessibility": 6,
+            "delight": 6
+        },
+        "ours": {
+            "glanceability": 4,
+            "focusDiscipline": 3,
+            "materialHonesty": 5,
+            "motion": 4,
+            "typography": 5,
+            "edgeStates": 5,
+            "dependability": 6,
+            "accessibility": 4,
+            "delight": 4
+        }
+    },
+    "biggestGap": "Focus discipline + glanceability collapse and swipe fracture: expected visionOS one focal element per moment (<1s glance, headline 22px + single hero halo + single CTA, 260ms cubic-bezier(0.32,0.72,0,1)), Horizon at least one hero hand + one card with clean snap-scroll. Got components/04-gestures/index.html:16-32 .ctrl-row 5 debug chips (top:48px, 11px blue Normal pill) + 50-55 stepper 'STEP 1 OF 5 \u00b7 GAZE / Look to point' (10px +16px) + 94-102 instruction 'Move the halo. Hold to select.' 14px/13px + 103-118 .illus-card 86px dashed halo 'DWELL 350ms / TAP OR CLICK' + 126-139 .practice 600x~300 with 3 equal 74px .target circles + footer 'Move halo \u00b7 dwell ring at 350ms \u00b7 or click' + 'gaze 392\u00d7429 \u00b7 idle' 10px + nav 'TAB CYCLE \u00b7 ESC BACK \u00b7 SPACE CAPTURE' + blue Next pill \u2014 8 competing text/focal groups vs 1, zero glanceability. Plus 258-295 .scroll-track flex 140px cards mask-image to 88% renders in /tmp/04-step3.png as 4 cards overlapping/opaque (Frost 0px, Ember clipped at ~120px with dark overlay behind, Fern/Dusk offscreen) with .swipe-indicator 4px bar invisible atop card and bottom '\u2190 Swipe'/'Swipe \u2192' chips semi-transparent behind cards \u2014 not focus-disciplined, not interruptible, vs visionOS 1 focal card.",
+    "reason": "FAIL vs platform bar. Blind A/B/C (revealed A=visionOS 83/90, B=HorizonOS 53/90, C=ours 40/90): ours last overall, loses on all 9 criteria so not tied-first and gaps>0. Evidence = self-probed 2026-08-26T13:50:32Z (reviews/probe-04-gestures-round1/report.json + stage.png/full.png) plus manual multi-step capture /tmp/04-step1.png through /tmp/04-step5.png, /tmp/04-edge-loading.png, /tmp/04-edge-error.png, /tmp/04-edge-offline.png, /tmp/04-edge-permission.png, /tmp/04-focus-hover.png, /tmp/04-step1-done.png: stagePresent true 600x600, consoleMsgs 0, pageErrors 0, failedReqs 0, focusableCount 15, unlabeled 0, subTenPx 0, lowAlpha 0, reducedMotionSupport true, hiddenFocusables 0, title 'Prism OS \u2014 Gesture Trainer'. System A (visionOS gesture onboarding): single headline + one-line subtitle + one large live halo/eye-dot that follows gaze, 260ms prism-ease, true 12% white glass over blurred world, one CTA (Next/Skip), dwell ring 350ms eased and interruptible, SF Pro 3 sizes, tabular numerals, Skip recovers anywhere. System B (Horizon tutorial): 3D hand mesh hero, four swipe cards with thick shadows, 2-3 captions per step, moderate bounce 300-400ms linear-ish, flat grey panels (no blur), basic Retry dialogs, 4 sizes, no tabular. System C (artifact under review): dense trainer as screenshotted. Per-criterion winners all A \u2014 1 Glanceability A9 vs B6 vs C4 \u2014 C has 8 focal text blocks (chip row Normal/Loading/Error/Offline/No access at top:48, stepper, instruction, illustration, practice status pill 0/3, 3 targets, gaze readout, nav hints) cannot be parsed in <1s at arm's length; A parses in <400ms, B in ~800ms with hand hero. 2 Focus discipline A10 vs B5 vs C3 \u2014 C has 3 equal .target (components/04-gestures/index.html:178-188 width 74px) no hierarchy, plus blue Normal chip and blue Next pill both high-salience, plus 'Tap outside move halo to a target' toast (os banner) that overlaps chip row in 04-step2-5.png and edge screenshots (top bar clipped under chips) \u2014 multiple competing foci; A has exactly one halo; target.gaze-focus (line 205-209) scales 1.08 with 2.5px focus but screenshot 04-focus-hover.png shows hover yields only faint lighten, not unmistakable vs A's magnetic halo. 3 Material honesty A9 vs B6 vs C5 \u2014 C stage background (line 9-14 radial-gradient 0.56/0.74/0.90 + rgba(6,10,16,0.78)) is 78-90% opaque paint, not translucent scrim over world; .mat-glass (design-system.css --mat-glass 0.78-0.84 + blur 22px) renders darker than visionOS 0.12 white glass; practice card --mat-raised 0.88-0.92 opaque; illustration cards have flat highlight linear-gradient 0.05/transparent; vs A true glass with specular. 4 Motion A10 vs B5 vs C4 (contender for biggest) \u2014 C uses correct --dur-base 260ms + --ease-prism for many (dot-step, practice, target, tap-btn, nav-btn) but violates spec elsewhere: os/shared/design-system.css:124 dwell-ring 350ms linear (should be cubic-bezier 0.32,0.72,0,1 and 200-320ms), components line 144 successPulse 520ms >320, line 330 shutterPress 420ms >320, line 342 flash 120ms ease (linear-ish, too fast), line 383 orbListen 1.0s infinite alternate, line 396 waves 1.2s ease-out infinite, line 496 shimmerMove 1.6s infinite, design-system banner-in 380ms >320 \u2014 not 200-320, not interruptible, linear where eased required; A is 260ms eased interruptible throughout. 5 Typography A9 vs B6 vs C5 \u2014 C uses correct -apple-system SF stack but per-stage exceeds 3 sizes: step-label 10px, step-title 16px, instrTitle 14px, instrBody 13px, practice-label 10px, practice-status 11px, caption 11px, gaze-readout 10px, key hint 10px, chip 11px, capture-count 11px \u2014 5+ sizes, hierarchy flat (PRACTICE \u00b7 GAZE 10px ink-40 0.42 low contrast vs Look to point 16px 800) vs A 3 sizes max per card with optical hierarchy and tabular numerals (gaze readout uses tabular but tiny 10px). 6 Edge states A9 vs B6 vs C5 \u2014 C ships all 5 states as required (Loading skeleton line 481-502, Error 'Sensor unavailable' with PR-GEST-503, Offline 'You're offline' with Use offline, Permission 'Microphone blocked' with Allow mic/Open Settings) but Loading (04-edge-loading.png) shows only faint skeleton + tiny blue progress line mid-stage, no spinner/label centric, and all edge overlays keep .ctrl-row chip row visible on top (z-index 700) occluding 'Tap outside...' banner text under Normal/Offline pills \u2014 z-index bug; A hides chrome behind sheet, B has generic dialogs. 7 Dependability A9 vs B7 vs C6 \u2014 C offers Retry/Continue (error), Retry/Use offline (offline), Allow mic/Not now/Open Settings (permission) and Esc back, so no dead end, but Next is enabled even when 0/3 incomplete (no guard), and Done on step5 shows banner but no auto-reset; A has Skip anywhere + hardware Esc. 8 Accessibility A9 vs B6 vs C4 \u2014 C reducedMotionSupport true (line 506-509 @media prefers-reduced-motion disables transitions) but fails otherwise: low-contrast labels (ink-40 0.42, ink-60 0.66), tiny 10px gaze readout and key hints, no text-scale handling (px everywhere), no mono-audio cue indication, gaze focus relies on halo color alone (not colorblind-safe beyond blue vs green success), keyboard Tab cycle exists but gaze halo vs focus ring compete; A passes WCAG AA, dynamic type, reduced-motion, mono. 9 Delight A9 vs B6 vs C4 \u2014 C has multiple competing delights (gaze green outline + 'Gaze mastered' banner + successPulse 520ms, tapBtn done green, swipe indicator, shutter flash, orb breathing/waves) so no single earned signature moment per VISION 9; A has one functional delight \u2014 live halo following gaze + dwell ring that IS the interaction; B has 3D pinch but decorative. Overall ours 40/90 last, not competitive with visionOS/Horizon OS bar \u2014 harsh fail."
+}

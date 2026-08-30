@@ -1,0 +1,123 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T05:18:00.000Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/05-notifications/index.html",
+    "report": "reviews/probe-05-notifications-main/report.json",
+    "stage": "reviews/probe-05-notifications-main/stage.png",
+    "full": "reviews/probe-05-notifications-main/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 28,
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Notifications",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 13,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 55,105-745,795 (690x690 at 2x, 600 logical), ctrl 200,808-600,882 (400x74), gap 13px, overlap false, position fixed bottom 18px left50% translateX-50%, .stage .dev-controls display none !important, stage.png contains zero pill chrome; full.png shows chips only in outside gap",
+    "audit": {
+      "distinctSizesStage": [10, 11, 12, 13, 14, 16, 22],
+      "distinctSizesCardNodes": [10, 11, 13, 14, 22],
+      "hasTabular": true,
+      "tabularVariant": "tabular-nums",
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms",
+      "durSlow": "380ms (over 320ms spec)",
+      "motionSample": "transform 0.26s cubic-bezier(0.32,0.72,0,1), box-shadow 0.16s cubic-bezier(0.32,0.72,0,1), dismiss 280ms cubic-bezier(0.32,0.72,0,1) with -8px overshoot then 110% exit, banner-in 380ms, rise-in 260ms, popSettle 360ms",
+      "swipeHint": "hintbar Swipe ←→ dismiss · Tap expand · Esc top · Hey Prism orb, plus notif-card swipe-bg linear gradient dismiss both sides opacity 0 pointer-events none",
+      "scroll": "notif-viewport inset 44px 0 0 0, overflow-y auto, scrollbar none, padding 10px 14px 74px 14px, gap12, 5 cards total (3 Now +2 Earlier) requires scroll, group headers with line",
+      "materialSample": "card background var(--mat-raised) linear-gradient(160deg rgba28,38,54 0.88→rgba14,21,32 0.92) + backdrop saturate1.4 blur22px + outline 1px rgba255,255,255 0.12 + shadow 0 12px 28px rgba0,0,0 0.26, stage background radial 42,53,80 0.54 + 20,26,40 0.72 +10,14,23 0.88 +6,10,16 0.74 + wash 86,184,255 0.08"
+    },
+    "captures": [
+      "reviews/probe-05-notifications-main/stage.png",
+      "reviews/probe-05-notifications-main/stage-normal.png",
+      "reviews/probe-05-notifications-main/stage-empty.png",
+      "reviews/probe-05-notifications-main/stage-loading.png",
+      "reviews/probe-05-notifications-main/stage-error.png",
+      "reviews/probe-05-notifications-main/stage-offline.png",
+      "reviews/probe-05-notifications-main/stage-permission.png",
+      "reviews/probe-05-notifications-main/stage-gaze.png",
+      "reviews/probe-05-notifications-main/stage-expanded.png",
+      "reviews/probe-05-notifications-main/stage-offline2.png",
+      "reviews/probe-05-notifications-main/stage-perm2.png"
+    ],
+    "verification": "Fresh context, no builder notes read. Probe via bun tools/probe.mjs http://localhost:4310/components/05-notifications/index.html (reviews/probe-05-notifications-main/report.json + stage.png/full.png 600x600 true, console0 pageErrors0 failedReqs0 focusable28 unlabeled0 subTen0 lowAlpha0 reducedMotion true). Edge states via playwright evaluate click of .dev-controls .chip[data-state=normal/empty/loading/error/offline/permission] each then wait800ms + stage screenshot + evaluate viewport/display/layer class. Interactions: dismiss n1 via .notif-dismiss click -> undo bar visible 4.2s timer -> undo restores 5 cards, expand n2 via main click -> is-expanded true + preview thumb, gaze focus via class gaze-focus + screenshot stage-gaze.png, reduced-motion sheet scan, tabular variant check, chip chrome audit."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Notification Center (visionOS 2.x / 26): Centered frosted glass stack over live passthrough world. One header 'Notifications' 22/-0.03 SF Pro Display 800 + subtle count pill, single group labels 'Earlier Today' 11/700 0.14em uppercase ink-60 with hairline divider only, no literal 'priority'/'tabular' tokens. Each banner is 18r glass (saturate 1.6 blur 28-34 + rim light + 2-layer depth shadow 40/90), 36px app icon with thin stroked glyph, title 15/600 ink-100, subtitle 13/400 ink-80 2-line clamp with 1.38 leading, time 11 tabular ink-60 right-aligned, inline actions muted until expanded (single primary gradient only on focus). Stack shows 2-3 banners peeking with depth scale 0.96 + blur falloff, single focal banner at a time (others dim to 0.42, focused scales 1.02 + 2.5px stroke-focus bloom 22px). Motion 260ms cubic-bezier(0.32,0.72,0,1) interruptible spring, dismiss is interruptible swipe with rubber-band + veil, reduced-motion collapses to crossfade 160ms. No dev chrome inside 600x600, statusbar only time + battery + Focus glyph.",
+    "System B": "Horizon OS notifications (Quest 3 v74 / Horizon Home feed): Flat opaque panels (rgba 36,36,36 0.98, 1px #333 border, no backdrop-filter, shadow 8px) full-width vertical list, date chips 'Today'/'Earlier' 12/600 on dark grey header bar with 3-dots overflow. Cards 12r, icon 24px flat tint, title 14 medium, body 12 regular, time 12 tabular but no optical hierarchy (3 equal weights), 2-3 equal CTAs per card (Reply/Open/Dismiss) all grey flat, no primary hierarchy, weak 1px blue focus ring competing across multiple cards. Motion linear 350-450ms slide with 20px overshoot bounce, janky blur none, no interrupt. Empty is centered text 'No notifications' 16/600 with no illustration, loading is three grey shimmer bars no skeleton depth, error is red text 'Failed to load' with plain Retry, offline shows snackbar 'No internet' overlapping list, permission is system dialog opaque. No undo, no glass, no delight beyond flat.",
+    "System C": "Artifact under review (Prism 05-notifications, components/05-notifications/index.html:9-536): 600x600 stage shell centered in device, stage background radial 120%90% at 50%16% rgba42,53,80 0.54→20,26,40 0.72→10,14,23 0.88 + 68%46% at 78%88% rgba86,184,255 0.08 wash + rgba6,10,16 0.74 base. Statusbar 44px 'Notifications · Center' + time tabular + dot ok + battery svg. Notif-viewport absolute inset 44px 0 0 0 scroll gap12 padding 10 14 74. Header rise-in: title 22/800 -0.03 ink-100 + count pill 11/700 tabular '5 new' rgba255,255,255 0.07, subtitle 11/600 0.04em ink-60 with dot ok + '3 now · 2 earlier · tabular' literal + 'tabular 10:37 AM' duplicate, actions Clear all + Focus 28px chips (rgba255,255,255 0.08 + outline 0.07). Groups: Now 3 + Earlier 2, head 11/700 0.14em uppercase ink-60 + count 11/600 tabular ink-40 + 1px line rgba255,255,255 0.06 + caption 10px 'priority' literal 0.06em ink-40. Cards: 5x .notif-card var(--mat-raised)+blur22+outline0.12 18r 12px padding gap10 shadow12/28 + ::after sheen, icon 36 r11 gradient per type (msg blue, capture dark, system purple, warn orange, team green) + svg 18, main flex1 with title-row name 14/700 -0.01 ink-100 ellipsis + time 11/600 tabular ink-60, body 13/500 1.38 ink-80 -webkit-line-clamp2, chiprow 28px chips 11/700 (primary gradient accent→accent-strong vs ghost transparent), dismiss × 26px 1px border rgba255,255,255 0.08. Expanded detail 8px margin border-top0.06 with preview 44 thumb + title12/700 + sub11/500. Swipe-bg dismiss gradients both sides opacity0. Hintbar absolute 12px left right bottom 12px gap8 padding8 10 12r rgba0,0,0 0.34 blur12 outline0.06 10/600 0.06em uppercase ink-60 with strong 11/700 + mono-dot accent. Undo bar absolute 12 12 12 var(--mat-raised)+blur glass outline0.12 18r pulse520ms with title13/700 + sub11/600 + chip32 primary. Dev chrome OUTSIDE stage: .dev-controls fixed bottom18 left50% translateX-50% gap6 padding8 12 999r rgba10,15,23 0.74 outline0.12 blur16 shadow8/24 contain 6 chips 26px 11/700 Normal/Empty/Loading/Error/Offline/No access (Normal active gradient). Animations banner-in 380ms, rise-in 260ms, dismiss 280ms cubic-bezier(0.32,0.72,0,1) with -8px overshoot, popSettle360ms 0.96→1.02→1, reduced-motion disables to 0.01ms."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 10,
+      "materialHonesty": 9,
+      "motion": 10,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 5,
+      "motion": 5,
+      "typography": 6,
+      "edgeStates": 6,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 5
+    },
+    "ours": {
+      "glanceability": 6,
+      "focusDiscipline": 4,
+      "materialHonesty": 7,
+      "motion": 7,
+      "typography": 5,
+      "edgeStates": 7,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 83,
+    "horizonOS": 48,
+    "ours": 55
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (83)",
+    "ours (55)",
+    "horizonOS (48)"
+  ],
+  "biggestGap": "Typography + Glanceability — leaked token strings and hierarchy pollution: expected visionOS clean optical hierarchy (3 sizes max per card, SF Pro 22/14/13/11 tabular, no dev tokens visible, subtitle reads '3 now · 2 earlier · 10:36 AM', group head reads 'Now 3' + hairline only). Got components/05-notifications/index.html:569-571 subtitle.innerHTML `${nowCount} now · ${earlierCount} earlier · tabular` + `<span>tabular ${time}` rendering as '3 now · 2 earlier · tabular tabular 10:37 AM' duplicate literal visible in reviews/probe-05-notifications-main/stage-normal.png top 46-68px; :621 group head `<span class=\"caption\">priority</span>` leaks literal 'priority' next to divider; :682 preview detail 'Tab View ... tabular 12 MP' leaks token again. Distinct stage font sizes = 7 (10,11,12,13,14,16,22) vs spec 3 per card, hintbar crams 'Swipe ←→ dismiss Tap expand · Esc top Hey Prism' 3 instructions 10px/0.06em competing with header. VisionOS would never ship literal variable names; this instantly breaks <1s glanceability and typography trust. Fix: remove all literal 'tabular'/'priority' strings, keep only time/group counts tabular via font-variant-numeric, limit hintbar to one phrase, retain 3-size hierarchy per card.",
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 83/90, B=Horizon 48/90, C=ours 55/90: ours second overall, loses 9/9 criteria so not first or tied-first and gaps>0 => fail per VISION Critic protocol 5. Evidence = self-probed 2026-08-27T05:18:00Z via bun tools/probe.mjs + 11 captures (stage.png/stage-normal.png/stage-empty.png/stage-loading.png/stage-error.png/stage-offline.png/stage-permission.png/stage-gaze.png/stage-expanded.png + full.png) at 600x600 true, console0 pageErrors0 failedReqs0 focusable28 unlabeled0 subTen0 lowAlpha0 reducedMotion true, chipsOutsideStage true gap13px overlap false. Per-criterion: 1 Glanceability A9 B5 C6 (+? but still fail): A extracts in <1s (single header + 2-3 peeking banners, one line preview); C needs ~2.1s: header 22 + pill 5 new + subtitle with duplicate tabular + grouplabel Now 3 + priority + line + 5 cards each 14 title/13 body/11 time/11 chips/26× dismiss = 7 foci before reading body, plus hintbar 3 phrases, plus scroll required (556h viewport vs 5×~92h + gaps). Leaked literals force re-parse. 2 Focus A10 B5 C4 (worst): A exactly one focal banner (others dim 0.42, focused scale1.02+gaze halo dot10+halo3+dwell14ring + bloom 22px); C at rest has 5 equal cards same mat-raised+blur22+0.12 stroke+12/28 shadow, no dim, header Clear all + Focus + hintbar equal weight, card internal 2 chips (Reply primary blue gradient vs Dismiss ghost) + × compete; gaze-focus scale1.025+stroke-focus+bloom only on hover (stage-gaze.png shows subtle) not unmistakable idle. 3 Material A9 B5 C7: C honors tokens (mat-raised + saturate1.4 blur22 + stroke-glass + sheen) but stage is synthetic radial 42,53,80→20,26,40→10,14,23 not live passthrough, reads as dark charcoal 0.74 opaque vs A live world with saturate1.6 blur28 rim light; Horizon opaque flat 36,36,36. 4 Motion A10 B5 C7: C correctly uses --ease-prism 0.32,0.72,0,1 and durFast160/durBase260 within 200-320, dismiss280 with -8px rubber-band settle interruptible via WAAPI, reduced-motion 0.01ms true; loses to A on durSlow380 over spec, banner-in blur6px main-thread, no spring physics interruptibility; B linear 400-500 bounce abuse. 5 Typography A9 B6 C5 (biggestGap): SF stack correct, tabular-nums present on 5 new/3/now/time, but leaked literals 'tabular'×2 and 'priority' and 'tabular 12 MP' plus 7 distinct sizes stage (10,11,12,13,14,16,22) vs 3 per card spec, hintbar 10px caps 0.06em cramped; B flat 14/12 no hierarchy; A 22/15/13/11 tabular pristine. 6 Edge A9 B6 C7: C ships all 5 via outside chips — empty state-card illustration + Enable notifications + Dismiss + caption, loading shimmer 1.2s skeletons opacity fade + caption, error card PR-NOTIF-503 tabular 9:41 + Retry→skeleton→banner + Dismiss, offline dim0.52+blur1px viewport + dim-on card Retry/Use cached + queued2, permission dim0.46 + Allow/Not now + Settings→Privacy path — all designed not defaulted, better than B plain text but A more humane minimal; C verbosity + leaked captions dock. 7 Dependability A9 B6 C7: C safe no dead ends — dismiss stack6 + undo 4.2s pulse with hide anim 220, Clear all staggered80ms + banner undo available, error Retry with disabled then skeleton then banner 'Notifications restored', offline Retry retains queued, permission both paths back to normal, expanded micro-details prevent dead ends; but cue() silent mono placeholder, banner queue not tested for overflow; A has full haptics+voiceOver undo. 8 Accessibility A9 B5 C6: C focus-visible 2.5px offset2, gaze-focus scale1.04-1.06 + bloom, 28 focusables Tab cycle + Enter/Space/Delete, aria-label on every notif (Mara — Lens check ... now), role list/listitem, tabular, reduced-motion, accent #56b8ff colorblind-safe, contrast ink-100 0.98/ink-80 0.86/ink-60 0.66 passes lowAlpha0; missing Dynamic Type scale slider, font px not rem, no real mono-audio cue, hintbar 10px small; A has system scaling + VoiceOver + mono mix. 9 Delight A9 B5 C6: C earns subtle: dismiss rubber-band -8px→110% exit, undo restore pulse scale0.96→1.025→1 + bloom + 520ms prism ease, expand preview thumb radial + sheen + popSettle; functional but generic vs A physics shuffle + parallax depth + haptic dwell ring; B none. Harsh bar: even best criteria (material/motion/edge/depend) trail A by 2 points.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (55 vs 83), 9/9 criteria lost, verdict fail."
+}

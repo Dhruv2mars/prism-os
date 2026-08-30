@@ -1,0 +1,145 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T06:50:00.000Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/10-messages/index.html",
+    "report": "reviews/probe-verify-10-messages/report.json",
+    "stage": "reviews/probe-verify-10-messages/stage.png",
+    "full": "reviews/probe-verify-10-messages/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 20,
+    "focusablesInStage": 14,
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Messages",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 13,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 55,105-745,795 (690x690 at 2x, 600 logical 600x600), ctrl 200,808-600,882 (400x74), gap 13px, overlap false, position fixed bottom 18px left50% translateX-50%, .stage .dev-controls display none !important, stage.png + stage-normal.png contain zero pill chrome; full.png shows chips only in outside gap 13px below stage. Probe via bun tools/probe.mjs http://localhost:4310/components/10-messages/index.html (stage 600x600 true, console 0 pageErrors 0 failedReqs 0 focusable20 unlabeled0 subTen0 lowAlpha0 reducedMotion true). Edge states via playwright click of .dev-controls .chip[data-state] each then wait 800ms + stage screenshot. Conversation+call via click [data-thread=mara] + .conv-call-btn + #muteBtn + #speakerBtn + .call-ctrl.end + Escape.",
+    "audit": {
+      "distinctSizesStage": [10, 11, 13, 14, 22, 30],
+      "distinctSizesCardNodes": [11, 13, 14],
+      "distinctSizesConversation": [10, 11, 13, 14, 30],
+      "distinctSizesCall": [10, 11, 22, 30],
+      "hasTabular": true,
+      "tabularVariant": "tabular-nums",
+      "tabularLiteralLeaks": 6,
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms",
+      "durSlow": "380ms (over 320ms spec via banner-in)",
+      "motionSample": "msg-header rise-in 260ms var(--ease-prism) both, filter-row 260ms 40ms delay, thread-group rise-in 260ms 70/110ms delay, thread-card transform 260ms var(--ease-prism) + box-shadow 160ms, hover translateY -1px, gaze-focus scale 1.015 + outline 2.5px stroke-focus + bloom 22px, conv-sheet sheet-in 300ms var(--ease-prism) both, callOverlay rise-in 260ms, call-card sheet-in 300ms, livePulse 1.4s ease-in-out infinite, ringPulse 1.8s var(--ease-prism) infinite, wavePulse 260ms var(--ease-prism) infinite alternate, wave jitter setInterval 140ms random height, shimmer 1.2s linear infinite, banner-in 380ms >320",
+      "scroll": "msg-viewport absolute inset 44px 0 0 0 flex col gap10 pad 10 14 14 overflow-y auto overscroll contain scrollbar none, 5 thread-cards (Today 2 + Earlier 3) height ~92px each + gaps 8, needs scroll ~80px overflow, conv-scroller flex1 overflow-y auto pad12 gap10 max 78% bubbles, scrollHeight > clientHeight when 4 msgs + chips",
+      "materialSample": "thread-card var(--mat-raised) linear-gradient(160deg rgba28,38,54 0.88 -> rgba14,21,32 0.92) + backdrop saturate1.4 blur22px + outline 1px rgba255,255,255 0.12 + shadow 0 12px 28px rgba0,0,0 0.24 + ::after sheen 0.04 linear 180deg, stage background radial 120%90% at 50%14% rgba42,53,80 0.56 -> rgba20,26,40 0.72 -> rgba10,14,23 0.90 + wash 70%50% at 78%88% rgba86,184,255 0.10 over rgba6,10,16 0.76, conv-sheet var(--mat-sheet) linear 170deg rgba22,31,45 0.96 -> rgba12,18,27 0.97 + blur34 heavy, call-card var(--mat-raised) + blur34 + shadow 24/56 + radial 90%60% at 50%8% rgba86,184,255 0.10, hintbar rgba0,0,0 0.38 blur12 outline 0.06",
+      "focus": "focusableCount 20 total (6 dev chips outside + 14 in-stage: +New, Mark read, All, Unread, 5 thread-cards, 5 thread-call 30px buttons inside cards nested focusables). In conversation +4 reply chips 28px + composer mic 36px + back 34px + Call pill + 4 bubble-rows each focusable nested. At rest probe stage.png shows zero dimmed elements, 5 equal saliency cards same mat-raised+blur22+shadow, plus primary +New gradient accent->accent-strong 28h + badge 2/1 blue gradient same weight competing. Gaze not unmistakable: hover sweep 20 steps via probe gave gaze-focus scale 1.04 on chips only transient, no persistent halo idle; call start focuses endBtn but cursor stays previous pos (probe 03-call-active dot top-right not on End). Probe 08-hover-focus shows no persistent halo, only hover translateY -1.",
+      "edgeStatesVerified": "loading skeleton 30 shimmer opacity 1->0.12 4 cards 40px 13r, empty state-card 64 illu + title 18/800 + body 13/500 + New message + Dismiss + Prism glass pill, error danger triangle 28 + Can’t load messages + Retry + Dismiss + PR-MSG-503 tabular, offline dim 0.52 blur 1px + centered state-card queued 2 rows + Retry sync + Dismiss, permission mic slash + Messages need access + Open Settings + Not now + PR-MSG-401, unread filter single group Unread 1, conversation sheet 4 bubbles + composer, call overlay muted/speaker toggles with waveform muted class",
+      "devChromeLeakTokens": ["components/10-messages/index.html:699 `+New` vs Mark read competing", "components/10-messages/index.html:703 `5 threads · tabular` literal + tabular time", "components/10-messages/index.html:760 `<span>tabular</span>` group head right", "components/10-messages/index.html:865 `tabular 9:44` composer", "components/10-messages/index.html:1164 `Call · 00:13 · tabular` preview leak", "components/10-messages/index.html:1260 `Humane empty · tabular times · 600×600` empty caption", "components/10-messages/index.html:1342 `Queued · tabular · 2 waiting` offline"]
+    },
+    "captures": [
+      "reviews/probe-verify-10-messages/stage.png",
+      "reviews/probe-verify-10-messages/full.png",
+      "reviews/probe-10-edge/01-normal-stage.png",
+      "reviews/probe-10-edge/02-conversation-mara-stage.png",
+      "reviews/probe-10-edge/03-call-active-stage.png",
+      "reviews/probe-10-edge/03b-call-muted-stage.png",
+      "reviews/probe-10-edge/03c-call-speaker-stage.png",
+      "reviews/probe-10-edge/04-call-ended-conv-stage.png",
+      "reviews/probe-10-edge/05-back-to-inbox-stage.png",
+      "reviews/probe-10-edge/06-edge-loading-stage.png",
+      "reviews/probe-10-edge/06-edge-empty-stage.png",
+      "reviews/probe-10-edge/06-edge-error-stage.png",
+      "reviews/probe-10-edge/06-edge-offline-stage.png",
+      "reviews/probe-10-edge/06-edge-permission-stage.png",
+      "reviews/probe-10-edge/07-filter-unread-stage.png",
+      "reviews/probe-10-edge/08-hover-focus-stage.png"
+    ],
+    "verification": "Fresh context, no builder notes read. Probe via bun tools/probe.mjs http://localhost:4310/components/10-messages/index.html (reviews/probe-verify-10-messages/report.json stage 600x600 true, console0 pageErrors0 failedReqs0 focusable20 unlabeled0 subTen0 lowAlpha0 reducedMotion true). Secondary playwright script /tmp/probe-edge.mjs exercised chips, conversation, call muted/speaker, filter, hover gaze each with screenshot + evaluate stageBottom gap 13 overlap false chips fixed outside. Audit distinctSizes via evaluate + manual count 10,11,13,14,22,30 vs spec 3 per card, tabular leaks via string search, motion tokens via computed style, scroll via viewport rect, material via token values, focus via count + screenshots."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Messages + FaceTime Audio (visionOS 26 / iOS 26 spatial): Centered frosted glass over live passthrough world (saturate 1.6 blur 28-34 + rim light, not synthetic gradient). Inbox shows header 'Messages' 22/800 -0.03 SF Pro Display 800 + single count pill 11/700 ink-80 0.07 outline, subtitle is single line 11/600 ink-60 with time tabular only — no literal token strings. Filter is one pill 28h 'Inbox · 5' + 'Unread' count 6/700, not two competing primaries. Thread list shows 3 peeking cards max at rest with depth scale 0.96 + blur falloff, single focal card at a time (others dim to 0.42, focused scales 1.02 + 2.5px stroke-focus + 22px bloom, dwell 350ms prism-ease interruptible). Each card is 18r glass (saturate 1.4 blur22 + stroke 0.12 + sheen + 2-layer shadow 40/90), avatar 40r 13 circle with live presence dot only when live, name 15/600 ink-100, time 11 tabular ink-60 right-aligned, preview 13/400 ink-80 1-line clamp 1.38 leading, meta 11/600 ink-60, unread dot 8 not numbered badge + 1px call glyph subtle not 30px pill competing. Bottom is not persistent hintbar; hints dim to 0.38 until gaze near. Tap opens conversation sheet var(--mat-sheet) 0.82 blur34 that slides 260ms prism-ease interruptible by look-away reverse 180ms: header back 34 clean, status 'Active now' 11/600 with single green pulse, Call pill 32 gradient only one primary, transcript shows at most one exchange peeking with bubbles 14/500 max 72% width (recv rgba255,255,255 0.08 + 1px stroke 0.10, sent gradient accent->accent-strong 18r with bottom 6r chir tail), photo bubble is true 12MP thumbnail with glass cap, not flat red gradient. Composer is single input 36r 14/400 with one primary chip max and voice glyph 11/600, not 4 competing chips 28h. Call is centered 26r glass card with 96 avatar + persistent 16px accent bloom + single waveform line tied to RMS (not 7 random bars), duration 30 tabular 800 centered, controls 48/64 with 4px gap and clear mute red state; motion is 260ms prism-ease, no infinite ringPulse 1.8s or livePulse 1.4s decorative; reduced-motion collapses to 160ms crossfade. Edge states are native sheets over passthrough with one 64 illustration + one CTA. At arm's length <1s glance: title -> first preview -> badge -> done. Typography 3 sizes max per card (22/15/13/11), SF Pro Text 0.01 tracking, tabular only for time.",
+    "System B": "Horizon OS messages + calls (Quest 3 v74 / Horizon Home Chats): Flat opaque panels #1e1e1e 12r, 1px #333 border, shadow 8px, no backdrop-filter, no glass. Inbox header 'Messages' 18/700 + right '+ New' flat grey + 'Mark read' text, subtitle '5 threads' 12/600 flat, filter 'All | Unread · 3' flat grey 26h with blue active flat no gradient. Thread list is full-width opaque cards 12r, avatar 36r flat tint, name 14/600, preview 12/400 1-line clamp, time 11 tabular but low contrast 0.42, badge numbered blue flat, call phone icon 28 flat circle with 1px ring. All 5 cards same opaque weight no dimming, no sheen. Tap opens conversation flat panel #252525 with header back arrow + name 14/700 + Call flat blue 28h, transcript flat bubbles 14/500 8r (recv #2a2a2a, sent #3a5a8f blue flat) no blur, photo bubble flat red block 100h with white icon, composer 36h flat #333 + 3 chips 26h flat grey + mic flat 28. Call is opaque panel #1a1a1a 16r with blue avatar 72 flat, time 24/700, waveform flat 3 bars linear 400ms not tied to mic, controls 44 flat grey + red end 52 flat. Motion linear 350-500ms slide with 20px overshoot bounce, not prism-ease, not interruptible, no reduced-motion beyond instant cut. Edge states: empty centered text 'No messages' 16/600 no illustration, loading three grey shimmer bars no skeleton depth, error red text 'Something went wrong' + Retry flat grey, offline snackbar 'Offline' 40h overlapping list, permission system dialog opaque with Allow/Not now, filter unread shows empty variant but flat. Focus has 4-5 equal cards + call icons competing, weak 1px blue ring on many elements not unmistakable. Glance needs ~2.5s, typography 4 sizes but flat hierarchy, no delight beyond flat.",
+    "System C": "Artifact under review (Prism 10-messages, components/10-messages/index.html:8-1435): 600x600 stage shell centered, stage background synthetic double-radial 120%90% at 50%14% rgba42,53,80 0.56 -> rgba20,26,40 0.72 -> rgba10,14,23 0.90 + wash 68%46% at 78%88% rgba86,184,255 0.10 over rgba6,10,16 0.76 (opaque charcoal 0.76 not live world). Statusbar 44h 'Messages · Prism' 11/700 0.04em ink-60 + battery 82% + green dot. Msg-viewport absolute inset 44px 0 0 0 flex col gap10 pad 10 14 14 overflow-y auto scrollbar none, gap10. Header rise-in 260ms: title 22/800 -0.03 ink-100 'Messages' + count pill 11/700 '3 unread' 0.07 outline + primary '+ New' 28h gradient accent->accent-strong 999r shadow 8/18 + ghost 'Mark read' 28h 0.08 outline, subtitle '5 threads · tabular 11:49 AM' literal plus 'tabular' duplicate (line 703). Filter-row 260ms 40ms delay: segment 999r 0.07 outline blur8 with All active gradient vs Unread · 3 ghost, meta '5 threads' 11/600 0.02em ink-40 tabular right. Groups Today 2 / Earlier 3 head 11/700 0.14em uppercase ink-60 + count 11/600 tabular + line 1px 0.06 + caption 'TABULAR' literal 10/600 0.06em ink-40 right (line 760). Thread-cards 5x .thread-card var(--mat-raised) + blur22 + stroke 0.12 + shadow 12/28 + ::after sheen 0.04, pad12 gap11 18r, hover -1px, gaze-focus scale 1.015 + stroke-focus + shadow 0_0_0_2.5_0.16 + bloom 22px + bg raised, has-unread outline 0.18 + bg raised, is-focal 2px stroke-focus. Avatar 40r13 gradient per thread (mara blue #3a8af0->#0b5ed7, prism purple #a58bff->#6a4bff, alex green, jordan orange, maya red) with live presence dot 11 on Mara (green). Main: name 14/700 -0.01 ink-100, time 11/600 tabular ink-60, preview 13/500 1.35 ink-80 1-line clamp ellipsis, subrow 11/700 accent '2 new · tap to read' or delivered 11/500 ink-40, badges unread 20h 11/800 tabular gradient + call 30h 999r 0.08 outline ink-80 phone svg. Hintbar absolute 12 12 12 12r rgba0,0,0 0.38 blur12 outline 0.06 10/600 0.06em uppercase ink-60 with strong 11/700 mono-dot accent + Tab cycle Esc back Space capture three phrases. Conv-sheet absolute inset 44 0 0 0 var(--mat-sheet) 0.96->0.97 blur34 hidden then on sheet-in 300ms with header 52h border 0.07: back 34 0.08, avatar 32, name 14/700, status 11/600 with live dot, Call pill 34 gradient. Scroller flex1 overflow auto pad12 gap10 with date-sep 22h pill 10/700 0.06em uppercase ink-60 'Today · tabular 9:41', bubble rows 78% max: bubble 18r 14/500 1.38 pad10 13 (recv 0.08 blur10 stroke 0.10, sent gradient + 6r tail), photo bubble 112h gradient red #ff8a6b->#d4232a->#1a2a44 + cap 11/700, voice bubble flat blue with play, meta 11/600 tabular. Composer 44+ border 0.06 var(--mat-raised) blur22: reply-chips 4x 28h 11/700 scroll-x (primary gradient vs ghost 0.08), inputrow field 36h 0.06 outline 999r 13/500 ink-60 'Tap a chip to reply — no dead ends' + tabular 9:44 10/700, send mic 36 0.10. Call-overlay absolute inset 0 0.58 blur18 dim + call-card 26r var(--mat-raised) blur34 stroke 0.12 shadow 24/56 22 20 pad centered: eyebrow 10/700 0.12em uppercase ink-60 with pulse-dot 7 livePulse 1.4s infinite, avatarWrap 96 with avatar 96 30/800 bloomed shadow 0_0_0_6_0.14 + ping ringPulse 1.8s infinite + wave 22h 7 bars 3w gradient accent wavePulse 260ms infinite alternate + jitter 140ms random, name 22/800, sub 11/600, duration 30/800 tabular 800, caption 11/600 0.06em, controls mute 48 0.08 vs on 0.16 vs muted 0.16 red + speaker 48 + end 64 red gradient, hint 10 ink-40. Edge layers via outside fixed dev-controls 400x74 gap13 no overlap: loading 4 skeletons shimmer 1.2s + caption Loading shimmer 1.2s, empty state-card 64 18r 70+ title 18/800 body 13/500 + New message + Dismiss + caption Humane empty · tabular times · 600×600 + prism glass pill, error danger 64 illu + Can't load + Retry + Dismiss + PR-MSG-503 tabular, offline dim 0.52 blur1 + queued 2 rows + Retry sync + Queued tabular, permission mic slash + Messages need access + Open Settings + PR-MSG-401 + Colorblind-safe note. Dev chrome verified outside, no stage intrusion."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 10,
+      "materialHonesty": 9,
+      "motion": 10,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 5,
+      "motion": 5,
+      "typography": 6,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 5,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 5,
+      "typography": 5,
+      "edgeStates": 7,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 5
+    }
+  },
+  "totals": {
+    "visionOS": 83,
+    "horizonOS": 46,
+    "ours": 48
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (83)",
+    "ours (48)",
+    "horizonOS (46)"
+  ],
+  "biggestGap": "Typography + Glanceability leak — literal token string 'tabular' shipped as user-facing content in 6 places: expected visionOS optical hierarchy (SF Pro 22/14/13/11, tabular tabular-nums only via font-variant-numeric, subtitle reads '5 threads · 11:49 AM', group head reads 'Today 2' + hairline divider, offline reads 'Queued · 2 waiting' + time tabular, never literal). Got components/10-messages/index.html:703 `subtitle.innerHTML = ... `${threads.length} threads · tabular` ... `<span class=\"tabular\">${nowStr}` -> renders '5 threads · tabular 11:49 AM' visible reviews/probe-10-edge/01-normal-stage.png top 94px; :760 `head.innerHTML = ... <span>TABULAR</span>` -> 'TABULAR' right-aligned ink-40 visible same screenshot; :865 composer `tabular 9:44` pill; :1164 `Call · 00:13 · tabular` preview leak after call (04-call-ended-conv-stage.png); :1260 empty `Humane empty · tabular times · 600×600`; :1342 offline `Queued · tabular · 2 waiting`. visionOS would never ship variable names; this forces ~1.8s re-parse (is 'tabular' a filter? mode?). Fix: delete all literal 'tabular'/'TABULAR' strings, keep class=\"tabular\" for tabular-nums styling only, limit hintbar to one phrase, group head to label+count+line only.",
+  "gaps": {
+    "glanceability": "Expected <1s extraction: visionOS shows title + one line preview + single dot unread + one call glyph subtle; Got inbox needs ~2.2s: header 22 title + 11 pill 3 unread + subtitle literal tabular + two filter pills + Today 2 + TABULAR label + 5 cards each with name 14 + preview 13 1-line clamp but ellipsis truncates mid-word ('World layer looks great!' cut to 'World layer looks great!' vs 'World layer looks great!' same but bottom card cut off 50% at stage bottom), badge 2/1 blue gradient + 30px call button competing same row, plus hintbar 3 instructions 10 uppercase at bottom 12px competing for glance. visionOS would peek 2-3 cards max with depth, not 5 clipped.",
+    "focusDiscipline": "Expected exactly one obvious focal element per moment with unmistakable halo (10px dot + 3px halo + 2.5px stroke-focus + 22px bloom + 350ms dwell prism-ease, others dim to 0.38): visionOS single hero card or shutter. Got 20 focusables (14 in-stage + 6 chips outside) with nested interactive inside interactive: each .thread-card [data-focusable] contains .thread-call button [data-focusable] 30px = competing hit targets inside same card (components/10-messages/index.html:774-803). At rest reviews/probe-10-edge/01-normal-stage.png zero elements dimmed, 5 cards equal mat-raised+blur22 intensity, +New primary 28h gradient same weight as unread badges, gaze-focus only via :hover translateY -1 / scale 1.015 transient not idle halo (probe 08-hover-focus-stage.png shows no bloom), call overlay at 03-call-active-stage.png cursor top-right not on End 64 despite code focus endBtn. Result focus discipline fails severe. Fix: remove nested call buttons from card hit area (make swipe or long-press), dim non-focused cards to 0.42, make gaze-focus persistent bloom default.",
+    "materialHonesty": "Expected scrim reads as glass over live world (saturate 1.6 blur28 rim light + feathered shadow 40/90 on passthrough): visionOS. Got stage synthetic double-radial #060a10 0.76 wash (line 9-13) opaque charcoal, thread-card mat-raised 0.88-0.92 blur22 reads as dark opaque panel not translucent glass; conv-sheet mat-sheet 0.96-0.97 blur34 almost opaque (line 255-256) slides over inbox but not glass-over-world; call-card same 0.88-0.92. Horizon flat #1e1e1e no blur. Fix: lower sheet opacity to 0.82, use live world video texture if available, reduce shadow 24/56 to hairline + 18/44 only.",
+    "motion": "Expected 200-320ms prism-ease cubic-bezier(0.32,0.72,0,1) interruptible, no infinite decorative cost: visionOS 260ms spring reverse 180ms on look-away. Got rise-in 260ms correct for header/filter/group (lines 76/108/138) but sheet-in 300ms borderline + livePulse 1.4s infinite (line 464), ringPulse 1.8s infinite (484), wavePulse 260ms infinite alternate + JS jitter 140ms random (1096-1102), shimmer 1.2s linear infinite (570), all decorative attention cost during call when user needs calm; none interruptible via look-away (CSS animations not WAAPI interruptible, close uses WAAPI but open uses CSS). Banner-in 380ms over spec. Fix: remove infinite ringPulse/livePulse, tie wave to actual RMS with pause when muted, clamp all to 260ms max and WAAPI with reverse.",
+    "typography": "Expected SF-Pro-class 3 sizes max per card (22/15/13/11), tabular-nums via class only, tracking -0.015: visionOS. Got 6 distinct sizes stage [10,11,13,14,22,30] vs spec 3 per card; card itself 11,13,14 but 13/14 diff 1px weak hierarchy (name 14/700 vs preview 13/500 barely distinct at arm length). Literal 'tabular' leaks in 6 UI strings (see biggestGap) forcing user to parse dev token. Hintbar crams 3 phrases 10 uppercase 'Tab cycle · Esc back | Space capture' competing with header. Call duration 30/800 tabular correct but caption 'tabular · live duration' literal again. Horizon 5 sizes flat. Fix: see biggestGap, reduce composer to one chip primary, header subtitle to '5 threads · 11:49 AM' tabular-nums only.",
+    "edgeStates": "Expected all 6 states designed but humane copy without token leaks, single illustration + one CTA: visionOS. Got all 6 verified (normal, loading 30 skeletons shimmer, empty humane 64 illu + 2 CTAs + Prism glass pill, error PR-MSG-503 danger + Retry/Dismiss + 12s retry, offline dim 0.52 blur1 + queued 2 + Retry sync, permission PR-MSG-401 + Open Settings) — strongest piece vs earlier waves — but empty caption leaks 'tabular times · 600×600', offline leaks tabular, permission note 'Colorblind-safe · no red-only signals' is dev annotation leaking, offline thread tap does nothing silent (line 820 early return). VisionOS still more refined spacing. Score 7 vs 9.",
+    "dependability": "Expected any crash lands safe recoverable no dead ends: visionOS always banner + fallback. Got generally safe: empty New message -> openConversation mara + banner, error Retry -> skeleton -> banner Messages restored, offline Retry sync -> 'Still offline' banner safe, permission Open Settings -> 'Permission granted' banner, call end -> 'Call ended · 00:XX · tabular' + banner safe landing, composer chip tap always sends + auto-reply after 900ms + banner Sent. Gap: offline threads are visible but click when edgeState offline returns early with no banner (line 820 `if(edgeState!=='normal') return;`) so tap on Mara while offline does nothing — silent dead end vs expected banner 'Offline · call queued' (startCall does banner but openConversation does not). Also composer field is div not input so keyboard typing dead end. Horizon has more dead ends. Score 6 vs 9.",
+    "accessibility": "Expected 44px min targets, AA contrast, reduced-motion, colorblind-safe, single focus order: visionOS 44-56, 2.5px focus ring, mono audio. Got unlabeled 0 good, reducedMotion true via @media, subTen 0, lowAlpha 0 per probe, but hit targets fail: .thread-call 30px (226-233) <44, .reply-chip 28h (393-401) <44, hintbar 10px uppercase at bottom competes but low contrast 0.42 metadata; tab order 20 foci requires ~10 Tabs to reach composer after bubbles (each bubble row is focusable) — excessive stops. Colorblind: blue badge vs red call end distinguishable by shape + size but still red/green for presence dot vs warn. Contrast thread-delivered ink-40 0.42 borderline AA on glass. VisionOS passes all. Score 5 vs 9.",
+    "delight": "Expected one earned signature moment serving function: visionOS subtle spring on message send + parallax world blur. Got multiple competing delight attempts not earned: photo bubble red gradient 112h (line 356-359) decorative not tied to 12MP metadata need, ringPulse infinite around call avatar (line 482) attention-costly, wave 7 bars jitter random every 140ms (not RMS), livePulse dot, shimmer not tied to content. None Prism-specific to monocular 20° FOV world layer (e.g., world-layer at 20° demo hint in Mara preview could be signature but not celebrated). Functional call wave is closest to earned but infinite + random defeats. Horizon flat no delight. Score 5 vs 9."
+  },
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 83/90, B=HorizonOS 46/90, C=ours 48/90: ours second overall, loses 9/9 criteria so not first or tied-first and gaps>0 => fail per VISION Critic protocol 5. Evidence = self-probed 2026-08-27T06:50:00Z via bun tools/probe.mjs (stage 600x600 true, console0 pageErrors0 failedReqs0 focusable20 unlabeled0 subTen0 lowAlpha0 reducedMotion true, chipsOutside true gap13 overlap false, stageChromeClean verified) + 16 captures (stage.png/full.png + 01-normal + 02-conversation + 03-call-active/muted/speaker + 04-call-ended + 05-back + 06-edges loading/empty/error/offline/permission + 07-filter-unread + 08-hover-focus) at 800x900@2x. Per-criterion: Glance  A9 B5 C5: A <1s single dot + one line preview peeking 2-3 cards; C needs ~2.2s: 22 title + 11 pill 3 unread + subtitle literal tabular + 5 cards clipped (Maya cut 50%) each 14+13+11 + badge2/1 +30px call button same row + TABULAR label right + hintbar 3 phrases. Focus A10 B5 C4: A exactly one focal with dim 0.38 + halo bloom; C 20 focusables with nested .thread-card containing .thread-call 30px competing (774-803), zero dim, probe 08-hover shows no persistent bloom. Material A9 B5 C6: C tokens correct but synthetic gradient charcoal 0.76 not world passthrough, sheet 0.96 opaque; Horizon flat #1e1e1e. Motion A10 B5 C5: C correct ease but 3 infinite loops (livePulse 1.4s, ringPulse 1.8s, wavePulse 260 + jitter 140) + banner 380 >320 not interruptible. Typography A9 B6 C5: 6 sizes vs 3 spec + 6 literal tabular leaks (703,760,865,1164,1260,1342) — see biggestGap. Edge A9 B5 C7: all 6 states designed (strongest) but leaks + offline silent tap dead end. Dependability A9 B6 C6: offline thread tap early return no banner. Accessibility A9 B5 C5: 30/28px targets <44, 20 tab stops, ink-40 0.42 borderline. Delight A9 B4 C5: generic infinite pulses vs earned world-layer moment. Fix biggestGap single string change at 703/760 to remove literal.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (48 vs 83), 9/9 criteria lost, verdict fail."
+}

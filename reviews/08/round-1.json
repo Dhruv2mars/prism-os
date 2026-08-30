@@ -1,0 +1,141 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T06:12:00.502Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/08-captions/index.html",
+    "report": "reviews/probe-08-round1/report.json",
+    "stage": "reviews/probe-08-round1/stage.png",
+    "full": "reviews/probe-08-round1/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 12,
+    "focusablesInStage": 6,
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS \u2014 Live Captions",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 45,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 55,105-745,795 (690x690 at 2x, 600 logical), ctrl 203,840-597,882 (395x42), gap 45px, overlap false, position fixed bottom 18px left50% translateX-50%, .stage .dev-controls display none !important, stage.png + stage-normal.png contain zero pill chrome; full.png shows chips only in outside gap 45px below stage",
+    "audit": {
+      "distinctSizesStage": [
+        10,
+        11,
+        13
+      ],
+      "distinctSizesCardNodes": [
+        10,
+        11,
+        13
+      ],
+      "hasTabular": true,
+      "tabularVariant": "tabular-nums",
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms",
+      "durSlow": "380ms (over 320ms spec)",
+      "motionSample": "cap-header rise-in 260ms var(--ease-prism) both, cap-line rise-in 260ms var(--ease-prism) both, controls-card rise-in 260ms var(--ease-prism) both delay80ms, word blurWipe 320ms var(--ease-prism) both, livePulse 1.4s ease-in-out infinite, wavePulse 280ms var(--ease-prism) infinite alternate, caretBlink 900ms steps(1) infinite, waveform streaming 260ms, banner-in 380ms (over spec)",
+      "scroll": "cap-viewport inset 44px 0 0 0 flex column gap10 padding10 14 12 overflow hidden, transcript-wrap flex1 min-height0 flex column overflow hidden 18r mat-glass blur22, transcript-scroller flex1 overflow-y auto overscroll contain scrollbar none padding12 12 10 gap10 scroll-behavior smooth, controls-card flex column gap10 mat-raised blur22 18r, at rest with 1 line viewport fits 600h, with 2 lines scroller 416h scrollHeight 362 fits no overflow, with 6 lines max shift keeps last6 lines (streamedLines>6 shift), hintRow flex justify-space-between 10/600 uppercase 0.06em",
+      "materialSample": "stage background radial 120%90% at 50%16% rgba42,53,80 0.56\u2192rgba20,26,40 0.72\u2192rgba10,14,23 0.90 + wash 70%52% at78%86% rgba86,184,255 0.10 over rgba6,10,16 0.76 (synthetic charcoal, not live passthrough), transcript-wrap background var(--mat-glass) linear 160deg rgba18,26,38 0.78\u2192rgba10,15,23 0.84 + backdrop saturate1.4 blur22px + outline 1px rgba255,255,255 0.12 + shadow 0 18px44 rgba0,0,0 0.28, controls-card var(--mat-raised) linear160deg rgba28,38,54 0.88\u2192rgba14,21,32 0.92 + blur22 + stroke0.12 + shadow16/36, cap-line current mat-raised + outline rgba86,184,255 0.22 + shadow + left 3px accent gradient bar with glow, live-pill rgba0,0,0 0.44 blur10 999r outline0.08",
+      "focus": "focusableCount 12 total (6 dev chips outside fixed + 6 in-stage: lang-chip 113x32 rgba255,255,255 0.08, cap-line current 630x100 focusable div, mute 41, pause primary 41 gradient, copy 55, clear 55). At rest reviews/probe-08-round1/stage-normal.png shows 6-7 equal foci: top live-pill 28h Live\u00b7English\u00b7on-device with pulsing dot 7 + timer-pill 28h 00:xx tabular with green dot + lang-chip English \u25be 28h 999r all same weight, transcript current line mat-raised with left-bar 3px accent + highlight on last word, controls waveform 12 bars streaming 260ms infinite alternate all moving, mute grey 41 vs pause primary gradient blue both 36h competing, Copy/Clear chips 26h 0.07, hint-row 10 0.06em 3 phrases Gaze+dwell 350ms + Wave reacts + Scroll. No dimming for non-current: old line same 16r 0.05/0.06 vs current 0.22 accent. Gaze sweep 700ms gives lang-chip gaze-focus scale1.04 + mute/pause scale1.06 bloom only transient, no persistent hero at idle. Ideal visionOS 3-4 foci with single hero live word.",
+      "captureInteractions": "word-by-word streaming: startStreaming 520ms delay \u2192 startNextLine pushes SCRIPT[0..5] then extra random, builds entry words split + revealed0 + time tabular + confidence 92-97%, revealWordsStep increments revealed++ renderAll + jitterWaveform progress*0.35 + random 72-106ms delay then next line 900ms, keeps last6 lines. Interactions verified via playwright: mute click toggles isMuted waveform muted + dot muted + banner Muted/On, pause click toggles isPaused waveform paused + dot paused + timer pause class + stopStreaming/stopWaveIdle + banner Paused/Resumed, langChip click cycles LANGUAGES English\u2192Espa\u00f1ol\u2192Fran\u00e7ais\u2192\u65e5\u672c\u8a9e with badgeLang sync + banner + pushes teaser line revealed 0 then reveal, copy writes streamedLines MARA:/YOU: text via clipboard + banner Copied, clear resets streamedLines+currentIdx then startNextLine 600ms if normal, os.on capture Space triggers pause, ArrowUp/Down scrolls scroller 60px smooth, gaze cursor dot+halo via core.js dwell350"
+    },
+    "captures": [
+      "reviews/probe-08-round1/stage.png",
+      "reviews/probe-08-round1/full.png",
+      "reviews/probe-08-round1/stage-normal.png",
+      "reviews/probe-08-round1/stage-loading.png",
+      "reviews/probe-08-round1/stage-empty.png",
+      "reviews/probe-08-round1/stage-error.png",
+      "reviews/probe-08-round1/stage-offline.png",
+      "reviews/probe-08-round1/stage-permission.png",
+      "reviews/probe-08-round1/stage-muted.png",
+      "reviews/probe-08-round1/stage-paused.png",
+      "reviews/probe-08-round1/stage-lang.png",
+      "reviews/probe-08-round1/full-normal.png",
+      "reviews/probe-08-round1/full-loading.png",
+      "reviews/probe-08-round1/full-empty.png",
+      "reviews/probe-08-round1/full-error.png",
+      "reviews/probe-08-round1/full-offline.png",
+      "reviews/probe-08-round1/full-permission.png",
+      "reviews/probe-verify-08-captions/stage.png",
+      "reviews/probe-verify-08-captions/full.png"
+    ],
+    "verification": "Fresh context, no builder notes read. Probe via bun tools/probe.mjs http://localhost:4310/components/08-captions/index.html (reviews/probe-08-round1/report.json stage 600x600 true, console0 pageErrors0 failedReqs0 focusable12 unlabeled0 subTen0 lowAlpha0 reducedMotion true) plus manual playwright sweep for edge chips outside stage fixed (gap 45px verified no intersection, .stage .dev-controls display none !important, stage.png+stage-normal.png contain zero pill chrome; full.png shows chips only in outside gap). Edge states via playwright click .dev-controls .chip[data-state=normal/loading/empty/error/offline/permission] outside stage each wait800ms + stage screenshot + evaluate stateLayer/viewport active/display/opacity. Interactions: mute toggle, pause toggle, lang cycle, copy, clear, capture Space, scroll. Chips outside stage fixed verified via evaluate. Blind side-by-side vs visionOS Live Captions and Horizon captions as System A/B/C scored 1-10 per VISION 9 criteria, winners picked, only then revealed ours."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Live Captions (visionOS 26 / iOS 26 Live Captions & visionOS Dictation): Centered over true live passthrough world with saturate 1.6 blur 28-34 + rim light, not synthetic gradient. Top bar hides until gaze \u2014 only one pill Live 28h 999r rgba0,0,0 0.42 blur10 with 7px pulsing accent dot + tabular timer 11/700 dot ok, language is implicit per speaker not duplicated pill. Transcript is single-hero focus: ONE current line at a time centered 658w with 16r glass, left 3px accent bar glow 10px, current word highlighted with 6r wash 0.16 + 0.18 stroke + 10px glow, previous lines dim to 0.42 opacity and scale 0.98 with blur falloff, no second equal card. Text is 15/600 ink-100 1.45 with 2-line clamp max, speaker pill 11/800 uppercase only for MARA vs You grey 0.12, time 11 tabular ink-60, confidence is thin 3px line with gradient 0.07 only on current. Waveform is single centered pill 48w 14h with 3 bars subtly reacting 200ms prism-ease, not 12-bar marching. Controls hide until gaze near: pause is single 44 primary gradient bloom persisting as hero, mute is ghost until hover. Motion 220-280ms cubic-bezier(0.32,0.72,0,1) interruptible spring, blurWipe 260ms per word interruptible by look-away reverse 180ms, no infinite 1.4s pulse nor 900ms caret blink. Typography 3 sizes max: 15 body / 11 meta / 10 caption, tabular only on timer, no duplicate English labels, hint is single 10 0.06em dimmed Wave reacts hidden. Edge states are native sheets over passthrough with one 64 illustration + one CTA + caption, no skeleton web list. Glance <0.9s: live word \u2192 done.",
+    "System B": "Horizon OS Captions (Quest 3 Horizon Home / Live Captions v74): Flat opaque panel #1e1e1e 12r, 1px #333 border, shadow 8px, no backdrop-filter. Stage is solid dark #121418 no radial wash, no blur glass. Header is 44h opaque bar Captions 16/700 left + 11/600 battery 82% right + divider, pills flat grey 28r 11/600 no blur. Transcript is full-width vertical list of 5 flat cards 12r #2a2a2a fill 1px #333, each card title 14 medium, body 13 regular, time 12 tabular but 4 equal weights, speaker tags flat grey MARA/YOU same grey chip 11/600, no left accent bar, no highlight, current word is bold but not washed. Waveform is 12 flat grey bars 3px with linear 400ms fade, not reacting to voice. Controls: mute + pause are flat grey circles 36 with 1px stroke, no primary hierarchy, copy/clear are flat 28r grey equal weight. Hint is 10/600 'Gaze + dwell' but cramped. Motion linear 350-500ms slide with 20px overshoot bounce, word reveal is instant no blur, caret is static pipe. Edge states: empty is centered text 'No captions' 16/600 no illustration, loading is spinner + Loading... 14/500 centered, error is red text 'Something wrong' + Retry flat grey, offline is snackbar 'Offline queuing' overlapping list, permission is system opaque dialog Allow/Not now with 1px border. No tabular beyond time, no reduce-motion sheet scan, focus is weak 1px blue ring competing across 6 cards. Glance needs ~2.8s, no hero.",
+    "System C": "Artifact under review (Prism 08-captions, components/08-captions/index.html:8-1223 stage 600x600 shell centered). Statusbar 44h Captions\u00b7Live 11/700 ink-60 0.04em + time tabular. Viewport flex column gap10 padding10 14 12 inset44 0 0 0. Header absolute with live-pill 28h 999r rgba0,0,0 0.44 blur10 outline0.08 + dot-live 7 livePulse 1.4s infinite + Live\u00b7English\u00b7on-device 10/700 uppercase + timer-pill 28h rgba255,255,255 0.07 outline0.07 blur8 + timer-dot 6 ok + 00:xx 11/700 tabular, right lang-chip 28h 999r rgba255,255,255 0.08 English \u25be 11/700 duplicate language (badgeLang already shows English). Transcript-wrap 416h 658w flex1 18r var(--mat-glass) linear160deg rgba18,26,38 0.78\u2192rgba10,15,23 0.84 + blur22 + stroke0.12 + shadow18/44 + ::after sheen, top/bottom fade 14h, scroller flex1 overflow-y auto gap10 pad12. Cap-line 16r pad10 rgba255,255,255 0.05 outline0.06 gap6 rise-in 260ms, current variant mat-raised outline0.22 shadow + left 3px gradient bar glow, head speaker-pill MARA gradient accent\u2192accent-strong 22h 10/800 uppercase vs YOU grey 22h, meta 10/600 tabular time + dot + words + Live badge 10/700 wash with pulsing dot, line-text 13/500 1.45 ink-80 (ink-100 when current) with word spans blurWipe 320ms both + pending blur6 opacity0 + highlight wash 0.16 stroke0.18 6r + caret 2x13 900ms steps infinite, foot 3h confidence bar 92px max + caption 10/600. Controls-card 18r mat-raised blur22 gap10 rise-in260 80ms: top waveform 12 bars 3w streaming 260ms infinite alternate jittered via revealWordsStep + idle 130ms, actions mute 36 grey 0.08 vs pause primary gradient 36 + shadow, bottom mini-stat Confidence 96% dot ok + words count tabular + chips-row Copy/Clear 26h 0.07 11/600, hint-row 10/600 0.06em 3 phrases Gaze+dwell 350ms + Wave reacts + Scroll \u2195. Edge views via outside fixed dev-controls 395x42 gap45 no overlap (Normal/Loading/Empty/Error/Offline/No mic chips 26h pill 0.74 bg blur16): loading 3 skeletons 16r + controls skeleton + shimmer caption, empty state-card 64illu + title18/800 + body13/500 + Start captions primary + How it works ghost, error danger illu + PR-CAP-503 tabular + Retry/Dismiss, offline dim-on viewport 0.52 blur1px pointer none + queued-list 2 items + Retry/Use on-device, permission mic blocked 64illu + Allow/Not now. All edges designed."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 10,
+      "materialHonesty": 9,
+      "motion": 10,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 4,
+      "motion": 5,
+      "typography": 5,
+      "edgeStates": 6,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 5,
+      "focusDiscipline": 4,
+      "materialHonesty": 7,
+      "motion": 6,
+      "typography": 6,
+      "edgeStates": 7,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 83,
+    "horizonOS": 45,
+    "ours": 54
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (83)",
+    "ours (54)",
+    "horizonOS (45)"
+  ],
+  "biggestGap": "Focus discipline \u2014 exactly one obvious focal element per moment, gaze states unmistakable: expected visionOS single hero live word with left 3px accent glow + highlight wash, waveform dimmed 0.42, neighbors dim 0.42 scale0.98 blur falloff, 3-4 focusables max with pause primary persisting as 44 bloom; got components/08-captions/index.html:69-115 header live-pill pulsing 1.4s + timer-pill 28h with green dot + lang-chip English \u25be duplicate language 113x32 all equal weight, 149-199 transcript-wrap scroller shows cap-line current mat-raised + left-bar + highlight 6r but old lines keep 16r 0.05/0.06 same radius no dim (verified after 2 lines both 100h visible, gap10), 299-325 controls-card waveform 12 bars streaming 260ms infinite alternate always moving + mute 41 grey + pause primary 41 gradient both competing, Copy 55 + Clear 55 chips 0.07, hint-row 376-382 3 phrases 10 0.06em Gaze+dwell 350ms\u00b7Wave reacts\u00b7Scroll \u2195. Probe focusablesInStage 6 at rest (lang-chip + current line div + mute + pause + copy + clear) vs ideal 1, livePulse + wavePulse + caretBlink 900ms steps all animating simultaneously. Result glance ~1.8s not <1s, focus fails harsh.",
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 83/90, B=Horizon 45/90, C=ours 54/90: ours second overall, loses 9/9 criteria so not first or tied-first and gaps>0 => fail per VISION Critic protocol 5. Evidence = self-probed 2026-08-27T06:12:00Z via bun tools/probe.mjs + 18 captures (stage.png/stage-normal.png/stage-loading.png/stage-empty.png/stage-error.png/stage-offline.png/stage-permission.png stage-muted/paused/lang + full.png each) at 600x600 true, console0 pageErrors0 failedReqs0 focusable12 unlabeled0 subTen0 lowAlpha0 reducedMotion true, chipsOutsideStage true gap45px overlap false verified via evaluate. Per-criterion: 1 Glanceability A9 B5 C5: A <1s hero word; C ~1.8s: header 3 pills Live\u00b7English\u00b7on-device + timer 00:xx + lang-chip duplicate English + transcript 16r cards + controls 12-bar waveform + 2 icon buttons + 2 chips + hint 3 phrases competes before reading highlight. 2 Focus A10 B5 C4 (biggestGap): A one bloom, others dim 0.42, 3 foci; C 6 equal focusables same mat-glass+blur22+stroke0.12 none dimmed, 12-bar waveform infinite + livePulse 1.4s + caret 900ms steps all competing, pause primary gradient competes with live pill, no persistent hero, scale only on hover 1.04/1.06 transient. 3 Material A9 B4 C7: C honors tokens (--mat-glass+blur22+stroke0.12+sheen) but stage is synthetic radial 42,53,80\u219220,26,40\u219210,14,23 over 0.76 charcoal not live passthrough saturate1.6 blur28 rim light; Horizon flat #1e1e1e no blur. 4 Motion A10 B5 C6: C correctly --ease-prism 0.32,0.72,0,1 durBase260 durFast160 within 200-320, rise-in260 blurWipe320 correct, but livePulse1.4s infinite + wavePulse280 infinite alternate + caretBlink900 steps + banner380 over spec + durSlow380 over, not verified interruptible by look-away; B linear400-500 bounce abuse. 5 Typography A9 B5 C6: SF stack correct, tabular-nums on 00:00/words/confidence true, distinctSizesStage 10,11,13=3 at limit but state-title18 adds 4th, duplicate English badgeLang+langChipLabel, hint 3 phrases 10 uppercase 0.06em cramped, speaker pills MARA gradient vs YOU grey add weight but not system. 6 Edge A9 B6 C7: all 6 designed (loading skeleton 3 bubbles + shimmer, empty 64illu+Start+How, error PR-CAP-503 danger+Retry/Dismiss, offline dim 0.52 blur1px queued-list tabular, permission Allow/Not now) but skeletons web-ish 5 lines per bubble, error literal PR-CAP-503 noise similar to 07, not native sheet simplicity. 7 Dependability A9 B6 C7: error Retry\u2192 setTimeout1100 normal + banner, Dismiss\u2192normal, offline Retry\u2192Still offline banner + Use on-device\u2192normal, permission Allow\u2192normal Not now\u2192normal, empty Start\u2192Starting normal, clear\u2192reset + resume, all recover safe; loading stays until Normal chip no auto timeout, banner safe. 8 Accessibility A9 B5 C6: unlabeled0 subTen0 lowAlpha0 reducedMotion true global 0.01ms disable, focus rings 2.5px stroke-focus + gaze-focus 1.04/1.06 bloom, colorblind-safe blue accent vs ok/warn/danger distinct, but hint 10/600 0.42 low contrast, no mono-audio cue, text scale via --stage-scale1.15 but no clamp. 9 Delight A9 B4 C6: blurWipe 320 + highlight wash + left-bar glow earned serves streaming, but competing 12-bar waveform + caret + livePulse dilutes; visionOS single word glow + single waveform pill earned delight.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (54 vs 83), 9/9 criteria lost, verdict fail."
+}

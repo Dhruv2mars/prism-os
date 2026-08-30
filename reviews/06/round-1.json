@@ -1,0 +1,129 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T05:11:56.872Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/06-assistant/index.html",
+    "report": "reviews/probe-06-round1/report.json",
+    "stage": "reviews/probe-06-round1/stage.png",
+    "full": "reviews/probe-06-round1/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 12,
+    "focusablesInStage": 5,
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Assistant",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 45,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 55,105-745,795 (690x690 at 2x, 600 logical), ctrl 201,840-599,882 (398x42), gap 45px, overlap false, position fixed bottom 18px left50% translateX-50%, .stage .dev-controls display none !important, stage.png + stage-normal.png contain zero pill chrome; full.png shows chips only in outside gap 45px below stage",
+    "audit": {
+      "distinctSizesStage": [10, 11, 13, 14],
+      "distinctSizesCardNodes": [10, 11, 13, 14, 18],
+      "hasTabular": true,
+      "tabularVariant": "tabular-nums",
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms",
+      "durSlow": "380ms (over 320ms spec)",
+      "motionSample": "view rise-in 260ms var(--ease-prism) both, sheet-in 280ms var(--ease-prism) both, msg rise-in 220ms var(--ease-prism) both, word-reveal blurWipe 320ms var(--ease-prism) both, waveform wavePulse 280ms var(--ease-prism) infinite alternate, dotBounce 320ms infinite alternate, thinking-dots 320ms infinite, orbListenPulse 320ms infinite alternate, mini-orb orbBreathe 320ms infinite alternate, livePulse 1.2s ease-in-out infinite, cursorBlink 900ms steps(1) infinite, dwell-ring 350ms linear, shimmer 1.2s linear infinite, orb transform 260ms var(--ease-prism) + box-shadow 160ms, gaze-focus transform 260ms",
+      "scroll": "assistant-viewport inset 44px 0 0 0, overflow-y auto, scrollbar none, padding 14px 16px 88px 16px, gap14, scrollHeight 727 vs clientHeight 556 in normal (needsScroll true, ~171px overflow), edge views 556/556 no scroll, viewport scrolls not page",
+      "materialSample": "sheet background var(--mat-glass) linear-gradient(160deg rgba18,26,38 0.78 -> rgba10,15,23 0.84) + backdrop saturate1.4 blur22px + outline 1px rgba255,255,255 0.12 + shadow 0 18px 44px rgba0,0,0 0.34 + ::after sheen linear 120deg 0.06, raised variant var(--mat-raised) linear 160deg rgba28,38,54 0.88 -> rgba14,21,32 0.92, stage background radial 120%90% at 50%16% rgba42,53,80 0.55 -> rgba20,26,40 0.72 -> rgba10,14,23 0.90 + wash 86,184,255 0.10 over rgba6,10,16 0.76, orb radial 38%38% at 32%28% #fff->#dff0ff->86c8ff->2f9dff->0b5ed7 with 18px bloom",
+      "focus": "focusableCount 12 total (6 dev chips outside + Clear + 4 suggestions + orb). In-stage 5 (Clear + 4 chips) plus orb absolute bottom14 (probe counts 5 in-stage due to absolute overflow calc). Gaze probe: orb hover via mouse move 700ms gives hasGaze false, transform none, boxShadow default not bloom; suggestion chip hover gives transform matrix(1,0,0,1,0,-1) via :hover translateY -1, not gaze-focus scale1.05. So gaze-focus not unmistakable via JS dwell; requires core dwell 350ms but probe sweep did not trigger class. At rest 5-6 equal saliency chips + transcript 4 bubbles + status-strip 12-bar waveform + metaCard 36px icon + orb 56px all compete for focus.",
+      "waveform": "12 bars width3 gap3 height28, --h 10-22, wavePulse 280ms infinite alternate paused when idle (opacity0.45 scale0.5), listening 220ms + JS voiceInterval 110ms random --h 6-22, streaming 260ms + JS animateWaveformStreamingTick 90ms sin+random, not interruptible via look-away",
+      "transcript": "seeded 4 messages (user 27chars + assistant 119chars + user 14 + assistant 71) each 13/500 1.45 max-width84% 18r, meta 11/600 tabular, sheet-header 14/700 title + 11/600 sub + live-dot 7 + Clear 32px, status-strip 44px waveform+13/700 strong+11/600 caption, suggestions 4x 30px 11/600 chip, composer-hint 10/600 three phrases + dot + Enter, metaCard 36px +13/700 +11/600 + tabular 600x600, orb 56 +10/700 label + hint pill"
+    },
+    "captures": [
+      "reviews/probe-06-round1/stage.png",
+      "reviews/probe-06-round1/full.png",
+      "reviews/probe-06-round1/stage-normal.png",
+      "reviews/probe-06-round1/stage-loading.png",
+      "reviews/probe-06-round1/stage-empty.png",
+      "reviews/probe-06-round1/stage-error.png",
+      "reviews/probe-06-round1/stage-offline.png",
+      "reviews/probe-06-round1/stage-permission.png",
+      "reviews/probe-06-round1/stage-gaze-orb.png",
+      "reviews/probe-06-round1/stage-gaze-chip.png",
+      "reviews/probe-06-round1/stage-listening.png",
+      "reviews/probe-06-round1/stage-thinking.png",
+      "reviews/probe-06-round1/stage-streaming.png",
+      "reviews/probe-06-round1/stage-streaming-end.png"
+    ],
+    "verification": "Fresh context, no builder notes read. Probe via bun tools/probe.mjs http://localhost:4310/components/06-assistant/index.html (reviews/probe-06-round1/report.json stage 600x600 true, console0 pageErrors0 failedReqs0 focusable12 unlabeled0 subTen0 lowAlpha0 reducedMotion true). Edge states via playwright click of .dev-controls .chip[data-state=normal/loading/empty/error/offline/permission] each then wait900ms + stage screenshot + evaluate view active/display/scroll. Interactions: orb click -> listening 400ms screenshot + thinking 900ms + streaming 1100ms with word-reveal count23, gaze focus via mouse move to orb and chip 700ms + screenshot + evaluate class/transform, audit distinctSizes/tabular/ease/motion/scroll/material verified via evaluate. Chips outside verified gap45 no overlap."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Siri / Apple Intelligence assistant (visionOS 26 / Siri orb): Centered 56-64px glass orb on true black / live passthrough blur (saturate 1.6 blur 28-34) with soft parallax bloom, not synthetic radial. Idle shows single line status 15/600 ink-80 'Ask Siri...' + one primary action (maybe one pill suggestion, 32px, not four). Transcript shows at most one exchange at a time — last user bubble (14/500, white on glass) + last assistant streaming line (15/400, ink-100) with generous 24px gap and trimmed whitespace, not four stacked bubbles. Waveform is single centered undulating line, not 12 discrete bars, animated 260ms cubic-bezier(0.32,0.72,0,1) interruptible spring tied to actual mic RMS, stops on look-away within 180ms reverse. Focus discipline perfect: exactly one focal element — orb when idle, waveform when listening, streaming line when replying; everything else dims to 0.38. Status is one word + live-dot pulse 1.2s eased but paused when not relevant. Motion 200-320ms prism-ease, interruptible by palm/look-away, reduced-motion collapses to 160ms crossfade. No dev chrome inside 600x600, no meta card, no hint bar clutter. Edge states are native sheets over passthrough with one illustration + one CTA. Typography 3 sizes max per card (17/15/11), tabular only for time, SF Pro Display -0.015 tracking.",
+    "System B": "Horizon OS assistant / Meta AI on Quest 3 (Horizon Home / Meta AI panel): Flat opaque panel #1e1e1e 12r, 1px #2a2a2a border, shadow 8px, no backdrop-filter, no glass. Header 16/700 'Meta AI' + flat 'Clear' text button 12/600. Transcript similar 4 bubbles but flat grey (user #3a3a3a, assistant #2a2a2a) 14/500 with 8px radius, time 11 tabular but low contrast. Below transcript, status bar is plain text 'Listening...' with 3-dot bouncing (linear 400ms) + 12px caption. Suggestion chips 2-3 flat grey 28px 12/600 with 1px focus ring weak, no gradient, no lift. Orb is flat 2D gradient circle 48px with hard edge, no bloom, scales on press linear 200ms with bounce. Edge states: empty is plain text 'No conversations', loading is spinner + 'Loading...' centered, error is red text 'Something went wrong' + Retry flat grey, offline is snackbar 'Offline' overlapping list, permission is system dialog opaque with Allow/Not Now. No undo, no queue card, no gleam. Motion linear 350-500ms slide, not interruptible, no reduced-motion beyond instant cut. Focus has 3-4 equal cards + orb + chips, weak 1px blue ring on many elements. Glance needs ~2.5s.",
+    "System C": "Artifact under review (Prism 06-assistant, components/06-assistant/index.html:9-1021): 600x600 stage shell centered, stage background synthetic radial 120%90% at 50%16% rgba42,53,80 0.55 -> rgba20,26,40 0.72 -> rgba10,14,23 0.90 + 68%46% at 78%88% rgba86,184,255 0.10 over rgba6,10,16 0.76 (opaque charcoal, not passthrough). Statusbar 44px 'Assistant' + time tabular + dot. Assistant-viewport absolute inset 44px 0 0 0 scroll pad 14 16 88 gap14. Sheet raised var(--mat-glass) + blur22 + stroke0.12 + sheen ::after, header 16 16 12 border 0.06 with mini-orb 32 gradient + title 14/700 -0.01 + sub 11/600 + live-dot 7 idle + Clear ghost 32px 13px. Transcript flex gap10 pad 14 16 12 min118 with 4 seeded msgs (user gradient accent->accent-strong 18r 4px bottom, assistant rgba255,255,255 0.08 18r 4px, 13/500 1.45, meta 11/600 tabular). Thinking-inline 38px 18r with dotBounce 320 infinite. Status-strip 44px 14r rgba255,255,255 0.06 + waveform 12 bars 3w gap3 h28 gradient accent 280ms infinite + strong13 + caption11. Suggestions 4 chips 30px 11/600 hover -1px gaze-focus 1.05. Composer-hint 8 16 14 border0.05 centered 10/600 three phrases + dot + Enter. MetaCard below sheet 36px icon +13/700 +11/600 + tabular 600x600 (second card). Orb-wrap bottom14 absolute 56 gradient orb + ::before halo 22 bloom + label 10/700 0.12em uppercase ink-40 + hint pill bottom72 10/600. Edge views 5: loading skeleton with mini-orb listening + 42% shimmer, empty state-card No history + illus 64 + 2 CTA + Try asking chips, error PR-AI-503 danger red triangle + Retry/Dismiss + 12s retry, offline queued 2 prompts + Queued pill + Retry/Use offline, permission Mic blocked slash + Allow/Not now + Settings toggle. Dev chrome OUTSIDE stage fixed bottom18 left50% 398x42 45px gap. Motion tokens correct 260/160 but durSlow 380 >320 and 5 infinite loops."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 10,
+      "materialHonesty": 9,
+      "motion": 10,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 5,
+      "motion": 5,
+      "typography": 6,
+      "edgeStates": 6,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 5,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 6,
+      "typography": 6,
+      "edgeStates": 7,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 83,
+    "horizonOS": 48,
+    "ours": 54
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (83)",
+    "ours (54)",
+    "horizonOS (48)"
+  ],
+  "biggestGap": "Focus discipline — exactly one obvious focal element per moment, gaze focus unmistakable: expected visionOS single hero (orb 56 + bloom + 10px dot/3px halo/2.5px stroke-focus/22px bloom + dwell 350ms cubic-bezier(0.32,0.72,0,1) interruptible, waveform single line, transcript shows 1 exchange, 1-2 suggestion pills max, all else dimmed 0.38). Got components/06-assistant/index.html:391-496 + 598-739 viewport + sheet + transcript + metaCard + orb: at rest reviews/probe-06-round1/stage.png shows 6 competing foci — header Clear ghost 32px + 4 suggestion chips 30px each at 11/600 (gap8 wrap) + status-strip 12-bar waveform 28h + metaCard second sheet 36px icon + 13/700 'Voice & gaze ready' + 600x600 pill + orb 56 + 'Hey Prism' label 10/700 — all same glass 0.08-0.12 + shadow 18/44, none dimmed. Probe focusableInStage 5 (plus orb) vs A 1-2; gaze probe stage-gaze-orb.png hasGaze false transform none (no gaze-focus class via mouse), stage-gaze-chip.png only :hover translateY -1 not scale1.05 gaze-focus, while A gaze-focus scale1.02 + stroke-focus + bloom is unmistakable idle. Result glance needs ~2.4s not <1s, violates VISION 2. Fix: show max 1 transcript exchange + 1-2 chips + collapse metaCard into hint bar single phrase, dim non-focused to 0.42, make gaze-focus on orb/chip scale1.06 + bloom default not hover-only.",
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 83/90, B=Horizon 48/90, C=ours 54/90: ours second overall, loses 9/9 criteria so not first or tied-first and gaps>0 => fail per VISION Critic protocol 5. Evidence = self-probed 2026-08-27T05:11:56Z via bun tools/probe.mjs + 14 captures (stage.png/full.png/stage-normal/loading/empty/error/offline/permission/gaze-orb/gaze-chip/listening/thinking/streaming/streaming-end) at 600x600 true, console0 pageErrors0 failedReqs0 focusable12 unlabeled0 subTen0 lowAlpha0 reducedMotion true, chipsOutsideStage true gap45 overlap false. Per-criterion: 1 Glanceability A9 B5 C5: A <1s single line + one pill + orb; C needs ~2.4s: header title 14 + sub 11 + idle dot + Clear + 4 msgs 13/500 (2 user gradient + 2 assistant glass) gap10 = 4 bubbles stacked + status-strip 12 bars 28h + 13 strong 11 caption + 4 chips 30px + composer-hint 3 phrases 10 + metaCard 36 icon +13 title 11 caption + tabular 600x600 + orb 56 + label 10 + hint pill. Literal content like 'Ready · Tap orb or say \"Hey Prism\"' + 'Ask anything — voice or tap' duplicate intent. Horizon similar clutter but flat. 2 Focus A10 B5 C4 (worst, see biggestGap): A exactly one focal (orb idle, waveform listening, streaming line replying) with dim 0.38 elsewhere + 10px dot halo dwell ring; C has 5 in-stage focusables competing equally (verified focusablesInStage 5 + orb competing), no dim, suggestion chips hover only -1px not gaze-focus scale, orb hasGaze false in probe, waveform always visible 12 bars even idle at 0.45 opacity still salience. 3 Material A9 B5 C6: C honors tokens for sheets (mat-glass + saturate1.4 blur22 + stroke 0.12 + sheen + shadow 18/44) but stage is synthetic double-radial #060a10 0.55-0.76 opaque not live world; reads charcoal vs A live passthrough blur28 rim light; sheets are glass-on-opaque not glass-over-world, heavy shadow vs A feathered. Horizon opaque #1e1e1e flat no blur. 4 Motion A10 B5 C6: C correctly uses --ease-prism 0.32,0.72,0,1 and durBase 260 for view/sheet/msg 260/280/220, word-reveal 320 within 200-320, interruptible scroll, reducedMotion disables most; loses because durSlow 380 exceeds 320 spec, and 5 infinite alternates (orbBreathe 320, livePulse 1.2s, dotBounce 320, wavePulse 280, orbListenPulse 320) run continuously costing attention and not interruptible via look-away; listen 850 + think 900 timers not cancellable except double-trigger banner 'One moment'; streaming word tick 72+28 delay overlapping 320 not reversible. A single spring 260 interruptible. 5 Typography A9 B6 C6: SF stack correct, tabular-nums for times/meta (hasTabular true), but distinctCardSizes 5 (10,11,13,14,18) exceeds 3 max per card per VISION 5; overall 4 sizes stage (10,11,13,14) okay but edge cards add 18 title, 11 captions at ink-60 0.66 borderline at 20deg, composer-hint crams 3 phrases + dot + Enter in 10/600 vs A 3 sizes max with 15/600 single hint. 6 EdgeStates A9 B6 C7 (best ours): all 5 designed not defaulted verified via chip clicks: loading skeleton with mini-orb listening + shimmer + Thinking… + waveform streaming + on-device chip; empty No history + state-illus 64 + body 13 + 2 CTA (Start/Try) + Try asking 3 chips; error PR-AI-503 danger red + Retry -> loading 1.2s -> normal trigger retry + Dismiss + last prompt saved strip; offline You’re offline slash + 2 queued items with Queued pill + Retry/Use offline + No network strip, queuePrompt adds item; permission Mic blocked slash + Allow/Not now + Settings pill + Voice off strip; all recoverable no dead end. Loses to A because A uses single illustration + one primary CTA over passthrough with haptics, while C empty adds second sheet, offline uses scrim-like strip duplicated, loading shows 3 skeletons vs A single shimmer. 7 Dependability A9 B6 C7: any crash lands safe — offline queue persists in queuedPrompts array, triggerAssistant guards permission/offline/normal with setState, Clear resets transcript with 'Cleared' hint + banner, error Retry/ Dismiss both return to normal, permission Allow -> normal + banner, offline Use offline -> normal offline reply. No dead end; but queue not durable across reload, 'Hey Prism' hotword buffer 1.4s but no system wake outside app, hold/dwell not required. 8 Accessibility A9 B5 C6: reducedMotion true (media query disables wave/cursor), unlabeled 0, focusVisible 2.5px offset2 on all chips/orb, keyboard Tab reaches all 12, colorblind accent #56b8ff distinct vs ok/warn/danger, tabular numerals. Fails text-scale, mono-audio cues silent, 30px chips (26px dev 26) under 44px target, 10px label/hint 0.42 contrast marginal, orb 56 touch target ok but hint hidden until hover/focus not idle discoverable. 9 Delight A9 B4 C6: one earned moment exists — waveform reacting to voice (voiceInterval 110ms random --h 6-22 + streaming sin lift) + blurWipe 320 per word serving streaming function + orb breathing — functional; but burdened by 5 simultaneous delights (orb halo radial + breathe + mini-orb breathe + dotBounce + livePulse) vs A single subtle parallax/ bloom; blurWipe per word with 28ms stagger overlapping 320 feels decorative not earned when 4 messages already visible, and listen pulse scale1.07 competes with waveform. Harsh pass requires ours first or tied-first zero gaps; ours last on focus/glance and second overall 54 vs 83, so verdict fail.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (54 vs 83), 9/9 criteria lost, verdict fail."
+}

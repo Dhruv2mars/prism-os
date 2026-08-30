@@ -1,0 +1,133 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T06:37:50.733Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/13-a11y/index.html",
+    "report": "reviews/probe-verify-13-a11y-new/report.json",
+    "stage": "reviews/probe-verify-13-a11y-new/stage.png",
+    "full": "reviews/probe-verify-13-a11y-new/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 37,
+    "focusablesInStage": 31,
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Accessibility",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 13,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate + screenshot: stage 55,105-745,795 (690x690 at 2x, 600 logical), .dev-controls fixed bottom18 left50% translateX-50% 400x38 gap6 padding8 12 999r rgba10,15,23 0.74 blur16 outline0.12 z1000, .stage .dev-controls{display:none !important} guard, gap13 no overlap, full.png shows 6 chips (Normal/Loading/Empty/Error/Offline/Blocked) outside, stage.png bare; plus hintbar bottom12 inside stage 12r rgba0,0,0 0.38 blur12",
+    "audit": {
+      "distinctSizesStage": [10, 11, 12, 13, 14, 16, 22, 23],
+      "distinctSizesCardNodes": [10, 11, 13, 14, 16, 23],
+      "hasTabular": true,
+      "tabularCount": 19,
+      "tabularVariant": "tabular-nums",
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms (under 200ms floor spec)",
+      "durSlow": "380ms (over 320ms ceil spec)",
+      "motionSample": "rise-in var(--dur-base) 260ms var(--ease-prism) both (5 groups staggered 40-160ms), pulseLive 1.4s ease-in-out infinite on live-dot, wavePulse 280ms var(--ease-prism) infinite alternate on 8 bars (--h 8-16px delay 0-462ms), belt-line divider 0.06, toggle scale 160ms, shimmer 1.2s linear infinite on loading, dwell-ring 350ms linear",
+      "scroll": "a11y-viewport absolute inset 44px 0 0 0 overflow-y auto overscroll contain scrollbar none padding10 12 68 gap10 scrollHeight1519 vs clientHeight556 needsScroll true overflow963 (~2.7x stage) — requires 2-3 temple swipes/Tabs to reach Focus & input grid; viewport scrolls not page",
+      "materialSample": "stage background radial120%90% at50%16% rgba42,53,80 0.56->20,26,40 0.72->10,14,23 0.90 + radial68%46% at78%86% rgba86,184,255 0.09 over rgba6,10,16 0.76 base; group-card/preview-card background var(--mat-glass) linear160deg rgba18,26,38 0.78->rgba10,15,23 0.84 + backdrop saturate1.4 blur22 + outline1px var(--a11y-outline) 0.12 (0.26 high-contrast) + shadow 0 12px 28px rgba0,0,0 0.22 + ::before sheen radial 120deg 0.06; preview-stage radial120%90% at50%16% rgba42,53,80 0.66->20,26,40 0.84->10,14,23 0.96 + wash; high-contrast toggles --ink-60 0.66->0.78 --ink-40 0.42->0.60 --stroke-glass 0.12->0.22",
+      "focus": "focusable 37 total (6 dev chips outside + 31 in-stage: hdr Reset/Done 2 + scale 3 chips+range + 3 toggles switches + contrast/motion/mono rows + color 4 chips + voice/captions + 3 focus-demo btns + equivalence 6 cells + etc). In-stage 31 competing at rest, no dim. Gaze probe sweep 20 steps + hover: .gaze-focus appears on .a11y-row.slider-row (scale 1.04 + outline2px var(--stroke-focus) + bloom) verified hasGaze true after hover vs idle none — but at rest 31 equal saliency rows/chips/toggles vs visionOS single hero. Keyboard Tab cycles hdr Reset->Done->slider-row->chips->range->rows (verified focus after 2 Tabs = Done primary) same outcome as gaze dwell 350ms per os.state.dwell true.",
+      "togglesVerified": {
+        "textScale": "range input min100 max150 step25 value125 + 3 chips 100/125/150 active state; .stage --a11y-scale 1.25 default -> 1.5 after input to 150 verified preview-kicker 10*scale 15px title 18*scale 27px previewScaleVal 150% fill width 100% vs row-title remains 14px unchanged (not system-wide). Chip click updates --a11y-scale + fill + badge + subtitle innerHTML + banner 'Text scale 150% --a11y-scale 1.50 live'",
+        "contrast": "click contrastToggle aria-checked false->true adds .high-contrast class verified preview-stage outline rgba255,255,255 0.20 vs 0.12 badge Standard->High; row-value Standard->High; banner 'Contrast High outline 0.26 glass stays translucent'",
+        "reducedMotion": "click motionToggle aria-checked false->true adds .a11y-reduced class verified wave class wave->wave paused animationName none vs wavePulse; pulse-dot animation none vs pulseLive; design-system prefers-reduced-motion sheet true but .a11y-reduced only pauses .pulse-dot/.wave i/.shimmerPulse not rise-in/banner-in",
+        "mono": "click monoToggle aria-checked false->true toggles mono true verified monoBadge Stereo->Mono · single cue monoIcon stereo->mono svg aria-label Mono audio, single channel wave class wave->wave muted opacity0.22 vs 0.72 banner 'Mono audio on cues merged'",
+        "colorblind": "4 chips Accent blue circle gradient var(--accent) pattern linear 90deg, OK green #4cd47c->#1a8a4a pattern repeating 45deg 0.16, Warn amber #ffc247->#ff7a1a pattern repeating 90deg 0.10, Danger red #ff5d5d->#c42323 pattern 135deg 0.14 each with distinct icon (focus/check/warn/danger) shape+icon distinguishable without hue verified patterns present"
+      },
+      "hintbar": "hintbar absolute left12 right12 bottom12 z540 rgba0,0,0 0.38 blur12 outline0.06 10/600 0.06em uppercase ink-60: 'Gaze dwell 350 ms = Tap · Tab cycles' + 'Focus ring 2.5 px · Esc back' — 2 phrases competing",
+      "previewLive": "preview-card earned moment: preview-header with Live pulse-dot 6px 1.4s + badges Standard/Default/Live, preview-stage 14pad 148min-h 16r with kicker/title/body/caption calc(...*var(--a11y-scale)) + metrics pill tabular live + wave 8 bars + mono-icon + badge — reflows live on scale/contrast/motion/mono changes verified via input event"
+    },
+    "captures": [
+      "reviews/probe-verify-13-a11y-new/stage.png",
+      "reviews/probe-verify-13-a11y-new/full.png",
+      "reviews/probe-verify-13-a11y-new/stage-contrast.png",
+      "reviews/probe-verify-13-a11y-new/stage-reduced.png",
+      "reviews/probe-verify-13-a11y-new/stage-focus.png",
+      "reviews/probe-verify-13-a11y-new/stage-loading.png",
+      "reviews/probe-verify-13-a11y-new/stage-empty.png",
+      "reviews/probe-verify-13-a11y-new/stage-error.png",
+      "reviews/probe-verify-13-a11y-new/stage-offline.png",
+      "reviews/probe-verify-13-a11y-new/stage-permission.png"
+    ],
+    "verification": "Fresh context, no builder notes. Probe via bun tools/probe.mjs http://localhost:4310/components/13-a11y/index.html -> reviews/probe-verify-13-a11y-new/report.json stage600x600 true console0 pageErrors0 failedReqs0 focusable37 unlabeled0 subTen0 lowAlpha0 reducedMotion true. Deep audit via playwright chromium 800x900@2x: goto networkidle wait600, evaluate sizes/dur/scale/scroll/focusable/devRect/chipGap + toggle scale 125->150 via range input check --a11y-scale 1.5 + kicker 15px title27px + contrast click verify high-contrast outline0.20 + reducedMotion click verify wavePaused+animationNone + focus Tabx2 + edge chips click each [normal,loading,empty,error,offline,permission] wait700 screenshot verify viewport display/stateLayer class hasCard, plus gaze sweep 20 steps verify hasGaze on slider-row."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS 26 Accessibility (Settings > Accessibility > Display & Text Size / Motion / Audio): Centered true glass over live passthrough world (saturate1.6 blur28-34 + rim light + feathered 40/90 shadow, not synthetic radial). Single header 'Accessibility' 22/800 -0.03 + 11/600 'Display & Text Size · tabular' single line, preview paragraph live at top reflows entire UI as you scrub Dynamic Type slider (7 steps 80%-310% UIContentSizeCategory, not preview-only) with Bold Text toggle, Increase Contrast (removes transparency -> 0.92 opaque + 1.5px stroke vs ours 0.26), Reduce Motion (converts all springs to 160ms crossfade interruptible system-wide, respects prefers-reduced-motion out of box), Reduce Transparency, Color Filters with shape+text alternatives. Each card isolates one control + live preview, one focal element dim others to 0.38, focus ring 2.5px #56b8ff halo 3px bloom 22px scale1.02 parallax unmistakable idle. Motion 260ms prism-ease interruptible spring everywhere, no infinite loops. Typography 3 sizes max per card (22/14/11) SF Pro -0.015 tracking, tabular only on time/size. No dev chrome, no hintbar clutter. Edge states native sheets with single illustration + one CTA. Delight is the live Dynamic Type preview itself — earned, functional, glass vibrancy.",
+    "System B": "Horizon OS Accessibility v74 (Settings > Accessibility on Quest 3): Flat opaque charcoal panel #232323 16r 1px #2f2f2f border shadow8 no backdrop-filter. Header 16/700 'Accessibility' + list of 6 toggles full-width: Text Size slider 100-200 coarse snap 25, High Contrast (inverts grey to white harsh, no glass), Reduce Motion (cuts to instant, not eased), Mono Audio, Color Correction presets. Preview is static text box 'The quick brown fox' not live metrics/wave, no pulse. Groups crammed vertical no preview-card isolation, icon 24 flat tint grey, title14 medium body12 regular weak hierarchy 5 sizes mixed, no tabular outside time. Focus ring 1px blue competing across 6 equal rows, no gaze halo, dwell not advertised. Scroll required (800px list) hintbar 'Swipe to dismiss' flat. Motion linear 350-450ms slide with bounce, not interruptible. Edge: empty 'No settings' text, loading spinner 'Loading...' centered, error red text 'Failed to load' flat Retry, offline snackbar overlapping list, permission system dialog opaque. No undo queue, no glass, no signature moment beyond flat toggle.",
+    "System C": "Artifact under review (Prism 13-a11y components/13-a11y/index.html:9-947): 600x600 stage shell centered, stage synthetic double-radial 42,53,80 0.56->20,26,40 0.72->10,14,23 0.90 wash 86,184,255 0.09 over rgba6,10,16 0.76 (charcoal opaque not passthrough) --a11y-scale 1.25 var. Viewport absolute inset44 0 0 0 gap10 pad10 12 68 scrollHeight1519 client556 2.7x overflow 37 focusables (6 dev chips outside fixed bottom13 gap6 Normal/Loading/Empty/Error/Offline/Blocked + 31 in-stage). Header rise-in title22/800 + subtitle 11/600 'Prism OS · scale125% · standard · motion · tabular' with dot ok + Reset ghost + Done gradient primary 28px. Groups: Vision 2 controls (slider-row with chips 100/125/150 active + range6px track + fill accent gradient + row High contrast with toggle switch 52x32 white thumb), Live preview card focal (header Live pulse-dot 6px 1.4s + badges Standard/Default/Live + stage 16r 14pad preview-kicker 10*scale title18*scale body13*scale caption11*scale metrics pill 26 tabular wave8 bars 280ms + mono-icon + mono badge), Motion & sound 2 toggles (Reduced motion purple icon + toggle + Mono audio), Color & shortcuts (title row + 4 color-chips Accent blue circle / OK green check / Warn amber triangle / Danger red X each 76min-w pad10 8r pattern bottom4px + note + Voice Hey Prism purple + Captions ok), Focus & input (helper 2.5px ring demo with 3 btns Gaze dwell 350ms yellow vs Tab cycle vs Show ring + legend + equivalence 6 cells gaze/tap/Enter/Space/Tab/Esc). Hintbar bottom12 rgba0,0,0 0.38 blur12 'Gaze dwell 350 ms = Tap · Tab cycles · Focus ring 2.5 px · Esc back'. State layers 5 via chips: loading skeleton with mini shimmer + 3 cards opacity0.86, empty 'Accessibility at defaults' illus + Enable high contrast / Set125% + 100% pill, error PR-A11Y-503 danger red triangle + Retry/Use cached + timer, offline 52% dim blur 'Offline · cached prefs 125% standard live · Cached 00:43 ago' + Retry/Use cached, permission 'Voice access blocked' lock + mic blocked row + Allow/Not now. All materials var(--mat-glass) blur22 outline0.12 vs high-contrast 0.26, shadows 12/28, animations rise-in 260 prism-ease staggered 40-160ms + infinite pulse/wave/shimmer."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 5,
+      "motion": 5,
+      "typography": 6,
+      "edgeStates": 6,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 4,
+      "focusDiscipline": 5,
+      "materialHonesty": 6,
+      "motion": 5,
+      "typography": 5,
+      "edgeStates": 8,
+      "dependability": 7,
+      "accessibility": 5,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 81,
+    "horizonOS": 46,
+    "ours": 51
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (81)",
+    "ours (51)",
+    "horizonOS (46)"
+  ],
+  "biggestGap": "Accessibility — text scale is preview-only, not system-wide (VISION 8): expected visionOS Dynamic Type where --a11y-scale reflows entire UI (7 stops 80-310% + Bold, slider scrubs all type + preview live, tabular retained). Got components/13-a11y/index.html:14 --a11y-scale:1.25 + :553 range 100-150 step25 + :525 chips 100/125/150 + :231 kicker calc(10px*var(--scale)) title calc(18px*var--) body calc(13px*var--) caption calc(11px*var--) inside #previewStage only — verified after setting range to 150: stage --a11y-scale 1.5 preview-kicker 15px title27px ok but row-title computed 14px row-sub 11px scale-chip 11px group-label 11px remain fixed (evaluate distinctSizesStage 8 vs distinctCard 6). Whole viewport does not scale, glanceability still requires 2-3 swipes (scrollHeight1519 vs556) to reach equivalence grid. Slider offers only 3 coarse stops vs visionOS 7. Contrast toggle only outline 0.12->0.26 and ink-60 0.66->0.78 not transparency removal (stage bg stays 0.76). Mono only icon+wave muted no haptics. Criterion scores 5 vs visionOS 9 and ties horizon 5 — fatal on the accessibility piece itself. Fix: apply --a11y-scale to viewport root (clamp fluid body 14->21 at 150%, caption 11->16) or remap all type via calc, keep preview live but scrub whole list, add 4 intermediate stops 110/125/135/150, wire high-contrast to reduce blur22->12 and mat-glass opacity 0.78->0.92 as visionOS Increase Contrast does.",
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 81/90, B=Horizon 46/90, C=ours 51/90: ours second but far from visionOS, loses 9/9 criteria so not first or tied-first and gaps>0 per Critic protocol 5. Harsh verdict — probe clean (stage600x600 console0 pageErrors0 failedReqs0 focusable37 unlabeled0 subTen0 lowAlpha0 RM true) masks real gaps. Per-criterion: 1 Glanceability A9 B5 C4: A extracts <1s single preview + one slider; C needs ~2.8s + 2-3 swipes — viewport scrollHeight1519 vs556 2.7x overflow, 5 groups (Vision2 + Live preview + Motion&sound2 + Color4 chips+Voice/Captions2 + Focus3btns+6cells) + header 22 + subtitle with tabular leak 'scale125%' + hintbar 2 phrases competing; stage.png shows Focus & input equivalence grid truncated below fold, requires scroll vs A isolation. 2 Focus A9 B5 C5: A exactly one hero dim others0.38 single 2.5px ring+halo bloom parallax; C at rest 31 in-stage equal saliency rows/chips/toggles same mat-glass blur22 outline0.12 shadow12/28 none dimmed; gaze-focus works (sweep verified hasGaze on slider-row scale1.04) but 37 compete so not unmistakable; keyboard Tab verified cycles but same density. 3 Material A9 B5 C6: A live passthrough saturate1.6 blur28 rim; C honors tokens (mat-glass blur22 ok) but stage synthetic radial 42,53,80 0.56 over charcoal 0.76 opaque reads panel not scrim, shadow heavy 12/28 vs feathered, high-contrast only outline bump not transparency cut (preview-stage outline 0.20 vs A 1.5px). 4 Motion A9 B5 C5: C uses --ease-prism 0.32,0.72,0,1 and durBase260 correct but durFast160 under200 floor and durSlow380 over320 ceil (design-system.css55-58 violation lives in situ); rise-in 260 staggered ok but pulseLive1.4s infinite + wavePulse280ms infinite alternate on 8 bars + shimmer1.2s infinite decorative cost attention, not interruptible springs; a11y-reduced pauses only pulse/wave/shimmerPulse :23-25 not rise-in/banner, so reduced-motion via toggle partial vs A system-wide 160 crossfade. 5 Typography A9 B6 C5: A 3 sizes max per card SF Pro -0.015 tabular only time; C 8 distinct stage sizes 10,11,12,13,14,16,22,23 (distinctCard6 >3) raw px not var(--fs-caption/body/title) tokens vs coherence YES-but gap, subtitle leaks size+ tabular + 'tabular' count; preview card itself 13/16/23 within 3 but Vision group card stacks 11/14 inside same 18r plus 10count 16title etc overall clutter, ink-40 at 0.42 low for captions. 6 Edge A9 B6 C8: only bright spot — 5 states designed via dev chips outside gap13 not defaulted (loading skeleton opacity1->0.72 3 cards + shimmer, empty 'Accessibility at defaults' illus64 + 2 CTAs + 100% pill, error PR-A11Y-503 danger + Retry/Use cached, offline dim0.52 blur1 'Offline · cached prefs 125%' + Cached00:43+Retry, permission lock 'Voice blocked' + mic row + Allow/Not now) all recover via setEdge normal + Esc back, but chips outside stage vs builder ideal inside showcase and loading not real spinner. 7 Dependability A9 B6 C7: error/offline/permission all have safe fallback + banner Use cached/queued + retry timing 900-1100ms, no dead ends, but PR-A11Y-503 banner copy generic vs A specific diagnostics. 8 Accessibility A9 B5 C5 biggestGap: see above — 5 controls present (scale slider+chips, contrast toggle, reducedMotion toggle, mono toggle, colorblind 4 chips with shape+icon+pattern) all labeled aria-checked + banners, but fails VISION 8 on the piece's core — preview-only scaling not system-wide, coarse steps, contrast no transparency cut, mono no queue. Horizon similarly 5 but flat. 9 Delight A9 B4 C6: C preview card live scaling functional earned moment (Live pulse 1.4s + metrics pill + wave) vs A vibrancy sheen signature — C synthetic radial not passthrough, pulse infinite vs breathe, no earned spring. Harsh Pass requires first vs visionOS — got second by 30pts and 9 gaps.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (51 vs 81), lost 9/9 criteria, verdict fail."
+}

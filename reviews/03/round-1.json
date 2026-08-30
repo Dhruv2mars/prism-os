@@ -1,0 +1,103 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-26T13:49:18.607Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/03-wm/index.html",
+    "report": "reviews/probe-03-wm-round1/report.json",
+    "stage": "reviews/probe-03-wm-round1/stage.png",
+    "full": "reviews/probe-03-wm-round1/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 27,
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Window Manager",
+    "extraCaptures": [
+      "/tmp/wm-01-initial-stacked.png",
+      "/tmp/wm-02-overview.png",
+      "/tmp/wm-03-tiled.png",
+      "/tmp/wm-05-minimized-one.png",
+      "/tmp/wm-06-minimized-two.png",
+      "/tmp/wm-08-empty.png",
+      "/tmp/wm-10-loading.png",
+      "/tmp/wm-11-error.png",
+      "/tmp/wm-12-offline.png",
+      "/tmp/wm-13-permission.png",
+      "/tmp/wm-16-tiled-three.png"
+    ]
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS windowing (visionOS 26 / 2): Single volumetric glass sheet per app, 28-34px corner radius, continuous frosted translucency over live passthrough (saturate 1.6 + blur 28-40px) with specular rim light and true depth shadow (2-layer: 40px/90px). No developer chrome inside stage — status shows time + battery only. One centered window occupies 92% stage width, stacked depth renders via perspective shift + scale 0.92 per layer + real blur falloff, tiled mode uses freeform draggable sheets with magnetic guides not rigid grid. Gaze focus = 4px glow + 1.02 scale on hovered titlebar only, exactly one halo at a time. 260ms prism-ease (0.32,0.72,0,1) interruptible, dismiss via head-flick scrim tap or 320ms slide-back.",
+    "System B": "Horizon OS windowing (Quest 3 v74): Opaque light-grey panels (rgba 0.96) with weak border, flat rectangular windows at fixed 16:9, top bar with traffic-light dots, dock/shelf at bottom with app icons + window previews. Layout is strict 1-2 column grid, no overlapping glass depth — windows tile with splitter handles, stacking is z-lift only. Chrome: window titlebar 48px black, visible resize grips, minimize/maximize/close always visible. Materials read as Android tablets floating, not scrim-over-world. Focus via controller ray or gaze dot but multiple windows stay equally bright; faint 1px blue ring. Motion linear 280-400ms with stop-start jank, no blur interpolation.",
+    "System C": "Artifact under review (Prism 03-wm): 600x600 dark radial stage (components/03-wm/index.html:9-14) with statusbar + two fixed control rows: .edge-row (top:48px) 6 pills (Normal blue + Empty/Loading/Error/Offline/No access) + .wm-toolbar (top:78px) 8 pills ( +Open/ Cycle/ −Minimize active-blue/ ×Close/Overview left, Stacked blue/Tiled right). Below, a single .win-sheet (max 520w 420h, --mat-sheet + --blur-heavy 34px, 26px radius, 24/56 shadow) centered via os.wm layer (blur 6px scrim). Stacked mode offsets -13px Y + scale 0.958 per layer + blur 1.4px + opacity 0.68-1.0 behind top. Tiled mode absolute-position grid (2-col, gap 10px) filling top:116 bottom:52 area. Bottom has .hintbar (2 windows · stacked · Maps) + .dock (Live Captions pill). Overview (backdrop rgba 0.52 blur 18px) shows 2-col cards. Edge states triggered by Normal chips swapping stateLayer."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 5,
+      "motion": 5,
+      "typography": 6,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 4,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 7,
+      "typography": 6,
+      "edgeStates": 7,
+      "dependability": 5,
+      "accessibility": 5,
+      "delight": 5
+    }
+  },
+  "totals": {
+    "visionOS": 81,
+    "horizonOS": 46,
+    "ours": 50
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (81)",
+    "ours (50)",
+    "horizonOS (46)"
+  ],
+  "biggestGap": "Developer chrome toolbar occlusion + focus theft + stage-area theft: expected visionOS window manager has zero control chrome inside the 600×600 stage — only time/battery in statusbar, windows consume full inset; the control row lives outside stage (simulator chrome). Got components/03-wm/index.html:15-42 .edge-row{top:48px} + .wm-toolbar{top:78px;justify-content:space-between} rendering 14 focusable pills in two rows occupying 68px vertical + 24px gutters, permanently over stage (z-index 560). Evidence reviews/probe-03-wm-round1/stage.png: blue Normal pill + blue Stacked pill + blue window outline = three competing primaries simultaneously; gaze halo at rest sits on Minimize chip (blue ring) not on window content, stealing the single focal element. Same occlusion in /tmp/wm-03-tiled.png and /tmp/wm-08-empty.png where chip bar sits atop window bodies leaving only 428px usable height (stage 600 -116 top -52 bottom -12 dock), forcing tiled windows to 209px tall with clipped text (Mara row truncated to Lens test at 4pm? I ll bring the mou...). Fix: move edge-state toggles and Stacked/Tiled/Cycle controls out of stage into simulator frame or collapsible dev drawer; restore full-height scrim windowing.",
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 81/90, B=Horizon 46/90, C=ours 50/90: ours second overall, loses 9/9 criteria so not tied-first and gaps>0. System A (visionOS): sparse, zero chrome, one focal glass sheet with true passthrough blur, 260ms prism-ease interruptible with perspective depth, SF 2-size hierarchy with tabular time, every edge state distinct with recovery, AAA contrast, earned orchid parallax delight. System B (Horizon): opaque flat panels, weak hierarchy, linear motion, equal-weight focus. System C (artifact): functional plumbing but noisy chrome. Per-criterion: 1 Glanceability A9 B5 C4 — C forces parsing 14 pills before window; window chrome label Nearby · 3 11px ink-60 is washed vs 1s threshold, stacked depth renders only one window fully visible so glance must also parse hintbar. 2 Focus discipline A9 B5 C4 — C at rest has three blue primaries (Normal, Stacked, is-focused window stroke) plus hintbar pill Live Captions blue dot; gaze focus halo exists (10px dot + dwell ring) but at probe it rested on Minimize chip not window. 3 Material honesty A9 B5 C6 — C honors tokens (--mat-sheet, --blur-heavy 34px, stroke-glass, inner sheen) but stage background is static dark radial (9-14) not live world, so glass reads as dark charcoal opaque; tiled mode sets layer background transparent + sheet opaque, losing scrim-over-world claim; overview bg rgba(4,7,11,0.52) is tinted dark not translucent. 4 Motion A9 B5 C7 (closest) — C correctly uses --ease-prism and --dur-base 260ms for sheet-in, rise-in, transform/opacity/filter transitions, minimize keyframes 240ms same ease, reduced-motion disables — verified in design-system.css:55-59 and index.html:149-155. Loses to A on interruptibility: stacked blur/scale transitions are CSS but blur filter animates on main thread and is not spring-interruptible; tiled placement jumps with left/top/width/height no FLIP. 5 Typography A9 B6 C6 — C SF stack correct, win-title 14px/700 + win-sub 11px/600 is clean, tabular where needed (00:12, 9:41), but chips 11px/700 repeated 14× create hierarchy noise; message body 13px inside 520px sheet is comfortable but truncation without ellipsis (Lens test at 4pm? I ll bring the mou) shows layout stress at small tiled heights. 6 Edge states A9 B5 C7 — C ships all five: empty (centered card with icon+No windows open+Open Messages/Gallery), loading (skeleton shimmer ×2 sheets + 1.2s caption), error (red dot + Window failed to load+Retry/Dismiss+PR-WM-502), offline (wifi slash + You re offline+Retry/Use cached+No network), permission (lock+Allow location/Not now+Settings→Privacy). Closer to A but empty leaves stale hintbar 2 windows · stacked · Live Captions (vs 0), loading second sheet is dimmed but still focusable behind? 7 Dependability A9 B6 C5 — C recovers via banners (Limit reached, Nothing to close) and stateLayer swaps keep windowsData cleared correctly on Normal, but empty→normal recreates only if both stacks empty (edge case), and minimized windows count shown but dock-height collapses to 0 when none — no dead end but stale counts mislead. 8 Accessibility A9 B5 C5 — C passes probe (27 focusables all aria-labeld, 0 unlabeled, 0 sub10, supports reduced-motion), but 32px dock-chip below 44px target, 11px captions borderline at 600px 1x, keyboard tab must traverse 14 toolbar chips before reaching window content. 9 Delight A9 B4 C5 — C stacked depth scale/blur parallax and minimize slide-back are earned (communicate z) but tiled grid snap is mechanical; no signature moment like visionOS sheet shimmer on gaze.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (50 vs 81), 9 gaps >0, verdict fail."
+}

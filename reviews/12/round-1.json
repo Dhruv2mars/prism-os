@@ -1,0 +1,160 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T06:31:11.605Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/12-webapps/index.html",
+    "report": "reviews/probe-verify-12-webapps/report.json",
+    "stage": "reviews/probe-verify-12-webapps/stage.png",
+    "full": "reviews/probe-verify-12-webapps/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 29,
+    "focusablesInStage": 23,
+    "unlabeledIconButtons": [],
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Web Apps",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 13,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 55,105-745,795 (690x690 at 2x, 600 logical 600x600), ctrlRow 200,808-600,882 (400x74) gap 13px overlap false position fixed bottom 18px left50% translateX-50%, .stage .dev-controls display none !important, stage.png + stage-normal.png contain zero pill chrome; full.png shows chips only outside gap below stage. Probe via bun tools/probe.mjs http://localhost:4310/components/12-webapps/index.html stage 600x600 true console0 pageErrors0 failedReqs0 focusable29 unlabeled0 subTen0 lowAlpha0 reducedMotion true. Edge states via playwright window.__setWebAppsState each + wait 500ms + stage screenshot. Permission gate via window.__openWebApp figma/slack then inspect .perm-gate rows + selected states + Esc.",
+    "audit": {
+      "distinctSizesStage": [11, 14, 16, 22],
+      "distinctSizesStageWithFractional": [11, 14, 16, 22],
+      "distinctSizesCardNodes": [11],
+      "distinctSizesCardWithName": [11, 14],
+      "hasTabular": true,
+      "tabularVariant": "tabular-nums",
+      "tabularEls": 26,
+      "tabularLiteralLeaks": 12,
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms",
+      "durSheet": "380ms (sheet-in exceeds 320)",
+      "motionSample": "web-header rise-in 260ms var(--ease-prism) both, search-wrap 260ms 30ms delay, .group rise-in 260ms 50/80/110ms stagger, app-card mat-glass blur22 stroke-glass 18r shadow 12/28 sheen ::after 0.04 transform 260ms prism-ease + outline 160ms + hover translateY -1px + gaze-focus scale 1.015 outline 2.5px bloom 0.14, btn-small transform 260ms, chip transform, gate-btn scale 1.04, sheet-in 380ms cubic-bezier(0.32,0.72,0,1) translateY 36->0 scale 0.97 blur8->0, close WAAPI 240ms scale 1->0.96 blur 0->6, shimmer 1.2s linear infinite infinite, reducedMotion @media collapses to 0.01ms, dwellRing 350ms linear",
+      "scroll": "web-viewport absolute inset 44px 0 0 0 flex col gap12 pad 10 12 72 12 overflow-y auto overscroll contain scrollbar none, sh 1411 ch 556 overflow 855px => 2.54 viewports scroll, 2 groups (Installed 6 cards 2col 3 rows ~ 134h each + Discover 4 cards ~ 64h each) = 10 cards, header 22 + search 36 + gap12, hintbar absolute left12 right12 bottom12 31h rgba0,0,0 0.38 blur12 outline 0.06 overlaps viewport 45px (hint top 750 vp bottom 795 overlap true covers last Discover card)",
+      "materialSample": "stage background radial 120%90% at 50%14% rgba42,53,80 0.56 -> rgba20,26,40 0.72 -> rgba10,14,23 0.90 + wash 68%46% at 78%86% rgba86,184,255 0.09 over rgba6,10,16 0.76 (opaque charcoal 0.76 not live passthrough), card var(--mat-glass) linear 160deg rgba18,26,38 0.78 -> rgba10,15,23 0.84 + backdrop saturate1.4 blur22 + outline 1px var(--stroke-glass) 0.12 + shadow 0_12_28_rgba0,0,0,0.22 + card sheen ::after linear 180deg rgba255,255,255 0.04, icon 42w 12r gradient per app + inset 0_1_0_rgba255,255,255_0.08 shadow 0_6_16_rgba0,0,0_0.22, perm-badge 22h 999r bg 0.07 outline 0.07 ink-60 11/600 trusted 0.10 green 0.18 needs 0.10 yellow 0.18, browser-sheet var(--mat-sheet) linear 170deg rgba22,31,45 0.96 -> rgba12,18,27 0.97 blur-heavy 34 shadow 0_24_56_rgba0,0,0_0.46 inset 0_1_0_rgba255,255,255_0.06 + sheen 0.05, perm-gate 10 12 pad bg0.03 border 0.06 gate-row 8_10_12r bg0.06 outline0.06, hintbar 0.38 blur12, offline-banner 0.38 blur12",
+      "focus": "focusableCount 29 total (6 dev chips outside + 23 in-stage: header +Add 28h / Filter 28h 2, search-field 36h 1, installed 6 cards each double [card data-focusable role=button aria-label + inner btn-small ghost/primary data-focusable] =12, discover 4 cards each double =8 => 23). DoubleFocusable trap verified via evaluate all 10 cards cardFocusable true && btnFocusable true both true. At rest stage.png zero dimmed, 10 cards equal mat-glass intensity, no persistent halo idle, gaze-focus .gaze-focus scale1.015 + outline stroke-focus transient only on hover not unmistakable, no dim others to 0.38, tab requires 23 stops to reach last Discover VS Code card. Hintbar 31h overlaps last card hides 45px.",
+      "edgeStatesVerified": "normal (stage.png header Web Apps 22/800 + sub 11 tabular 6 installed + search 36 + Installed 6 apps + Discover 4 picks), loading (stateLayer on 6 app-card skeletons 134h each + 3 store skeletons + shimmer + caption Loading web apps · prism-ease 260 ms · tabular), empty (dim-on state-card 64 illu 18r + No web apps yet 18/800 + body 14/500 Install your first PWA · glass scrim + Browse Discover + Add by URL + 0 installed · 4 in Discover caption literal tabular leak), error (danger triangle 26 + Can't load Web Apps + Prism couldn't reach catalog + Retry -> loading 1300ms then normal banner Web Apps restored + Use cached -> offline + code PR-WEB-503 · 9:41 AM), offline (offline-banner cached available + Discover paused + inline 6 installed · 4 cached · 2 need network + grid 6 cards 2 need network dim + 5 btn-small disabled Offline + store-list opacity 0.52 pointer none + note paused literal), permission-denied (viewport inline permNote Location blocked 32 icon yellow + Figma needs location — allow in gate + Allow btn 28h primary + first card location badge needs yellow vs camera neutral + hint still visible; gate test: __openWebApp figma normal gate 2 rows Camera/Location prompt both unselected, blocked preset location Block selected true via evaluate rows[1].blockSelected true ), plus permission gate details verified: browser-sheet sheet-in 380m dialog role, browser-bar 46h back 34 + url-pill 30h 11/600 999r lock green + trust-chip Trusted/Unverified 24h green/yellow + close 34, perm-gate head Permissions · figma.com wants · tabular + 2 gate rows allow/block 26h selected outline2px focus, gate help literal glass scrim stays translucent · tabular, content mock 600x600 canvas, footer cached/live dot + Details/Open chips, Esc restores hint opacity",
+      "permissionGate": "gate verified in 2 states: normal figma gate rows Camera prompt (allowSelected false block false) + Location prompt false false with Allow/Block 26h each aria-label Allow camera for figma.com etc, trust-chip Trusted green; permission-denied figma gate Location row Block selected true (evaluate gate blocked rows[1].blockSelected true) Camera false false, help text literal. Slack gate Microm 8 focusablesInSheet, Mic/Notifications rows, lock icon true urlPill slack.com·443. Gate backdrop blur10 layer + sheet blur34 correct but sheet duration 380 exceeds spec.",
+      "devChromeLeakTokens": [
+        "components/12-webapps/index.html:559 banner literal 'from ${app.domain} · ${app.size} MB · tabular' visible on Install toast",
+        "components/12-webapps/index.html:599 offline sub literal 'Offline · <tabular>6 installed..</tabular> · tabular' renders '· tabular' suffix at subtitle when offline",
+        "components/12-webapps/index.html:601 normal sub literal '· glass scrim' not leak but '· tabular' wrapper tabular class ok; however offline branch leaks",
+        "components/12-webapps/index.html:607 banner literal 'Enter domain · tabular · e.g. figma.com'",
+        "components/12-webapps/index.html:617 banner literal 'tabular · updated'",
+        "components/12-webapps/index.html:655 search empty literal 'Try camera or figma.com · tabular'",
+        "components/12-webapps/index.html:676 note literal 'Discover paused offline · cached launch still works · tabular'",
+        "components/12-webapps/index.html:691 banner literal 'Figma · permission granted · tabular'",
+        "components/12-webapps/index.html:764 loading caption literal 'Loading web apps · prism-ease 260 ms · tabular'",
+        "components/12-webapps/index.html:786 empty caption literal '0 installed · 4 in Discover · tabular'",
+        "components/12-webapps/index.html:902 gate head literal 'Permissions · ${app.domain} wants · tabular' visible in sheet",
+        "components/12-webapps/index.html:950 gate help literal 'Glass scrim stays translucent — permissions never hide world layer · tabular'"
+      ]
+    },
+    "captures": [
+      "reviews/probe-verify-12-webapps/stage.png",
+      "reviews/probe-verify-12-webapps/full.png",
+      "/tmp/stage-normal.png",
+      "/tmp/stage-loading.png",
+      "/tmp/stage-empty.png",
+      "/tmp/stage-error.png",
+      "/tmp/stage-offline.png",
+      "/tmp/stage-permission-denied.png",
+      "/tmp/stage-gate-normal.png",
+      "/tmp/stage-gate-blocked.png"
+    ],
+    "verification": "Fresh context no builder notes read. Probe via bun tools/probe.mjs http://localhost:4310/components/12-webapps/index.html reviews/probe-verify-12-webapps (stage 600x600 true console0 pageErrors0 failedReqs0 focusable29 unlabeled0 subTen0 lowAlpha0 reducedMotion true title Prism OS — Web Apps probedAt 2026-08-27T06:31:11.605Z). Secondary playwright at 800x900@2x exercised chipsOutside gap13 overlap false, sh/ch overflow 855, doubleFocusable trap, hint overlap 45px, distinctSizes via getComputedStyle, tabular leaks via TreeWalker + grep 48 hits 12 literal · tabular, focusables 23 in-stage + 6 out, edge chips click each then wait500 screenshot 8 states, gate open via __openWebApp figma/slack + evaluate gate rows selected + Esc, offline disabled 5.",
+    "timings": {
+      "probeMs": 700,
+      "dwellMs": 350,
+      "durBase": 260,
+      "durSheet": 380
+    }
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Safari/PWA web apps (visionOS 26 Safari, 600x600 spatial): Single glass pane over live passthrough (saturate1.6 blur28-34 rim light feathered 12/28 shadow not synthetic charcoal). Statusbar 44h time + battery only no duplicate subtitle. Header Web Apps 22/800 -0.03 SF Pro Display + subtitle single line 11/600 ink-60 6 installed · 4 cached · v2.4 tabular-nums via class only never literal token. Search field 36h 999r 14/400 placeholder ink-40 + single ⌘K 11/700 pill right blur8 glass. Installed group is single hero row peeking 2.5 cards depth scale 0.96 blur falloff: 2 columns gap10 but only first 4 cards visible at rest with peek third row, each PWA bubble 60w gradient icon 12r + name 13/600 ink-100 single line + domain 10/500 tabular ink-60 + single Trusted pill 10/700 green only when verified not per-card competing yellows, version 10 tabular ink-40. No nested button trap: card itself is launch (single tab), secondary dots menu long-press only. At any moment exactly one card is focal scaled 1.02 + 2.5px stroke-focus + 22px bloom + 350ms dwell prism-ease interruptible by look-away reverse 180ms others dim 0.42, hint not overlapping viewport. Discover is separate sheet pushed on Add not stacked same viewport. Motion 260ms prism-ease only, stagger max 40ms 2 cards, sheet 260ms not 380, shimmer only when loading skeleton tied to fetch. Typography 3 sizes per card max (22/13/11/10) -0.015 tracking single hierarchy. Edge overflows peeking not 855 scroll. Delight one earned moment: icon parallax + install morph scale 0.92->1 260ms.",
+    "System B": "HorizonOS Browser web apps (Quest 3 v74 Horizon Browser + PWA): Flat opaque panels #202020 12r 1px #333 border shadow 8px no backdrop-filter no glass no sheen. Header Web Apps 18/700 flat + right +Add flat grey 28h + Filter flat grey 28h no gradient, subtitle 12/600 flat 6 installed · 10 total flat not tabular class. Search 36h flat #2a2a2a 8r magnifier flat, group heads flat uppercase 11/700 ink-60 + count pill flat grey 11/600 + line #333. Installed grid 2col 10 cards same opaque 12r rows 52h icon 32r flat tint, name 14/600 flat, domain 11/400 flat, desc 11/400 flat 0.42 low contrast, perm badges flat grey pill 18h, version flat grey, Launch/Install flat blue 26h no gradient bloom. All 10 cards same weight no dim, visible at once with 855 scroll no peeking, no dim others. Flat list Discover same opaque 12r stacked below. Permission prompt flat dialog #2a2a2a 12r Allow/Block flat grey/blue 26h not scrim translucent, no lock pill, offline banner flat snackbar 40h overlapping list, store opacity 1 not 0.52 dim. Motion linear 350-500ms slide +20px bounce not prism-ease not interruptible, no dwellRing, shimmer flat grey bars. Focus 30+ equal cards weak 1px blue ring many not unmistakable no halo. Glance ~2.8s dense flat, typography 4 sizes flat 11/12/14/18 no hierarchy, no literal leak but also no tabular-nums polish, no delight beyond flat.",
+    "System C": "Artifact under review (Prism 12-webapps components/12-webapps/index.html:8-1076): 600x600 stage shell centered, stage background synthetic triple-radial 120%90% at 50%14% rgba42,53,80 0.56 -> rgba20,26,40 0.72 -> rgba10,14,23 0.90 + wash 68%46% at 78%86% rgba86,184,255 0.09 over rgba6,10,16 0.76 (opaque charcoal 0.76 not live passthrough) stage.png verified synthetic no world video. Statusbar 44h Web Apps · Prism 11/700 ink-60 + battery 82%. Web-viewport absolute inset44 0 0 0 flex col gap12 pad10 12 72 12 overflow-y auto overscroll contain scrollbar none sh1411 ch556 overflow855 2.54 viewports. Header rise-in 260 both: title 22/800 -0.03 ink-100 Web Apps + sub 11/600 0.04em ink-60 tabular span 6 installed · v2.4 · 10 total + glass scrim suffix + hdr +Add 28h primary gradient accent->accent-strong shadow6/14 11/700 999r + Filter 28h ghost 0.08 outline. Search-wrap 260 30 delay: search-field 36h 999r 14/500 ink-80 0.06 blur8 pl34 placeholder Search apps domains permissions ink-40 + icon 16 magnifier + meta ⌘K 22h 11/700 0.06. Groups 2 rise-in 50/80: heads 11/700 0.12em uppercase ink-60 + count 11/700 0.06 tabular ink-40 999r 0.06 + line1px0.06. Installed-grid 1fr1fr gap10 6 cards mats: app-card var(--mat-glass) 160deg 0.78->0.84 blur22 saturate1.4 outline0.12 18r pad12 gap10 shadow12/28 sheen ::after 0.04 hover -1px gaze-focus scale1.015 bloom14: top 42w12r icon gradients #A259FF etc + meta name14/700 ink-100 ellipsis + trust-dot14 green ok when trusted + domain11/600 tabular + desc11/500 line-clamp2 + perm-row 22h badge11/600 999r bg0.07 trusted green0.10 needs yellow0.10 Unverified + foot version11 tabular ink-40 + btn-small 28h primary ghost. Store-list 4 cards horizontal gap12 pad10_12 opacity1 normal offline 0.52 dim pointer none + note literal tabular. Offline-banner 10_12 14r 0.38 blur12 + cached available + Discover paused 6 installed ·4 cached·2 need network. StateLayer inset44: loading group 2 skeletons shimmer1.2s infinite 6+3 cards + caption loading literal + prism-ease, empty state-card 420w blur-heavy 24_18 pad radial0.08 illu64 18r + No web apps yet18/800 + body14/500 PWA glass scrim + Browse Discover primary 44h + Add by URL + literal caption, error danger illu64 warn + Can't load + Retry-> loading1300ms->normal banner restored + Use cached->offline + PR-WEB-503 badge, permission inline card yellow32 + Location blocked + Allow btn primary. Hintbar absolute left12 right12 bottom12 31h rgba0,0,0 0.38 blur12 outline0.06 11/600 uppercase ink-60 strong11/700 Gaze dwell350ms + dot accent bloom6 + Tab cycle Esc back — overlaps viewport45px covering last card. Browser-sheet absolute centered min540 520 max var(--mat-sheet) blur-heavy 34 26r outline0.12 shadow24/56 sheen0.05 sheet-in 380ms (exceeds 320) + browser-bar46h border0.07 back34 0.08 + url-pill30h 999r 11/700 lock green + trust-chip24h green/yellow + close34 + perm-gate 10_12 bg0.03 border0.06 head11/700 uppercase + gate-row8_10 12r bg0.06 icon28 9r title14/700 sub11/500 actions Allow26h gradient Block ghost 26h selected outline2px focus, help literal glass scrim + tabular. Content mocks per app Figma/Linear etc. Focus double trap all cards cardFocusable && btnFocusable both true 20 stops for10 apps. Tabular literals 12 containing · tabular dev token (559,599,607,617,655,676,691,764,786,902,950...)."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 4,
+      "focusDiscipline": 4,
+      "materialHonesty": 3,
+      "motion": 4,
+      "typography": 5,
+      "edgeStates": 5,
+      "dependability": 5,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 5,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 5,
+      "typography": 5,
+      "edgeStates": 7,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 5
+    }
+  },
+  "totals": {
+    "visionOS": 81,
+    "horizonOS": 39,
+    "ours": 48
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (81)",
+    "ours (48)",
+    "horizonOS (39)"
+  ],
+  "biggestGap": "Focus discipline — nested double focusable trap + overlapping hintbar + no persistent focal halo · expected visionOS exactly one obvious focal element per moment (gaze halo 10px dot + 3px halo + 2.5px stroke-focus + 22px bloom 350ms dwell prism-ease interruptible, others dim to 0.42, single tab per PWA). Got components/12-webapps/index.html:473-551 buildAppCard creates both card [data-focusable] role=button tabindex0 aria-label Figma... + nested inner .btn-small [data-focusable] Launch/Install inside same card => 10 cards =20 stops; plus header 2 + search 1 =23 in-stage, 29 total with 6 dev chips outside; tab order 23 stops to reach Discover first card (Overleaf) requires ~12Tabs through Installed; at rest reviews/probe-verify-12-webapps/stage.png zero cards dimmed all same mat-glass 0.84 blur22 shadow12/28 + hintbar absolute 12 12 12 bottom 31h rgba0,0,0 0.38 blur12 overlaps viewport 45px (hintRect.top750 vp.bottom795) covering last store card VS Code 9.8MB; gaze-focus only transient scale1.015 hover not idle unmistakable halo; sweep 20 steps gave no bloom. Fix: remove [data-focusable] from .app-card container where inner button exists (make only button focusable) OR make card focusable and button aria-hidden with card click delegates, dim non-focused groups to 0.42 + scale 0.98, move hintbar outside stage or pad viewport bottom 72->90 to avoid overlap, make gaze-focus persistent + bloom default.",
+  "gaps": {
+    "glanceability": "Expected <1s extraction: visionOS title22 + sub single line tabular + search36 + 2.5 cards peeking depth 0.96 blur falloff only 4 cards visible hero. Got 2 groups 10 cards dense same weight: header title22 + sub11 tabular 6installed·v2.4·10total+glass scrim long 45char + +Add primary gradient competes + Filter ghost + search36 + ⌘K pill + Installed 6 apps 2cols 3 rows fully visible + Discover 4 picks stacked gap10 sh1411 needs 855px scroll 2.54 viewports; each card 18r same mat-glass 0.84 + per-card 3-4 perm badges 22h trusted green needs yellow + version11 tabular + Launch ghost same 11/600 competes; group heads same 11/700 + count 11/700 pill + line0.06 no hierarchy. At arm length need ~2.4s to locate Filter vs +Add vs which app needs location permission (Figma vs Notion). Fix: limit viewport to hero 2x2 Installed peek + Discover collapsed to +Add sheet not stacked, make Installed head count single 11/600 tabular not pill with line, remove per-card Trusted pill when trusted (use dot only), move Filter into search filter chip inside field.",
+    "focusDiscipline": "Expected exactly one focal element dim others 0.42 + halo bloom + 350ms dwell interruptible. Got 29 focusables (23 in-stage double trap +6 out) 23-stop tab order, card 1.015 scale transient only not persistent, zero dim at rest stage.png 10 cards same intensity +Done gradient same as Trusted pill same 11/700 + search-meta pill competes, sweep gave no halo idle, hintbar overlap 45px adds second competing focal strip. Fix see biggestGap: single focusable per card, dim groups, hint outside.",
+    "materialHonesty": "Expected scrim reads as glass over live world saturate1.6 blur28 rim light feathered shadow hairline on passthrough translucent 0.42. Got stage synthetic triple radial rgba42,53,80 0.56-> rgba20,26,40 0.72-> rgba10,14,23 0.90 wash 0.09 over rgba6,10,16 0.76 opaque charcoal 0.76 blocks world not translucent, mats 0.78-0.84 opaque dark panels not glass, preview stage radial 0.9-1.0 inside sheet almost opaque 0.96, hintbar 0.38 correct but stage wash synthetic 0.09 blue adds depth fake not passthrough live. Horizon flat #202020 0.12 no blur at all. Score 6 vs 9 vs 3. Fix: lower stage opacity 0.76->0.38 blur10 placeholder for live world video, lower card opacity 0.84->0.62, reduce shadow 12/28-> 0_8_16, keep sheet 0.96 but show world blur behind via layer backdrop 10 already present more translucency.",
+    "motion": "Expected 200-320ms prism-ease cubic-bezier(0.32,0.72,0,1) interruptible look-away reverse 180ms, no decorative infinite cost. Got rise-in 260 correct for header/search/groups (50/80/110) stagger ok 3 groups 110 total good, card transform 260 prism correct, but sheet-in 380ms exceeds 320 spec (gateExtra sheetAnim 0.38s) + close 240 correct borderline + shimmer 1.2s linear infinite on 6+3 loading skeletons decorative infinite + shift staggered 3 pops attention cost on first load, hint opacity 0->1 not animated interruptible. Horizon linear 350+ bounce not prism 4. Fix: clamp sheet-in 380->260, collapse stagger to 0/40 max 2 groups peek, make shimmer tied to fetch with opacity fade on done, ensure hint hide uses 260 WAAPI not instant opacity.",
+    "typography": "Expected SF-Pro-class 3 sizes max per card (22/14/11/10) tracking -0.015 tabular via class only, no literal token strings. Got uniqGlobal 11/14/16/22 (4 sizes) per card 11+14 2 sizes internal hierarchy weak 3px diff name14 vs domain11 barely distinct arm length with tracking 0.01; search 14 competes with name14 same; badge/Version all 11 same 0.42/0.60 low contrast no hierarchy; literal dev token '· tabular' leaks in 12 strings visible when triggered (loading caption 764, offline subtitle suffix 599, gate head 902, gate help 950 etc) forces user parse variable name as content; empty caption 786 shows '0 installed · 4 in Discover · tabular' literally in stage-empty.png mid. Vision uses class tabular-nums only. Fix: delete all ' · tabular' literals (grep 12) keep class tabular, reduce sizes to 22/14/11/10 only remove 16, increase name 14->16 or decrease badge 11->10 for hierarchy +0.5 weight.",
+    "edgeStates": "Expected all 6 states designed as glass sheets over passthrough single illu64 + one CTA humane copy safe. Got all 6 verified strong vs earlier waves: loading shimmer 6+3 skeletons + caption literal leak, empty state-card 64 illu 18r + No web apps yet + body PWA glass scrim + Browse/ Add by URL + caption literal, error danger triangle + Can't load + Retry-> normal banner + Use cached->offline + PR-WEB-503 badge, offline banner cached + store opacity0.52 dim correct + 5 disabled Offline buttons, permission inline Location blocked + Allow btn + gate rows Block selected verified true for location, plus browser-sheet permission gate fully designed. Strongest piece but defects: permission-denied shows inline card only not centered dim-on sheet overlay expected, hintbar remains visible over dim (should hide) overlapping 45px, empty/loading captions leak literal tabular, offline search still enabled while Discover paused pointer none confusing, gate help literal. Score 7 vs 9 vs 5. Fix: hide hintbar in empty/error/offline dim-on via stateLayer.on display, unify permission-denied to dim-on centered card with Allow/Block not inline, delete literals, disable search when offline or show inline empty search card instead.",
+    "dependability": "Expected any failure lands safe recoverable no dead ends queued actions banner. Got generally safe: error Retry disables -> loading1300ms->normal banner restored, Use cached -> offline safe, empty Browse Discover scrolls safe + Add by URL banner safe, offline Launch cached works + non-cached Spotify 41MB blocked shows banner needs network tabular safe, install while offline early return no hang, search Esc clears, back Esc closes sheet restores hint opacity, permission Allow/Block banners safe. Gaps: offline detail sheet open then edge Switch to offline leaves sheet interactive while viewport says offline paused mismatch (sheet still shows Allow/Block while offline banner says queued), search filter while offline filters dimmed store list opacity0.52 but still shows 0 picks with no inline empty guidance, installing flow Install toast Installing... then Open but if edge switched to error during install no cancellation. Horizon more dead ends flat no cached fallback. Score 6 vs 9 vs 5. Fix: close any wm-layer on setEdge offline/error/empty, make search while offline show inline paused note not filter, make install abort on offline transition.",
+    "accessibility": "Expected 44px min targets AA4.5:1 reduced-motion colorblind-safe single focus order. Got reducedMotion true @media 0.01ms correct, unlabeled0 subTen0 lowAlpha0 hidden0 focus-visible 2.5px stroke-focus correct, accent cyan-blue colorblind safe vs warn/danger, tabular-nums correct. Gaps: hit targets fail 26h gate-btn +28h btn-small +28h hdr-chip + 34h back <44 -> thumb 26 circle <44 circular touch; 29 focusables double trap 23 stops excessive for one-hand Tab cycles; hintbar 11 uppercase ink-60 on 0.38 bg contrast ~3.8:1 borderline AA + overlaps last card 45px hidden content not keyboard reachable without scroll; domain 11/600 ink-60 on 0.07 outline borderline 4.2:1 barely + version ink-40 0.42 on mat 0.84 still low; no mono-audio cue for blocked permission (relies on color yellow). Vision 44-56 targets 2.5 ring passes all. Score 5 vs 9 vs 5. Fix: increase btn-small 28->36h gate 26->32h hdr 28->32h, eliminate double focusable to 10 stops, move hint outside or pad viewport bottom 90, bump hint ink-60->ink-80 for 5:1, add non-color icon for blocked (shield slash).",
+    "delight": "Expected one earned signature moment serving function not decorative infinite cost. Got preview stage inside browser-sheet Figma canvas height120 radial gradient + frame 600x600 pill tabular + glass scrim description but static image not interactive glass filter tied to slider (like settings brightness); install morph Installing… 1100ms then Open but linear not parallax, hint dot bloom static, shimmer infinite decorative, 3 duplicate literals + 380 sheet cost. No earned moment: gate allow/block selected outline2px is functional but not delightful, url-pill lock green + trust chip are util not delight. Vision signature: PWA bubble parallax + install morph scale 0.92->1 260 prism-ease + glass reflects world dim. Horizon flat none. Score 5 vs 9 vs 4 because glass scrim note translucent stays correct but burdened by literal noise and 380 overshoot defeats polish. Fix: add single earned: app-icon morph from grid card 42-> sheet 28 zoom 260 prism-ease tied to wm open, keep sheet 260 not 380, remove literals, make trust-dot pulse once on install."
+  },
+  "reason": "FAIL vs platform bar (VISION 9). Blind A/B/C revealed A=visionOS 81/90 B=HorizonOS 39/90 C=ours 48/90: ours second above Horizon but loses 9/9 criteria not first or tied-first and gaps>0 => fail per Critic protocol 5. Evidence self-probed 2026-08-27T06:31:11.605Z via bun tools/probe.mjs (stage 600x600 true console0 pageErrors0 failedReqs0 focusable29 unlabeled0 subTen0 lowAlpha0 reducedMotion true chipsOutside gap13 overlap false stageChromeClean) + playwright 800x900@2x 10 captures stage-normal/loading/empty/error/offline/permission-denied + gate-normal/blocked + audits sh1411 ch556 overflow855 2.54viewports doubleFocusable 10cards both true trap 23 in-stage hintOverlap45px sheet380>320 literals12 · tabular. Per-criterion: Glance A9 B4 C5 dense 2.54 viewports competing +Add/Filter. Focus A9 B4 C4 29 focusables double trap no dim halo. Material A9 B3 C6 synthetic 0.76 charcoal not live passthrough but blur22 correct. Motion A9 B4 C5 sheet380 exceeds 320 + shimmer infinite. Typography A9 B5 C5 4 sizes 11/14/16/22 weak 3px diff +12 literal tabular leaks. Edge A9 B5 C7 all 6 states designed strong but inline permission vs dim-on + literal leaks + hint overlap. Dependability A9 B5 C6 generally safe but offline sheet mismatch. Accessibility A9 B5 C5 26-28h targets <44 23 stops hint overlap borderline. Delight A9 B4 C5 no earned morph burdened literals. Fix biggestGap single double focusable + hint overlap + persistent halo.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (48 vs 81) 9/9 lost verdict fail."
+}

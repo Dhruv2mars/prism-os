@@ -1,0 +1,45 @@
+{
+  "verdict": "fail",
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 10,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 10,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 6,
+      "focusDiscipline": 7,
+      "materialHonesty": 6,
+      "motion": 6,
+      "typography": 7,
+      "edgeStates": 7,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 5
+    },
+    "ours": {
+      "glanceability": 4,
+      "focusDiscipline": 6,
+      "materialHonesty": 6,
+      "motion": 4,
+      "typography": 5,
+      "edgeStates": 1,
+      "dependability": 4,
+      "accessibility": 5,
+      "delight": 3
+    }
+  },
+  "biggestGap": "Edge states: builder rule requires control row to trigger empty/loading/error/offline/permission-denied variants per VISION.md:6 + Builder rules. Expected: 5 toggles showing designed states. Got: probe HTML hasEmpty=false hasLoading=false hasError=false hasOffline=false hasDenied=false; specimen only offers 'Show banner' button. Criterion 6 scores 1/10 vs visionOS 10/10. No recovery/dead-end handling visible, violates Dependability too.",
+  "reason": "FAIL vs platform bar. Blind scoring (A=visionOS 83/90, B=Horizon 57/90, C=ours 38/90): ours last overall, loses on all 9 criteria so not tied-first and gaps>0. Evidence = probe 2026-08-26T13:27:03Z (reviews/00/round-2/{stage,full}.png + report.json): stage 600x600 clean (0 console errors, 8 focusables, reducedMotion true) but rendered output shows dense catalog not glanceable specimen (5 sections crammed, scrollHeight 606>client 556 requires scroll — visionOS isolates one material/type per card); focus not unmistakable (8 clustered pills/chip/toggles, gaze halo tiny white dot at center over type demo barely visible, no expansion/parallax vs visionOS hover); material honesty flat (glass/raised/sunken pills in stage.png are near-identical dark fills with faint stroke, not translucent vibrancy over world; backdrop-filter 22px present but stage bg rgba(6,10,16,.66) reads opaque vs visionOS saturate+blur); motion token violation (CSS --dur-fast 160ms and --dur-slow 380ms both outside VISION 200-320 spec, caption literally advertises illegal tokens; only rise-in 260ms correct, not interruptible); typography stacks 4 sizes (44/30/17/14) in one Type Scale block violating '3 sizes max per card', captions 11px at ink-40 (0.42) low glance; a11y only reducedMotion, no text-scale/Dynamic Type, no audio cues; Delight none earned (generic rise-in + banner) vs visionOS waveguide sheen signature. Biggest gap is edge states — total absence fails harsh Pass rule 'Good enough is fail'."
+}

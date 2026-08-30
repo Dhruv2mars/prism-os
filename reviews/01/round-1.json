@@ -1,0 +1,45 @@
+{
+  "verdict": "fail",
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 10,
+      "focusDiscipline": 10,
+      "materialHonesty": 9,
+      "motion": 10,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 5,
+      "motion": 4,
+      "typography": 6,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 5,
+      "focusDiscipline": 4,
+      "materialHonesty": 5,
+      "motion": 3,
+      "typography": 6,
+      "edgeStates": 3,
+      "dependability": 5,
+      "accessibility": 4,
+      "delight": 5
+    }
+  },
+  "biggestGap": "Motion + progress theatre: expected visionOS silent black, precise logo, no progress-bar theatre, instant interruptible handoff at 200-320ms var(--ease-prism) cubic-bezier(0.32,0.72,0,1) per VISION.md:4. Got components/01-boot/index.html:18-21 .tri draw 900ms + .beam 700ms 350ms delay + .spec-line 600ms + .arc-fill 2900ms cubic-bezier(.4,.1,.2,1) with @keyframes fillarc 471->471 (no-op, so probe-r2/stage.png ring stays empty grey, zero fill theatre), caption slot rot 800ms x3 (Optics/Sensors/Secure), hint fade 1000ms, total 3200ms uninterruptible sequence before handoff; plus .hold-ring 1200ms linear scaleX and .chev bob 1400ms infinite, .warn-glyph pulse 1100ms infinite — all outside 200-320ms, wrong easing, linear, not interruptible, opposite to 'no progress bar theatre' bar.",
+  "reason": "FAIL vs platform bar. Blind A/B/C (revealed A=visionOS 84/90, B=Horizon 44/90, C=ours 40/90): ours last overall, loses on all 9 criteria so not tied-first and gaps>0. System A (visionOS): silent black, single precise mark centered, no chrome, 220ms prism-ease fade, instant handoff on tap, glass not needed. System B (Horizon): choppy center loader + % text + linear spinner >500ms, flat grey panels, verbose captions. System C (artifact): spectacle theatre. Evidence = self-probed 2026-08-26T13:34:01Z default boot + hold=boot + hold=fail (reviews/01/probe-r2, probe-r2b, probe-r2c /stage.png+report.json): stage 600x600 true, 0 console errors, reducedMotion true, focusableCount 5, lowAlpha 2, subTen 0, title 'Prism OS - Boot'. Per-criterion winners all A: 1 Glanceability A10 vs B5 vs C5 — C boot is minimal (prism triangle + 3 spectral lines + 'Secure boot verified' 13px .08em) but debug .ctrl-row (components/01-boot/index.html:65-67 top:52 right:14) steals focus top-right, and in hold=boot probe-r2b/stage.png the pill 'simulate boot failure' literally occludes letters 'ism' of 'Welcome to Prism' — 1s glance broken, while A has zero chrome. 2 Focus discipline A10 vs B5 vs C4 — C boot has 3 foci (mark+chip row+ultra-dim 'tap anywhere to skip' ink-20), handoff has 4 (title+chev+swipe+press+chips), recovery has 2 competing CTAs without one obvious; gaze halo at 10px not unmistakable vs A. 3 Material honesty A9 vs B5 vs C5 — C boot/handoff background radial-gradient(90% 70% #0c1220->#05070c) is opaque paint (components/01-boot/index.html:9), not translucent scrim over world as VISION hardware model requires; recovery card does use var(--mat-glass) + blur-glass but sits on opaque stage so not glass-over-world; A earns honesty via true black OLED. 4 Motion A10 vs B4 vs C3 (biggest gap) — see biggestGap field; also .boot.play .tri 900ms, .beam 700ms, .spec 600ms, .skip-hint 400ms, handoff .rise 450ms all outside 260ms token and not interruptible (only pointerdown clears timers abruptly, no reversible ease). 5 Typography A9 vs B6 vs C6 — SF stack ok, recovery respects 3 sizes (19px title/14px body/11px caption) and tabular numerals for 82% /21.4GB, but 'Secure boot verified' 13px tracking .08em at ink-60 and boot captions compete, and 'Welcome to Prism' fs-display 30px collides with chip row. 6 Edge states A9 vs B5 vs C3 — builder rule requires control row for empty/loading/error/offline/permission-denied; C only ships 'simulate boot failure' + 'replay boot' (2 of 5), no empty/offline/denied design; hold=fail diagnostics show static Battery 82% ok Storage 21.4GB ok Thermal Nominal all green dots even when boot failed — masks cause, not designed error. 7 Dependability A9 vs B6 vs C5 — C does land fail->recovery with Restart + Hold to reinstall (hold-ring 1200ms linear, cancels on pointerleave/up, no keyboard/space/enter alternative, no gaze dwell, label reverts after 3400ms), but handoff requires drag >36px or ArrowUp only, no dwell/enter, and replay clones node (freshBoot) losing state; no dead end but recovery misleading. 8 Accessibility A9 vs B5 vs C4 — reducedMotion present (design-system.css @media), but C has 2 lowAlpha texts (probe lowAlphaTextCount 2) = 'tap anywhere to skip' and 'or press ^' at var(--ink-20) 0.22 on #05070c ~1.5:1 fails WCAG, no text-scale, no mono-audio cues, hold action not operable without pointer, focus rings present but chips small. 9 Delight A9 vs B4 vs C5 — prism beam dispersion (white in, 3 colored lines out) is the one earned moment serving 'Optics calibrated' but over-animated and outer arc theatre broken (471->471), plus chev bob/pulse loops are decorative attention cost vs A haptic fade. Harsh Pass requires ours first or tied-first zero gaps; ours last on every criterion, so verdict fail. Biggest gap is Motion/theatre as above; fixing only that still leaves handoff chip overlap and accessibility contrast as next blockers."
+}

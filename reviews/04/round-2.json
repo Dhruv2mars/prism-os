@@ -1,0 +1,125 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-26T16:08:46.741Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/04-gestures/index.html",
+    "report": "reviews/04/round-2/report.json",
+    "stage": "reviews/04/round-2/stage.png",
+    "full": "reviews/04/round-2/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 15,
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Gesture Trainer",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 45,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 55,105-745,795 (690x690 at 2x, 600 logical), ctrl 223,840-576,882 (352x42), shell 100,150-700,750 (600x600 logical), ctrl.position fixed bottom 18px left50% translateX-50%, .stage .ctrl-row display:none !important; gap 45px, overlap false; stage.png contains zero pill chrome; full.png shows chips only in outside gap",
+    "audit": {
+      "distinctSizesStage": [10, 11, 12, 13, 15, 16],
+      "uniqPracticeSizes": [10, 11],
+      "hasTabular": true,
+      "gazeReadoutVariant": "tabular-nums",
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "swipeTrack": "592 scrollW / 540 clientW, gap 12px, 4 cards 158.7w, mask none, snap start mandatory",
+      "scrollCards": "Frost/Ember/Fern/Dusk no overlap, verified step3-state.png"
+    },
+    "captures": [
+      "reviews/04/round-2/step1-initial.png",
+      "reviews/04/round-2/step1-done.png",
+      "reviews/04/round-2/step2-state.png",
+      "reviews/04/round-2/step2-tapped.png",
+      "reviews/04/round-2/step3-state.png",
+      "reviews/04/round-2/step3-after-swipe.png",
+      "reviews/04/round-2/step3-scrolled.png",
+      "reviews/04/round-2/step4-state.png",
+      "reviews/04/round-2/step4-captured.png",
+      "reviews/04/round-2/step5-state.png",
+      "reviews/04/round-2/step5-orb.png",
+      "reviews/04/round-2/edge-loading.png",
+      "reviews/04/round-2/edge-error.png",
+      "reviews/04/round-2/edge-offline.png",
+      "reviews/04/round-2/edge-permission.png",
+      "reviews/04/round-2/focus-hover-step1.png",
+      "reviews/04/round-2/final-normal.png"
+    ],
+    "verification": "Fresh context, no builder notes read. Probe via bun tools/probe.mjs http://localhost:4310/components/04-gestures/index.html (reviews/probe-04-gestures-round2 + /tmp/04-round2-1787760522). Multi-step navigate via #nextBtn click x5, interactions: 3 gaze targets click, #tapBtn click, ArrowRight x2 + scrollTrack.scrollTo 160 smooth, Space capture, #orbBtn click. Edge states via window.__setGestureState(normal/loading/error/offline/permission). Focus-hover via mouse move to [data-target=0]. Motion tokens audited via getComputedStyle --ease-prism/--dur-base and sheet scan for prefers-reduced-motion."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS gesture onboarding (visionOS 2.x eye + hand onboarding): Single hero moment per step — centered headline 22px/-0.015 tracking (SF Pro Display) + one-line 15px subtitle, one live gaze dot (10px white + 3px halo + 14px dwell ring) that exactly follows eye at 60Hz, one hero illustration (thin stroked hand/eye, 1px, no fill) on 12% white glass (saturate 1.6 blur 28px) over live passthrough world. Dwell ring 350ms linear eased with ease-prism 0.32,0.72,0,1, fully interruptible by look-away (ring shrinks back 180ms). Single primary CTA (Continue/Skip) bottom-center 44px, muted secondary. No dev chrome, no stepper numbers at top. Progress = 5 thin 2px segments. Interrupt anywhere via palm-up or Back.",
+    "System B": "Horizon OS first-use tutorial (Horizon OS v74 / Quest hand-tracking tutorial): 3D rendered hand mesh hero (palm, ~40% of screen) with flat opaque cards (#1f1f1f, 1px #333 border, no backdrop-filter, shadow 8px) stacked vertically, 2-3 captions per step of equal weight (14px medium + 12px regular), four swipe cards per row with heavy drop shadow, linear 400-500ms slide with 20px overshoot bounce, flat grey panels, weak 1px blue focus ring duplicated across cards, retry dialogs centered opaque, no tabular, no dwell visual beyond spinner.",
+    "System C": "Artifact under review (Prism 04-gestures round-2, components/04-gestures/index.html): 600x600 stage with dark radial scrim (42,53,80 0.56 / 20,26,40 0.74 / 10,14,23 0.90 + 6,10,16 0.78 base). Top inset statusbar 44px (9:40 PM tabular + Gestures · Trainer + 82% batt). Trainer viewport inset 44px 0 0 0 with stepper row (24px icon + 10px uppercase Step 1 of 5 · Gaze 0.10em ink-40 + 13px/700 Look to point ink-80 left, 5 dots 6px/16px active right, opacity 0.72) + centered instruction (13px/700 Move the halo. Hold to select. + 12px/500 1.35 body max 340px, opacity 0.94) + illus 52px (.illus-card rgba255,255,255 0.04 + 1px 0.06 outline + linear sheen) with SVG 260x64 (2 outer targets 14r white + center 14r accent + 20r dashed accent + 3-4 dash gaze paths + 10px DWELL 350ms/TAP OR CLICK captions) + practice hero card flex1 min188px var(--mat-raised) + blur22 + 1.5px accent 0.18 outline + 26r + 18/40 shadow + inset 1px, head 10px uppercase Practice · gaze + 22px pill 11/700 0/3 · hold to select. Step views: v0 3x 56px .target (rgba255,255,255 0.06 + 1px 0.10 outline, ::before 1.3px 0.16 ring, ::after 22px white dot) gap14px + gaze-readout 10px tabular bottom-right; v1 52px Select pill gradient accent→accent-strong + halo; v2 138px swipe-cards flex gap12 snap mandatory no mask 92px h 16r glass + 36px swatch + 4px indicator (36% handle) + hint Temple swipe 10px uppercase 0.06em + keys; v3 84px shutter white circle + 6px ring + flash overlay + 11px capture count pill; v4 72px orb radial #fff→#0b5ed7 + waves + voice-card 06/07 outline. Nav-row Back ghost 34px + Next primary gradient 34px + center Tab/Esc/Space keys 10px 0.62 opacity. Dev chrome now OUTSIDE stage: .ctrl-row fixed bottom18 left50% translateX-50% 352x42 pill bar rgba10,15,23 0.74 + glass 1px + blur16 + shadow 8/24, 5 chips 26px 11/700 Normal/Loading/Error/Offline/No access, Normal active gradient #051423, verified no overlap."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 10,
+      "materialHonesty": 9,
+      "motion": 10,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 5,
+      "motion": 5,
+      "typography": 6,
+      "edgeStates": 6,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 5
+    },
+    "ours": {
+      "glanceability": 6,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 7,
+      "typography": 6,
+      "edgeStates": 7,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 83,
+    "horizonOS": 48,
+    "ours": 55
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (83)",
+    "ours (55)",
+    "horizonOS (48)"
+  ],
+  "biggestGap": "Focus discipline — exactly one obvious focal element per moment, gaze halo unmistakable: expected visionOS single hero (one 10px dot+halo following gaze + single 350ms dwell ring eased cubic-bezier(0.32,0.72,0,1) + one CTA Continue, everything else muted to <0.45 opacity). Got components/04-gestures/index.html:197-243 + 742-753 .practice #practice0 56px-gap14 3 equal .target circles (width 56 height 56, ::before 1.3px 0.16, ::after white 22px) each with gaze-focus scale 1.08 + stroke-focus + identical 'hold 350ms' dwell-hint 10px/700 uppercase ink-40 shown only on hover, plus stepper 5 dots (6px/16px active at 178-188), plus blue Next pill and blue Normal chip both high-salience, plus bottom 'Move halo · dwell ring at 350ms · or click' caption 10px ink-40 + gaze readout 'gaze -- · -- · idle' — 7 competing foci in reviews/04/round-2/step1-initial.png and focus-hover-step1.png shows only one target gains scale 1.08 while other two remain equally bright (no dim). VisionOS would dim non-focused targets to 0.35 and enlarge focused to 1.12; ours keeps all three at 0.06 bg + 1.08 scale only on hover, requiring 350ms JS dwell before .done state. Swipe step duplicates pattern: 4 equal 138px cards with no hero card.",
+  "reason": "FAIL vs platform bar. Fresh rendered-only blind (A=visionOS 83/90, B=Horizon 48/90, C=ours 55/90): chip-fix verified and worth +15 net vs round-1 C 40/90 (chip row now 45px below stage, stage.png clean, overlap false per probeEvidence.chromeFix), but ours still second overall, loses 9/9 criteria so not first or tied-first and gaps>0 => fail per VISION Critic protocol 5. Evidence = self-probed 2026-08-26T16:08:46Z + 15 captures (reports/probe-04-gestures-round2/report.json + stage.png/full.png + step1-initial.png through step5-orb.png + edge-loading/error/offline/permission.png + focus-hover-step1.png) at 600x600 true, console0 pageErrors0 failedReqs0 focusable15 unlabeled0 subTen0 lowAlpha0 reducedMotion true. Per-criterion: 1 Glanceability A9 B5 C6 (+2 vs r1 4): chips outside instantly removes top 48px pill bar theft and lets stepper/instruction read, but C still needs ~2.3s not <1s: stepper 10px label + 13px title + 5 dots + instruction 13px title + 12px body (max340) + illus 52px SVG with 10px DWELL/TAP captions + practice head pill + 3 targets + caption + nav hint all visible at once vs A single headline + one hero halo (<400ms). 2 Focus A10 B5 C4 (+1 vs r1 3 but still worst): see biggestGap — 3 equal targets no hierarchy is the load-bearing defect; nav Back ghost + Next primary both compete; dots compete; Horizon at least has one hand hero even if flat. VisionOS gaze-focus unmistakable = 10px dot + 3px halo + 2.5px stroke-focus + 22px bloom + 1.02 scale; ours .target.gaze-focus scale 1.08 + stroke-focus + 18px bloom but only after JS dwell class, and sweep probe shows hover without JS gives no transform (previous round bug partly fixed but still 3-way tie). 3 Material A9 B5 C6 (+1 vs r1 5): correct tokens for practice cards (var(--mat-raised) + blur22 + stroke 0.18 vs --mat-glass linear 18,26,38 0.78 + blur22) but stage background remains synthetic double-radial #060a10 0.78 on dark (index.html:9-14) not live-world glass; reads near-opaque charcoal (#111827) with inner sheen, not 12% white scrim + saturate1.6 blur28 like A; Horizon opaque #1f1f1f looks same. 4 Motion A10 B5 C7 (+3 vs r1 4): now honors VISION tokens --dur-base 260ms + --ease-prism cubic 0.32,0.72,0,1 for rise-in 260ms, target 260ms, tap/shutter/orb 260ms, swipe smooth scroll, reduced-motion true, shimmer 1.6s eased; but loses on 2 edges: shutterPress 420ms (>320ms limit) + successPulse 520ms scale 1.02 slightly bouncy vs A strict 200-320ms interruptible spring, and blur filter not spring-interruptible; still beats Horizon linear 400ms + bounce. 5 Typography A9 B6 C6 (+1 vs r1 5): SF stack correct, tabular-nums for gaze readout and time, but stage distinct sizes 6 (10,11,12,13,15,16 audit) exceeds 3 max per VISION typography; practice card alone passes (10,11) but overall card hierarchy mixes 10px label (0.10em) + 13px/700 title + 12px/500 body + 11px/700 pill + 10px/700 dwell-hint; captions at 10-11 ink-40 borderline at 1m; Horizon mixes 4 sizes flat. 6 EdgeStates A9 B6 C7 (+2 vs r1 5): chip row triggers all 4: loading skeleton with shimmer + mini-progress 42% + Calibrating sensors · 350ms dwell (edge-loading.png), error Sensor unavailable triangle + Retry/Continue + PR-GEST-503 dot bad (edge-error.png), offline You’re offline wifi-slash + Retry/Use offline + Retrying… (edge-offline.png), permission Microphone blocked mic-slash + Allow/Not now + Open Settings toggle sheet (edge-permission.png) — all designed not defaulted and recoverable, inset 44px→0 with 56px top padding avoids statusbar clip (unlike r1 toast-over-chip bug); but still loses to A because loading lacks support link and error diagnostics still static; Horizon only spinner. 7 Dependability A9 B6 C7 (+1 vs r1 6): any failure lands safe — os.banner for tap outside, gaze mastered, capture N, Hey Prism listening, trainer complete 3200ms, back handles stateLayer/wm/top/dwell, stateLayer has Retry/Continue/Allow/Use offline all with timeout recover; no dead end except step completion auto-advance is missing (user must click Next manually after 3/3). 8 Accessibility A9 B5 C6 (+2 vs r1 4): unlabeled 0, focus rings 2.5px offset2, gaze-focus scaling, reduced-motion disables all but banner-in, chip bar fixed outside stage not trapping focus, tabular numerals, colorblind-safe accent #56b8ff vs ok #4cd47c; but 10px captions at ink-40 (0.42) low contrast at 20deg FOV, no text-scale control, no mono-audio toggle, stepper dots 6px small target; Horizon worse (5). 9 Delight A9 B5 C6 (+2 vs r1 4): one earned moment exists — dwell 350ms ring + 520ms successPulse on 3/3 + shutter flash 140ms + orb 1.0s alternate + waves 1.2s ease-out, all functional not decorative; but feels three competing delights (pulse + flash + orb alternate) vs A single spectral prism dispersion; timing slightly over. Net: chips-outside fixes stage-theft (+2 glance, +2 edge, +1 material, +3 motion) but focus discipline remains load-bearing failure; requires single-hero refactor to pass.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (55 vs 83), 9/9 criteria lost, verdict fail."
+}

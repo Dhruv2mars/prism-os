@@ -1,0 +1,109 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-26T16:05:13.288Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/03-wm/index.html",
+    "report": "reviews/03/probe-round2/report.json",
+    "stage": "reviews/03/probe-round2/stage.png",
+    "full": "reviews/03/probe-round2/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 27,
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Window Manager",
+    "chromeFixVerified": {
+      "stageBox": "105,105 to 795,795 (690x690 at 2x, 600x600 logical)",
+      "edgeRow": "top:12 bottom:86 (fixed, outside stage; expected outside, got outside)",
+      "wmToolbar": "top:800 bottom:882 (fixed, outside stage; expected outside, got outside)",
+      "insideActiveChips": 0,
+      "outsideActiveChips": 2,
+      "stagePNGHasPills": false,
+      "stateLayerInset": "top:44px bottom:0px left:12px right:12px = 556px usable (was 428px)",
+      "tiledGeometry": "n=3 -> 2x top row 283x273 at top:44, bottom row 576x273 at top:327; verified fill of 556h (was 209px tall clipped)"
+    },
+    "extraCaptures": [
+      "/tmp/probe-state-normal.png",
+      "/tmp/probe-state-empty.png",
+      "/tmp/probe-state-loading.png",
+      "/tmp/probe-state-error.png",
+      "/tmp/probe-state-offline.png",
+      "/tmp/probe-state-permission.png",
+      "/tmp/probe-state-overview.png"
+    ]
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS windowing (visionOS 26): Single volumetric glass sheet per app, 28-34px radius, continuous frosted translucency over live passthrough (saturate 1.6 + blur 28-40px) with specular rim + 2-layer depth shadow (40/90px). No controls inside stage — status shows time + battery only, windows consume full inset. One centered sheet at 92% stage width, stacked depth via perspective scale 0.92 + real blur falloff, tiled via freeform draggable sheets with magnetic guides not rigid grid. Gaze focus = 4px glow + 1.02 scale on hovered titlebar only, exactly one halo. 260ms prism-ease (0.32,0.72,0,1) fully interruptible spring, dismiss via scrim tap or 320ms slide-back.",
+    "System B": "Horizon OS windowing (Quest 3 v74): Opaque light-grey panels rgba 0.96, weak border, flat rectangular 16:9 windows with 48px black titlebar + traffic dots, bottom shelf with icons + previews. Strict 1-2 column grid, no overlapping glass depth — z-lift only, splitter handles in tiled. Materials read as Android tablets floating, not scrim-over-world. Focus via controller ray or gaze dot but all windows stay equally bright; faint 1px blue ring. Motion linear 280-400ms stop-start, no blur interpolation.",
+    "System C": "Artifact under review (Prism 03-wm round 2, components/03-wm/index.html): 600x600 dark radial stage (radial 42,53,80 0.55 / 20,26,40 0.72 / 10,14,23 0.88 + 6,10,16 0.74 scrim). Statusbar 44px (time + WM · 3 windows + battery 82%) at top inset. No pills inside stage — .edge-row (6 pills: Normal active-blue + Empty/Loading/Error/Offline/No access) fixed top:12 outside stage, .wm-toolbar ( +Open / Cycle / −Minimize / ×Close / Overview left, Stacked active-blue / Tiled right) fixed bottom:18 outside stage. StateLayer inset 44px→0 gives 556px usable (was 428px). Center win-sheet (520w max 420h, --mat-sheet 0.96-0.97 + blur-heavy 34px, radius 26, shadow 24/56) with titlebar 42px (8px accent dot + 14px/700 title + 11px/60 sub + 30px minimize/close). Stacked offsets -13px Y + scale 0.958 per layer + blur 1.4px + opacity 0.84-1. Bottom hintbar 33px (n windows · mode · focused) + dock placeholder. Overview (rgba 4,7,11 0.52 blur 18px) shows 2-col cards. Edge states via Normal chips swapping stateLayer."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 5,
+      "materialHonesty": 5,
+      "motion": 5,
+      "typography": 6,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 6,
+      "focusDiscipline": 7,
+      "materialHonesty": 6,
+      "motion": 7,
+      "typography": 6,
+      "edgeStates": 8,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 81,
+    "horizonOS": 46,
+    "ours": 59
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (81)",
+    "ours (59)",
+    "horizonOS (46)"
+  ],
+  "biggestGap": "Material honesty — opaque charcoal sheets vs translucent scrim over world: expected visionOS volumetric glass 0.78-0.84 alpha + saturate 1.6 + 28-40px blur over live passthrough + specular rim + 2-layer shadow. Got components/03-wm/index.html:9-14 static dark radial ([6,10,16] 0.74) and components/03-wm/index.html:161-164 .win-sheet background var(--mat-sheet) linear-gradient(22,31,45 0.96 → 12,18,27 0.97) + backdrop blur-heavy 34px — 96-97% opaque, reads as charcoal opaque not glass; verified reviews/03/probe-round2/stage.png center sheet shows near-opaque dark with inner sheen but no world bleed; tiled mode sets wm-layer background transparent and sheets remain opaque, breaking scrim claim; overview bg rgba(4,7,11 0.52) tinted dark not translucent. Horizon opaque 0.96 panels look same. Fix: drop sheet alpha to 0.72-0.84, use --mat-glass token, place live world canvas behind stage, keep layer scrim blur 18px consistent across stacked/tiled, add rim highlight already in ::after but make stroke-glass visible at 0.12 insufficient alone.",
+  "reason": "FAIL vs platform bar. Chrome theft fix verified: pills now outside stage (edgeRow top 12/bottom 86, stage top 105; wmToolbar top 800/bottom 882, stage bottom 795; insideActive 0, outsideActive 2; stage.png has zero pills; usable height restored 428→556px; tiled 283x273/576x273 now fits without truncation). That lifts glanceability 4→6 and focus 4→7 vs round-1, but artifact still second overall 59 vs visionOS 81 (Horizon 46), loses 9/9 criteria so not tied-first. Per-criterion: 1 Glance A9 B5 C6 — C now has single focal sheet (is-focused 1 inside) vs 3 competing blues before, but still shows 3 stacked layers simultaneously (0.84/0.92 opacity peek) forcing parsing of 2 background messages/maps behind Live Captions; hintbar 33px + statusbar 51px = 84px chrome inside stage plus dock 37px = 121px still, though dock empty hides; Live Captions body mixes 11/12/13px. 2 Focus A9 B5 C7 — C now exactly one is-focused ring (rgba 86,184,255 0.9 + 28px glow) + gaze-focus scale 1.02 on hover, probe sweep found 1 focused sheet 0 chips inside; but full.png still shows 2 blue pills outside (Normal, Stacked) which judges see as simulator chrome — not stage theft, but still 2 competing hues in viewport; dock/hintbar adds second text focal. 3 Material A9 B5 C6 — see biggestGap. 4 Motion A9 B5 C7 — C correct --ease-prism 0.32,0.72,0,1 and --dur-base 260ms for transform/opacity/filter/box-shadow, sheet-in 380ms slightly over 320ms, minimize 240ms same ease, overview rise-in 260ms, reduced-motion true; loses on interruptibility: blur filter animates main thread not spring-interruptible, tiled left/top/width/height jumps no FLIP, parallax offX 7→2px barely perceptible and disabled in tiled/overview. 5 Typography A9 B6 C6 — SF stack correct, title 14/700 ink-100, sub 11/600 ink-60, body 13/1.45 ink-80, time tabular; but per-card body still mixes 3 sizes (11/12/13) at limit, hintbar 10px uppercase 0.06em tracked is sub-11 and marginal at arm's length (probe subTen 0 but 10px is threshold); hintbar + win-sub + caption creates 4 tiers globally. 6 Edge A9 B5 C8 (strongest) — all 6 states distinct with recovery: empty grid + 2 primary CTAs (open-msg/gallery → setEdge normal), loading shimmer 1.2s with 2 skeleton sheets, error win-sheet is-focused with red dot + Retry/Dismiss (Retry animates skeleton then banner 'Maps restored'), offline dams to 0.56 dim + Retry/Use cached, permission lock + Allow/Not now; but offline/permission dim still leaves stateLayer overlay that must be dismissed before windows usable, and empty→normal recreates via winCounter leak (count 4 after). 7 Dependability A9 B6 C7 — limit 5 windows banners 'Limit reached close a window first' safe, swipe/back/capture handlers guard edgeState/ overviewMode, empty restore works, no crash; dead-end risk low but tiled overflow >5 not tested and parallax pointerleave resets via updateLayout not spring. 8 Accessibility A9 B5 C6 — focusable 27, unlabeled 0, subTen 0, lowAlpha 0, reducedMotion true, focusVisible 2.5px stroke-focus, colorblind cyan accent distinct vs ok/warn/danger, keyboard Tab lands on win-sheet with ring; fails text-scale (no rem scaling), mono-audio stub silent, contrast ink-60 0.66 on 12,18,27 may be ~5:1 not AAA, dock empty still occupies 37px hit area with zero chips. 9 Delight A9 B4 C6 — earned parallax depth (pointermove per-dist offX 7- depth*0.6, offY 5- depth*0.4, baseY -13*dist) is functional spatial cue but delta only ~4px total, nearly invisible in probe screenshots; minimize scale 0.88 blur 8px + overview card scale 1.02 are expected not signature; visionOS orchid rim + depth shadow reads as delight, C needs one obvious moment (e.g., sheet sheen tracking gaze).",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (59 vs 81), 9 gaps >0, verdict fail."
+}

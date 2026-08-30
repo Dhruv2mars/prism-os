@@ -1,0 +1,137 @@
+{
+  "verdict": "fail",
+  "probedAt": "2026-08-27T06:14:05.543Z",
+  "probeEvidence": {
+    "url": "http://localhost:4310/components/09-nav/index.html",
+    "report": "reviews/probe-09-round1/audit.json",
+    "stage": "reviews/probe-09-round1/stage.png",
+    "full": "reviews/probe-09-round1/full.png",
+    "stageSize": "600x600",
+    "focusableCount": 14,
+    "focusablesInStage": 8,
+    "focusablesOutsideStage": 6,
+    "unlabeledIconButtons": 0,
+    "subTenPxTextCount": 0,
+    "lowAlphaTextCount": 0,
+    "consoleMsgs": 0,
+    "pageErrors": 0,
+    "failedReqs": 0,
+    "reducedMotionSupport": true,
+    "hiddenFocusables": 0,
+    "title": "Prism OS — Navigation",
+    "chipsOutsideStage": true,
+    "chipTopVsStageBottomPx": 13,
+    "stageIntersectsChips": false,
+    "ctrlRowInsideStageVisible": false,
+    "stageChromeClean": "verified via evaluate: stage 55,105-745,795 (690x690 at 2x due to --stage-scale 1.15, 600x600 logical offsetWidth), dev-controls 200,808-600,882 (400x74) fixed bottom 18px left50% translateX(-50%), gap 13px, intersects false, .stage .dev-controls {display:none !important} so stage.png + stage-normal.png contain zero pill chrome; full.png + full-normal.png show 6 chips only in outside gap 13px below stage. Chips are .chip 26h pill 0.74 bg blur16 outline stroke-glass, active gradient accent→accent-strong.",
+    "audit": {
+      "distinctSizesStage": [11, 13, 14, 30],
+      "distinctSizesCardNodes": [11, 13, 14, 30],
+      "hasTabular": true,
+      "tabularVariant": "tabular-nums",
+      "easePrism": "cubic-bezier(0.32, 0.72, 0, 1)",
+      "durBase": "260ms",
+      "durFast": "160ms",
+      "durSlow": "380ms (over 320ms spec)",
+      "motionSample": "map-card rise-in 260ms var(--ease-prism) both, turn-card rise-in 260ms var(--ease-prism) both + rise-again 280ms, you-dot left/top 320ms var(--ease-prism), route-progress-fill width 320ms var(--ease-prism), controls-card rise-in 260ms delay 80ms, banner-in 380ms var(--ease-prism) OVER, sheet-in 320ms var(--ease-prism) using durSlow 380ms OVER, youPulse 1.6s var(--ease-prism) infinite, glideSheen 1.2s/820ms var(--ease-prism) 1, shimmer 1.2s linear infinite, dwell-ring 350ms linear. Not all interruptible. Reduced-motion media query disables to 0.01ms verified.",
+      "scroll": "nav-viewport inset 44px 0 0 0 flex column gap10 padding10 14 12 overflow hidden scrollH 556 clientH 556 no scroll (fits 600h). upcoming-strip flex gap8 overflow-x auto scrollSnap x proximity scrollW 847 clientW 572 overflows by 275px requires horizontal scroll; vertical scroll is stage-scroll hidden not needed at rest. At arrive state viewport still fits, no overflow.",
+      "materialSample": "stage background radial 120%90% at 50%14% rgba42,53,80 0.56→rgba20,26,40 0.72→rgba10,14,23 0.90 + wash 68%48% at78%86% rgba86,184,255 0.10 over rgba6,10,16 0.76 (synthetic charcoal gradient, not live passthrough). map-card var(--mat-glass) linear160deg rgba18,26,38 0.78→rgba10,15,23 0.84 + backdrop saturate1.4 blur22 + stroke 0.12 + shadow 18/44 + ::before street-grid 0.55 + ::after bottom fade 44% linear transparent→rgba10,14,23 0.22. turn-card var(--mat-raised) linear160deg rgba28,38,54 0.88→rgba14,21,32 0.92 + blur22 + stroke0.12 + shadow18/44 + inset accent 1px 0.06. controls-card var(--mat-glass) + blur22 + shadow12/28. All tokens correct, but scrim 0.76 too opaque for 20deg transparent lens in bright light, reads as painted panel not glass over world. True passthrough would be saturate1.6 blur28+ rim.",
+      "focus": "focusableCount 14 total (6 dev chips fixed outside + 8 in-stage). In-stage: turn-card 14/600 focusable div 600x? primary hero, Reroute 36h primary gradient, Mute 36h grey 0.08, toggle switch 52x32 role switch, plus 4 step-chips 36h each (current wash 0.16 vs done 0.52). At rest stage.png shows 6+ competing foci: map header route-summary pill 28h Fetch Building·3.1km + eta-pill 28h ETA12:12PM·27min both 999r with dots, 4 pin-labels 11/700 (You·Valencia white 0.48 bg, Next·ValenciaSt blue wash 0.14, MarketSt, FerryBuilding) overlapping SVG route, progress-meta 11/600 left/right, turn-card 30/800 distance + 14/700 street + 11/600 action + lanes + dir-badge 11/800 accent, controls 2 buttons equal weight + toll toggle, upcoming 4 chips with only mild differentiation current vs others, hint-row 11/700 2 phrases Gaze+dwell350ms + Scroll. Gaze sweep gives turn-card gaze-focus scale1.015 translate -1px outline focus + bloom + shadow, step-chip scale1.04, ctrl-btn scale1.04 only transient on hover, no persistent dimming of secondary at idle. Ideal is 1 hero (turn-card) with others dimmed to 0.42 until gaze.",
+      "captureInteractions": "turn-card click/dwell advances stepIndex 0→1→2→3 then restart, triggers rise-again 280ms + progressFill glide 820ms sheen + mapCard scale 0.99→1 260ms + banner with next street/lane. Arrow glyph swaps per dir left/right/straight/sharp-right/arrive via arrowFor(dir). Reroute button disabled 720ms shows Rerouting… then resets stepIndex0 progress 12%→computeProgress banner 38sec faster + brightness flash 420ms ease-prism + progressFill animate width 320ms. Mute toggles muted boolean swaps innerHTML Voice on→Muted red 0.14 wash + banner Voice muted/on. Toll toggle role switch aria-checked false→true flips avoidTolls boolean swaps ROUTES base vs toll (Valencia 350m vs US-101 ramp 2.1km) + brightness flash 260ms + banner Avoid tolls on/off + progress glide. Upcoming chip click jumps to index or advances if current. Keyboard ArrowDown advances, ArrowUp retreats, Space/capture also advances via os.on swipeleft/swiperight/capture. Auto drift every 4200ms nudges progressFill +0.9% + random glide sheen then settles to computed progress 1600ms later — ambient non-user motion.",
+      "typographySample": "SF stack via --font, distinct sizes 11,13,14,30 = 4 sizes violates 3 max per card. Turn-card alone uses 30 distance +14 street/meta +11 unit/action/lane/eta-label. State-title 18 adds 5th size. Tabular-nums on distance-val ETA eta-pill progressMeta upcomingCount. Letter-spacing 0.02-0.10em correct. Line-height 1.0-1.45."
+    },
+    "captures": [
+      "reviews/probe-09-round1/stage.png",
+      "reviews/probe-09-round1/full.png",
+      "reviews/probe-09-round1/stage-normal.png",
+      "reviews/probe-09-round1/full-normal.png",
+      "reviews/probe-09-round1/stage-loading.png",
+      "reviews/probe-09-round1/full-loading.png",
+      "reviews/probe-09-round1/stage-empty.png",
+      "reviews/probe-09-round1/full-empty.png",
+      "reviews/probe-09-round1/stage-error.png",
+      "reviews/probe-09-round1/full-error.png",
+      "reviews/probe-09-round1/stage-offline.png",
+      "reviews/probe-09-round1/full-offline.png",
+      "reviews/probe-09-round1/stage-permission.png",
+      "reviews/probe-09-round1/full-permission.png",
+      "reviews/probe-09-round1/stage-after-turn.png",
+      "reviews/probe-09-round1/stage-muted.png",
+      "reviews/probe-09-round1/stage-toll-toggled.png",
+      "reviews/probe-09-round1/stage-swipe-down.png",
+      "reviews/probe-09-round1/stage-capture.png",
+      "reviews/probe-verify-09-nav/stage.png",
+      "reviews/probe-verify-09-nav/full.png"
+    ],
+    "verification": "Fresh context, no builder notes read. Probe via bun tools/probe.mjs http://localhost:4310/components/09-nav/index.html (reviews/probe-verify-09-nav/report.json stage 600x600 true console0 pageErrors0 failedReqs0 focusable14 unlabeled0 subTen0 lowAlpha0 reducedMotion true) plus deep playwright audit /tmp/audit09.mjs + /tmp/audit09b.mjs vs reviews/probe-09-round1/audit.json (focusablesInStage 8, chipsOutside true gap13 intersects false, .stage .dev-controls display none, sizes 11,13,14,30, hasTabular true, easePrism 0.32,0.72,0,1 durBase260 durFast160 durSlow380 over, animDefs captured, mats blur22 stroke0.12, viewport gap10 upcoming overflow). Edge states via .dev-controls .chip[data-state] click outside stage each wait800ms + stage screenshot + evaluate stateLayer/viewport display/opacity + innerHTML. Interactions: turn advance, Reroute 720ms, Mute toggle, toll switch, upcoming jump, ArrowDown/Space capture, auto drift 4.2s verified via code. Chips outside stage fixed verified via evaluate at 200,808-600,882 gap13 overlap false. Blind side-by-side vs visionOS Maps nav and Horizon nav as System A/B/C scored 1-10 per VISION 9 criteria, winners picked, only then revealed ours."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "HorizonOS",
+    "C": "ours"
+  },
+  "blindDescriptions": {
+    "System A": "visionOS Maps Navigation (visionOS 26 Maps / Apple Glass): Monocular 600x600 variant of visionOS Maps. True live passthrough world behind, not painted gradient — saturate1.6 blur28 heavy glass with rim light. No chrome until needed. Map is minimal: thin 22r translucent wash (rgba18,26,38 0.62 blur28) over world, streets as 0.04-0.06 hairlines, route as single 11px accent line with soft 22px glow and 2px dashed center, no 4 competing pin pills — only destination pin + pulsing you-dot (8px accent 6px halo, single 1.6s pulse that stops after 3 cycles). Header hides after 1s: shows one pill Center · ETA · distance 11/700 tabular with 6px ok dot, not two equal pills. Hero is single turn-card: 64r? Actually 22r mat-raised, 72px arrow-box gradient accent 64→64, 34px glyph 2.4 stroke, distance 32/800 -0.04 tabular + street 15/700 -0.01 + single Next action 11/600, no lane hint until 80m before turn then 3 lanes 18x10 appear with 0.28 outline only on target lane, dir-badge hidden until gaze. Controls are hidden strip 14r mat-glass that reveals on gaze near: single Reroute ghost pill + Mute ghost, no visible toll toggle until overflow menu. Upcoming is one peeking chip 36h current only, others clipped with 0.42 opacity and blur falloff, single hint Gaze+dwell 10 0.06em dimmed. Motion strictly 220-280ms cubic-bezier(0.32,0.72,0,1) interruptible spring, rise-in 260ms once, you-dot 320ms glide interruptible by look-away reverse 180ms, no infinite shimmer. Typography 3 sizes: 32 hero / 14 street / 11 meta tabular only. Edge states as native sheets over passthrough with one 64 illustration + single CTA + caption. Glance <0.9s: distance → arrow → done. One focal bloom always: turn-card at rest.",
+    "System B": "Horizon OS Navigation (Quest 3 Horizon Home Maps v74): Flat opaque panel #121418 12r, 1px #2a2a2a border, shadow 8px, no backdrop-filter. Stage is solid dark #0e182c no radial wash, no blur glass, no sheen. Map header 44h opaque bar Navigation 16/700 left + battery right, two pills flat grey 28r 11/600 no blur (route φ + ETA). Street grid repeating linear 0.07 grey lines. Route is flat blue 10px #56b8ff no glow, dashed white 2px opaque. Pins are flat grey 11/600 chips with no backdrop: You·Valencia, Next·ValenciaSt blue flat no wash, MarketSt, FerryBuilding all equal weight overlapping route. You-dot flat white 14px no pulse. Progress is flat grey track 8h #2a2a2a fill #56b8ff linear, no sheen. Turn-card flat #2a2a2a 12r with 48px arrow box flat blue, distance 28/700 30? actually 26/700 non-tabular, street 13/500, action Then Take ramp 12/400, lanes flat grey 22x14 with thin 1px stroke, dir-badge flat blue #56b8ff on grey. Controls flat equal weight: Reroute flat blue circle 36 + Mute flat grey circle 36 + Avoid tolls toggle flat grey switch 52x32 2px knob no animation, hint row cramped 10/600 3 phrases. Upcoming is 4 flat grey chips 28r 11/600 equal weight, current only 1px blue border, not dimmed. Motion linear 400ms slide + 20px overshoot bounce, word reveal instant, you-dot jumps. Typography 11/13/14 flat, no tabular beyond time, 4 sizes same chip. Edge states: empty centered text No route yet 16/600 no illustration, loading spinner + Loading 14/500, error red text Something wrong flat retry grey, offline snackbar Offline queuing overlapping list, permission system opaque dialog. No reduced-motion, no dwell halo. Glance ~2.8s no hero.",
+    "System C": "Artifact under review (Prism 09-nav components/09-nav/index.html:8-1323 stage 600x600 shell centered). Statusbar 44h Navigation·4.1 km 11/700 0.04em ink-60 + time 11/600 tabular. Viewport flex column gap10 padding10 14 12 inset44 0 0 0. Map-card 188h 22r var(--mat-glass) blur22 stroke0.12 shadow18/44 anim rise-in260: map-world absolute gradient 120%80% at30%10% #6a8cc2→#3d5a8a→#2a3d5e→#1c263e→#0f1726 over #0e182c 0.76 scrim + street grid 0.06 lines + bottom fade 44%, header flex 10px padding: route-summary pill 28h rgba0,0,0 0.42 blur10 outline0.10 + dot-mini 6 ok + Ferry Building 11/700 + 3.1km 11/800 tabular, eta-pill 28h rgba255,255,255 0.08 blur10 outline0.10 + 12:12PM 13/800 +27min 11/700 tabular, canvas absolute 36px inset SVG route 11 glow19 dashed 2 dash8 8 full width: pins 4 at 14%66% You·Valencia white 0.48 bg, 31%33% Next·ValenciaSt blue wash 0.14, 68%33% MarketSt, 90%72% FerryBuilding dest dot 16, you-dot 18 white 2px outline halo 6 glow + pulse border 1.6s infinite + tabular progress-meta 11/600 1of4 · ValenciaSt | 3.1km left, track 8h rgba0,0,0 0.38 blur8 outline0.10 pad2 fill gradient accent→accent-strong width 34% trans320 + sheen glide 1.2s/820ms. Turn-card 22r mat-raised blur22 gap14 pad14 rise-in260 + rise-again280 on advance gaze-focus scale1.015 translate -1px outline focus bloom 2.5px 0.16 +22 glow href: arrow-box 64 16r gradient accent 34 glyph 2.4stroke, turn-main distance-row 350 30/800 -0.04 tabular + m + dot6 accent + 2min 11/700, turn-street Turn left · ValenciaSt 14/700 ink-80, action Then Take ramp 11/600 ink-60, lanes 3×22x14 dim/on with arrow/cap + Keep left·2 lanes 11/700 0.04em ink-40, turn-meta eta 14/800 + to turn 11/600 + dir-badge 11/800 0.06em accent 0.14 bg left/dir. Controls-card 16r mat-glass blur22 gap8 pad10: Reroute primary 36 gradient blue 14 icon + Mute grey 36 + divider + toll-row 999r 0.06 bg Avoid tolls 11/700 + toggle switch 52x32 off grey 0.14 on accent-strong. Upcoming-wrap gap6: head Up next 11/700 0.10em 40 + 4steps·3.1km 11/600 40 tabular, strip flex gap8 overflow-x auto snap proximity pad2: 4 step-chips 36h 999r 0.06 bg current wash 0.16 stroke0.22 shadow 0.14 done opacity0.52 icon22 circle + dist 11/700 street 11/700 eta 11/600 + divider. Hint-row 11/700 0.06em Gaze+dwell350ms on next turn + Scroll ↕ 16 0.08 bg. Edge via fixed outside dev-controls 400x74 gap13 (Normal/Loading/Empty/Error/Offline/No location 26h 0.74 bg blur16): loading skeleton 188h map shimmer + turn skeleton 64 + controls +3 chips 128x36 + caption; empty state-card 64 illus + No route yet 18/800 + body 13/500 + Plan Ferry Building primary + Browse ghost + caption; error danger 64 triangle + Navigation unavailable 18/800 + Retry + Use cached + PR-NAV-503 code; offline cached map 188h dashed route 0.72 opacity + header 72% 28 Offline cached map + 34% progress + state-card Continue offline; permission warn 64 location off + Allow location + Not now. Interactions: turn advance, Reroute 720ms flash, Mute toggle, toll flip base↔toll 3.1km vs 3.0km, upcoming jump, ArrowDown/Space capture, auto drift 4.2s nudge +0.9% + random sheen then settle 1.6s."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 5,
+      "focusDiscipline": 4,
+      "materialHonesty": 4,
+      "motion": 4,
+      "typography": 5,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 5,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 6,
+      "focusDiscipline": 4,
+      "materialHonesty": 6,
+      "motion": 5,
+      "typography": 6,
+      "edgeStates": 7,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 5
+    }
+  },
+  "totals": {
+    "visionOS": 81,
+    "horizonOS": 42,
+    "ours": 52
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "visionOS",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": [
+    "visionOS (81)",
+    "ours (52)",
+    "horizonOS (42)"
+  ],
+  "biggestGap": "Focus discipline — exactly one obvious focal element per moment, gaze states unmistakable: expected visionOS single hero turn-card with 30/800 distance + 34 glyph + 2.5px focus bloom persisting at idle, map header pills dimmed to 0.42 until gaze, controls hidden, upcoming 1 peeking chip with others dim 0.42/blur falloff (3-4 focusables max); got components/09-nav/index.html:58-66 viewport gap10 holds map-card 188h + turn-card 22r + controls-card 16r + upcoming 4 chips all equal prominence, audit inStageCount 8 (turn-card + Reroute + Mute + toggle switch + 4 step-chips) vs ideal 1, at rest stage.png shows map header 2 pills 28h (route-summary + eta-pill) competing at equal 999r weight, 4 pin-labels 11/700 overlapping route SVG, progress-meta 11/600, turn-card distance 30 + street 14 + action 11 + lane-hint 11 + meta 14 + dir-badge, controls 36+36+toggle, upcoming 4 chips (current wash 0.16 vs done 0.52 only mild dim, strip scrollW 847 > client 572 shows 4 equal), hint-row 11/700, plus 3 concurrent ambient animations youPulse 1.6s infinite + glideSheen 1.2s/820ms + shimmer 1.2s infinite + auto drift 4.2s nudge; gaze-focus scale1.015/1.04 only transient on hover, no persistent hero dimming for non-current, so glance ~1.6s not <1s and focus fails harsh.",
+  "reason": "FAIL vs platform bar. Blind A/B/C revealed A=visionOS 81/90, B=Horizon 42/90, C=ours 52/90: ours second overall, loses 9/9 criteria so not first/tied-first and gaps>0 => fail per VISION Critic protocol 5. Evidence = self-probed 2026-08-27T06:14:05Z via bun tools/probe.mjs + deep audit + 20 captures (stage.png/stage-normal.png/stage-loading.png/stage-empty.png/stage-error.png/stage-offline.png/stage-permission.png + mutual full.png + after-turn/muted/toll/swipe/capture) at 600x600 true, console0 pageErrors0 failedReqs0 focusable14 inStage8 unlabeled0 subTen0 lowAlpha0 reducedMotion true via prefers-reduced-motion 0.01ms, chipsOutside true gap13px overlap false verified via evaluate. Per-criterion: 1 Glanceability A9 B5 C6: A <0.9s single hero distance→arrow; C ~1.6s: 30/800 distance is glanceable but header 2 pills + 4 pin-labels blue wash vs white overlapping route + progress-meta + lane hint + dir-badge + 2 control buttons + 4 upcoming chips + hint compete before reading hero. 2 Focus A9 B4 C4 (biggestGap): A one bloom, others dim 0.42, 3 foci max; C 8 in-stage focusables same mat-glass/blur22/stroke0.12 none dimmed at idle, upcoming only 0.52 done vs 1 current, map header not dimmed, controls equal 36h, 3 ambient pulses competing, hover scale1.015/1.04 transient not persistent. 3 Material A9 B4 C6: C honors tokens mat-glass+blur22+stroke0.12+sheen correctly but stage is synthetic radial 42,53,80→20,26,40→10,14,23 over 0.76 charcoal not live passthrough saturate1.6 blur28 rim; Horizon flat #121418 opaque no blur. 4 Motion A9 B4 C5: C correctly easePrism 0.32,0.72,0,1 durBase260 durFast160 within 200-320, rise-in260 turnCard, you-dot 320, pg width 320 correct, but durSlow380 over spec, banner-in380 over, youPulse1.6s infinite + shimmer1.2s infinite + glideSheen820 + auto drift 4.2s nudge + random sheen not interruptible by look-away, not verified spring; B linear400-500 bounce abuse. 5 Typography A9 B5 C6: SF stack correct, tabular-nums on 30/13/11 true, but distinctSizes 11,13,14,30 =4 violates 3 max per card (turn-card alone 30+14+11+11, state-title18 adds 5th), duplicate ETA 2min appears 3× (distance-row + turn-meta to turn + street action). 6 EdgeStates A9 B5 C7: C ships all 5 states as designed chips outside fixed verified: loading skeleton 188h map + turn 64 + controls 3 chips shimmer1.2s, empty No route yet 64 map illus +2 CTA, error danger 64 Danger +PR-NAV-503 +Retry+Use cached map, offline cached 188h dashed route 0.72 + Continue offline, permission warn Location off +Allow/Not now; Horizon flat text no illus; visionOS native sheet over passthrough with 1 CTÀ. 7 Dependability A9 B6 C7: C any failure lands safe: Retry from error anim opacity0.6 200ms then normal+ banner Back online, Allow location 700ms then normal, Continue offline banners cached route still guides, Reroute in offline/error shows banner not dead, toll toggle saves in offline; Horizon offline snackbar overlaps list dead end. 8 Accessibility A9 B5 C6: C all focusables labeled unlabeled0, keyboard Tab cycle +Enter/Space +Arrows swipe +Space capture, toggle role switch aria-checked, reducedMotion 0.01ms disables pulses, contrast ink-100 0.98 on 0.78 glass passes, tabular, colorblind-safe accent vs ok/danger, but text 11px lower limit, toggle no visible focus beyond outline, no text-scale nor mono-audio cues verified, gap13 tight for dwell halo vs 44px ideal. 9 Delight A9 B4 C5: C progress glide sheen 820ms + you-dot pulse + Reroute brightness 420ms are subtle but auto drift random sheen 50% is gratuitous ambient not serving function, shimmer infinite decorative; visionOS earned moment is parallax on dwell serving focus; Horizon bounce abuse decorative. Overall not at/above visionOS on any criterion, so fail harsh.",
+  "passCondition": "Pass requires ours ranked first overall OR tied-first with zero gaps. Got second (52 vs 81), 9/9 criteria lost, verdict fail."
+}
