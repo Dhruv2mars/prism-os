@@ -6,8 +6,13 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const url = process.argv[2];
-const out = resolve(process.argv[3] ?? `reviews/probe-${Date.now()}`);
+const outArg = process.argv[3];
 if (!url) { console.error('usage: bun tools/probe.mjs <url> [outdir]'); process.exit(2); }
+if (outArg?.startsWith('-')) {
+  console.error(`outdir looks like a flag: ${outArg}\nusage: bun tools/probe.mjs <url> [outdir]`);
+  process.exit(2);
+}
+const out = resolve(outArg ?? `reviews/probe-${Date.now()}`);
 mkdirSync(out, { recursive: true });
 
 const browser = await chromium.launch();
