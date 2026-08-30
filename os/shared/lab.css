@@ -1,0 +1,59 @@
+/* Prism OS — simulator lab rail. Renders OUTSIDE the stage, always.
+   Nothing in this file may position anything inside .stage. */
+
+.device { grid-template-columns: 1fr; }
+
+.lab-rail {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 248px;
+  z-index: 10000;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 18px 16px;
+  overflow-y: auto;
+  background: rgba(6, 9, 14, 0.92);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font);
+  color: rgba(255, 255, 255, 0.8);
+  -webkit-font-smoothing: antialiased;
+}
+.lab-rail::-webkit-scrollbar { width: 0; }
+
+.lab-head { display: flex; flex-direction: column; gap: 3px; }
+.lab-head b { font-size: 13px; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+.lab-head span { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #59627a; }
+
+.lab-group { display: flex; flex-direction: column; gap: 7px; }
+.lab-group > h4 {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.16em;
+  text-transform: uppercase; color: #59627a; margin: 4px 0 1px;
+}
+.lab-btn {
+  appearance: none; -webkit-appearance: none;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  width: 100%; min-height: 30px; padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.78);
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  text-align: left; cursor: pointer;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+.lab-btn:hover { background: rgba(255, 255, 255, 0.1); }
+.lab-btn[aria-pressed="true"], .lab-btn.on {
+  background: rgba(86, 184, 255, 0.16);
+  border-color: rgba(86, 184, 255, 0.55);
+  color: #cfe9ff;
+}
+.lab-btn kbd {
+  font-family: inherit; font-size: 10px; font-weight: 600;
+  color: #59627a; background: none; border: 0;
+}
+.lab-range { width: 100%; accent-color: #56b8ff; }
+.lab-note { font-size: 10px; line-height: 1.5; color: #59627a; }
+.lab-val { font-variant-numeric: tabular-nums; color: #8b93a7; font-size: 11px; }
+
+/* the stage sits centred in the space left of the rail */
+body.has-lab .device { right: 248px; }
+body.has-lab .device { position: fixed; inset: 0 248px 0 0; }

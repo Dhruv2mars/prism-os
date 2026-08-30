@@ -1,147 +1,295 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Prism OS — build progress</title></head>
 <body style="margin:0;background:#0a0e17;color:#eef1f7;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif">
-<div style="max-width:860px;margin:0 auto;padding:40px 22px">
+<div style="max-width:900px;margin:0 auto;padding:40px 22px 70px">
   <header style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">
     <h1 style="font-size:26px;font-weight:800;letter-spacing:-0.02em;margin:0">Prism OS <span style="color:#56b8ff;font-weight:700">build progress</span></h1>
-    <span class="tab" style="color:#8b93a7;font-size:13px;font-variant-numeric:tabular-nums">2026-08-27 07:07 UTC · wave 4</span>
+    <span style="color:#8b93a7;font-size:13px;font-variant-numeric:tabular-nums">2026-08-30 15:17 UTC · wave 0</span>
   </header>
-  <p style="color:#8b93a7;margin:0 0 18px;font-size:14px">Prism OS — the operating system for smart glasses.</p>
-  <p style="margin:0 0 18px;font-size:13px"><a href="https://github.com/Dhruv2mars/prism-os" style="color:#56b8ff;text-decoration:none;border-bottom:1px solid rgba(86,184,255,.4)">https://github.com/Dhruv2mars/prism-os</a> · live demo served from <span class="tab" style="color:#8b93a7">/components/&lt;id&gt;/index.html</span></p>
-  <div style="height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:26px">
-    <div style="height:100%;width:0%;background:linear-gradient(90deg,#2f9dff,#56b8ff);transition:width .5s"></div>
+  <p style="color:#8b93a7;margin:0 0 14px;font-size:14px">Prism OS — the operating system for smart glasses.</p>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+    <div style="flex:1;height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden">
+      <div style="height:100%;width:0%;background:linear-gradient(90deg,#2f9dff,#56b8ff);transition:width .5s"></div>
+    </div>
+    <span style="font-variant-numeric:tabular-nums;font-weight:700;font-size:14px;color:#c6cdd9">0/26 passed</span>
   </div>
-  <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,.03);border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.07)">
-    <thead><tr style="text-align:left">
-      <th style="padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#58607a;border-bottom:1px solid rgba(255,255,255,.08)">piece</th>
-      <th style="padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#58607a;border-bottom:1px solid rgba(255,255,255,.08)">status</th>
-      <th style="padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#58607a;border-bottom:1px solid rgba(255,255,255,.08)">round</th>
-      <th style="padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#58607a;border-bottom:1px solid rgba(255,255,255,.08)">latest verdict</th>
-    </tr></thead>
+  <p style="color:#58607a;font-size:12px;line-height:1.6;margin:0 0 26px;max-width:78ch">PASS requires, twice consecutively from two DIFFERENT fresh critics: ours ranked first overall, or tied-first with zero named gaps. One pass is luck. Two is real.</p>
+  
+<section style="margin-bottom:26px">
+  <h2 style="font-size:13px;letter-spacing:.02em;margin:0 0 3px;display:flex;align-items:baseline;gap:9px">
+    <span style="color:#58607a;font-size:11px;text-transform:uppercase;letter-spacing:.12em">Wave 0</span>
+    <span style="font-weight:700">foundation</span>
+    <span style="color:#58607a;font-weight:600;font-variant-numeric:tabular-nums">0/3</span>
+  </h2>
+  <p style="color:#58607a;font-size:12px;line-height:1.5;margin:0 0 9px;max-width:70ch">The visual, motion, and sensory language every other piece inherits. Nothing else may start until these pass, because a wrong foundation is what produced a 55/90 plateau last time.</p>
+  <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,.03);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.07)">
     <tbody>
 <tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">00 foundation kit</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(255,157,93,.14);color:#ff9d5d;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">fixing</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R4</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">fail (55/90 vs visionOS 83)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: catalog scroll + focus vs visionOS isolated</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">00-foundation<div style="font-weight:400;color:#8b93a7;font-size:12px">foundation &amp; materials</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
 </tr>
 
 <tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">01 boot + recovery</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(255,157,93,.14);color:#ff9d5d;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">fixing</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R2</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">fail (53/90 vs visionOS 84)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: edge states missing 3 of 5 · diagnostics all green</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">16-motion<div style="font-weight:400;color:#8b93a7;font-size:12px">motion &amp; transition language</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
 </tr>
 
 <tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">02 home environment</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(255,157,93,.14);color:#ff9d5d;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">fixing</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R2</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">fail (54/90 vs visionOS 82)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: focus discipline: 3 foci compete at rest</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">03 window manager</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(255,157,93,.14);color:#ff9d5d;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">fixing</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R2</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">fail (59/90 vs visionOS 81)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: material honesty 0.96 opaque not scrim</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">04 gesture trainer</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(255,157,93,.14);color:#ff9d5d;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">fixing</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R2</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">fail (55/90 vs visionOS 83)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: 3 equal 56px targets + 5 dots vs one halo</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">05 notifications</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">fail (55/90 vs visionOS 83)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: 7 sizes vs 3 per card · typography</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">06 AI assistant</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">fail (54/90 vs visionOS 83)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: 6 foci compete + dwell not scaled</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">07 camera + capture</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">built · probe pass (23 focusable)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: await harsh blind critic</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">08 live captions</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">built · probe pass (12 focusable)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: await harsh blind critic</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">09 navigation</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">built · probe pass (14 focusable)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: await harsh blind critic</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">10 messages + calls</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">built · probe pass (20 focusable)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: await harsh blind critic</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">11 settings</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">built · probe pass (36 focusable)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: await harsh blind critic</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">12 web apps platform</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">built · probe pass (29 focusable)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: await harsh blind critic</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">13 accessibility</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">built · probe pass (37 focusable)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: await harsh blind critic</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">14 onboarding + pairing</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">built · probe pass (17 focusable)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: await harsh blind critic</div></td>
-</tr>
-
-<tr>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">15 performance HUD</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(86,184,255,.14);color:#56b8ff;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">critic</span></td>
-  <td class="tab" style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7">R1</td>
-  <td style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">built · probe pass (19 focusable)<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: await harsh blind critic</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">17-audio-haptics<div style="font-weight:400;color:#8b93a7;font-size:12px">spatial audio &amp; haptics</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
 </tr></tbody>
   </table>
-  <h2 style="font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:#58607a;margin:26px 0 8px">Build log</h2>
-  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.55"><div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">repo scaffolded · design system frozen · probe harness live</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">foundation specimen shipped (materials, type, controls, motion)</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">wave 1 builders dispatched: boot, home, window manager, gestures</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+12m</span><span style="color:#aab2c5">pushed to github.com/Dhruv2mars/prism-os · wave 1 builders relaunching after provider outage</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+4h</span><span style="color:#aab2c5">wave1 chrome fix landed · chips outside stage · motion clamped 200-320 prism-ease</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+4h</span><span style="color:#aab2c5">wave1 re-critics: scores 53-59/90 (vs 83 visionOS) — biggest gaps focus/material</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+6h</span><span style="color:#aab2c5">wave2 built: notifications, assistant, camera, captions, nav — all probe pass, critics 05/06 fail typography/focus</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+7h</span><span style="color:#aab2c5">wave3+4 built: messages, settings, webapps, a11y, onboarding, HUD — all probe pass</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+7h</span><span style="color:#aab2c5">coherence integrator pass: 16/16 probe pass 600x600, tokens consistent, dev chrome outside stage</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+8h</span><span style="color:#aab2c5">sweep typography · removed literal 'tabular' leaks from 16 files (05/10/11/12/15 gaps)</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+8h</span><span style="color:#aab2c5">focus polish: 02 hero+orb dim, 05 parallax dim 0.65, 06 chips 0.68 / wave 0.5, 03 glass 0.78-0.84</span></div></div>
-  <p style="color:#58607a;font-size:12px;margin-top:24px">Every piece is built by one agent and judged by a fresh-context critic that inspects rendered output only, scored against visionOS and Horizon OS side by side. Pass = ours ranked first or tied-first with zero named gaps.</p>
+</section>
+
+<section style="margin-bottom:26px">
+  <h2 style="font-size:13px;letter-spacing:.02em;margin:0 0 3px;display:flex;align-items:baseline;gap:9px">
+    <span style="color:#58607a;font-size:11px;text-transform:uppercase;letter-spacing:.12em">Wave 1</span>
+    <span style="font-weight:700">shell</span>
+    <span style="color:#58607a;font-weight:600;font-variant-numeric:tabular-nums">0/5</span>
+  </h2>
+  <p style="color:#58607a;font-size:12px;line-height:1.5;margin:0 0 9px;max-width:70ch">Boot, home, window management, input, and text entry. Every app surface depends on these interaction primitives.</p>
+  <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,.03);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.07)">
+    <tbody>
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">01-boot<div style="font-weight:400;color:#8b93a7;font-size:12px">boot &amp; recovery</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">02-home<div style="font-weight:400;color:#8b93a7;font-size:12px">home environment</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">03-wm<div style="font-weight:400;color:#8b93a7;font-size:12px">window manager</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">04-gestures<div style="font-weight:400;color:#8b93a7;font-size:12px">gesture &amp; input model</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">18-textinput<div style="font-weight:400;color:#8b93a7;font-size:12px">text input &amp; dictation</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr></tbody>
+  </table>
+</section>
+
+<section style="margin-bottom:26px">
+  <h2 style="font-size:13px;letter-spacing:.02em;margin:0 0 3px;display:flex;align-items:baseline;gap:9px">
+    <span style="color:#58607a;font-size:11px;text-transform:uppercase;letter-spacing:.12em">Wave 2</span>
+    <span style="font-weight:700">system surfaces</span>
+    <span style="color:#58607a;font-weight:600;font-variant-numeric:tabular-nums">0/6</span>
+  </h2>
+  <p style="color:#58607a;font-size:12px;line-height:1.5;margin:0 0 9px;max-width:70ch">Cross-cutting system UI. Notifications, assistant, search, privacy, settings, accessibility. Apps assume these exist.</p>
+  <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,.03);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.07)">
+    <tbody>
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">05-notifications<div style="font-weight:400;color:#8b93a7;font-size:12px">notifications</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">06-assistant<div style="font-weight:400;color:#8b93a7;font-size:12px">AI assistant</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">19-search<div style="font-weight:400;color:#8b93a7;font-size:12px">universal search &amp; command</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">20-privacy<div style="font-weight:400;color:#8b93a7;font-size:12px">privacy &amp; capture indicators</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">11-settings<div style="font-weight:400;color:#8b93a7;font-size:12px">settings</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">13-a11y<div style="font-weight:400;color:#8b93a7;font-size:12px">accessibility</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr></tbody>
+  </table>
+</section>
+
+<section style="margin-bottom:26px">
+  <h2 style="font-size:13px;letter-spacing:.02em;margin:0 0 3px;display:flex;align-items:baseline;gap:9px">
+    <span style="color:#58607a;font-size:11px;text-transform:uppercase;letter-spacing:.12em">Wave 3</span>
+    <span style="font-weight:700">first-party apps</span>
+    <span style="color:#58607a;font-weight:600;font-variant-numeric:tabular-nums">0/6</span>
+  </h2>
+  <p style="color:#58607a;font-size:12px;line-height:1.5;margin:0 0 9px;max-width:70ch">The apps that prove the shell works. Each is an independent surface a critic can rank alone.</p>
+  <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,.03);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.07)">
+    <tbody>
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">07-camera<div style="font-weight:400;color:#8b93a7;font-size:12px">camera &amp; capture</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">08-captions<div style="font-weight:400;color:#8b93a7;font-size:12px">live captions</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">09-nav<div style="font-weight:400;color:#8b93a7;font-size:12px">navigation</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">10-messages<div style="font-weight:400;color:#8b93a7;font-size:12px">messages &amp; calls</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">21-media<div style="font-weight:400;color:#8b93a7;font-size:12px">media &amp; now playing</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">15-hud<div style="font-weight:400;color:#8b93a7;font-size:12px">performance HUD</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr></tbody>
+  </table>
+</section>
+
+<section style="margin-bottom:26px">
+  <h2 style="font-size:13px;letter-spacing:.02em;margin:0 0 3px;display:flex;align-items:baseline;gap:9px">
+    <span style="color:#58607a;font-size:11px;text-transform:uppercase;letter-spacing:.12em">Wave 4</span>
+    <span style="font-weight:700">platform</span>
+    <span style="color:#58607a;font-weight:600;font-variant-numeric:tabular-nums">0/6</span>
+  </h2>
+  <p style="color:#58607a;font-size:12px;line-height:1.5;margin:0 0 9px;max-width:70ch">The third-party story that was silently dropped last time: a runtime that actually runs foreign code, a permission broker that actually enforces, a catalog, an SDK, a simulator, and the out-of-box flow that ties it together.</p>
+  <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,.03);border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.07)">
+    <tbody>
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">12-webapps<div style="font-weight:400;color:#8b93a7;font-size:12px">web apps runtime</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">22-permissions<div style="font-weight:400;color:#8b93a7;font-size:12px">permission broker</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">23-appstore<div style="font-weight:400;color:#8b93a7;font-size:12px">app catalog &amp; install</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">24-devsdk<div style="font-weight:400;color:#8b93a7;font-size:12px">developer SDK &amp; manifest spec</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">25-devsim<div style="font-weight:400;color:#8b93a7;font-size:12px">developer simulator &amp; devtools</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr>
+
+<tr>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">14-onboarding<div style="font-weight:400;color:#8b93a7;font-size:12px">onboarding &amp; pairing</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+</tr></tbody>
+  </table>
+</section>
+  <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#58607a;margin:26px 0 9px">Blocked / deviations</h2>
+<div style="border:1px solid rgba(255,157,93,.3);background:rgba(255,157,93,.07);border-radius:12px;padding:12px 14px;margin-bottom:9px">
+  <div style="font-weight:700;font-size:13px;color:#ffb989">Sub-agent reasoning effort = medium, set via .claude/agents/*.md frontmatter</div>
+  <div style="color:#8b93a7;font-size:12px;margin-top:2px">partially blocked in this session, not descoped</div>
+  <div style="color:#aab2c5;font-size:12px;line-height:1.55;margin-top:6px">The four agent definitions exist on disk with `model: opus` and `effort: medium`. The Claude Code harness registers .claude/agents/*.md at SESSION START, so definitions authored mid-session are not selectable as subagent_type in this run — a spawn with subagent_type 'prism-builder' errors with 'Agent type not found'.</div>
+  <div style="color:#aab2c5;font-size:12px;line-height:1.55;margin-top:5px"><b style="color:#c6cdd9">Workaround </b>Spawning the generic agent with an explicit model override (verified: reports claude-opus-5) and prepending the full role definition — including the critic's disqualification rule — to every spawn prompt. Behaviour matches the definitions; only the effort knob is not settable per-spawn.</div>
+  <div style="color:#8b93a7;font-size:12px;line-height:1.55;margin-top:5px"><b style="color:#c6cdd9">Residual </b>Reasoning effort cannot be pinned to medium from inside this session and is not introspectable by a subagent. The frontmatter takes effect on the next session start. Verified via throwaway spawn: model is claude-opus-5; effort was not determinable.</div>
+</div>
+  <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#58607a;margin:26px 0 8px">Build log</h2>
+  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.55"><div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">read 22 prior verdicts · root-caused the plateau to in-stage dev chrome, undemoted foci, and leaked tokens</span></div>
+<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">probe.mjs rewritten as an enforcing gate: exit 1 on dev chrome in stage, token leaks, overflow, reduced-motion, console errors</span></div>
+<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">os/shared/lab.js + lab.css added — dev controls in an outside rail, 5 edge states URL-drivable, world layer behind the glass</span></div>
+<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">agent definitions written: builder, critic, sweep, integrator (opus/medium) · critic carries its own disqualification rule</span></div>
+<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">piece list expanded 16 -&gt; 26 across 5 waves · web apps runtime, permission broker, catalog, SDK, devtools, text input, search, privacy, media, audio/haptics, motion all now explicit pieces</span></div></div>
+  <p style="color:#58607a;font-size:12px;margin-top:24px;line-height:1.6;max-width:78ch">Every piece is built by one agent and judged by a fresh-context critic that runs the probe itself and inspects only rendered output, scored blind against a named visionOS screen and a named Horizon OS screen across nine criteria. Every piece carries two consecutive PASS verdicts from two different fresh critics; the coherence integrator signs off on the whole system; the web apps runtime actually runs a third-party app; the developer platform is real; the dashboard shows N/N passed.</p>
 </div></body></html>

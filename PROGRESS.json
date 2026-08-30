@@ -1,198 +1,444 @@
 {
   "project": "Prism OS",
-  "tagline": "Prism OS — the operating system for smart glasses.",
-  "updated": "2026-08-27 07:07",
-  "wave": 4,
+  "tagline": "Prism OS \u2014 the operating system for smart glasses.",
+  "updated": "2026-08-30 15:17",
+  "wave": 0,
+  "runId": "gauntlet-2",
+  "doneDefinition": "Every piece carries two consecutive PASS verdicts from two different fresh critics; the coherence integrator signs off on the whole system; the web apps runtime actually runs a third-party app; the developer platform is real; the dashboard shows N/N passed.",
+  "passRule": "PASS requires, twice consecutively from two DIFFERENT fresh critics: ours ranked first overall, or tied-first with zero named gaps. One pass is luck. Two is real.",
+  "antiStall": {
+    "ratchet": "Below 75 total, score must climb >=5 per round. Two rounds under +5 -> discard the builder's approach and respawn with a different one.",
+    "rebuild": "4 fails with <10 total improvement -> delete the piece and rebuild from scratch.",
+    "sweep": "Same gap category named on >=3 pieces -> freeze new rounds, run ONE sweep agent across every piece.",
+    "noSilentDescope": "Anything that cannot be done goes under 'blocked' with a reason. Dropping it quietly is the worst available outcome."
+  },
+  "priorRun": {
+    "verdicts": 22,
+    "allFail": true,
+    "oursRange": "47-59/90",
+    "visionOSRange": "81-83/90",
+    "rootCauses": [
+      "The loop never looped: 10 of 16 pieces sat at FAIL with no builder ever sent back.",
+      "Focus discipline named the biggest gap on 9 pieces across 11 verdicts, fixed on none.",
+      "Engineering tokens ('tabular', 'prism-ease \u00b7 260ms') shipped in user-visible copy on 5 pieces.",
+      "Web Apps was a picture of a platform: zero iframe, zero sandbox, zero manifest, zero postMessage.",
+      "The Meta developer platform was in scope and was silently dropped.",
+      "328MB of screenshots across 411 PNGs; nothing committed for 8 hours of work."
+    ]
+  },
+  "countermeasures": [
+    "tools/probe.mjs is now an enforcing GATE (exit 1 on violation), not a reporter. It fails the build on dev chrome inside the stage, engineering tokens in rendered text, stage overflow, unhonored reduced motion, unnamed focusables, and any console or page error.",
+    "os/shared/lab.js moves every developer control OUT of the 600x600 stage into a fixed rail, and drives all five edge states from the URL so critics can screenshot them.",
+    "os/shared/lab.js also paints a world layer behind the glass, so material honesty is judgeable instead of assumed.",
+    "The critic's disqualification rule lives in .claude/agents/prism-critic.md frontmatter, so it survives a spawn prompt that forgets to repeat it.",
+    "No piece is ever left at FAIL without a live builder on it."
+  ],
+  "waves": [
+    {
+      "wave": 0,
+      "name": "foundation",
+      "rationale": "The visual, motion, and sensory language every other piece inherits. Nothing else may start until these pass, because a wrong foundation is what produced a 55/90 plateau last time.",
+      "pieces": [
+        "00-foundation",
+        "16-motion",
+        "17-audio-haptics"
+      ]
+    },
+    {
+      "wave": 1,
+      "name": "shell",
+      "rationale": "Boot, home, window management, input, and text entry. Every app surface depends on these interaction primitives.",
+      "pieces": [
+        "01-boot",
+        "02-home",
+        "03-wm",
+        "04-gestures",
+        "18-textinput"
+      ]
+    },
+    {
+      "wave": 2,
+      "name": "system surfaces",
+      "rationale": "Cross-cutting system UI. Notifications, assistant, search, privacy, settings, accessibility. Apps assume these exist.",
+      "pieces": [
+        "05-notifications",
+        "06-assistant",
+        "19-search",
+        "20-privacy",
+        "11-settings",
+        "13-a11y"
+      ]
+    },
+    {
+      "wave": 3,
+      "name": "first-party apps",
+      "rationale": "The apps that prove the shell works. Each is an independent surface a critic can rank alone.",
+      "pieces": [
+        "07-camera",
+        "08-captions",
+        "09-nav",
+        "10-messages",
+        "21-media",
+        "15-hud"
+      ]
+    },
+    {
+      "wave": 4,
+      "name": "platform",
+      "rationale": "The third-party story that was silently dropped last time: a runtime that actually runs foreign code, a permission broker that actually enforces, a catalog, an SDK, a simulator, and the out-of-box flow that ties it together.",
+      "pieces": [
+        "12-webapps",
+        "22-permissions",
+        "23-appstore",
+        "24-devsdk",
+        "25-devsim",
+        "14-onboarding"
+      ]
+    }
+  ],
   "pieces": [
     {
-      "id": "00",
-      "name": "foundation kit",
+      "id": "00-foundation",
+      "name": "foundation & materials",
       "wave": 0,
-      "status": "fixing",
-      "round": 4,
-      "verdict": "fail (55/90 vs visionOS 83)",
-      "gap": "catalog scroll + focus vs visionOS isolated"
+      "surface": "A single real surface that demonstrates glass over world, type scale, and controls in use \u2014 not a token catalog.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/00-foundation/index.html"
     },
     {
-      "id": "01",
-      "name": "boot + recovery",
+      "id": "16-motion",
+      "name": "motion & transition language",
+      "wave": 0,
+      "surface": "Every transition the OS uses, shown on real surfaces: rise, sheet, dismiss, handoff, interrupt.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/16-motion/index.html"
+    },
+    {
+      "id": "17-audio-haptics",
+      "name": "spatial audio & haptics",
+      "wave": 0,
+      "surface": "Spatial audio placement and the haptic vocabulary, made visible and audible.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/17-audio-haptics/index.html"
+    },
+    {
+      "id": "01-boot",
+      "name": "boot & recovery",
       "wave": 1,
-      "status": "fixing",
-      "round": 2,
-      "verdict": "fail (53/90 vs visionOS 84)",
-      "gap": "edge states missing 3 of 5 · diagnostics all green"
+      "surface": "Cold boot, handoff to home, and every failure path including safe mode.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/01-boot/index.html"
     },
     {
-      "id": "02",
+      "id": "02-home",
       "name": "home environment",
       "wave": 1,
-      "status": "fixing",
-      "round": 2,
-      "verdict": "fail (54/90 vs visionOS 82)",
-      "gap": "focus discipline: 3 foci compete at rest"
+      "surface": "The resting surface. Time, glanceable state, app access.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/02-home/index.html"
     },
     {
-      "id": "03",
+      "id": "03-wm",
       "name": "window manager",
       "wave": 1,
-      "status": "fixing",
-      "round": 2,
-      "verdict": "fail (59/90 vs visionOS 81)",
-      "gap": "material honesty 0.96 opaque not scrim"
+      "surface": "Placing, stacking, and dismissing app surfaces in a 20-degree FOV.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/03-wm/index.html"
     },
     {
-      "id": "04",
-      "name": "gesture trainer",
+      "id": "04-gestures",
+      "name": "gesture & input model",
       "wave": 1,
-      "status": "fixing",
-      "round": 2,
-      "verdict": "fail (55/90 vs visionOS 83)",
-      "gap": "3 equal 56px targets + 5 dots vs one halo"
+      "surface": "Gaze, dwell, temple touchpad, capture button \u2014 taught and practiced.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/04-gestures/index.html"
     },
     {
-      "id": "05",
+      "id": "18-textinput",
+      "name": "text input & dictation",
+      "wave": 1,
+      "surface": "Entering text on glasses: dictation primary, gaze-keyboard fallback, correction.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/18-textinput/index.html"
+    },
+    {
+      "id": "05-notifications",
       "name": "notifications",
       "wave": 2,
-      "status": "critic",
-      "round": 1,
-      "verdict": "fail (55/90 vs visionOS 83)",
-      "gap": "7 sizes vs 3 per card · typography"
+      "surface": "Interruption without hijack. Peek, expand, act, dismiss, group.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/05-notifications/index.html"
     },
     {
-      "id": "06",
+      "id": "06-assistant",
       "name": "AI assistant",
       "wave": 2,
-      "status": "critic",
-      "round": 1,
-      "verdict": "fail (54/90 vs visionOS 83)",
-      "gap": "6 foci compete + dwell not scaled"
+      "surface": "Wake, listen, answer, act. One conversation surface.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/06-assistant/index.html"
     },
     {
-      "id": "07",
-      "name": "camera + capture",
+      "id": "19-search",
+      "name": "universal search & command",
       "wave": 2,
-      "status": "critic",
-      "round": 1,
-      "verdict": "built · probe pass (23 focusable)",
-      "gap": "await harsh blind critic"
+      "surface": "One field that finds apps, people, settings, and runs commands.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/19-search/index.html"
     },
     {
-      "id": "08",
-      "name": "live captions",
+      "id": "20-privacy",
+      "name": "privacy & capture indicators",
       "wave": 2,
-      "status": "critic",
-      "round": 1,
-      "verdict": "built · probe pass (12 focusable)",
-      "gap": "await harsh blind critic"
+      "surface": "Hardware-honest indicators for camera, mic, and location. Never defeatable.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/20-privacy/index.html"
     },
     {
-      "id": "09",
-      "name": "navigation",
-      "wave": 2,
-      "status": "critic",
-      "round": 1,
-      "verdict": "built · probe pass (14 focusable)",
-      "gap": "await harsh blind critic"
-    },
-    {
-      "id": "10",
-      "name": "messages + calls",
-      "wave": 3,
-      "status": "critic",
-      "round": 1,
-      "verdict": "built · probe pass (20 focusable)",
-      "gap": "await harsh blind critic"
-    },
-    {
-      "id": "11",
+      "id": "11-settings",
       "name": "settings",
-      "wave": 3,
-      "status": "critic",
-      "round": 1,
-      "verdict": "built · probe pass (36 focusable)",
-      "gap": "await harsh blind critic"
+      "wave": 2,
+      "surface": "System preferences that are findable and reversible.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/11-settings/index.html"
     },
     {
-      "id": "12",
-      "name": "web apps platform",
-      "wave": 3,
-      "status": "critic",
-      "round": 1,
-      "verdict": "built · probe pass (29 focusable)",
-      "gap": "await harsh blind critic"
-    },
-    {
-      "id": "13",
+      "id": "13-a11y",
       "name": "accessibility",
-      "wave": 3,
-      "status": "critic",
-      "round": 1,
-      "verdict": "built · probe pass (37 focusable)",
-      "gap": "await harsh blind critic"
+      "wave": 2,
+      "surface": "Text scale, contrast, reduced motion, mono audio \u2014 applied system-wide, not previewed.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/13-a11y/index.html"
     },
     {
-      "id": "14",
-      "name": "onboarding + pairing",
+      "id": "07-camera",
+      "name": "camera & capture",
       "wave": 3,
-      "status": "critic",
-      "round": 1,
-      "verdict": "built · probe pass (17 focusable)",
-      "gap": "await harsh blind critic"
+      "surface": "Viewfinder, shutter, review, and the privacy contract around them.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/07-camera/index.html"
     },
     {
-      "id": "15",
+      "id": "08-captions",
+      "name": "live captions",
+      "wave": 3,
+      "surface": "Real-time speech on glass without occluding the speaker.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/08-captions/index.html"
+    },
+    {
+      "id": "09-nav",
+      "name": "navigation",
+      "wave": 3,
+      "surface": "Turn-by-turn in the periphery. One instruction at a time.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/09-nav/index.html"
+    },
+    {
+      "id": "10-messages",
+      "name": "messages & calls",
+      "wave": 3,
+      "surface": "Threads, reply by voice, incoming call, and call in progress.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/10-messages/index.html"
+    },
+    {
+      "id": "21-media",
+      "name": "media & now playing",
+      "wave": 3,
+      "surface": "Playback control and now-playing that lives quietly at the edge.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/21-media/index.html"
+    },
+    {
+      "id": "15-hud",
       "name": "performance HUD",
+      "wave": 3,
+      "surface": "Frame time, thermal, battery, and radio state for developers.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/15-hud/index.html"
+    },
+    {
+      "id": "12-webapps",
+      "name": "web apps runtime",
       "wave": 4,
-      "status": "critic",
-      "round": 1,
-      "verdict": "built · probe pass (19 focusable)",
-      "gap": "await harsh blind critic"
+      "surface": "A real sandboxed iframe host: manifest, lifecycle, postMessage bridge, offline.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/12-webapps/index.html"
+    },
+    {
+      "id": "22-permissions",
+      "name": "permission broker",
+      "wave": 4,
+      "surface": "Grant, deny, and revoke \u2014 user-facing, persistent, and enforced by the runtime.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/22-permissions/index.html"
+    },
+    {
+      "id": "23-appstore",
+      "name": "app catalog & install",
+      "wave": 4,
+      "surface": "Discover, install, update, and remove third-party web apps.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/23-appstore/index.html"
+    },
+    {
+      "id": "24-devsdk",
+      "name": "developer SDK & manifest spec",
+      "wave": 4,
+      "surface": "The surface a third-party developer actually calls, documented and callable.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/24-devsdk/index.html"
+    },
+    {
+      "id": "25-devsim",
+      "name": "developer simulator & devtools",
+      "wave": 4,
+      "surface": "Run and inspect your app against the OS: logs, permissions, frame budget.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/25-devsim/index.html"
+    },
+    {
+      "id": "14-onboarding",
+      "name": "onboarding & pairing",
+      "wave": 4,
+      "surface": "First power-on to a working, fitted, paired device.",
+      "status": "queued",
+      "round": 0,
+      "verdict": null,
+      "gap": null,
+      "consecutivePasses": 0,
+      "path": "components/14-onboarding/index.html"
+    }
+  ],
+  "blocked": [
+    {
+      "item": "Sub-agent reasoning effort = medium, set via .claude/agents/*.md frontmatter",
+      "status": "partially blocked in this session, not descoped",
+      "detail": "The four agent definitions exist on disk with `model: opus` and `effort: medium`. The Claude Code harness registers .claude/agents/*.md at SESSION START, so definitions authored mid-session are not selectable as subagent_type in this run \u2014 a spawn with subagent_type 'prism-builder' errors with 'Agent type not found'.",
+      "workaround": "Spawning the generic agent with an explicit model override (verified: reports claude-opus-5) and prepending the full role definition \u2014 including the critic's disqualification rule \u2014 to every spawn prompt. Behaviour matches the definitions; only the effort knob is not settable per-spawn.",
+      "residual": "Reasoning effort cannot be pinned to medium from inside this session and is not introspectable by a subagent. The frontmatter takes effect on the next session start. Verified via throwaway spawn: model is claude-opus-5; effort was not determinable."
     }
   ],
   "log": [
     {
       "t": "t+0m",
-      "msg": "repo scaffolded · design system frozen · probe harness live"
+      "msg": "read 22 prior verdicts \u00b7 root-caused the plateau to in-stage dev chrome, undemoted foci, and leaked tokens"
     },
     {
       "t": "t+0m",
-      "msg": "foundation specimen shipped (materials, type, controls, motion)"
+      "msg": "probe.mjs rewritten as an enforcing gate: exit 1 on dev chrome in stage, token leaks, overflow, reduced-motion, console errors"
     },
     {
       "t": "t+0m",
-      "msg": "wave 1 builders dispatched: boot, home, window manager, gestures"
+      "msg": "os/shared/lab.js + lab.css added \u2014 dev controls in an outside rail, 5 edge states URL-drivable, world layer behind the glass"
     },
     {
-      "t": "t+12m",
-      "msg": "pushed to github.com/Dhruv2mars/prism-os · wave 1 builders relaunching after provider outage"
+      "t": "t+0m",
+      "msg": "agent definitions written: builder, critic, sweep, integrator (opus/medium) \u00b7 critic carries its own disqualification rule"
     },
     {
-      "t": "t+4h",
-      "msg": "wave1 chrome fix landed · chips outside stage · motion clamped 200-320 prism-ease"
-    },
-    {
-      "t": "t+4h",
-      "msg": "wave1 re-critics: scores 53-59/90 (vs 83 visionOS) — biggest gaps focus/material"
-    },
-    {
-      "t": "t+6h",
-      "msg": "wave2 built: notifications, assistant, camera, captions, nav — all probe pass, critics 05/06 fail typography/focus"
-    },
-    {
-      "t": "t+7h",
-      "msg": "wave3+4 built: messages, settings, webapps, a11y, onboarding, HUD — all probe pass"
-    },
-    {
-      "t": "t+7h",
-      "msg": "coherence integrator pass: 16/16 probe pass 600x600, tokens consistent, dev chrome outside stage"
-    },
-    {
-      "t": "t+8h",
-      "msg": "sweep typography · removed literal 'tabular' leaks from 16 files (05/10/11/12/15 gaps)"
-    },
-    {
-      "t": "t+8h",
-      "msg": "focus polish: 02 hero+orb dim, 05 parallax dim 0.65, 06 chips 0.68 / wave 0.5, 03 glass 0.78-0.84"
+      "t": "t+0m",
+      "msg": "piece list expanded 16 -> 26 across 5 waves \u00b7 web apps runtime, permission broker, catalog, SDK, devtools, text input, search, privacy, media, audio/haptics, motion all now explicit pieces"
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os"
