@@ -102,8 +102,8 @@
       "name": "foundation & materials",
       "wave": 0,
       "surface": "A single real surface that demonstrates glass over world, type scale, and controls in use \u2014 not a token catalog.",
-      "status": "queued",
-      "round": 0,
+      "status": "building",
+      "round": 1,
       "verdict": null,
       "gap": null,
       "consecutivePasses": 0,
@@ -114,8 +114,8 @@
       "name": "motion & transition language",
       "wave": 0,
       "surface": "Every transition the OS uses, shown on real surfaces: rise, sheet, dismiss, handoff, interrupt.",
-      "status": "queued",
-      "round": 0,
+      "status": "building",
+      "round": 1,
       "verdict": null,
       "gap": null,
       "consecutivePasses": 0,
@@ -126,8 +126,8 @@
       "name": "spatial audio & haptics",
       "wave": 0,
       "surface": "Spatial audio placement and the haptic vocabulary, made visible and audible.",
-      "status": "queued",
-      "round": 0,
+      "status": "building",
+      "round": 1,
       "verdict": null,
       "gap": null,
       "consecutivePasses": 0,
@@ -439,7 +439,17 @@
     {
       "t": "t+0m",
       "msg": "piece list expanded 16 -> 26 across 5 waves \u00b7 web apps runtime, permission broker, catalog, SDK, devtools, text input, search, privacy, media, audio/haptics, motion all now explicit pieces"
+    },
+    {
+      "t": "t+1h",
+      "msg": "wave 0 open: 3 builders live on foundation, motion, audio+haptics \u2014 all on the new gate"
+    },
+    {
+      "t": "t+1h",
+      "msg": "live progress page published \u00b7 regenerated from PROGRESS.json by tools/build-live.mjs after every verdict"
     }
   ],
-  "repo": "https://github.com/Dhruv2mars/prism-os"
+  "repo": "https://github.com/Dhruv2mars/prism-os",
+  "livePage": "https://ryqmfw6i1gsg.postplan.dev",
+  "livePageDraft": "ryqmfw6i1gsg"
 }
