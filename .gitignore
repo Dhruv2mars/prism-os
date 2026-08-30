@@ -1,3 +1,12 @@
 node_modules/
 .DS_Store
 dist/
+
+# Probe artifacts. Screenshots are large (~800KB each) and fully regenerable:
+#   bun tools/probe.mjs <url> <outdir>
+# The verdict JSONs in reviews/<id>/round-N.json are the durable record.
+reviews/**/*.png
+reviews/probe-[0-9]*/
+
+# Dirs created by passing a flag where probe.mjs expects an outdir.
+/--*/
