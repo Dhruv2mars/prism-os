@@ -102,11 +102,11 @@
       "name": "foundation & materials",
       "wave": 0,
       "surface": "A single real surface that demonstrates glass over world, type scale, and controls in use \u2014 not a token catalog.",
-      "status": "judging",
-      "round": 2,
-      "verdict": "PASS r1 (1 of 2), r2 gate green, awaiting second critic",
-      "gap": "Gaze reticle punched through body copy at stage centre (fixed systemically). Remaining: dwell sweep rect not concentric with .ftile; Glass plate at 0.70-0.79 fully occludes the world bloom, so the opening frame of a materials piece reads as a dark slab.",
-      "consecutivePasses": 1,
+      "status": "building",
+      "round": 3,
+      "verdict": "FAIL r2 (tie at 71 with named gaps)",
+      "gap": "Density ladder inverted in rendered pixels: Glass transmits 0.53 of world luminance, Sheet transmits 1.04 \u2014 backwards. On Outdoor the streetlamp reads as a hard shape through Sheet, whose own caption says the world stays as colour not shapes, while Glass erases it and reads as a sunglasses tint. Also: .ctl .btn and .toggle are hardcoded px and do not scale with --a11y-scale, ending up half the size of the copy at scale 2.",
+      "consecutivePasses": 0,
       "path": "components/00-foundation/index.html",
       "history": [
         {
@@ -115,8 +115,16 @@
           "visionOS": 71,
           "horizon": 48,
           "verdict": "pass"
+        },
+        {
+          "round": 2,
+          "ours": 71,
+          "visionOS": 71,
+          "horizon": 51,
+          "verdict": "fail"
         }
-      ]
+      ],
+      "ratchet": "under 75 and went backwards (74 to 71) \u2014 one round under +5, round 3 must reach 78 or the approach gets discarded"
     },
     {
       "id": "16-motion",
@@ -529,9 +537,22 @@
     {
       "t": "2026-08-31T12:41:37",
       "event": "16-motion r1 FAIL \u2014 ours 73, tied visionOS 73, Horizon 52. Tie with three named gaps is a fail. Critic monkey-patched Element.prototype.animate and traced frames: WAAPI, easing, durations and transform retargeting all verified genuinely correct, but the card's own grow/shrink cannot be interrupted at all. Builder respawned with the measured trace; ratchet armed at 78."
+    },
+    {
+      "t": "2026-08-31T12:47:50",
+      "event": "00-foundation r2 FAIL \u2014 ours 71, tied visionOS 71, Horizon 51. Score went DOWN from 74. Critic measured pixel luminance transmission on the Outdoor backdrop and found the density ladder inverted: the r2 builder tuned materials by eye on Street and believed them honest. Builder respawned and required to print a measured transmission table instead."
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os",
   "livePage": "https://ryqmfw6i1gsg.postplan.dev",
-  "livePageDraft": "ryqmfw6i1gsg"
+  "livePageDraft": "ryqmfw6i1gsg",
+  "sweepWatch": {
+    "controls-ignore-a11y-scale": {
+      "namedOn": [
+        "00-foundation",
+        "17-audio-haptics"
+      ],
+      "note": "Interactive controls sized in hardcoded px so they do not grow with --a11y-scale, while surrounding copy does. Sweep is triggered at 3 pieces."
+    }
+  }
 }

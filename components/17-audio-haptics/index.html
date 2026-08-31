@@ -27,7 +27,7 @@
  }
  .meaning{
   font-size:calc(var(--fs-body) * var(--s));
-  font-weight:500; line-height:1.34; color:var(--ink-60);
+  font-weight:500; line-height:1.34; color:var(--ink-80);
   text-align:center; max-width:calc(340px * var(--s)); margin-top:calc(3px * var(--s));
  }
 
@@ -35,10 +35,11 @@
  .field{
   --field: clamp(120px, calc(256px - (var(--s) - 1) * 160px), 208px);
   --r: calc(var(--field) * 0.375);
+  --orb: clamp(17px, calc(var(--field) * 0.144), 30px);
   position:relative; flex:none;
   width:var(--field); height:var(--field); border-radius:50%;
   background:
-   radial-gradient(circle at 50% 30%, rgba(32,46,66,0.66), rgba(10,16,25,0.80) 74%);
+   radial-gradient(circle at 50% 28%, rgba(36,52,74,0.58), rgba(10,16,25,0.74) 74%);
   backdrop-filter:saturate(1.5) blur(18px);
   -webkit-backdrop-filter:saturate(1.5) blur(18px);
   outline:1px solid rgba(255,255,255,0.12);
@@ -81,24 +82,26 @@
  .spoke.dragging{ transition:none }
  .spoke::before{
   content:""; position:absolute; left:50%; top:calc(50% - var(--r));
-  width:1px; height:calc(var(--r) - 14px);
+  width:1px; height:calc(var(--r) - var(--orb) / 2);
   transform:translateX(-50%);
   background:linear-gradient(180deg, rgba(86,184,255,0.55), rgba(86,184,255,0.04));
  }
  .orb{
   position:absolute; left:50%; top:calc(50% - var(--r));
-  width:30px; height:30px; margin:-15px 0 0 -15px; border-radius:50%;
+  width:var(--orb); height:var(--orb);
+  margin:calc(var(--orb) / -2) 0 0 calc(var(--orb) / -2); border-radius:50%;
   background:radial-gradient(circle at 38% 32%, #d7efff, var(--accent) 46%, var(--accent-deep) 100%);
   filter:drop-shadow(0 0 16px rgba(86,184,255,0.55));
   transition:opacity var(--dur-base) var(--ease-prism), transform var(--dur-base) var(--ease-prism);
  }
  .orb::after{
-  content:""; position:absolute; inset:-7px; border-radius:50%;
+  content:""; position:absolute; inset:-5px; border-radius:50%;
   border:1.5px solid rgba(86,184,255,0.34);
  }
  .ripple{
   position:absolute; left:50%; top:calc(50% - var(--r));
-  width:30px; height:30px; margin:-15px 0 0 -15px; border-radius:50%;
+  width:var(--orb); height:var(--orb);
+  margin:calc(var(--orb) / -2) 0 0 calc(var(--orb) / -2); border-radius:50%;
   border:2px solid rgba(86,184,255,0.75); opacity:0; pointer-events:none;
  }
  .field.mono .orb{ transform:translateY(var(--r)) scale(0.62); opacity:0.42 }
@@ -193,17 +196,17 @@
  }
  .note{
   font-size:calc(12px * var(--s)); line-height:1.35; font-weight:500;
-  color:var(--ink-40); text-align:center; max-width:calc(360px * var(--s)); opacity:0.9;
+  color:var(--ink-60); text-align:center; max-width:calc(360px * var(--s));
  }
  .index{ display:flex; align-items:center; gap:calc(4px * var(--s)); flex-wrap:wrap; justify-content:center }
  .tab{
   appearance:none; border:0; background:none; font-family:inherit;
   padding:calc(4px * var(--s)) calc(9px * var(--s)); border-radius:var(--r-pill);
   font-size:calc(11px * var(--s)); font-weight:650; letter-spacing:0.03em;
-  color:var(--ink-100); opacity:0.30; cursor:pointer;
+  color:var(--ink-100); opacity:0.44; cursor:pointer;
   transition:opacity var(--dur-fast) var(--ease-prism), background var(--dur-fast) var(--ease-prism);
  }
- .tab:hover{ opacity:0.6 }
+ .tab:hover{ opacity:0.72 }
  .tab[aria-selected="true"]{ opacity:0.92; background:rgba(255,255,255,0.09) }
 
  /* ---------- edge states ---------- */
@@ -211,14 +214,20 @@
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:calc(9px * var(--s)); text-align:center; padding:0 calc(6px * var(--s));
  }
+ /* A notice is top-anchored, not centred, so its geometry is deterministic:
+    the mark ends just above the middle of the lens and the headline starts just
+    below it. The band of quiet between them is exactly where the gaze reticle
+    comes to rest, so the reticle never lands on a word. */
+ .col.notice{ justify-content:flex-start }
+ .col.notice .edge{ margin-top:max(0px, calc(244px - 120px * var(--s))) }
  .edge .glyph{
   position:relative; width:calc(112px * var(--s)); height:calc(112px * var(--s));
-  margin-bottom:calc(4px * var(--s));
+  margin-bottom:calc(26px * var(--s));
  }
  .edge .glyph svg{ width:100%; height:100% }
  .edge h2{
   font-size:calc(var(--fs-title) * var(--s));
-  font-weight:700; letter-spacing:-0.014em; line-height:1.14; color:var(--ink-100);
+  font-weight:700; letter-spacing:-0.014em; line-height:1.2; color:var(--ink-100);
   max-width:calc(380px * var(--s));
  }
  .edge p{
@@ -229,6 +238,12 @@
   font-size:calc(12px * var(--s)); color:var(--ink-40); max-width:calc(330px * var(--s));
  }
  .edge .btn{ margin-top:calc(6px * var(--s)); min-height:calc(44px * var(--s)); font-size:calc(var(--fs-body) * var(--s)) }
+
+ /* the lens is transparent and the sun is behind it: every line carries a
+    shadow of its own so nothing depends on the world staying dark. */
+ .meaning, .note, .bearing, .tab, .edge h2, .edge p, .edge .foot, .dur, .score .lbl{
+  text-shadow:0 1px 3px rgba(2,6,12,0.75);
+ }
 
  .sweep{ transform-origin:50% 50%; animation:spin 1.5s linear infinite }
  @keyframes spin{ to{ transform:rotate(360deg) } }
@@ -244,6 +259,9 @@
     every cue stays reachable by swipe. At 175% the definition goes too, leaving
     name, place, touch, action. Nothing is ever clipped: past 300% the band
     scrolls and says so. */
+ .col.md .edge .foot{ display:none }
+ .col.md .edge .glyph{ width:calc(76px * var(--s)); height:calc(76px * var(--s)); margin-bottom:calc(16px * var(--s)) }
+ .col.lg .edge .glyph{ display:none }
  .col.md .note, .col.md .rose, .col.md .score .lbl, .col.md .index{ display:none }
  .col.md .meaning{ max-width:calc(300px * var(--s)) }
  .col.lg .meaning{ display:none }
@@ -253,6 +271,9 @@
  .col.lg .track{ height:clamp(34px, calc(30px * var(--s)), 56px) }
  .col.lg .score{ padding:calc(7px * var(--s)) calc(12px * var(--s)) }
  .col.lg .play{ min-height:clamp(44px, calc(40px * var(--s)), 84px) }
+ /* at the largest text the plan view goes: the bearing line already says the
+    direction in words, and the action must stay on screen. */
+ .col.xl .field{ display:none }
 
  /* the band scrolls only when text is set so large that it must; when it does,
     the edge softens so the wearer can see there is more below. */
@@ -508,8 +529,10 @@ function render(){
   clearTimeout(render._t);
   const col = el('div', 'col');
   if (S.tactile && S.view === 'Ready') col.classList.add('tactile');
+  if (S.view !== 'Ready') col.classList.add('notice');
   if (S.scale >= 1.3) col.classList.add('md');
   if (S.scale >= 1.75) col.classList.add('lg');
+  if (S.scale >= 2.8) col.classList.add('xl');
   surface.appendChild(col);
   ({
     'Ready': viewReady,

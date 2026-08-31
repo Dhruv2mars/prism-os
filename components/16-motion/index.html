@@ -12,7 +12,7 @@
   position:absolute; inset:44px 0 0 0; z-index:2;
   display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
   gap:calc(14px * var(--pm));
-  padding:calc(10px * var(--pm)) calc(26px * var(--pm)) calc(56px * var(--pm));
+  padding:calc(10px * var(--pm)) calc(26px * var(--pm)) calc(52px * var(--pm));
   overflow-y:auto; overscroll-behavior:contain; scrollbar-width:none;
  }
  .surface::-webkit-scrollbar{ display:none }
@@ -27,20 +27,41 @@
   position:relative; width:min(452px, 100%);
   padding:calc(20px * var(--pm)) calc(22px * var(--pm)) calc(18px * var(--pm));
   border-radius:var(--r-lg);
-  background:linear-gradient(158deg, rgba(20,29,43,0.72), rgba(9,14,22,0.80));
-  backdrop-filter:saturate(1.5) blur(24px);
-  -webkit-backdrop-filter:saturate(1.5) blur(24px);
+  /* thin enough that the street behind the lens keeps reading through it */
+  background:linear-gradient(158deg, rgba(20,29,43,0.64), rgba(9,14,22,0.77));
+  backdrop-filter:saturate(1.6) blur(26px);
+  -webkit-backdrop-filter:saturate(1.6) blur(26px);
   outline:1px solid rgba(255,255,255,0.13);
   box-shadow:
-   0 2px 0 -1px rgba(255,255,255,0.22) inset,
-   0 22px 54px rgba(0,0,0,0.46),
-   0 3px 12px rgba(0,0,0,0.30);
+   0 1px 0 rgba(255,255,255,0.28) inset,
+   0 -1px 0 rgba(255,255,255,0.06) inset,
+   0 26px 62px rgba(0,0,0,0.46),
+   0 4px 14px rgba(0,0,0,0.32);
   text-align:left; overflow:hidden;
-  transition:transform var(--dur-base) var(--ease-prism);
+  transition:
+   transform var(--dur-base) var(--ease-prism),
+   outline-color var(--dur-fast) var(--ease-prism),
+   background var(--dur-base) var(--ease-prism);
  }
  .msg.leaving{ position:absolute; left:50%; top:0; transform:translateX(-50%); pointer-events:none }
- .msg:hover{ transform:translateY(-2px) }
- .msg.leaving:hover{ transform:translateX(-50%) }
+
+ /* gaze / hover / keyboard land on the same visible state, and it survives
+    the entrance because the entrance hands the element back to CSS */
+ .msg:hover, .msg:focus-visible{
+  transform:translateY(-3px);
+  outline-color:rgba(86,184,255,0.5);
+  background:linear-gradient(158deg, rgba(26,37,54,0.68), rgba(11,17,26,0.79));
+ }
+ .msg.gaze-focus{
+  transform:translateY(-3px);
+  outline-color:rgba(86,184,255,0.5);
+  box-shadow:
+   0 0 0 2px rgba(86,184,255,0.8),
+   0 1px 0 rgba(255,255,255,0.3) inset,
+   0 30px 68px rgba(0,0,0,0.5),
+   0 4px 14px rgba(0,0,0,0.32) !important;
+ }
+ .msg.leaving:hover, .msg.leaving.gaze-focus{ transform:translateX(-50%) }
 
  .meta{ display:flex; align-items:baseline; gap:calc(9px * var(--pm)); margin-bottom:calc(9px * var(--pm)) }
  .who{
@@ -89,14 +110,27 @@
  /* ---------------- demoted queue trail ---------------- */
  .queue{
   display:flex; align-items:center; gap:calc(8px * var(--s));
+  min-height:calc(34px * var(--s)); /* reserved so the recovery pill never shifts the card */
   opacity:0.42; flex:none;
+  transition:opacity var(--dur-base) var(--ease-prism);
  }
+ .queue.offer{ opacity:0.92 }
  .queue i{
   width:calc(5px * var(--s)); height:calc(5px * var(--s)); border-radius:50%;
   background:var(--ink-100); display:block;
  }
  .queue i.spent{ background:var(--ink-20) }
  .queue span{ font-size:calc(var(--fs-caption) * var(--s)); font-weight:600; color:var(--ink-80); letter-spacing:0.01em }
+ .undo{
+  appearance:none; font-family:inherit; cursor:pointer;
+  margin-left:calc(4px * var(--s));
+  min-height:calc(32px * var(--s)); padding:0 calc(13px * var(--s));
+  border-radius:var(--r-pill);
+  border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08);
+  color:var(--ink-100); font-size:calc(var(--fs-caption) * var(--s)); font-weight:600;
+  transition:background var(--dur-fast) var(--ease-prism);
+ }
+ .undo:hover{ background:rgba(255,255,255,0.16) }
 
  /* ---------------- designed edge screens ---------------- */
  .edge{
@@ -106,9 +140,9 @@
  .glyph{
   width:calc(84px * var(--bm)); height:calc(84px * var(--bm)); margin-bottom:calc(8px * var(--pm));
   display:grid; place-items:center; border-radius:50%;
-  background:radial-gradient(circle at 50% 34%, rgba(30,44,64,0.66), rgba(9,14,22,0.72) 74%);
+  background:radial-gradient(circle at 50% 34%, rgba(30,44,64,0.60), rgba(9,14,22,0.70) 74%);
   outline:1px solid rgba(255,255,255,0.11);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
  }
  .glyph svg{ width:52%; height:52% }
  .edge h1{
@@ -137,9 +171,11 @@
  .stage.gazing .gaze-cursor{ opacity:1 }
 
  @media (prefers-reduced-motion: reduce){
-  .msg, .act, .toggle{ transition-duration:1ms !important }
+  .msg, .act, .queue, .undo{ transition-duration:1ms !important }
  }
  [data-reduced-motion] .msg,
+ [data-reduced-motion] .queue,
+ [data-reduced-motion] .undo,
  [data-reduced-motion] .act{ transition-duration:1ms !important }
 </style>
 </head>
@@ -180,6 +216,16 @@ function play(el, frames, dur) {
     duration: rm ? 1 : dur, easing: EASE, fill: 'both',
   });
 }
+/* An arrival holds its final pose with fill:both. Left in place that pose
+   pins transform at none forever and every hover / gaze / focus state on the
+   card silently stops rendering. Once the arrival has landed, hand the
+   element back to CSS. */
+function land(anim) {
+  anim.finished.then(() => { if (anim.playState === 'finished') anim.cancel(); }).catch(() => {});
+  return anim;
+}
+function arrive(el, frames, dur) { return land(play(el, frames, dur)); }
+
 /* current rendered pose — the basis for retargeting mid-flight */
 function pose(el) {
   const cs = getComputedStyle(el);
@@ -194,14 +240,22 @@ function retarget(el, to, dur) {
   el.getAnimations().forEach((a) => a.cancel());
   return play(el, [from, to], dur);
 }
-/* height change that keeps its own continuity */
+
+const heightAnims = (el) => el.getAnimations()
+  .filter((a) => a.effect?.getKeyframes?.().some((k) => k.height !== undefined));
+
+/* Height change that keeps its own continuity, including when it interrupts
+   itself. Order is load-bearing: read the LIVE height first, then release the
+   running height animation, and only then measure the new resting height.
+   Measuring before the release lets the in-flight animation force the reading,
+   the delta collapses to zero, and the interruption is silently dropped. */
 function resize(el, mutate, dur = D.change) {
   const h0 = el.getBoundingClientRect().height;
+  heightAnims(el).forEach((a) => a.cancel());
   mutate();
   const h1 = el.getBoundingClientRect().height;
-  if (reduced() || Math.abs(h1 - h0) < 1) return;
-  el.getAnimations().forEach((a) => { if (a.effect?.getKeyframes?.()[0]?.height) a.cancel(); });
-  el.animate([{ height: `${h0}px` }, { height: `${h1}px` }],
+  if (reduced() || Math.abs(h1 - h0) < 1) return null;
+  return el.animate([{ height: `${h0}px` }, { height: `${h1}px` }],
     { duration: dur, easing: EASE });
 }
 
@@ -224,7 +278,7 @@ const THREAD = [
   },
 ];
 
-const S = { view: 'ready', idx: 0, expanded: false, failed: false, busy: false };
+const S = { view: 'ready', idx: 0, expanded: false, failed: false, busy: false, moving: false };
 
 /* -------------------------------------------------------------------- views -- */
 const ICONS = {
@@ -257,11 +311,32 @@ function cardHTML(m) {
    </article>`;
 }
 
-function queueHTML() {
+function queueLabel() {
   const left = THREAD.length - S.idx - 1;
+  return left === 0 ? 'Last one' : `${left} more waiting`;
+}
+
+function queueHTML() {
   const dots = THREAD.map((_, i) => `<i class="${i <= S.idx ? 'spent' : ''}"></i>`).join('');
-  const label = left === 0 ? 'Last one' : `${left} more waiting`;
-  return `<div class="queue">${dots}<span class="tabular">${label}</span></div>`;
+  return `<div class="queue">${dots}<span class="tabular" data-qlabel>${queueLabel()}</span>
+    <button class="undo" data-undo type="button" hidden>Undo</button></div>`;
+}
+
+/* the trail is updated in place, never replaced, so the dot that just spent
+   itself can carry the tail end of the card's exit */
+function paintQueue(pulse = -1) {
+  const q = surface.querySelector('.queue');
+  if (!q) return null;
+  const dots = [...q.querySelectorAll('i')];
+  dots.forEach((d, i) => d.classList.toggle('spent', i <= S.idx));
+  q.querySelector('[data-qlabel]').textContent = queueLabel();
+  if (pulse >= 0 && dots[pulse] && !reduced()) {
+    dots[pulse].animate(
+      [{ transform: 'scale(1)' }, { transform: 'scale(2.2)' }, { transform: 'scale(1)' }],
+      { duration: D.change, easing: EASE },
+    );
+  }
+  return q;
 }
 
 function edge(kind) {
@@ -274,22 +349,22 @@ function edge(kind) {
     empty: {
       icon: ICONS.clear, h: 'You are all caught up',
       p: 'Nothing waiting. New messages will arrive here on their own.',
-      btn: 'Look back at today', act: () => reset(),
+      btn: 'Look back at today',
     },
     error: {
       icon: ICONS.warn, h: 'Messages did not load',
       p: 'The handoff to your phone timed out. Nothing was lost.',
-      btn: 'Try again', act: () => go('loading', true),
+      btn: 'Try again',
     },
     offline: {
       icon: ICONS.offline, h: 'No connection',
       p: 'You are seeing what was already on the glasses. New messages resume when you reconnect.',
-      btn: 'Show what I have', act: () => reset(),
+      btn: 'Show what I have',
     },
     denied: {
       icon: ICONS.bell, h: 'Notifications are off',
       p: 'Prism can show messages the moment they land, once you allow notifications.',
-      btn: 'Allow notifications', act: () => { grant(); },
+      btn: 'Allow notifications',
     },
   }[kind];
 
@@ -312,9 +387,12 @@ const EDGE_ACT = {
 
 /* --------------------------------------------------------------- rendering -- */
 let barAnim = null;
+let undoTimer = null;
 
 function paint(kind, animateIn = true) {
   barAnim?.cancel(); barAnim = null;
+  clearTimeout(undoTimer);
+  S.moving = false;
   const net = stage.querySelector('[data-sb-net]');
   if (net) { net.className = kind === 'offline' ? 'dot bad' : 'dot ok'; net.title = kind === 'offline' ? 'no connection' : 'connected'; }
   surface.innerHTML = '';
@@ -323,7 +401,9 @@ function paint(kind, animateIn = true) {
   if (kind === 'ready') {
     const wrap = el(`<div class="stack">${cardHTML(THREAD[S.idx])}</div>`);
     surface.appendChild(wrap);
-    surface.appendChild(el(queueHTML()));
+    const q = el(queueHTML());
+    surface.appendChild(q);
+    q.querySelector('[data-undo]').addEventListener('click', () => { hideUndo(); step('undo'); });
     node = wrap.querySelector('[data-card]');
     wireCard(node);
   } else {
@@ -341,7 +421,7 @@ function paint(kind, animateIn = true) {
   }
 
   if (animateIn) {
-    play(node, [
+    arrive(node, [
       { transform: 'translateY(22px) scale(0.965)', opacity: 0, filter: 'blur(9px)' },
       { transform: 'none', opacity: 1, filter: 'blur(0px)' },
     ], D.enter);
@@ -358,10 +438,14 @@ function wireCard(card) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDetail(card); }
   });
   card.querySelector('[data-reply]').addEventListener('click', () => sendReply(card));
-  card.querySelector('[data-done]').addEventListener('click', () => advance('done'));
+  card.querySelector('[data-done]').addEventListener('click', () => step('done'));
 }
 
-/* change: the card grows around its new content, continuously */
+/* the live card, never the one that is already on its way out */
+const liveCard = () => surface.querySelector('[data-card]:not(.leaving)');
+
+/* change: the card grows around its new content, continuously, and a second
+   press mid-grow re-aims from wherever the edge currently is */
 function toggleDetail(card) {
   const detail = card.querySelector('[data-detail]');
   S.expanded = !S.expanded;
@@ -372,7 +456,7 @@ function toggleDetail(card) {
 
 /* an action that can fail, inline, without losing the card */
 function sendReply(card) {
-  if (S.busy) return;
+  if (S.busy || card.classList.contains('leaving')) return;
   S.busy = true;
   const reply = card.querySelector('[data-reply]');
   reply.textContent = 'Listening…';
@@ -384,50 +468,59 @@ function sendReply(card) {
       if (!card.querySelector('.fail')) {
         const f = el('<p class="fail">Reply did not send. It is saved as a draft.</p>');
         resize(card, () => card.appendChild(f));
-        play(f, [{ opacity: 0 }, { opacity: 1 }], D.change);
+        arrive(f, [{ opacity: 0 }, { opacity: 1 }], D.change);
       }
-      retarget(card, { transform: 'translateX(0px)' }, D.change);
+      land(retarget(card, { transform: 'translateX(0px)' }, D.change));
     } else {
       reply.textContent = 'Sent';
-      setTimeout(() => advance('sent'), 380);
+      setTimeout(() => step('sent'), 380);
     }
   }, reduced() ? 60 : 460);
 }
 
-/* leave, then enter: the two halves of the same move */
-function advance(reason) {
-  const card = surface.querySelector('[data-card]');
-  if (!card) return;
+/* leave, then enter: the two halves of the same move.
+   'done' and 'sent' consume a message, 'undo' puts the last one back. */
+function step(reason) {
+  const card = liveCard();
+  if (!card || S.moving) return;
+  if (reason === 'undo' && S.idx === 0) return;
+  S.moving = true;
+  clearTimeout(undoTimer);
+
+  const from = S.idx;
   const wrap = card.parentElement;
   const h0 = wrap.getBoundingClientRect().height;
   wrap.style.height = `${h0}px`;
 
   card.classList.add('leaving');
-  const out = retarget(card, {
-    transform: reason === 'sent'
-      ? 'translateX(-50%) translateY(-28px) scale(0.955)'
-      : 'translateX(-50%) translateY(36px) scale(0.94)',
-    opacity: 0, filter: 'blur(8px)',
-  }, D.leave);
+  const exit = reason === 'done'
+    ? 'translateX(-50%) translateY(36px) scale(0.94)'
+    : 'translateX(-50%) translateY(-28px) scale(0.955)';
+  const out = retarget(card, { transform: exit, opacity: 0, filter: 'blur(8px)' }, D.leave);
   out.finished.then(() => card.remove()).catch(() => {});
 
-  S.idx += 1;
+  S.idx += reason === 'undo' ? -1 : 1;
   S.expanded = false;
+
   if (S.idx >= THREAD.length) {
     setTimeout(() => {
+      S.moving = false;
       if (S.view !== 'ready') return;
       S.view = 'empty'; paint('empty'); syncLab('empty');
     }, reduced() ? 20 : 140);
     return;
   }
 
+  /* the trail spends the dot the card just left behind */
+  paintQueue(reason === 'undo' ? from : S.idx);
+  if (reason === 'done') offerUndo(THREAD[from].who.split(' ')[0]);
+
   setTimeout(() => {
+    S.moving = false;
     if (S.view !== 'ready') { wrap.style.height = ''; return; }
     const fresh = el(cardHTML(THREAD[S.idx]));
     wrap.appendChild(fresh);
     wireCard(fresh);
-    const q = surface.querySelector('.queue');
-    if (q) q.replaceWith(el(queueHTML()));
 
     /* the frame resizes continuously around the new card, it never snaps */
     const h1 = fresh.getBoundingClientRect().height;
@@ -437,11 +530,31 @@ function advance(reason) {
     }
     wrap.style.height = '';
 
-    play(fresh, [
+    arrive(fresh, [
       { transform: 'translateY(26px) scale(0.96)', opacity: 0, filter: 'blur(10px)' },
       { transform: 'none', opacity: 1, filter: 'blur(0px)' },
     ], D.enter);
   }, reduced() ? 10 : 90);
+}
+
+/* nothing leaves without a way back */
+function offerUndo(name) {
+  const q = surface.querySelector('.queue');
+  if (!q) return;
+  q.classList.add('offer');
+  q.querySelector('[data-qlabel]').textContent = `Dismissed ${name}`;
+  q.querySelector('[data-undo]').hidden = false;
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(hideUndo, 5200);
+}
+function hideUndo() {
+  clearTimeout(undoTimer);
+  const q = surface.querySelector('.queue');
+  if (!q) return;
+  q.classList.remove('offer');
+  const b = q.querySelector('[data-undo]');
+  if (b) b.hidden = true;
+  paintQueue();
 }
 
 function reset() { S.idx = 0; S.expanded = false; go('ready', true); }
@@ -463,27 +576,44 @@ stage.addEventListener('pointermove', wake, { once: true });
 stage.addEventListener('pointerdown', wake, { once: true });
 addEventListener('keydown', wake, { once: true });
 
-os.on('back', () => { if (S.view === 'ready') advance('done'); });
-os.on('swipeleft', () => { if (S.view === 'ready') advance('done'); });
-os.on('capture', () => { const c = surface.querySelector('[data-card]'); if (c) sendReply(c); });
+os.on('back', () => { if (S.view === 'ready') step('done'); });
+os.on('swipeleft', () => { if (S.view === 'ready') step('done'); });
+os.on('swiperight', () => { if (S.view === 'ready') step('undo'); });
+os.on('capture', () => { const c = liveCard(); if (c) sendReply(c); });
 
 /* --------------------------------------------------------------- lab rail --- */
 let labReady = false;
+const toReady = () => { if (S.view !== 'ready') { S.idx = 0; go('ready'); } };
+
 const lab = mountLab({
   piece: '16-motion',
   title: 'Motion',
   states: ['ready', 'loading', 'empty', 'error', 'offline', 'denied'],
   onState: (s) => { clearTimeout(go._t); if (s === 'ready') { S.idx = 0; S.expanded = false; } S.view = s; paint(s); if (s === 'loading') go('loading'); },
   actions: [
-    { label: 'A message arrives', run: () => { if (S.view !== 'ready') { S.idx = 0; go('ready'); } else advance('done'); } },
-    { label: 'Open the thread', run: () => { const c = surface.querySelector('[data-card]'); if (c) toggleDetail(c); } },
-    { label: 'Dismiss with a flick', run: () => { if (S.view === 'ready') advance('done'); } },
-    { label: 'Reply fails to send', run: () => { S.failed = true; const c = surface.querySelector('[data-card]'); if (c) sendReply(c); } },
-    { label: 'Interrupt mid-flight', run: () => {
-        if (S.view !== 'ready') { S.idx = 0; go('ready'); }
-        const c = surface.querySelector('[data-card]');
+    { label: 'A message arrives', run: () => { if (S.view !== 'ready') { S.idx = 0; go('ready'); } else step('done'); } },
+    { label: 'Open the thread', run: () => { const c = liveCard(); if (c) toggleDetail(c); } },
+    { label: 'Dismiss with a flick', run: () => { if (S.view === 'ready') step('done'); } },
+    { label: 'Undo the dismiss', run: () => { hideUndo(); step('undo'); } },
+    { label: 'Reply fails to send', run: () => { S.failed = true; const c = liveCard(); if (c) sendReply(c); } },
+    { label: 'Interrupt the grow', run: () => {
+        toReady();
+        const c = liveCard();
+        if (!c) return;
+        if (S.expanded) toggleDetail(c);
+        setTimeout(() => { const a = liveCard(); if (a) toggleDetail(a); }, 60);
+        setTimeout(() => { const b = liveCard(); if (b) toggleDetail(b); }, 170);
+      } },
+    { label: 'Interrupt the exit', run: () => {
+        toReady();
+        const c = liveCard();
         if (c) toggleDetail(c);
-        setTimeout(() => { const d = surface.querySelector('[data-card]'); if (d) advance('done'); }, 90);
+        setTimeout(() => { const d = liveCard(); if (d) step('done'); }, 90);
+      } },
+    { label: 'Two dismisses at once', run: () => {
+        toReady();
+        step('done');
+        setTimeout(() => step('done'), 200);
       } },
   ],
   onScale: () => paint(S.view, false),
