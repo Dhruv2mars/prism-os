@@ -123,12 +123,22 @@
       "name": "motion & transition language",
       "wave": 0,
       "surface": "Every transition the OS uses, shown on real surfaces: rise, sheet, dismiss, handoff, interrupt.",
-      "status": "judging",
-      "round": 1,
-      "verdict": "gate-pass, critic respawned after rate limit",
-      "gap": "",
+      "status": "building",
+      "round": 2,
+      "verdict": "FAIL r1 (tie at 73 with named gaps)",
+      "gap": "resize() measures the post-mutation height before cancelling the in-flight height animation, so h1-h0 < 1px, the guard returns early, and interruption is ignored \u2014 then a 61px single-frame snap. Plus: card hover feedback is dead because the enter animation holds fill:'both'; and advance() matches the leaving card, so two fast dismisses silently eat a message.",
       "consecutivePasses": 0,
-      "path": "components/16-motion/index.html"
+      "path": "components/16-motion/index.html",
+      "history": [
+        {
+          "round": 1,
+          "ours": 73,
+          "visionOS": 73,
+          "horizon": 52,
+          "verdict": "fail"
+        }
+      ],
+      "ratchet": "under 75 \u2014 round 2 must reach 78 or higher"
     },
     {
       "id": "17-audio-haptics",
@@ -515,6 +525,10 @@
     {
       "t": "2026-08-31T12:40:41",
       "event": "00-foundation r2 finished and independently re-gated: PASS. Real fixes, not cosmetics \u2014 the stage overflow was uncrapped scenery, and the dwell sweep was measured with getBoundingClientRect through the stage's 1.15 scale so the traced corners drifted off the tile; switched to offsetWidth. Materials now differ by how much world comes through, not by grey value. Second fresh critic dispatched for the consecutive pass."
+    },
+    {
+      "t": "2026-08-31T12:41:37",
+      "event": "16-motion r1 FAIL \u2014 ours 73, tied visionOS 73, Horizon 52. Tie with three named gaps is a fail. Critic monkey-patched Element.prototype.animate and traced frames: WAAPI, easing, durations and transform retargeting all verified genuinely correct, but the card's own grow/shrink cannot be interrupted at all. Builder respawned with the measured trace; ratchet armed at 78."
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os",
