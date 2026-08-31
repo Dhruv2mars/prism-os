@@ -17,7 +17,7 @@
 
   --as: var(--a11y-scale, 1);
   --t-eyebrow: max(10.5px, calc(11px * var(--as)));
-  --t-word:    calc(40px * min(var(--as), 2.2));
+  --t-word:    calc(46px * min(var(--as), 2.2));
   --t-line:    calc(15px * var(--as));
   --t-hero:    calc(48px * min(var(--as), 2.2));
   --t-mid:     calc(18px * var(--as));
@@ -45,8 +45,8 @@
   background: linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.14)); }
 .sc-lamp { left: 19%; top: 33.4%; width: 22px; height: 22px; border-radius: 50%;
   background: radial-gradient(circle, rgba(255,246,220,0.92), rgba(255,220,160,0.30) 46%, transparent 72%); }
-.sc-win { border-radius: 3px;
-  background: linear-gradient(180deg, rgba(255,238,200,0.40), rgba(255,212,148,0.16)); }
+.sc-win { border-radius: 3px; filter: blur(2.5px);
+  background: linear-gradient(180deg, rgba(255,238,200,0.26), rgba(255,212,148,0.10)); }
 .sc-win.a { left: 66%; top: 15%; width: 52px; height: 21px; }
 .sc-win.b { left: 78.5%; top: 13%; width: 21px; height: 50px; }
 .sc-win.c { left: 60%; top: 29%; width: 25px; height: 21px; opacity: 0.62; }
@@ -203,7 +203,7 @@
 /* the specimen names itself, at a size you can read while walking */
 .word {
   position: relative; z-index: 2;
-  font-size: var(--t-word); font-weight: 640; letter-spacing: -0.028em;
+  font-size: var(--t-word); font-weight: 660; letter-spacing: -0.03em;
   line-height: 1; color: var(--ink-100);
   text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
 }
@@ -428,9 +428,9 @@ function focusTile() {
   const svg = t.querySelector('svg');
   const rect = svg.querySelector('rect');
   const fit = () => {
-    const b = t.getBoundingClientRect();
-    if (!b.width || !b.height) return;
-    const w = b.width + SWEEP_GAP * 2, h = b.height + SWEEP_GAP * 2;
+    const bw = t.offsetWidth, bh = t.offsetHeight;
+    if (!bw || !bh) return;
+    const w = bw + SWEEP_GAP * 2, h = bh + SWEEP_GAP * 2;
     svg.setAttribute('viewBox', `0 0 ${w.toFixed(2)} ${h.toFixed(2)}`);
     rect.setAttribute('x', SWEEP_W / 2);
     rect.setAttribute('y', SWEEP_W / 2);
@@ -531,7 +531,7 @@ const STEPS = [
 const GLYPH = {
   empty: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.72)" stroke-width="1.4"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke-dasharray="3 3.4"/></svg>',
   error: '<svg viewBox="0 0 24 24" fill="none" stroke="#ff8f8f" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v5"/><path d="M12 16.1h.01"/></svg>',
-  offline: '<svg viewBox="0 0 24 24" fill="none" stroke="#ffd27a" stroke-width="1.5" stroke-linecap="round"><path d="M6.4 17.4h10.2a3.6 3.6 0 0 0 .4-7.18A5.4 5.4 0 0 0 7.5 8.6"/><path d="M4 4l16 16"/></svg>',
+  offline: '<svg viewBox="0 0 24 24" fill="none" stroke="#ffd27a" stroke-width="1.6" stroke-linecap="round"><path d="M2.6 8.6a15 15 0 0 1 18.8 0"/><path d="M5.9 12.3a10 10 0 0 1 12.2 0"/><path d="M9.1 15.9a5 5 0 0 1 5.8 0"/><circle cx="12" cy="19.4" r="0.9" fill="#ffd27a" stroke="none"/><path d="M3.4 3.4l17.2 17.2" stroke="#0a0f18" stroke-width="3.6"/><path d="M3.4 3.4l17.2 17.2"/></svg>',
   denied: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(134,198,255,.85)" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="10.4" width="14" height="9.2" rx="3"/><path d="M8.4 10.4V8a3.6 3.6 0 0 1 7.2 0"/></svg>',
 };
 

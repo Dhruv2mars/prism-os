@@ -102,9 +102,9 @@
       "name": "foundation & materials",
       "wave": 0,
       "surface": "A single real surface that demonstrates glass over world, type scale, and controls in use \u2014 not a token catalog.",
-      "status": "building",
-      "round": 1,
-      "verdict": "PASS (1 of 2), r2 fix in progress",
+      "status": "judging",
+      "round": 2,
+      "verdict": "PASS r1 (1 of 2), r2 gate green, awaiting second critic",
       "gap": "Gaze reticle punched through body copy at stage centre (fixed systemically). Remaining: dwell sweep rect not concentric with .ftile; Glass plate at 0.70-0.79 fully occludes the world bloom, so the opening frame of a materials piece reads as a dark slab.",
       "consecutivePasses": 1,
       "path": "components/00-foundation/index.html",
@@ -511,6 +511,10 @@
     {
       "t": "2026-08-31T12:36:00",
       "event": "Second rate-limit hit killed all three agents. Re-gated the partial work: both builders' files were complete but each failed one check, so both were respawned to finish rather than restart. 16-motion critic respawned clean. No work lost."
+    },
+    {
+      "t": "2026-08-31T12:40:41",
+      "event": "00-foundation r2 finished and independently re-gated: PASS. Real fixes, not cosmetics \u2014 the stage overflow was uncrapped scenery, and the dwell sweep was measured with getBoundingClientRect through the stage's 1.15 scale so the traced corners drifted off the tile; switched to offsetWidth. Materials now differ by how much world comes through, not by grey value. Second fresh critic dispatched for the consecutive pass."
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os",

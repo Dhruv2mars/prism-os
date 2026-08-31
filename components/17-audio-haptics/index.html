@@ -33,7 +33,7 @@
 
  /* ---------- head-centred field ---------- */
  .field{
-  --field: clamp(128px, calc(300px - (var(--s) - 1) * 172px), 244px);
+  --field: clamp(120px, calc(256px - (var(--s) - 1) * 160px), 208px);
   --r: calc(var(--field) * 0.375);
   position:relative; flex:none;
   width:var(--field); height:var(--field); border-radius:50%;
@@ -49,23 +49,29 @@
   touch-action:none; cursor:grab;
   transition:opacity var(--dur-base) var(--ease-prism), filter var(--dur-base) var(--ease-prism);
  }
+ .col:not(.md) .field{ margin:calc(15px * var(--s)) 0 calc(17px * var(--s)) }
  .field:active{ cursor:grabbing }
  .field.mono{ cursor:default }
  .field svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible }
 
- /* cardinal words live on an inner ring the orb can never reach: the orb
-    orbits at --r, the words sit at --lr, and --lr + word < --r - orb. */
- .rose{ position:absolute; inset:0; pointer-events:none; --lr:calc(var(--field) * 0.17) }
+ /* Cardinal words sit OUTSIDE the disc, on the rim margin. The orb orbits at
+    --r = 0.375 of the field, so its farthest edge stays inside the rim while
+    every word starts beyond it: word and orb can never meet, and the middle of
+    the field — where the gaze reticle rests — holds no glyph at all. */
+ .rose{
+  position:absolute; inset:0; pointer-events:none;
+  --rim: calc(var(--field) / 2);
+ }
  .rose span{
   position:absolute; left:50%; top:50%;
-  font-size:calc(11px * var(--s)); font-weight:650; letter-spacing:0.08em;
-  color:var(--ink-60); text-transform:lowercase; white-space:nowrap;
-  text-shadow:0 1px 3px rgba(4,8,14,0.85);
+  font-size:calc(11.5px * var(--s)); font-weight:700; letter-spacing:0.09em;
+  color:rgba(255,255,255,0.74); text-transform:lowercase; white-space:nowrap;
+  text-shadow:0 1px 3px rgba(2,6,12,0.92), 0 0 10px rgba(2,6,12,0.7);
  }
- .rose .n{ transform:translate(-50%, calc(-50% - var(--lr))) }
- .rose .s{ transform:translate(-50%, calc(-50% + var(--lr))) }
- .rose .w{ transform:translate(calc(-100% - var(--lr) * 0.55), -50%) }
- .rose .e{ transform:translate(calc(var(--lr) * 0.55), -50%) }
+ .rose .n{ transform:translate(-50%, calc(-50% - var(--rim) - 11px)) }
+ .rose .s{ transform:translate(-50%, calc(-50% + var(--rim) + 11px)) }
+ .rose .w{ transform:translate(calc(-100% - var(--rim) - 9px), -50%) }
+ .rose .e{ transform:translate(calc(var(--rim) + 9px), -50%) }
 
  .spoke{
   position:absolute; inset:0; pointer-events:none;
@@ -233,13 +239,28 @@
  .col.tactile .score .lbl{ color:var(--ink-60) }
 
  /* ---------- large text: shed the quiet layers, keep every meaning ----------
-    At 130% the flavour line and the cardinal words go — the bearing sentence
-    already says the same thing in full words. At 175% the vocabulary strip and
-    the definition go too, leaving name, place, touch, action. */
- .col.md .note, .col.md .rose, .col.md .score .lbl{ display:none }
+    At 130% the flavour line, the cardinal words and the vocabulary strip go —
+    the bearing sentence already says in full words what the rose draws, and
+    every cue stays reachable by swipe. At 175% the definition goes too, leaving
+    name, place, touch, action. Nothing is ever clipped: past 300% the band
+    scrolls and says so. */
+ .col.md .note, .col.md .rose, .col.md .score .lbl, .col.md .index{ display:none }
  .col.md .meaning{ max-width:calc(300px * var(--s)) }
- .col.lg .index, .col.lg .meaning{ display:none }
- .col.lg{ justify-content:flex-start; gap:calc(12px * var(--s)) }
+ .col.lg .meaning{ display:none }
+ .col.lg{ justify-content:flex-start; gap:calc(10px * var(--s)); padding:calc(8px * var(--s)) 22px calc(10px * var(--s)) }
+ /* past 175% the drawn waveform and the button stop growing: they are shapes
+    and targets, already far past any legible or reachable minimum. */
+ .col.lg .track{ height:clamp(34px, calc(30px * var(--s)), 56px) }
+ .col.lg .score{ padding:calc(7px * var(--s)) calc(12px * var(--s)) }
+ .col.lg .play{ min-height:clamp(44px, calc(40px * var(--s)), 84px) }
+
+ /* the band scrolls only when text is set so large that it must; when it does,
+    the edge softens so the wearer can see there is more below. */
+ .surface.more::after{
+  content:""; position:absolute; left:0; right:0; bottom:0; height:46px;
+  background:linear-gradient(180deg, rgba(6,10,16,0), rgba(6,10,16,0.55));
+  pointer-events:none;
+ }
 
  [data-reduced-motion] .sweep{ animation:none }
  [data-reduced-motion] *{ transition-duration:1ms !important }
@@ -499,6 +520,9 @@ function render(){
     'Offline': viewOffline,
   }[S.view] || viewReady)(col);
   syncRoute();
+  requestAnimationFrame(() => {
+    surface.classList.toggle('more', surface.scrollHeight > surface.clientHeight + 2);
+  });
 }
 
 function syncRoute(){
