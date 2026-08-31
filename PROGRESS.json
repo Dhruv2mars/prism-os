@@ -102,9 +102,9 @@
       "name": "foundation & materials",
       "wave": 0,
       "surface": "A single real surface that demonstrates glass over world, type scale, and controls in use \u2014 not a token catalog.",
-      "status": "building",
+      "status": "judging",
       "round": 1,
-      "verdict": null,
+      "verdict": "gate-pass, awaiting critic",
       "gap": null,
       "consecutivePasses": 0,
       "path": "components/00-foundation/index.html"
@@ -116,7 +116,7 @@
       "surface": "Every transition the OS uses, shown on real surfaces: rise, sheet, dismiss, handoff, interrupt.",
       "status": "building",
       "round": 1,
-      "verdict": null,
+      "verdict": "builder respawned after rate limit",
       "gap": null,
       "consecutivePasses": 0,
       "path": "components/16-motion/index.html"
@@ -126,9 +126,9 @@
       "name": "spatial audio & haptics",
       "wave": 0,
       "surface": "Spatial audio placement and the haptic vocabulary, made visible and audible.",
-      "status": "building",
+      "status": "judging",
       "round": 1,
-      "verdict": null,
+      "verdict": "gate-pass, awaiting critic",
       "gap": null,
       "consecutivePasses": 0,
       "path": "components/17-audio-haptics/index.html"
@@ -413,10 +413,17 @@
   "blocked": [
     {
       "item": "Sub-agent reasoning effort = medium, set via .claude/agents/*.md frontmatter",
-      "status": "partially blocked in this session, not descoped",
+      "status": "RESOLVED as of session restart 2026-08-31",
       "detail": "The four agent definitions exist on disk with `model: opus` and `effort: medium`. The Claude Code harness registers .claude/agents/*.md at SESSION START, so definitions authored mid-session are not selectable as subagent_type in this run \u2014 a spawn with subagent_type 'prism-builder' errors with 'Agent type not found'.",
       "workaround": "Spawning the generic agent with an explicit model override (verified: reports claude-opus-5) and prepending the full role definition \u2014 including the critic's disqualification rule \u2014 to every spawn prompt. Behaviour matches the definitions; only the effort knob is not settable per-spawn.",
-      "residual": "Reasoning effort cannot be pinned to medium from inside this session and is not introspectable by a subagent. The frontmatter takes effect on the next session start. Verified via throwaway spawn: model is claude-opus-5; effort was not determinable."
+      "residual": "Reasoning effort cannot be pinned to medium from inside this session and is not introspectable by a subagent. The frontmatter takes effect on the next session start. Verified via throwaway spawn: model is claude-opus-5; effort was not determinable.",
+      "resolution": "Session restarted, so .claude/agents/*.md registered. prism-builder / prism-critic / prism-sweep / prism-integrator are now selectable as subagent_type, carrying `model: opus` + `effort: medium` from frontmatter. No per-spawn override needed; the workaround is retired."
+    },
+    {
+      "item": "Opus 5 session rate limit halted all three wave-0 builders mid-run",
+      "status": "RESOLVED",
+      "detail": "All three wave-0 builders terminated with HTTP 429 rate_limit ('You've hit your session limit', model claude-opus-5). 00-foundation and 17-audio-haptics had already written complete files; 16-motion had written nothing.",
+      "resolution": "Limit reset. Both written files were re-gated on resume and both exit 0 (GATE: PASS), so no work was lost. 16-motion respawned from scratch."
     }
   ],
   "log": [
@@ -447,6 +454,18 @@
     {
       "t": "t+1h",
       "msg": "live progress page published \u00b7 regenerated from PROGRESS.json by tools/build-live.mjs after every verdict"
+    },
+    {
+      "t": "2026-08-31T07:26:54",
+      "event": "Rate limit cleared. Re-gated the two wave-0 files the killed builders left on disk: 00-foundation GATE PASS, 17-audio-haptics GATE PASS. Neither needed rework."
+    },
+    {
+      "t": "2026-08-31T07:26:54",
+      "event": "Agent definitions registered at session start \u2014 prism-builder/critic/sweep/integrator now spawn natively at opus+medium. Spawn-prompt workaround retired."
+    },
+    {
+      "t": "2026-08-31T07:26:54",
+      "event": "Wave 0 live: builder on 16-motion, fresh blind critics on 00-foundation r1 and 17-audio-haptics r1."
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os",
