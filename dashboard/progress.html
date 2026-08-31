@@ -4,7 +4,7 @@
 <div style="max-width:900px;margin:0 auto;padding:40px 22px 70px">
   <header style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">
     <h1 style="font-size:26px;font-weight:800;letter-spacing:-0.02em;margin:0">Prism OS <span style="color:#56b8ff;font-weight:700">build progress</span></h1>
-    <span style="color:#8b93a7;font-size:13px;font-variant-numeric:tabular-nums">2026-08-30 15:17 UTC · wave 0</span>
+    <span style="color:#8b93a7;font-size:13px;font-variant-numeric:tabular-nums">2026-08-31T18:07:57 UTC · wave 0</span>
   </header>
   <p style="color:#8b93a7;margin:0 0 14px;font-size:14px">Prism OS — the operating system for smart glasses.</p>
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
@@ -42,10 +42,10 @@
 
 <tr>
   <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">17-audio-haptics<div style="font-weight:400;color:#8b93a7;font-size:12px">spatial audio &amp; haptics</div></td>
-  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(255,194,71,.14);color:#ffc247;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">building</span></td>
-  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R1</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">judging</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R2</td>
   <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:#4cd47c"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
-  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">PASS (1 of 2), r2 fix in progress<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: Bearing readout collides with the compass-rose &quot;behind&quot; label and the source orb in every cue state. Also: at text scale 1.6 the column overflows 676 vs 556 and clips &quot;Confirm&quot; and &quot;Capture&quot; out of reach.</div></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">PASS r1 (1 of 2), r2 gate green, awaiting second critic<div style="color:#ff9d5d;font-size:12px;margin-top:3px">gap: Bearing readout collides with the compass-rose &quot;behind&quot; label and the source orb in every cue state. Also: at text scale 1.6 the column overflows 676 vs 556 and clips &quot;Confirm&quot; and &quot;Capture&quot; out of reach.</div></td>
 </tr></tbody>
   </table>
 </section>
@@ -301,10 +301,24 @@
   
   
 </div>
+
+<div style="border:1px solid rgba(255,157,93,.3);background:rgba(255,157,93,.07);border-radius:12px;padding:12px 14px;margin-bottom:9px">
+  <div style="font-weight:700;font-size:13px;color:#ffb989">Opus 5 session rate limit — third hit, killed all three live agents</div>
+  <div style="color:#8b93a7;font-size:12px;margin-top:2px">RESOLVED at 18:04 Asia/Calcutta</div>
+  <div style="color:#aab2c5;font-size:12px;line-height:1.55;margin-top:6px">Rate limit fired again at ~12:50pm Asia/Calcutta with reset at 5:30pm. Killed 'Fix 00-foundation r3' (had read nothing yet), 'Judge 17-audio-haptics r2' (no verdict written), and 'Fix 16-motion r2' (died at the write boundary, mid-sentence on 'Now I'll rewrite the piece'). Working tree was clean on resume, so 16-motion had written nothing — unlike hits #1 and #2, no partial file to re-gate.</div>
+  
+  
+</div>
+
+<div style="border:1px solid rgba(255,157,93,.3);background:rgba(255,157,93,.07);border-radius:12px;padding:12px 14px;margin-bottom:9px">
+  <div style="font-weight:700;font-size:13px;color:#ffb989">Static server on :4310 died between sessions, silently failing every spawned agent</div>
+  <div style="color:#8b93a7;font-size:12px;margin-top:2px">RESOLVED</div>
+  <div style="color:#aab2c5;font-size:12px;line-height:1.55;margin-top:6px">The `python3 -m http.server 4310` process did not survive the process restart. Three agents spawned against a dead server: curl returned connection-refused (exit 7) and no agent could load a page or run the probe. They left two empty probe dirs and no verdicts. The failure is silent from the orchestrator's side — the agents just stop with no completion record.</div>
+  
+  
+</div>
   <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#58607a;margin:26px 0 8px">Build log</h2>
-  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.55"><div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">os/shared/lab.js + lab.css added — dev controls in an outside rail, 5 edge states URL-drivable, world layer behind the glass</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">agent definitions written: builder, critic, sweep, integrator (opus/medium) · critic carries its own disqualification rule</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">piece list expanded 16 -&gt; 26 across 5 waves · web apps runtime, permission broker, catalog, SDK, devtools, text input, search, privacy, media, audio/haptics, motion all now explicit pieces</span></div>
+  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.55"><div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+0m</span><span style="color:#aab2c5">piece list expanded 16 -&gt; 26 across 5 waves · web apps runtime, permission broker, catalog, SDK, devtools, text input, search, privacy, media, audio/haptics, motion all now explicit pieces</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+1h</span><span style="color:#aab2c5">wave 0 open: 3 builders live on foundation, motion, audio+haptics — all on the new gate</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+1h</span><span style="color:#aab2c5">live progress page published · regenerated from PROGRESS.json by tools/build-live.mjs after every verdict</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T07:26:54</span><span style="color:#aab2c5">undefined</span></div>
@@ -317,6 +331,8 @@
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T12:36:00</span><span style="color:#aab2c5">undefined</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T12:40:41</span><span style="color:#aab2c5">undefined</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T12:41:37</span><span style="color:#aab2c5">undefined</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T12:47:50</span><span style="color:#aab2c5">undefined</span></div></div>
+<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T12:47:50</span><span style="color:#aab2c5">undefined</span></div>
+<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T12:48:37</span><span style="color:#aab2c5">undefined</span></div>
+<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">undefined</span><span style="color:#aab2c5">undefined</span></div></div>
   <p style="color:#58607a;font-size:12px;margin-top:24px;line-height:1.6;max-width:78ch">Every piece is built by one agent and judged by a fresh-context critic that runs the probe itself and inspects only rendered output, scored blind against a named visionOS screen and a named Horizon OS screen across nine criteria. Every piece carries two consecutive PASS verdicts from two different fresh critics; the coherence integrator signs off on the whole system; the web apps runtime actually runs a third-party app; the developer platform is real; the dashboard shows N/N passed.</p>
 </div></body></html>

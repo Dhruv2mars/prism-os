@@ -62,12 +62,12 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
 <body><div class="wrap">
 <h1>Prism OS <span>the gauntlet</span></h1>
 <p class="sub">Prism OS — the operating system for smart glasses.</p>
-<p class="meta">Updated 2026-08-30 15:17 UTC · run gauntlet-2 · <a href="https://github.com/Dhruv2mars/prism-os">https://github.com/Dhruv2mars/prism-os</a></p>
+<p class="meta">Updated 2026-08-31T18:07:57 UTC · run gauntlet-2 · <a href="https://github.com/Dhruv2mars/prism-os">https://github.com/Dhruv2mars/prism-os</a></p>
 
 <div class="stats">
   <div class="stat"><b>0<span style="color:var(--faint);font-size:15px">/26</span></b><span>passed</span></div>
-  <div class="stat"><b>3</b><span>agents live</span></div>
-  <div class="stat"><b>6</b><span>rounds run</span></div>
+  <div class="stat"><b>2</b><span>agents live</span></div>
+  <div class="stat"><b>7</b><span>rounds run</span></div>
   <div class="stat"><b>5</b><span>waves</span></div>
 </div>
 <div class="bar"><i style="width:0.0%"></i></div>
@@ -108,8 +108,8 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
     </tr>
     <tr>
       <td class="pid"><b>17-audio-haptics</b><span>spatial audio &amp; haptics</span></td>
-      <td><span class="badge" style="color:#ffc247;background:rgba(255,194,71,.13)">building</span></td>
-      <td class="num">R1</td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R2</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="spark"><svg width="108" height="30" viewBox="0 0 108 30" aria-hidden="true">
     <line x1="0" y1="9.1" x2="108" y2="9.1" stroke="rgba(255,255,255,.2)" stroke-dasharray="2 3" stroke-width="1"/>
@@ -367,10 +367,20 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
   <p>All three agents (00-foundation r2 builder, 17-audio-haptics r2 builder, 16-motion critic) terminated with HTTP 429 rate_limit, reset 12:10pm Asia/Calcutta. Three parallel Opus agents exhaust the session limit in roughly 30-40 minutes of work.</p>
   
   
+</div><div class="blk">
+  <b>Opus 5 session rate limit — third hit, killed all three live agents</b><span class="bs">RESOLVED at 18:04 Asia/Calcutta</span>
+  <p>Rate limit fired again at ~12:50pm Asia/Calcutta with reset at 5:30pm. Killed 'Fix 00-foundation r3' (had read nothing yet), 'Judge 17-audio-haptics r2' (no verdict written), and 'Fix 16-motion r2' (died at the write boundary, mid-sentence on 'Now I'll rewrite the piece'). Working tree was clean on resume, so 16-motion had written nothing — unlike hits #1 and #2, no partial file to re-gate.</p>
+  
+  
+</div><div class="blk">
+  <b>Static server on :4310 died between sessions, silently failing every spawned agent</b><span class="bs">RESOLVED</span>
+  <p>The `python3 -m http.server 4310` process did not survive the process restart. Three agents spawned against a dead server: curl returned connection-refused (exit 7) and no agent could load a page or run the probe. They left two empty probe dirs and no verdicts. The failure is silent from the orchestrator's side — the agents just stop with no completion record.</p>
+  
+  
 </div>
 
 <h2>Build log</h2>
-<ul class="log"><li><span class="t">2026-08-31T12:47:50</span><span></span></li><li><span class="t">2026-08-31T12:41:37</span><span></span></li><li><span class="t">2026-08-31T12:40:41</span><span></span></li><li><span class="t">2026-08-31T12:36:00</span><span></span></li><li><span class="t">2026-08-31T07:37:14</span><span></span></li><li><span class="t">2026-08-31T07:35:24</span><span></span></li><li><span class="t">2026-08-31T07:35:24</span><span></span></li><li><span class="t">2026-08-31T07:35:24</span><span></span></li><li><span class="t">2026-08-31T07:26:54</span><span></span></li><li><span class="t">2026-08-31T07:26:54</span><span></span></li><li><span class="t">2026-08-31T07:26:54</span><span></span></li><li><span class="t">t+1h</span><span>live progress page published · regenerated from PROGRESS.json by tools/build-live.mjs after every verdict</span></li><li><span class="t">t+1h</span><span>wave 0 open: 3 builders live on foundation, motion, audio+haptics — all on the new gate</span></li><li><span class="t">t+0m</span><span>piece list expanded 16 -&gt; 26 across 5 waves · web apps runtime, permission broker, catalog, SDK, devtools, text input, search, privacy, media, audio/haptics, motion all now explicit pieces</span></li><li><span class="t">t+0m</span><span>agent definitions written: builder, critic, sweep, integrator (opus/medium) · critic carries its own disqualification rule</span></li><li><span class="t">t+0m</span><span>os/shared/lab.js + lab.css added — dev controls in an outside rail, 5 edge states URL-drivable, world layer behind the glass</span></li><li><span class="t">t+0m</span><span>probe.mjs rewritten as an enforcing gate: exit 1 on dev chrome in stage, token leaks, overflow, reduced-motion, console errors</span></li><li><span class="t">t+0m</span><span>read 22 prior verdicts · root-caused the plateau to in-stage dev chrome, undemoted foci, and leaked tokens</span></li></ul>
+<ul class="log"><li><span class="t"></span><span></span></li><li><span class="t">2026-08-31T12:48:37</span><span></span></li><li><span class="t">2026-08-31T12:47:50</span><span></span></li><li><span class="t">2026-08-31T12:41:37</span><span></span></li><li><span class="t">2026-08-31T12:40:41</span><span></span></li><li><span class="t">2026-08-31T12:36:00</span><span></span></li><li><span class="t">2026-08-31T07:37:14</span><span></span></li><li><span class="t">2026-08-31T07:35:24</span><span></span></li><li><span class="t">2026-08-31T07:35:24</span><span></span></li><li><span class="t">2026-08-31T07:35:24</span><span></span></li><li><span class="t">2026-08-31T07:26:54</span><span></span></li><li><span class="t">2026-08-31T07:26:54</span><span></span></li><li><span class="t">2026-08-31T07:26:54</span><span></span></li><li><span class="t">t+1h</span><span>live progress page published · regenerated from PROGRESS.json by tools/build-live.mjs after every verdict</span></li><li><span class="t">t+1h</span><span>wave 0 open: 3 builders live on foundation, motion, audio+haptics — all on the new gate</span></li><li><span class="t">t+0m</span><span>piece list expanded 16 -&gt; 26 across 5 waves · web apps runtime, permission broker, catalog, SDK, devtools, text input, search, privacy, media, audio/haptics, motion all now explicit pieces</span></li><li><span class="t">t+0m</span><span>agent definitions written: builder, critic, sweep, integrator (opus/medium) · critic carries its own disqualification rule</span></li><li><span class="t">t+0m</span><span>os/shared/lab.js + lab.css added — dev controls in an outside rail, 5 edge states URL-drivable, world layer behind the glass</span></li><li><span class="t">t+0m</span><span>probe.mjs rewritten as an enforcing gate: exit 1 on dev chrome in stage, token leaks, overflow, reduced-motion, console errors</span></li><li><span class="t">t+0m</span><span>read 22 prior verdicts · root-caused the plateau to in-stage dev chrome, undemoted foci, and leaked tokens</span></li></ul>
 
 <footer>Every piece is built by one agent and judged by a fresh-context critic that runs the probe itself and reads only its own screenshots — never a builder's words. Each is scored blind as System A/B/C against a specifically named visionOS screen and a specifically named Horizon OS screen, across nine criteria worth 90 points: glanceability, focus discipline, material honesty, motion, typography, edge states, dependability, accessibility, delight.<br><br>Every piece carries two consecutive PASS verdicts from two different fresh critics; the coherence integrator signs off on the whole system; the web apps runtime actually runs a third-party app; the developer platform is real; the dashboard shows N/N passed.</footer>
 </div></body></html>
