@@ -1,0 +1,122 @@
+{
+  "url": "http://localhost:4310/components/17-audio-haptics/index.html",
+  "probedAt": "2026-08-31T02:05:01.756Z",
+  "gate": {
+    "pass": false,
+    "violations": [
+      "gaze reticle collides with 6 text run(s) — e.g. \"behind\" in span.s (at rest, reticle rest point (stage centre)). Keep the stage centre clear of glyphs, composite the reticle as a ring rather than a filled disc, and hide it until the first gaze or pointer event."
+    ],
+    "warnings": []
+  },
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "reducedMotion": {
+    "ok": true,
+    "infiniteAnimations": 0,
+    "contentPresent": true
+  },
+  "screenshots": [
+    "full.png",
+    "stage.png",
+    "stage-reduced-motion.png"
+  ],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "inStageFocusables": 8,
+  "labFocusables": 25,
+  "totalFocusables": 33,
+  "labInsideStage": 0,
+  "devTokenLeaks": [],
+  "loudElementCount": 1,
+  "loudElements": [
+    "h1.name"
+  ],
+  "surfaces": [
+    {
+      "el": "main.surface",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.col",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.field",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "radial-gradient(circle at 50% 30%, rgba(32, 46, 66, 0.66), rgba(10, 16",
+      "backdrop": "saturate(1.5) blur(18px)"
+    },
+    {
+      "el": "svg.[object",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "circle.[object",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "g.[object",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.rose",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.spoke",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    }
+  ],
+  "unlabeledIconButtons": [],
+  "subTenPxTextCount": 0,
+  "reducedMotionSupport": true,
+  "hasLab": true,
+  "labControls": [
+    "Ready",
+    "Loading",
+    "Sound blocked",
+    "No output",
+    "No motor",
+    "Offline",
+    "Notification from behind",
+    "Hit the end of a list",
+    "Mono audio",
+    "Haptics only",
+    "Reduced motion",
+    "Street",
+    "Room",
+    "Outdoor",
+    "Night",
+    "Confirm",
+    "Arrive",
+    "Alert",
+    "Fail",
+    "Boundary",
+    "Capture",
+    "Light",
+    "Standard",
+    "Strong"
+  ],
+  "overflow": {
+    "stageScrollH": 600,
+    "stageClientH": 600,
+    "innerScrollH": null,
+    "innerClientH": null
+  },
+  "title": "Prism OS — Spatial Audio & Haptics"
+}

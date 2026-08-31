@@ -168,6 +168,63 @@ const audit = await page.evaluate(({ FOCUS_SEL, DEV_TOKENS }) => {
   };
 }, { FOCUS_SEL, DEV_TOKENS });
 
+
+/* The gaze cursor is checked in every frame a critic will actually look at,
+   not just the first one — the resting frame, the swept frame, and each
+   edge state. A reticle that punches a hole through a glyph is a hard fail. */
+async function cursorCollisions(page, frame) {
+  return page.evaluate((frameName) => {
+    const stage = document.querySelector('.stage');
+    const cursorEl = stage?.querySelector('.gaze-cursor, [data-cursor]');
+    if (!stage) return [];
+    const sb = stage.getBoundingClientRect();
+    const cs = cursorEl && getComputedStyle(cursorEl);
+    const cr = cursorEl && cursorEl.getBoundingClientRect();
+    const painted = !!cursorEl && cs.display !== 'none' && cs.visibility !== 'hidden'
+      && parseFloat(cs.opacity) >= 0.35 && cr.width >= 1;
+
+    /* Two boxes matter. Where the reticle is painted right now, and where it
+       returns to the instant the wearer looks up — core.js parks it at stage
+       centre. Content must be clear of both; hiding the cursor at rest only
+       defers the collision to the first gaze. */
+    const boxes = [];
+    if (painted) {
+      const pad = Math.max(cr.width, cr.height) * 0.5;
+      boxes.push({ why: 'painted reticle', l: cr.left - pad, r: cr.right + pad, t: cr.top - pad, b: cr.bottom + pad });
+    }
+    const rest = 12;
+    const mx = sb.left + sb.width / 2, my = sb.top + sb.height / 2;
+    boxes.push({ why: 'reticle rest point (stage centre)', l: mx - rest, r: mx + rest, t: my - rest, b: my + rest });
+
+    const hits = [];
+    const tw = document.createTreeWalker(stage, NodeFilter.SHOW_TEXT);
+    for (let n = tw.nextNode(); n; n = tw.nextNode()) {
+      const txt = n.nodeValue.trim();
+      if (!txt || cursorEl.contains(n)) continue;
+      const pe = n.parentElement;
+      if (!pe) continue;
+      const ps = getComputedStyle(pe);
+      if (ps.visibility === 'hidden' || ps.display === 'none' || parseFloat(ps.opacity) < 0.15) continue;
+      const rng = document.createRange();
+      rng.selectNodeContents(n);
+      let hit = null;
+      for (const r of rng.getClientRects()) {
+        if (r.width < 1 || r.height < 1) continue;
+        for (const c of boxes) {
+          if (r.left < c.r && r.right > c.l && r.top < c.b && r.bottom > c.t) { hit = c.why; break; }
+        }
+        if (hit) break;
+      }
+      if (hit) {
+        hits.push({ frame: frameName, why: hit, text: txt.slice(0, 48), el: pe.tagName.toLowerCase() + (pe.className ? '.' + String(pe.className).split(' ')[0] : '') });
+      }
+    }
+    return hits;
+  }, frame);
+}
+
+const cursorHits = await cursorCollisions(page, 'at rest');
+
 /* sweep gaze across the stage to exercise hover/focus, then rest slightly high */
 const box = await page.locator('.stage').boundingBox().catch(() => null);
 if (box) {
@@ -177,6 +234,7 @@ if (box) {
   await page.mouse.move(box.x + box.width / 2, box.y + box.height * 0.35);
 }
 await page.waitForTimeout(700);
+cursorHits.push(...(await cursorCollisions(page, 'gaze swept to centre')));
 
 await page.screenshot({ path: `${out}/full.png`, fullPage: false });
 if (box) await page.locator('.stage').screenshot({ path: `${out}/stage.png` });
@@ -190,6 +248,7 @@ for (let i = 0; i < stateBtns.length && i < 8; i++) {
   await page.waitForTimeout(650);
   const f = `stage-${name}.png`;
   await page.locator('.stage').screenshot({ path: `${out}/${f}` }).catch(() => {});
+  cursorHits.push(...(await cursorCollisions(page, `state: ${name}`)));
   shots.push(f);
 }
 
@@ -235,6 +294,10 @@ if (audit.overflow && audit.overflow.stageScrollH > audit.overflow.stageClientH 
 }
 if (audit.unlabeledIconButtons.length) violations.push(`${audit.unlabeledIconButtons.length} focusable(s) with no accessible name`);
 if (audit.subTenPxTextCount > 0) violations.push(`${audit.subTenPxTextCount} text node(s) under 10px`);
+if (cursorHits.length) {
+  const h = cursorHits[0];
+  violations.push(`gaze reticle collides with ${cursorHits.length} text run(s) — e.g. "${h.text}" in ${h.el} (${h.frame}, ${h.why}). Keep the stage centre clear of glyphs, composite the reticle as a ring rather than a filled disc, and hide it until the first gaze or pointer event.`);
+}
 
 const warnings = [];
 if (!audit.hasLab) warnings.push('no lab rail mounted — critics cannot reach edge states; import mountLab from /os/shared/lab.js');

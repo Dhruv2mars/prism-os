@@ -78,6 +78,51 @@ export function mountWorld(stage, kind = 'street') {
 
 /* ------------------------------------------------------------------ lab ----- */
 
+
+/* The gaze cursor is a reticle, not a sticker. Two rules, both systemic:
+   it stays invisible until the wearer actually looks or gestures, and when
+   it is visible it composites as a ring so glyphs read straight through it.
+   design-system.css is frozen, so the override ships here and every piece
+   inherits it by calling mountLab. */
+export function hardenGaze(stage = document.querySelector('.stage')) {
+  if (!stage) return;
+
+  if (!document.querySelector('style[data-gaze-fix]')) {
+    const st = document.createElement('style');
+    st.setAttribute('data-gaze-fix', '');
+    st.textContent = `
+      .stage .gaze-cursor {
+        opacity: 0;
+        background: transparent;
+        box-shadow:
+          inset 0 0 0 1.5px rgba(255, 255, 255, 0.92),
+          0 0 0 1px rgba(0, 0, 0, 0.35),
+          0 0 12px rgba(86, 184, 255, 0.45);
+        transition: opacity var(--dur-fast) var(--ease-prism);
+      }
+      .stage .gaze-cursor[data-awake] { opacity: 1; }
+      :root[data-reduced-motion] .stage .gaze-cursor { transition: none; }
+    `;
+    document.head.appendChild(st);
+  }
+
+  const cursor = stage.querySelector('.gaze-cursor');
+  if (!cursor || cursor.hasAttribute('data-gaze-bound')) return;
+  cursor.setAttribute('data-gaze-bound', '');
+
+  let idle;
+  const sleep = () => cursor.removeAttribute('data-awake');
+  const wake = () => {
+    cursor.setAttribute('data-awake', '');
+    clearTimeout(idle);
+    idle = setTimeout(sleep, 2600);
+  };
+  for (const ev of ['pointermove', 'pointerdown', 'keydown', 'wheel']) {
+    stage.addEventListener(ev, wake, { passive: true });
+  }
+  window.addEventListener('keydown', wake, { passive: true });
+}
+
 export function mountLab(cfg = {}) {
   const {
     piece = '', title = '', states = [], onState = null,
@@ -246,6 +291,9 @@ export function mountLab(cfg = {}) {
   const stage = document.querySelector('.stage');
   if (stage && worlds) mountWorld(stage, api.world);
   if (states.length) onState?.(api.state);
+
+  /* after the piece has mounted, so the cursor exists */
+  queueMicrotask(() => hardenGaze());
 
   return api;
 }

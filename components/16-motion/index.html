@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Motion</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+ :root{ --s: var(--a11y-scale, 1); --pm: calc(1 + (var(--s) - 1) * 0.28); --bm: min(var(--s), 1.7); }
+
+ .surface{
+  position:absolute; inset:44px 0 0 0; z-index:2;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  gap:calc(14px * var(--pm));
+  padding:calc(10px * var(--pm)) calc(26px * var(--pm)) calc(18px * var(--pm));
+  overflow-y:auto; overscroll-behavior:contain; scrollbar-width:none;
+ }
+ .surface::-webkit-scrollbar{ display:none }
+ /* centred while it fits, top-anchored the moment large text makes it taller */
+ .surface > :first-child{ margin-top:auto }
+ .surface > :last-child{ margin-bottom:auto }
+
+ /* ---------------- the one focal element: the live card ---------------- */
+ .stack{ position:relative; width:100%; display:flex; justify-content:center; flex:none }
+
+ .msg{
+  position:relative; width:min(452px, 100%);
+  padding:calc(20px * var(--pm)) calc(22px * var(--pm)) calc(18px * var(--pm));
+  border-radius:var(--r-lg);
+  background:linear-gradient(158deg, rgba(20,29,43,0.72), rgba(9,14,22,0.80));
+  backdrop-filter:saturate(1.5) blur(24px);
+  -webkit-backdrop-filter:saturate(1.5) blur(24px);
+  outline:1px solid rgba(255,255,255,0.13);
+  box-shadow:
+   0 2px 0 -1px rgba(255,255,255,0.22) inset,
+   0 22px 54px rgba(0,0,0,0.46),
+   0 3px 12px rgba(0,0,0,0.30);
+  text-align:left; overflow:hidden;
+  transition:transform var(--dur-base) var(--ease-prism);
+ }
+ .msg.leaving{ position:absolute; left:50%; top:0; transform:translateX(-50%); pointer-events:none }
+ .msg:hover{ transform:translateY(-2px) }
+ .msg.leaving:hover{ transform:translateX(-50%) }
+
+ .meta{ display:flex; align-items:baseline; gap:calc(9px * var(--pm)); margin-bottom:calc(9px * var(--pm)) }
+ .who{
+  font-size:calc(var(--fs-body) * var(--s)); font-weight:600; color:var(--ink-60);
+  letter-spacing:0.005em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+ }
+ .when{ font-size:calc(var(--fs-caption) * var(--s)); font-weight:500; color:var(--ink-40); white-space:nowrap; margin-left:auto }
+
+ .line{
+  font-size:calc(var(--fs-title) * var(--s)); font-weight:600; line-height:1.24;
+  letter-spacing:-0.016em; color:var(--ink-100);
+ }
+
+ .detail{ height:0; overflow:hidden; opacity:0 }
+ .detail .inner{ padding-top:calc(14px * var(--pm)); display:flex; flex-direction:column; gap:calc(8px * var(--pm)) }
+ .quote{
+  font-size:calc(var(--fs-body) * var(--s)); font-weight:500; line-height:1.4; color:var(--ink-60);
+  padding-left:calc(12px * var(--pm)); border-left:2px solid rgba(255,255,255,0.14);
+ }
+ .quote b{ font-weight:600; color:var(--ink-80) }
+
+ .acts{ display:flex; flex-wrap:wrap; align-items:center; gap:calc(8px * var(--pm)); margin-top:calc(16px * var(--pm)) }
+ .act{
+  appearance:none; font-family:inherit; cursor:pointer;
+  display:inline-flex; align-items:center; gap:calc(7px * var(--s));
+  min-height:calc(38px * var(--s)); padding:0 calc(16px * var(--s));
+  border-radius:var(--r-pill);
+  font-size:calc(var(--fs-body) * var(--s)); font-weight:600; letter-spacing:0.005em;
+  border:1px solid rgba(86,184,255,0.42);
+  background:rgba(86,184,255,0.15); color:#cfe9ff;
+  transition:background var(--dur-fast) var(--ease-prism), border-color var(--dur-fast) var(--ease-prism);
+ }
+ .act:hover{ background:rgba(86,184,255,0.26) }
+ .act.quiet{ border-color:rgba(255,255,255,0.13); background:rgba(255,255,255,0.05); color:var(--ink-60) }
+ .act.quiet:hover{ background:rgba(255,255,255,0.11) }
+ .act svg{ flex:none }
+
+ /* inline failure inside the card */
+ .fail{
+  display:flex; align-items:center; gap:calc(8px * var(--s));
+  margin-top:calc(14px * var(--pm)); padding-top:calc(12px * var(--pm));
+  border-top:1px solid rgba(255,255,255,0.10);
+  font-size:calc(var(--fs-caption) * var(--s)); font-weight:600; color:#ffd08a;
+ }
+
+ /* ---------------- demoted queue trail ---------------- */
+ .queue{
+  display:flex; align-items:center; gap:calc(8px * var(--s));
+  opacity:0.42; flex:none;
+ }
+ .queue i{
+  width:calc(5px * var(--s)); height:calc(5px * var(--s)); border-radius:50%;
+  background:var(--ink-100); display:block;
+ }
+ .queue i.spent{ background:var(--ink-20) }
+ .queue span{ font-size:calc(var(--fs-caption) * var(--s)); font-weight:600; color:var(--ink-80); letter-spacing:0.01em }
+
+ /* ---------------- designed edge screens ---------------- */
+ .edge{
+  width:min(430px, 100%); display:flex; flex-direction:column; align-items:center;
+  text-align:center; gap:calc(8px * var(--pm)); padding:calc(6px * var(--pm)) 0;
+ }
+ .glyph{
+  width:calc(84px * var(--bm)); height:calc(84px * var(--bm)); margin-bottom:calc(8px * var(--pm));
+  display:grid; place-items:center; border-radius:50%;
+  background:radial-gradient(circle at 50% 34%, rgba(30,44,64,0.66), rgba(9,14,22,0.72) 74%);
+  outline:1px solid rgba(255,255,255,0.11);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);
+ }
+ .glyph svg{ width:52%; height:52% }
+ .edge h1{
+  font-size:calc(var(--fs-title) * var(--s)); font-weight:600; letter-spacing:-0.016em;
+  line-height:1.2; color:var(--ink-100);
+ }
+ .edge p{
+  font-size:calc(var(--fs-body) * var(--s)); font-weight:500; line-height:1.42; color:var(--ink-60);
+  max-width:calc(330px * var(--bm));
+ }
+ .edge .act{ margin-top:calc(12px * var(--pm)) }
+
+ /* determinate sync bar — loading is a designed screen, not a spinner */
+ .bar{
+  width:min(260px, 70%); height:calc(4px * var(--s)); margin-top:calc(14px * var(--s));
+  border-radius:999px; background:rgba(255,255,255,0.12); overflow:hidden;
+ }
+ .bar u{
+  display:block; height:100%; width:100%; border-radius:999px;
+  transform-origin:left center; transform:scaleX(0.32);
+  background:linear-gradient(90deg, rgba(86,184,255,0.35), var(--accent));
+ }
+
+ /* no gaze detected yet — the pointer dot stays out of the composition */
+ .stage .gaze-cursor{ opacity:0 }
+ .stage.gazing .gaze-cursor{ opacity:1 }
+
+ @media (prefers-reduced-motion: reduce){
+  .msg, .act, .toggle{ transition-duration:1ms !important }
+ }
+ [data-reduced-motion] .msg,
+ [data-reduced-motion] .act{ transition-duration:1ms !important }
+</style>
+</head>
+<body>
+ <div class="device"><div class="stage-shell"><div class="stage" data-stage></div></div></div>
+
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+import { mountLab, mountWorld } from '/os/shared/lab.js';
+
+const stage = document.querySelector('[data-stage]');
+const os = createOS(stage, { scale: 1 });
+mountWorld(stage, 'street');
+stage.appendChild(os.statusbar());
+
+const surface = document.createElement('main');
+surface.className = 'surface stage-scroll';
+stage.appendChild(surface);
+
+/* ------------------------------------------------------------------ motion --
+   Every transition below runs on the Web Animations API so an in-flight move
+   can be read, cancelled and re-aimed from wherever it currently is. */
+const EASE = getComputedStyle(document.documentElement)
+  .getPropertyValue('--ease-prism').trim() || 'ease';
+const D = { enter: 300, change: 260, leave: 220 };
+
+const reduced = () =>
+  document.documentElement.hasAttribute('data-reduced-motion') ||
+  matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* strip everything but opacity when motion is reduced */
+function flat(frames) {
+  return frames.map((f) => ({ opacity: f.opacity ?? 1 }));
+}
+function play(el, frames, dur) {
+  const rm = reduced();
+  return el.animate(rm ? flat(frames) : frames, {
+    duration: rm ? 1 : dur, easing: EASE, fill: 'both',
+  });
+}
+/* current rendered pose — the basis for retargeting mid-flight */
+function pose(el) {
+  const cs = getComputedStyle(el);
+  return {
+    transform: cs.transform === 'none' ? 'none' : cs.transform,
+    opacity: cs.opacity,
+    filter: cs.filter === 'none' ? 'blur(0px)' : cs.filter,
+  };
+}
+function retarget(el, to, dur) {
+  const from = pose(el);
+  el.getAnimations().forEach((a) => a.cancel());
+  return play(el, [from, to], dur);
+}
+/* height change that keeps its own continuity */
+function resize(el, mutate, dur = D.change) {
+  const h0 = el.getBoundingClientRect().height;
+  mutate();
+  const h1 = el.getBoundingClientRect().height;
+  if (reduced() || Math.abs(h1 - h0) < 1) return;
+  el.getAnimations().forEach((a) => { if (a.effect?.getKeyframes?.()[0]?.height) a.cancel(); });
+  el.animate([{ height: `${h0}px` }, { height: `${h1}px` }],
+    { duration: dur, easing: EASE });
+}
+
+/* -------------------------------------------------------------------- data -- */
+const THREAD = [
+  {
+    who: 'Maya Okonkwo', when: '2 min ago',
+    line: 'Landing at 6:40. Can you grab me at arrivals?',
+    prior: [['Maya', 'Boarding now, gate changed to B12.'], ['You', 'Got it. Text me when you land.']],
+  },
+  {
+    who: 'Dad', when: '11 min ago',
+    line: 'The photos from Sunday came out beautifully.',
+    prior: [['Dad', 'Is the light better in the morning there?'], ['You', 'Much better. Sending a few.']],
+  },
+  {
+    who: 'Ines Ruiz', when: '24 min ago',
+    line: 'Moving our walk to Thursday, same time.',
+    prior: [['Ines', 'Rain all Tuesday apparently.'], ['You', 'Thursday works fine.']],
+  },
+];
+
+const S = { view: 'ready', idx: 0, expanded: false, failed: false, busy: false };
+
+/* -------------------------------------------------------------------- views -- */
+const ICONS = {
+  clear: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.62)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>',
+  sync: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(86,184,255,0.9)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v4h-4"/></svg>',
+  warn: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,208,138,0.92)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5"/><circle cx="12" cy="16.6" r="0.9" fill="rgba(255,208,138,0.92)" stroke="none"/><path d="M12 3.5 21 19.5H3z"/></svg>',
+  offline: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.62)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 8.6A15 15 0 0 1 9 5.4"/><path d="M6 12.4a10 10 0 0 1 3.4-2.2"/><path d="M9.6 16.1a5 5 0 0 1 2.4-1"/><circle cx="12" cy="19.4" r="0.9" fill="rgba(255,255,255,0.62)" stroke="none"/><path d="M3 3l18 18"/><path d="M21.5 8.6a15 15 0 0 0-5.6-3.1"/></svg>',
+  bell: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.62)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5a6 6 0 0 1 12 0c0 4 1.4 5.6 2 6.3H4c.6-.7 2-2.3 2-6.3z"/><path d="M10 19.4a2.2 2.2 0 0 0 4 0"/></svg>',
+};
+
+function el(html) {
+  const t = document.createElement('template');
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+
+function cardHTML(m) {
+  return `
+   <article class="msg" data-card data-focusable tabindex="0"
+            aria-label="Message from ${m.who}. ${m.line}">
+     <div class="meta"><span class="who">${m.who}</span><span class="when">${m.when}</span></div>
+     <p class="line">${m.line}</p>
+     <div class="detail" data-detail><div class="inner">
+       ${m.prior.map(([w, t]) => `<p class="quote"><b>${w}</b> — ${t}</p>`).join('')}
+     </div></div>
+     <div class="acts">
+       <button class="act" data-reply type="button">Reply by voice</button>
+       <button class="act quiet" data-done type="button">Done</button>
+     </div>
+   </article>`;
+}
+
+function queueHTML() {
+  const left = THREAD.length - S.idx - 1;
+  const dots = THREAD.map((_, i) => `<i class="${i <= S.idx ? 'spent' : ''}"></i>`).join('');
+  const label = left === 0 ? 'Last one' : `${left} more waiting`;
+  return `<div class="queue">${dots}<span class="tabular">${label}</span></div>`;
+}
+
+function edge(kind) {
+  const map = {
+    loading: {
+      icon: ICONS.sync, h: 'Catching up',
+      p: 'Pulling the messages that arrived while your glasses were asleep.',
+      bar: true,
+    },
+    empty: {
+      icon: ICONS.clear, h: 'You are all caught up',
+      p: 'Nothing waiting. New messages will arrive here on their own.',
+      btn: 'Look back at today', act: () => reset(),
+    },
+    error: {
+      icon: ICONS.warn, h: 'Messages did not load',
+      p: 'The handoff to your phone timed out. Nothing was lost.',
+      btn: 'Try again', act: () => go('loading', true),
+    },
+    offline: {
+      icon: ICONS.offline, h: 'No connection',
+      p: 'You are seeing what was already on the glasses. New messages resume when you reconnect.',
+      btn: 'Show what I have', act: () => reset(),
+    },
+    denied: {
+      icon: ICONS.bell, h: 'Notifications are off',
+      p: 'Prism can show messages the moment they land, once you allow notifications.',
+      btn: 'Allow notifications', act: () => { grant(); },
+    },
+  }[kind];
+
+  return `
+    <section class="edge">
+      <div class="glyph" aria-hidden="true">${map.icon}</div>
+      <h1>${map.h}</h1>
+      <p>${map.p}</p>
+      ${map.bar ? '<div class="bar" role="progressbar" aria-label="Catching up"><u data-bar></u></div>' : ''}
+      ${map.btn ? `<button class="act" data-edge-act type="button">${map.btn}</button>` : ''}
+    </section>`;
+}
+
+const EDGE_ACT = {
+  empty: () => reset(),
+  error: () => go('loading', true),
+  offline: () => reset(),
+  denied: () => grant(),
+};
+
+/* --------------------------------------------------------------- rendering -- */
+let barAnim = null;
+
+function paint(kind, animateIn = true) {
+  barAnim?.cancel(); barAnim = null;
+  const net = stage.querySelector('[data-sb-net]');
+  if (net) { net.className = kind === 'offline' ? 'dot bad' : 'dot ok'; net.title = kind === 'offline' ? 'no connection' : 'connected'; }
+  surface.innerHTML = '';
+  let node;
+
+  if (kind === 'ready') {
+    const wrap = el(`<div class="stack">${cardHTML(THREAD[S.idx])}</div>`);
+    surface.appendChild(wrap);
+    surface.appendChild(el(queueHTML()));
+    node = wrap.querySelector('[data-card]');
+    wireCard(node);
+  } else {
+    node = el(edge(kind));
+    surface.appendChild(node);
+    const b = node.querySelector('[data-edge-act]');
+    if (b) b.addEventListener('click', () => EDGE_ACT[kind]?.());
+    const fill = node.querySelector('[data-bar]');
+    if (fill && !reduced()) {
+      barAnim = fill.animate(
+        [{ transform: 'scaleX(0.14)' }, { transform: 'scaleX(0.96)' }],
+        { duration: 1500, easing: EASE, fill: 'both' },
+      );
+    }
+  }
+
+  if (animateIn) {
+    play(node, [
+      { transform: 'translateY(22px) scale(0.965)', opacity: 0, filter: 'blur(9px)' },
+      { transform: 'none', opacity: 1, filter: 'blur(0px)' },
+    ], D.enter);
+  }
+  return node;
+}
+
+function wireCard(card) {
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('button')) return;
+    toggleDetail(card);
+  });
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDetail(card); }
+  });
+  card.querySelector('[data-reply]').addEventListener('click', () => sendReply(card));
+  card.querySelector('[data-done]').addEventListener('click', () => advance('done'));
+}
+
+/* change: the card grows around its new content, continuously */
+function toggleDetail(card) {
+  const detail = card.querySelector('[data-detail]');
+  S.expanded = !S.expanded;
+  card.setAttribute('aria-expanded', String(S.expanded));
+  resize(card, () => { detail.style.height = S.expanded ? 'auto' : '0'; });
+  retarget(detail, { opacity: S.expanded ? 1 : 0 }, D.change);
+}
+
+/* an action that can fail, inline, without losing the card */
+function sendReply(card) {
+  if (S.busy) return;
+  S.busy = true;
+  const reply = card.querySelector('[data-reply]');
+  reply.textContent = 'Listening…';
+  setTimeout(() => {
+    S.busy = false;
+    if (S.failed) {
+      S.failed = false;
+      reply.textContent = 'Try again';
+      if (!card.querySelector('.fail')) {
+        const f = el('<p class="fail">Reply did not send. It is saved as a draft.</p>');
+        resize(card, () => card.appendChild(f));
+        play(f, [{ opacity: 0 }, { opacity: 1 }], D.change);
+      }
+      retarget(card, { transform: 'translateX(0px)' }, D.change);
+    } else {
+      reply.textContent = 'Sent';
+      setTimeout(() => advance('sent'), 380);
+    }
+  }, reduced() ? 60 : 460);
+}
+
+/* leave, then enter: the two halves of the same move */
+function advance(reason) {
+  const card = surface.querySelector('[data-card]');
+  if (!card) return;
+  const wrap = card.parentElement;
+  const h0 = wrap.getBoundingClientRect().height;
+  wrap.style.height = `${h0}px`;
+
+  card.classList.add('leaving');
+  const out = retarget(card, {
+    transform: reason === 'sent'
+      ? 'translateX(-50%) translateY(-28px) scale(0.955)'
+      : 'translateX(-50%) translateY(36px) scale(0.94)',
+    opacity: 0, filter: 'blur(8px)',
+  }, D.leave);
+  out.finished.then(() => card.remove()).catch(() => {});
+
+  S.idx += 1;
+  S.expanded = false;
+  if (S.idx >= THREAD.length) {
+    setTimeout(() => {
+      if (S.view !== 'ready') return;
+      S.view = 'empty'; paint('empty'); syncLab('empty');
+    }, reduced() ? 20 : 140);
+    return;
+  }
+
+  setTimeout(() => {
+    if (S.view !== 'ready') { wrap.style.height = ''; return; }
+    const fresh = el(cardHTML(THREAD[S.idx]));
+    wrap.appendChild(fresh);
+    wireCard(fresh);
+    const q = surface.querySelector('.queue');
+    if (q) q.replaceWith(el(queueHTML()));
+
+    /* the frame resizes continuously around the new card, it never snaps */
+    const h1 = fresh.getBoundingClientRect().height;
+    if (!reduced() && Math.abs(h1 - h0) > 1) {
+      wrap.animate([{ height: `${h0}px` }, { height: `${h1}px` }],
+        { duration: D.change, easing: EASE });
+    }
+    wrap.style.height = '';
+
+    play(fresh, [
+      { transform: 'translateY(26px) scale(0.96)', opacity: 0, filter: 'blur(10px)' },
+      { transform: 'none', opacity: 1, filter: 'blur(0px)' },
+    ], D.enter);
+  }, reduced() ? 10 : 90);
+}
+
+function reset() { S.idx = 0; S.expanded = false; go('ready', true); }
+function grant() { go('loading', true); os.banner('<b>Notifications on.</b> Messages will land here.', { top: 52 }); }
+
+function go(view, animateIn = true) {
+  S.view = view;
+  paint(view, animateIn);
+  syncLab(view);
+  if (view === 'loading') {
+    clearTimeout(go._t);
+    go._t = setTimeout(() => { if (S.view === 'loading') { S.idx = 0; go('ready'); } }, reduced() ? 300 : 1500);
+  }
+}
+
+/* ------------------------------------------------------------------- input -- */
+const wake = () => stage.classList.add('gazing');
+stage.addEventListener('pointermove', wake, { once: true });
+stage.addEventListener('pointerdown', wake, { once: true });
+addEventListener('keydown', wake, { once: true });
+
+os.on('back', () => { if (S.view === 'ready') advance('done'); });
+os.on('swipeleft', () => { if (S.view === 'ready') advance('done'); });
+os.on('capture', () => { const c = surface.querySelector('[data-card]'); if (c) sendReply(c); });
+
+/* --------------------------------------------------------------- lab rail --- */
+let labReady = false;
+const lab = mountLab({
+  piece: '16-motion',
+  title: 'Motion',
+  states: ['ready', 'loading', 'empty', 'error', 'offline', 'denied'],
+  onState: (s) => { clearTimeout(go._t); if (s === 'ready') { S.idx = 0; S.expanded = false; } S.view = s; paint(s); if (s === 'loading') go('loading'); },
+  actions: [
+    { label: 'A message arrives', run: () => { if (S.view !== 'ready') { S.idx = 0; go('ready'); } else advance('done'); } },
+    { label: 'Open the thread', run: () => { const c = surface.querySelector('[data-card]'); if (c) toggleDetail(c); } },
+    { label: 'Dismiss with a flick', run: () => { if (S.view === 'ready') advance('done'); } },
+    { label: 'Reply fails to send', run: () => { S.failed = true; const c = surface.querySelector('[data-card]'); if (c) sendReply(c); } },
+    { label: 'Interrupt mid-flight', run: () => {
+        if (S.view !== 'ready') { S.idx = 0; go('ready'); }
+        const c = surface.querySelector('[data-card]');
+        if (c) toggleDetail(c);
+        setTimeout(() => { const d = surface.querySelector('[data-card]'); if (d) advance('done'); }, 90);
+      } },
+  ],
+  onScale: () => paint(S.view, false),
+  onReducedMotion: () => paint(S.view, false),
+});
+
+function syncLab(view) {
+  if (!labReady) return;
+  lab.state = view;
+  [...lab.rail.querySelectorAll('.lab-group')][0]
+    ?.querySelectorAll('.lab-btn')
+    .forEach((b, i) => b.setAttribute('aria-pressed',
+      String(['ready', 'loading', 'empty', 'error', 'offline', 'denied'][i] === view)));
+  const u = new URL(location.href); u.searchParams.set('state', view);
+  history.replaceState(null, '', u);
+}
+labReady = true;
+syncLab(S.view);
+</script>
+</body>
+</html>

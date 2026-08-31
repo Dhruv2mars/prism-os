@@ -102,12 +102,21 @@
       "name": "foundation & materials",
       "wave": 0,
       "surface": "A single real surface that demonstrates glass over world, type scale, and controls in use \u2014 not a token catalog.",
-      "status": "judging",
+      "status": "building",
       "round": 1,
-      "verdict": "gate-pass, awaiting critic",
-      "gap": null,
-      "consecutivePasses": 0,
-      "path": "components/00-foundation/index.html"
+      "verdict": "PASS (1 of 2)",
+      "gap": "Gaze reticle punched through body copy at stage centre (fixed systemically). Remaining: dwell sweep rect not concentric with .ftile; Glass plate at 0.70-0.79 fully occludes the world bloom, so the opening frame of a materials piece reads as a dark slab.",
+      "consecutivePasses": 1,
+      "path": "components/00-foundation/index.html",
+      "history": [
+        {
+          "round": 1,
+          "ours": 74,
+          "visionOS": 71,
+          "horizon": 48,
+          "verdict": "pass"
+        }
+      ]
     },
     {
       "id": "16-motion",
@@ -126,12 +135,21 @@
       "name": "spatial audio & haptics",
       "wave": 0,
       "surface": "Spatial audio placement and the haptic vocabulary, made visible and audible.",
-      "status": "judging",
+      "status": "building",
       "round": 1,
-      "verdict": "gate-pass, awaiting critic",
-      "gap": null,
-      "consecutivePasses": 0,
-      "path": "components/17-audio-haptics/index.html"
+      "verdict": "PASS (1 of 2)",
+      "gap": "Bearing readout collides with the compass-rose \"behind\" label and the source orb in every cue state. Also: at text scale 1.6 the column overflows 676 vs 556 and clips \"Confirm\" and \"Capture\" out of reach.",
+      "consecutivePasses": 1,
+      "path": "components/17-audio-haptics/index.html",
+      "history": [
+        {
+          "round": 1,
+          "ours": 68,
+          "visionOS": 67,
+          "horizon": 46,
+          "verdict": "pass"
+        }
+      ]
     },
     {
       "id": "01-boot",
@@ -466,6 +484,18 @@
     {
       "t": "2026-08-31T07:26:54",
       "event": "Wave 0 live: builder on 16-motion, fresh blind critics on 00-foundation r1 and 17-audio-haptics r1."
+    },
+    {
+      "t": "2026-08-31T07:35:24",
+      "event": "00-foundation r1 PASS \u2014 ours 74, visionOS 71, Horizon 48. Wins focus discipline, typography, edge states, dependability."
+    },
+    {
+      "t": "2026-08-31T07:35:24",
+      "event": "17-audio-haptics r1 PASS \u2014 ours 68, visionOS 67, Horizon 46. Audio verified genuinely spatialized (HRTF panner, synthesized cues), not depicted."
+    },
+    {
+      "t": "2026-08-31T07:35:24",
+      "event": "SYSTEMIC FIX: both critics independently named the gaze reticle occluding glyphs \u2014 it originates in frozen core.js, so it would have hit all 26 pieces. Fixed at altitude in os/shared/lab.js (hardenGaze: hidden until first gaze/pointer, composited as a ring not a filled disc), applied automatically by mountLab. Probe gate now enforces it in every captured frame plus the reticle rest point; negative-tested to confirm it bites."
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os",
