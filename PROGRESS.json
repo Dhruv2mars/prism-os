@@ -153,9 +153,9 @@
       "name": "spatial audio & haptics",
       "wave": 0,
       "surface": "Spatial audio placement and the haptic vocabulary, made visible and audible.",
-      "status": "building",
-      "round": 1,
-      "verdict": "PASS (1 of 2), r2 fix in progress",
+      "status": "judging",
+      "round": 2,
+      "verdict": "PASS r1 (1 of 2), r2 gate green, awaiting second critic",
       "gap": "Bearing readout collides with the compass-rose \"behind\" label and the source orb in every cue state. Also: at text scale 1.6 the column overflows 676 vs 556 and clips \"Confirm\" and \"Capture\" out of reach.",
       "consecutivePasses": 1,
       "path": "components/17-audio-haptics/index.html",
@@ -541,6 +541,10 @@
     {
       "t": "2026-08-31T12:47:50",
       "event": "00-foundation r2 FAIL \u2014 ours 71, tied visionOS 71, Horizon 51. Score went DOWN from 74. Critic measured pixel luminance transmission on the Outdoor backdrop and found the density ladder inverted: the r2 builder tuned materials by eye on Street and believed them honest. Builder respawned and required to print a measured transmission table instead."
+    },
+    {
+      "t": "2026-08-31T12:48:37",
+      "event": "17-audio-haptics r2 finished and independently re-gated: PASS. The r2 draft had moved cardinal labels to an inner radius, parking 'behind' on the stage centre; builder inverted the geometry so words sit outside the rim and the orb orbits inside it, and the two can never meet. Column now fits 556 in 556 at every scale from 0.8 to 3.1 \u2014 edge states were previously 1157px tall and unreachable. Audio engine verified untouched by diff. Second fresh critic dispatched."
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os",
@@ -554,5 +558,14 @@
       ],
       "note": "Interactive controls sized in hardcoded px so they do not grow with --a11y-scale, while surrounding copy does. Sweep is triggered at 3 pieces."
     }
-  }
+  },
+  "deviations": [
+    {
+      "piece": "17-audio-haptics",
+      "item": "Reticle rest-zone rule not enforced above 100% text scale",
+      "detail": "The probe's reticle rest-point check runs at default scale only. The builder self-reported a residual: at exactly 200-240% text the bearing line passes through the stage-centre rest point.",
+      "decision": "Left for the critic to judge rather than gated. The rest-zone rule is a proxy for the real requirement, which is that the reticle must never occlude a glyph; the systemic fix already composites it as a hollow ring that stays invisible until gaze. Extending an absolute centre-clear rule to 240% text would force layouts to keep a hole in the middle of the screen at the exact scale where space is scarcest.",
+      "risk": "If a critic names it, it becomes a real gap and gets fixed."
+    }
+  ]
 }
