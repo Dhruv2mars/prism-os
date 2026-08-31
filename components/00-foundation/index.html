@@ -17,13 +17,43 @@
 
   --as: var(--a11y-scale, 1);
   --t-eyebrow: max(10.5px, calc(11px * var(--as)));
-  --t-name:    calc(19px * var(--as));
-  --t-line:    calc(13.5px * var(--as));
-  --t-hero:    calc(46px * var(--as));
+  --t-word:    calc(40px * min(var(--as), 2.2));
+  --t-line:    calc(15px * var(--as));
+  --t-hero:    calc(48px * min(var(--as), 2.2));
   --t-mid:     calc(18px * var(--as));
   --t-small:   calc(13px * var(--as));
 }
 .surface button { font: inherit; color: inherit; background: none; border: 0; }
+
+/* -------------------------------------------------------------- the world ---
+   The lab paints a passthrough gradient. Real light has structure, and glass
+   is only legible as glass when structure survives it, so this layer adds the
+   things you actually look through a lens at: a horizon, lit windows, a lamp,
+   a post, a silhouette. It is scenery, never UI. */
+.scene { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.scene {
+  background:
+    radial-gradient(80px 80px at 20.5% 35%, rgba(255, 226, 170, 0.34), transparent 70%),
+    radial-gradient(150px 120px at 71% 21%, rgba(255, 222, 168, 0.20), transparent 72%);
+}
+.scene i { position: absolute; display: block; }
+.sc-horizon { left: 0; right: 0; top: 57%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.20) 16%, rgba(255,255,255,0.10) 72%, transparent); }
+.sc-kerb { left: 0; right: 0; top: 74%; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.09) 30%, transparent); }
+.sc-post { left: 11.5%; top: 20%; bottom: 21%; width: 9px; border-radius: 2px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.14)); }
+.sc-lamp { left: 19%; top: 33.4%; width: 22px; height: 22px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,246,220,0.92), rgba(255,220,160,0.30) 46%, transparent 72%); }
+.sc-win { border-radius: 3px;
+  background: linear-gradient(180deg, rgba(255,238,200,0.40), rgba(255,212,148,0.16)); }
+.sc-win.a { left: 66%; top: 15%; width: 52px; height: 21px; }
+.sc-win.b { left: 78.5%; top: 13%; width: 21px; height: 50px; }
+.sc-win.c { left: 60%; top: 29%; width: 25px; height: 21px; opacity: 0.62; }
+.sc-mass { left: -6%; bottom: -8%; width: 46%; height: 36%;
+  background: radial-gradient(64% 74% at 44% 100%, rgba(0,0,0,0.46), transparent 72%); }
+.sc-mass.r { left: auto; right: -8%; width: 36%; height: 26%;
+  background: radial-gradient(60% 70% at 60% 100%, rgba(0,0,0,0.34), transparent 72%); }
 
 /* world dimmer / blackout, painted above the passthrough, below the specimen */
 .veil {
@@ -31,139 +61,189 @@
   transition: opacity var(--dur-base) var(--ease-prism);
   pointer-events: none;
 }
-.surface[data-veil="dim"]  .veil { opacity: 1; background: rgba(4, 7, 11, 0.46); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
-.surface[data-veil="off"]  .veil { opacity: 1; background: rgba(7, 10, 15, 0.94); }
+.surface[data-veil="dim"] .veil { opacity: 1; background: rgba(4, 7, 11, 0.46); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.surface[data-veil="off"] .veil { opacity: 1; background: rgba(7, 10, 15, 0.9); }
 
 .eyebrow {
   position: absolute; top: calc(20px * min(var(--as), 1.4)); left: 26px; z-index: 2;
   font-size: var(--t-eyebrow); font-weight: 700;
   letter-spacing: 0.20em; text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.34);
+  color: rgba(255, 255, 255, 0.30);
 }
 
-.area { position: absolute; inset: 52px 46px 54px; z-index: 2; display: grid; place-items: center; }
+.area { position: absolute; inset: 50px 46px 96px; z-index: 2; display: grid; place-items: center; }
 .stack {
   grid-area: 1 / 1; width: 100%; max-width: 408px;
   display: flex; flex-direction: column; align-items: center;
-  gap: calc(17px * min(var(--as), 1.6));
+  gap: calc(18px * min(var(--as), 1.6));
 }
-.layers { position: relative; width: 100%; min-height: 244px; display: grid; }
+.layers { position: relative; width: 100%; min-height: 240px; display: grid; }
 
 /* ----------------------------------------------------------------- glass ---
-   0.70 -> 0.79 alpha over the world, saturating blur behind, a 1px specular
-   rim on the top edge, and a real two-layer shadow (contact + ambient). */
+   Low fill, high saturation, and the world darkened by multiplication rather
+   than buried under paint — so the structure behind the lens survives, which
+   is the only way a plate reads as glass instead of as a painted rectangle. */
 .plate {
   grid-area: 1 / 1; position: relative;
-  width: 100%; min-height: 244px;
+  width: 100%; min-height: 240px;
   display: grid; place-items: center;
   padding: calc(22px * min(var(--as), 1.5)) calc(26px * min(var(--as), 1.3));
   border-radius: var(--r-lg);
-  background: linear-gradient(158deg, rgba(21, 30, 45, 0.70) 0%, rgba(10, 15, 24, 0.79) 100%);
-  backdrop-filter: saturate(1.5) blur(20px);
-  -webkit-backdrop-filter: saturate(1.5) blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.30), 0 30px 64px -16px rgba(0, 0, 0, 0.62);
+  background: linear-gradient(158deg, rgba(16, 25, 39, 0.30) 0%, rgba(7, 12, 20, 0.46) 100%);
+  backdrop-filter: saturate(1.9) blur(13px) brightness(0.56);
+  -webkit-backdrop-filter: saturate(1.9) blur(13px) brightness(0.56);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.34), 0 30px 64px -16px rgba(0, 0, 0, 0.6);
   transition: opacity var(--dur-base) var(--ease-prism),
               transform var(--dur-base) var(--ease-prism),
               box-shadow var(--dur-fast) var(--ease-prism);
 }
-/* specular rim: a bright hairline riding the top edge + an inner sheen */
-.plate::before {
+/* specular rim: a bright hairline riding the top edge */
+.plate::before, .riser::before, .sheetm::before {
   content: ""; position: absolute; left: 18px; right: 18px; top: 0; height: 1px;
-  border-radius: 1px; pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.52) 20%, rgba(255,255,255,0.62) 58%, transparent);
+  border-radius: 1px; pointer-events: none; z-index: 1;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55) 20%, rgba(255,255,255,0.66) 58%, transparent);
 }
-.plate::after {
+/* sheen: static top-light, plus the travelling highlight that fires on gaze */
+.plate::after, .riser::after, .sheetm::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.09), transparent 16%),
-    radial-gradient(120% 78% at 16% -12%, rgba(150, 200, 255, 0.10), transparent 62%);
+    linear-gradient(112deg, transparent 32%, rgba(255,255,255,0.14) 46%, transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0.10), transparent 18%),
+    radial-gradient(120% 78% at 16% -12%, rgba(150, 200, 255, 0.12), transparent 62%);
+  background-size: 260% 100%, auto, auto;
+  background-position: 165% 0, 0 0, 0 0;
+  background-repeat: no-repeat;
 }
-.plate.is-quiet { opacity: 0.42; transform: scale(0.985); }
-.surface[data-tint="fixed"] .plate {
-  background: linear-gradient(158deg, rgba(19, 26, 38, 0.90) 0%, rgba(9, 13, 20, 0.94) 100%);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+.stage .plate.gaze-focus::after, .stage .plate:focus-visible::after,
+.stage .riser.gaze-focus::after, .stage .riser:focus-visible::after,
+.stage .sheetm.gaze-focus::after, .stage .sheetm:focus-visible::after {
+  animation: sheen 300ms var(--ease-prism) both;
+}
+@keyframes sheen {
+  from { background-position: 165% 0, 0 0, 0 0; }
+  to   { background-position: -65% 0, 0 0, 0 0; }
+}
+
+.plate.is-quiet { opacity: 0.4; transform: scale(0.985); }
+
+/* denied fallback: sensing off, so the tint is fixed and the world is held down */
+.surface[data-tint="fixed"] .plate,
+.surface[data-tint="fixed"] .riser,
+.surface[data-tint="fixed"] .sheetm {
+  background: linear-gradient(158deg, rgba(19, 26, 38, 0.74) 0%, rgba(9, 13, 20, 0.8) 100%);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
 }
 
 /* gaze focus keeps the material shadow and adds the ring + lift */
 .stage .plate.gaze-focus, .stage .plate:focus-visible,
 .stage .riser.gaze-focus, .stage .riser:focus-visible,
-.stage .well.gaze-focus,  .stage .well:focus-visible {
-  box-shadow: 0 2px 6px rgba(0,0,0,0.30), 0 34px 74px -16px rgba(0,0,0,0.66),
+.stage .sheetm.gaze-focus, .stage .sheetm:focus-visible {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.34), 0 34px 74px -16px rgba(0,0,0,0.66),
               0 0 0 2.5px var(--stroke-focus), 0 0 34px rgba(86,184,255,0.34) !important;
   transform: scale(1.014);
 }
 .stage .well.gaze-focus, .stage .well:focus-visible {
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.62), inset 0 -1px 0 rgba(255,255,255,0.06),
-              0 0 0 2.5px var(--stroke-focus), 0 0 30px rgba(86,184,255,0.30) !important;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.7), inset 0 -1px 0 rgba(255,255,255,0.06),
+              0 0 0 2.5px var(--stroke-focus), 0 0 30px rgba(86,184,255,0.3) !important;
 }
-.plate:focus-visible, .riser:focus-visible, .well:focus-visible, .ftile:focus-visible { outline: none; }
+.plate:focus-visible, .riser:focus-visible, .well:focus-visible,
+.sheetm:focus-visible, .ftile:focus-visible { outline: none; }
 
-/* ---------------------------------------------------------------- raised --- */
+/* ---------------------------------------------------------------- raised ---
+   Lifted off the glass: brighter tint, deeper blur, so the world behind it is
+   softer and further away than the world behind the plate underneath. */
 .riser {
   grid-area: 1 / 1; place-self: center;
-  width: 74%; min-height: calc(112px * min(var(--as), 1.5));
+  width: 74%; min-height: calc(116px * min(var(--as), 1.5));
+  display: grid; place-items: center;
   border-radius: var(--r-md);
-  background: linear-gradient(158deg, rgba(47, 61, 86, 0.76) 0%, rgba(24, 34, 51, 0.82) 100%);
-  backdrop-filter: saturate(1.6) blur(26px);
-  -webkit-backdrop-filter: saturate(1.6) blur(26px);
-  border: 1px solid rgba(255, 255, 255, 0.17);
-  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.34), 0 36px 72px -18px rgba(0, 0, 0, 0.70);
+  background: linear-gradient(158deg, rgba(64, 84, 118, 0.40) 0%, rgba(26, 38, 58, 0.56) 100%);
+  backdrop-filter: saturate(2) blur(30px) brightness(0.74);
+  -webkit-backdrop-filter: saturate(2) blur(30px) brightness(0.74);
+  border: 1px solid rgba(255, 255, 255, 0.19);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.36), 0 36px 72px -18px rgba(0, 0, 0, 0.7);
   transform: translateY(-4px);
   transition: transform var(--dur-base) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
 }
-.riser::before {
-  content: ""; position: absolute; left: 16px; right: 16px; top: 0; height: 1px; border-radius: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.62) 26%, rgba(255,255,255,0.70) 62%, transparent);
-}
-.riser, .well { position: relative; }
 
-/* ---------------------------------------------------------------- sunken --- */
+/* ---------------------------------------------------------------- sunken ---
+   A hole in the glass: the world is still there but dim, flat and unsaturated,
+   with no rim light of its own. */
 .well {
   grid-area: 1 / 1; place-self: center;
-  width: 78%; min-height: calc(108px * min(var(--as), 1.5));
+  width: 78%; min-height: calc(112px * min(var(--as), 1.5));
+  display: grid; place-items: center;
   border-radius: var(--r-md);
-  background: rgba(4, 8, 14, 0.55);
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.62),
+  background: rgba(3, 6, 11, 0.42);
+  backdrop-filter: saturate(0.7) blur(4px) brightness(0.34);
+  -webkit-backdrop-filter: saturate(0.7) blur(4px) brightness(0.34);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.7),
               inset 0 -1px 0 rgba(255, 255, 255, 0.06),
-              inset 0 0 0 1px rgba(0, 0, 0, 0.38);
+              inset 0 0 0 1px rgba(0, 0, 0, 0.4);
   transition: box-shadow var(--dur-fast) var(--ease-prism);
 }
 
-/* ------------------------------------------------------------------ type --- */
-.comp { display: flex; flex-direction: column; align-items: center; gap: calc(4px * var(--as)); text-align: center; }
-.t-hero {
-  font-size: var(--t-hero); font-weight: 700; letter-spacing: -0.025em; line-height: 1;
-  font-variant-numeric: tabular-nums; color: var(--ink-100);
+/* ----------------------------------------------------------------- sheet ---
+   The densest surface, for reading: the world survives only as a wash of its
+   own colour, never as its shapes. */
+.sheetm {
+  grid-area: 1 / 1; place-self: stretch;
+  display: grid; place-items: center;
+  border-radius: var(--r-lg);
+  background: linear-gradient(170deg, rgba(20, 30, 45, 0.6) 0%, rgba(9, 15, 24, 0.72) 100%);
+  backdrop-filter: saturate(1.25) blur(44px) brightness(0.5);
+  -webkit-backdrop-filter: saturate(1.25) blur(44px) brightness(0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.38), 0 40px 80px -20px rgba(0, 0, 0, 0.72);
+  transition: transform var(--dur-base) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
 }
-.t-mid  { font-size: var(--t-mid); font-weight: 600; letter-spacing: -0.01em; color: rgba(255,255,255,0.88); }
+.riser, .well, .sheetm { position: relative; }
+
+/* the specimen names itself, at a size you can read while walking */
+.word {
+  position: relative; z-index: 2;
+  font-size: var(--t-word); font-weight: 640; letter-spacing: -0.028em;
+  line-height: 1; color: var(--ink-100);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
+}
+
+/* ------------------------------------------------------------------ type --- */
+.comp { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: calc(4px * var(--as)); text-align: center; }
+.t-hero {
+  font-size: var(--t-hero); font-weight: 700; letter-spacing: -0.028em; line-height: 1;
+  font-variant-numeric: tabular-nums; color: var(--ink-100);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
+}
+.t-mid  { font-size: var(--t-mid); font-weight: 600; letter-spacing: -0.01em; color: rgba(255,255,255,0.9); }
 .t-small{ font-size: var(--t-small); font-weight: 500; color: var(--ink-60); }
 
 /* -------------------------------------------------------------- controls --- */
-.ctl { display: flex; align-items: center; justify-content: center; gap: calc(14px * min(var(--as),1.4)); flex-wrap: wrap; }
+.ctl { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; gap: calc(14px * min(var(--as),1.4)); flex-wrap: wrap; }
 .ctl .btn { min-height: 44px; }
 .ctl .chip { height: calc(30px * min(var(--as), 1.5)); font-size: max(10.5px, calc(11px * var(--as))); }
 .ctl .toggle { appearance: none; -webkit-appearance: none; border: 0; cursor: pointer; }
-.ctl-note { margin-top: calc(14px * var(--as)); font-size: var(--t-small); color: rgba(255,255,255,0.42); text-align: center; }
+.ctl-note { position: relative; z-index: 2; margin-top: calc(14px * var(--as)); font-size: var(--t-small); color: rgba(255,255,255,0.46); text-align: center; }
 
 /* ----------------------------------------------------------------- focus --- */
 .ftile {
   grid-area: 1 / 1; place-self: center; position: relative;
-  width: 224px; min-height: calc(92px * min(var(--as), 1.5));
+  width: calc(228px * min(var(--as), 1.4)); min-height: calc(96px * min(var(--as), 1.5));
   display: grid; place-items: center;
-  border-radius: 22px;
-  background: linear-gradient(158deg, rgba(47, 61, 86, 0.74), rgba(24, 34, 51, 0.80));
-  backdrop-filter: saturate(1.6) blur(24px); -webkit-backdrop-filter: saturate(1.6) blur(24px);
+  border-radius: 24px;
+  background: linear-gradient(158deg, rgba(64, 84, 118, 0.42), rgba(26, 38, 58, 0.58));
+  backdrop-filter: saturate(2) blur(26px) brightness(0.78);
+  -webkit-backdrop-filter: saturate(2) blur(26px) brightness(0.78);
   border: 1px solid rgba(134, 198, 255, 0.55);
-  box-shadow: 0 3px 9px rgba(0,0,0,0.34), 0 0 0 2.5px rgba(86,184,255,0.85), 0 0 36px rgba(86,184,255,0.38);
+  box-shadow: 0 3px 9px rgba(0,0,0,0.36), 0 0 0 2.5px rgba(86,184,255,0.85), 0 0 36px rgba(86,184,255,0.38);
   font-size: var(--t-mid); font-weight: 600; color: var(--ink-100);
   cursor: pointer;
 }
-.dwell-sweep { position: absolute; inset: -9px; overflow: visible; }
+.ftile span { position: relative; z-index: 2; }
+.dwell-sweep { position: absolute; left: -9px; top: -9px; right: -9px; bottom: -9px; overflow: visible; }
 .dwell-sweep rect {
   fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round;
   stroke-dasharray: 100; stroke-dashoffset: 100;
-  vector-effect: non-scaling-stroke;
   animation: sweep 1900ms var(--ease-prism) infinite;
 }
 @keyframes sweep {
@@ -174,10 +254,12 @@
 }
 
 /* --------------------------------------------------------------- caption --- */
-.cap { text-align: center; display: flex; flex-direction: column; gap: calc(4px * var(--as)); }
-.cap-name { font-size: var(--t-name); font-weight: 600; letter-spacing: -0.012em; color: rgba(255,255,255,0.90); }
-.cap-line { font-size: var(--t-line); font-weight: 450; line-height: 1.4; color: rgba(255,255,255,0.56); }
-.surface[data-big="1"] .cap-line, .surface[data-big="1"] .eyebrow { display: none; }
+.cap { text-align: center; }
+.cap-line {
+  font-size: var(--t-line); font-weight: 500; line-height: 1.35;
+  letter-spacing: -0.006em; color: rgba(255, 255, 255, 0.58);
+}
+.surface[data-big="1"] .eyebrow { display: none; }
 
 /* ------------------------------------------------------------------ pips --- */
 .pips {
@@ -186,17 +268,22 @@
 }
 .pip {
   width: 5px; height: 5px; border-radius: 999px;
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.18);
   transition: width var(--dur-base) var(--ease-prism), background var(--dur-base) var(--ease-prism);
 }
-.pip.on { width: 17px; background: rgba(134, 198, 255, 0.85); }
+.pip.on { width: 17px; background: rgba(134, 198, 255, 0.8); }
 .pips[hidden] { display: none; }
 
 /* ------------------------------------------------------------ edge states --- */
-.edge { display: flex; flex-direction: column; align-items: center; text-align: center; gap: calc(9px * min(var(--as),1.5)); }
-.edge-glyph { width: 30px; height: 30px; opacity: 0.72; }
-.edge-title { font-size: var(--t-mid); font-weight: 600; letter-spacing: -0.01em; color: rgba(255,255,255,0.92); }
-.edge-line  { font-size: var(--t-small); line-height: 1.45; color: rgba(255,255,255,0.52); max-width: 27ch; }
+.edge-plate {
+  background: linear-gradient(158deg, rgba(18, 27, 42, 0.5) 0%, rgba(8, 13, 21, 0.66) 100%);
+  backdrop-filter: saturate(1.5) blur(30px) brightness(0.46);
+  -webkit-backdrop-filter: saturate(1.5) blur(30px) brightness(0.46);
+}
+.edge { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; gap: calc(9px * min(var(--as),1.5)); }
+.edge-glyph { width: 32px; height: 32px; opacity: 0.78; }
+.edge-title { font-size: var(--t-mid); font-weight: 600; letter-spacing: -0.012em; color: rgba(255,255,255,0.94); }
+.edge-line  { font-size: var(--t-small); line-height: 1.45; color: rgba(255,255,255,0.55); max-width: 27ch; }
 .edge-acts  { display: flex; align-items: center; gap: 10px; margin-top: calc(6px * var(--as)); flex-wrap: wrap; justify-content: center; }
 .edge-acts .btn { min-height: 40px; font-size: max(11px, calc(13px * var(--as))); padding: 0 var(--sp-4); }
 .bars { display: flex; flex-direction: column; gap: 10px; width: 76%; }
@@ -204,18 +291,13 @@
 .bars i:nth-child(1) { width: 58%; height: 20px; }
 .bars i:nth-child(3) { width: 74%; }
 
-/* larger, more legible gaze cursor than the 10px default */
-.stage .gaze-cursor {
-  width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16), 0 0 20px rgba(86, 184, 255, 0.85);
-}
-
 /* the lab's reduced-motion switch must behave exactly like the OS setting */
 html[data-reduced-motion] *, html[data-reduced-motion] *::before, html[data-reduced-motion] *::after {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
+html[data-reduced-motion] .dwell-sweep rect { stroke-dashoffset: 0; opacity: 0.9; }
 @media (prefers-reduced-motion: reduce) {
   .dwell-sweep rect { stroke-dashoffset: 0; opacity: 0.9; }
 }
@@ -237,6 +319,16 @@ import { mountLab, mountWorld } from '/os/shared/lab.js';
 
 const stage = document.querySelector('[data-stage]');
 const os = createOS(stage, { scale: 1 });
+
+/* scenery behind the lens: what the material has to let through */
+const scene = document.createElement('div');
+scene.className = 'scene';
+scene.setAttribute('aria-hidden', 'true');
+scene.innerHTML =
+  '<i class="sc-horizon"></i><i class="sc-kerb"></i><i class="sc-post"></i>' +
+  '<i class="sc-lamp"></i><i class="sc-win a"></i><i class="sc-win b"></i>' +
+  '<i class="sc-win c"></i><i class="sc-mass"></i><i class="sc-mass r"></i>';
+stage.insertBefore(scene, os.cursor);
 
 /* ---------------------------------------------------------------- surface -- */
 const surface = document.createElement('div');
@@ -276,10 +368,11 @@ function focal(node, label, fn) {
   node.addEventListener('click', act(fn));
   return node;
 }
+const word = (t) => el('span', 'word', t);
 
 /* ------------------------------------------------------------- specimens --- */
 const plate = (opts = {}) => {
-  const p = el(opts.tag || 'div', 'plate' + (opts.quiet ? ' is-quiet' : ''));
+  const p = el(opts.tag || 'div', 'plate' + (opts.quiet ? ' is-quiet' : '') + (opts.edge ? ' edge-plate' : ''));
   if (opts.body) p.appendChild(opts.body);
   return p;
 };
@@ -321,64 +414,99 @@ function controlRow() {
   return wrap;
 }
 
+/* The dwell sweep traces the tile itself: the stroked path is measured from the
+   tile's own box, so its corners stay concentric with the tile's corners at any
+   text size. A viewBox that does not match the box scales the arcs unevenly. */
+const SWEEP_GAP = 9, SWEEP_W = 2.5, TILE_R = 24;
+let sweepObserver = null;
 function focusTile() {
   const t = el('button', 'ftile');
   t.type = 'button';
   t.innerHTML =
-    '<svg class="dwell-sweep" viewBox="0 0 240 108" preserveAspectRatio="none" aria-hidden="true">' +
-    '<rect x="1.5" y="1.5" width="237" height="105" rx="27" pathLength="100"></rect></svg>' +
+    '<svg class="dwell-sweep" aria-hidden="true"><rect pathLength="100"></rect></svg>' +
     '<span>Hold to press</span>';
+  const svg = t.querySelector('svg');
+  const rect = svg.querySelector('rect');
+  const fit = () => {
+    const b = t.getBoundingClientRect();
+    if (!b.width || !b.height) return;
+    const w = b.width + SWEEP_GAP * 2, h = b.height + SWEEP_GAP * 2;
+    svg.setAttribute('viewBox', `0 0 ${w.toFixed(2)} ${h.toFixed(2)}`);
+    rect.setAttribute('x', SWEEP_W / 2);
+    rect.setAttribute('y', SWEEP_W / 2);
+    rect.setAttribute('width', (w - SWEEP_W).toFixed(2));
+    rect.setAttribute('height', (h - SWEEP_W).toFixed(2));
+    rect.setAttribute('rx', TILE_R + SWEEP_GAP - SWEEP_W / 2);
+  };
+  sweepObserver?.disconnect();
+  sweepObserver = new ResizeObserver(fit);
+  sweepObserver.observe(t);
+  requestAnimationFrame(fit);
   return focal(t, 'Hold to press', () => goStep(0, -1));
 }
 
 const STEPS = [
   {
     name: 'Glass',
-    line: 'the material most surfaces are made of',
+    line: 'The material most surfaces are made of.',
     build() {
-      const p = plate();
-      return { node: p, focal: focal(p, 'Show the next material', () => goStep(1, 1)) };
+      const p = plate({ body: word('Glass') });
+      return { node: p, focal: focal(p, 'Glass. Show the next material', () => goStep(1, 1)) };
     },
-    tech: [['Fill', '0.70 → 0.79'], ['Behind', 'blur 20px, saturate 1.5'],
+    tech: [['Fill', '0.30 → 0.46'], ['Behind', 'blur 13, saturate 1.9, 56% light'],
            ['Rim', '1px specular, top edge'], ['Shadow', '2px contact + 30px ambient']],
   },
   {
     name: 'Raised',
-    line: 'for anything that sits on top of glass',
+    line: 'For anything that sits on top of glass.',
     build() {
       const p = plate({ quiet: true });
       const r = el('button', 'riser'); r.type = 'button';
-      focal(r, 'Show the next material', () => goStep(2, 1));
+      r.appendChild(word('Raised'));
+      focal(r, 'Raised. Show the next material', () => goStep(2, 1));
       return { node: [p, r], focal: r };
     },
-    tech: [['Fill', '0.76 → 0.82'], ['Behind', 'blur 26px, saturate 1.6'],
-           ['Rim', '1px at 0.70 alpha'], ['Shadow', '3px contact + 36px ambient']],
+    tech: [['Fill', '0.40 → 0.56, lighter tint'], ['Behind', 'blur 30, saturate 2.0, 74% light'],
+           ['Rim', '1px at 0.66 alpha'], ['Shadow', '3px contact + 36px ambient']],
   },
   {
     name: 'Sunken',
-    line: 'for wells that hold content inside a surface',
+    line: 'For wells that hold content inside a surface.',
     build() {
       const p = plate({ quiet: true });
       const w = el('button', 'well'); w.type = 'button';
-      focal(w, 'Show the next material', () => goStep(3, 1));
+      w.appendChild(word('Sunken'));
+      focal(w, 'Sunken. Show the next material', () => goStep(3, 1));
       return { node: [p, w], focal: w };
     },
-    tech: [['Fill', '0.55 flat, no blur'], ['Depth', 'inset 0 2px 8px'],
-           ['Rim', 'inner 0.06 at the base'], ['Shadow', 'none — it is a hole']],
+    tech: [['Fill', '0.42 flat'], ['Behind', 'blur 4, saturate 0.7, 34% light'],
+           ['Depth', 'inset 0 2px 10px'], ['Shadow', 'none — it is a hole']],
+  },
+  {
+    name: 'Sheet',
+    line: 'For reading. The world stays as colour, not as shapes.',
+    build() {
+      const p = el('button', 'sheetm'); p.type = 'button';
+      p.appendChild(word('Sheet'));
+      focal(p, 'Sheet. Show the next material', () => goStep(4, 1));
+      return { node: p, focal: p };
+    },
+    tech: [['Fill', '0.60 → 0.72'], ['Behind', 'blur 44, saturate 1.25, 50% light'],
+           ['Use', 'long text, one at a time'], ['Shadow', '4px contact + 40px ambient']],
   },
   {
     name: 'Type',
-    line: 'three sizes, one voice, numbers that hold their place',
+    line: 'Three sizes, one voice. Numbers hold their place.',
     build() {
       const p = plate({ body: departure() });
-      return { node: p, focal: focal(p, 'Show the next material', () => goStep(4, 1)) };
+      return { node: p, focal: focal(p, 'Type. Show the next specimen', () => goStep(5, 1)) };
     },
-    tech: [['Sizes', '46 / 18 / 13 px'], ['Weights', '700 / 600 / 500'],
-           ['Numerals', 'tabular-nums, live'], ['Scale', 'multiplied by --a11y-scale']],
+    tech: [['Sizes', '48 / 18 / 13 px'], ['Weights', '700 / 600 / 500'],
+           ['Numerals', 'fixed width, live'], ['Scale', 'follows the text size slider']],
   },
   {
     name: 'Controls',
-    line: 'one button, one chip, one switch — the whole family',
+    line: 'One button, one chip, one switch — the whole family.',
     build() {
       const p = plate({ body: controlRow() });
       return { node: p, focal: p };
@@ -388,20 +516,20 @@ const STEPS = [
   },
   {
     name: 'Focus',
-    line: 'where you look is lit; hold for a moment to press',
+    line: 'Where you look is lit. Hold for a moment to press.',
     build() {
       const p = plate({ quiet: true });
       const t = focusTile();
       return { node: [p, t], focal: t };
     },
-    tech: [['Ring', '2.5px #56b8ff'], ['Halo', '36px bloom at 0.38'],
-           ['Dwell', '350ms to activate'], ['Easing', 'cubic-bezier(0.32,0.72,0,1)']],
+    tech: [['Ring', '2.5px accent'], ['Halo', '36px bloom at 0.38'],
+           ['Dwell', '350ms to activate'], ['Sweep', 'traces the tile edge']],
   },
 ];
 
 /* ----------------------------------------------------------- edge states --- */
 const GLYPH = {
-  empty: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.4"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke-dasharray="3 3.4"/></svg>',
+  empty: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.72)" stroke-width="1.4"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke-dasharray="3 3.4"/></svg>',
   error: '<svg viewBox="0 0 24 24" fill="none" stroke="#ff8f8f" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v5"/><path d="M12 16.1h.01"/></svg>',
   offline: '<svg viewBox="0 0 24 24" fill="none" stroke="#ffd27a" stroke-width="1.5" stroke-linecap="round"><path d="M6.4 17.4h10.2a3.6 3.6 0 0 0 .4-7.18A5.4 5.4 0 0 0 7.5 8.6"/><path d="M4 4l16 16"/></svg>',
   denied: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(134,198,255,.85)" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="10.4" width="14" height="9.2" rx="3"/><path d="M8.4 10.4V8a3.6 3.6 0 0 1 7.2 0"/></svg>',
@@ -427,7 +555,7 @@ function edgeCard({ glyph, title, line, actions, bars }) {
     });
     box.appendChild(acts);
   }
-  return plate({ body: box });
+  return plate({ body: box, edge: true });
 }
 
 const EDGES = {
@@ -463,7 +591,7 @@ const EDGES = {
     tech: [['State', 'no link to the phone'], ['Way out', 'Use the saved set']],
     build: () => edgeCard({
       glyph: 'offline', title: 'You are offline',
-      line: 'The six samples saved on your glasses are still here.',
+      line: 'The seven samples saved on your glasses are still here.',
       actions: [{ label: 'Use the saved set', kind: 'primary', run: () => { step = 0; setState('ready'); } }],
     }),
   },
@@ -494,6 +622,8 @@ function setState(s) { lab.setState(s); }
 
 function render(animate = 1, dir = 1) {
   clearInterval(ticker);
+  sweepObserver?.disconnect();
+  sweepObserver = null;
   area.replaceChildren();
   surface.dataset.tint = tint;
 
@@ -508,7 +638,7 @@ function render(animate = 1, dir = 1) {
     (Array.isArray(built.node) ? built.node : [built.node]).forEach((n) => layers.appendChild(n));
     stack.appendChild(layers);
     const cap = el('div', 'cap');
-    cap.append(el('div', 'cap-name', entry.name), el('div', 'cap-line', entry.line));
+    cap.appendChild(el('div', 'cap-line', entry.line));
     stack.appendChild(cap);
     pips.hidden = false;
     pips.replaceChildren(...STEPS.map((_, i) => el('span', 'pip' + (i === step ? ' on' : ''))));
@@ -534,8 +664,7 @@ function render(animate = 1, dir = 1) {
 let readoutEl = null;
 function readout(entry, name) {
   if (!readoutEl) return;
-  const rows = entry.tech.map(([k, v]) =>
-    `<div class="row"><dt></dt><dd></dd></div>`).join('');
+  const rows = entry.tech.map(() => `<div class="row"><dt></dt><dd></dd></div>`).join('');
   readoutEl.innerHTML = `<h4></h4><dl>${rows}</dl>`;
   readoutEl.querySelector('h4').textContent = name ? `Specimen — ${name}` : 'Specimen — edge state';
   const dts = readoutEl.querySelectorAll('dt');

@@ -104,7 +104,7 @@
       "surface": "A single real surface that demonstrates glass over world, type scale, and controls in use \u2014 not a token catalog.",
       "status": "building",
       "round": 1,
-      "verdict": "PASS (1 of 2)",
+      "verdict": "PASS (1 of 2), r2 fix in progress",
       "gap": "Gaze reticle punched through body copy at stage centre (fixed systemically). Remaining: dwell sweep rect not concentric with .ftile; Glass plate at 0.70-0.79 fully occludes the world bloom, so the opening frame of a materials piece reads as a dark slab.",
       "consecutivePasses": 1,
       "path": "components/00-foundation/index.html",
@@ -125,7 +125,7 @@
       "surface": "Every transition the OS uses, shown on real surfaces: rise, sheet, dismiss, handoff, interrupt.",
       "status": "judging",
       "round": 1,
-      "verdict": "gate-pass, awaiting critic",
+      "verdict": "gate-pass, critic respawned after rate limit",
       "gap": "",
       "consecutivePasses": 0,
       "path": "components/16-motion/index.html"
@@ -137,7 +137,7 @@
       "surface": "Spatial audio placement and the haptic vocabulary, made visible and audible.",
       "status": "building",
       "round": 1,
-      "verdict": "PASS (1 of 2)",
+      "verdict": "PASS (1 of 2), r2 fix in progress",
       "gap": "Bearing readout collides with the compass-rose \"behind\" label and the source orb in every cue state. Also: at text scale 1.6 the column overflows 676 vs 556 and clips \"Confirm\" and \"Capture\" out of reach.",
       "consecutivePasses": 1,
       "path": "components/17-audio-haptics/index.html",
@@ -442,6 +442,13 @@
       "status": "RESOLVED",
       "detail": "All three wave-0 builders terminated with HTTP 429 rate_limit ('You've hit your session limit', model claude-opus-5). 00-foundation and 17-audio-haptics had already written complete files; 16-motion had written nothing.",
       "resolution": "Limit reset. Both written files were re-gated on resume and both exit 0 (GATE: PASS), so no work was lost. 16-motion respawned from scratch."
+    },
+    {
+      "item": "Opus 5 session rate limit \u2014 second hit, killed all three live agents",
+      "status": "RESOLVED, but recurring; recorded as a known operating constraint",
+      "detail": "All three agents (00-foundation r2 builder, 17-audio-haptics r2 builder, 16-motion critic) terminated with HTTP 429 rate_limit, reset 12:10pm Asia/Calcutta. Three parallel Opus agents exhaust the session limit in roughly 30-40 minutes of work.",
+      "resolution": "Both builders had already written complete files before dying \u2014 the Write lands atomically, so no work was lost either time. Each file failed exactly one gate check (00-foundation: stage overflow 648>600; 17-audio-haptics: glyphs in the reticle rest zone) because neither builder reached its self-verify step. Both respawned to finish from the current file state rather than from scratch. The 16-motion critic had written no verdict and was respawned clean.",
+      "mitigation": "Every killed agent's partial output is re-gated by the orchestrator before it is trusted or discarded. The gate is what makes an interrupted run recoverable instead of a loss."
     }
   ],
   "log": [
@@ -500,6 +507,10 @@
     {
       "t": "2026-08-31T07:37:14",
       "event": "16-motion built from scratch and re-gated independently: GATE PASS. One focal element (a live message card), all six transitions on the Web Animations API including a genuine mid-flight retarget. Fresh blind critic dispatched."
+    },
+    {
+      "t": "2026-08-31T12:36:00",
+      "event": "Second rate-limit hit killed all three agents. Re-gated the partial work: both builders' files were complete but each failed one check, so both were respawned to finish rather than restart. 16-motion critic respawned clean. No work lost."
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os",

@@ -9,17 +9,14 @@
  :root{ --s: var(--a11y-scale, 1); }
 
  /* ---------- surface shell ---------- */
- .surface{
-  position:absolute; inset:44px 0 0 0; z-index:2;
-  display:flex; align-items:center; justify-content:flex-start;
-  overflow-y:auto; overscroll-behavior:contain; scrollbar-width:none;
- }
- .surface::-webkit-scrollbar{ display:none }
+ /* the stage never scrolls; this band does, so large text can never strand
+    content outside the lens. Centred only while there is room to centre. */
+ .surface{ z-index:2 }
  .col{
-  width:100%; min-height:100%;
+  box-sizing:border-box; width:100%; min-height:100%;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:calc(10px * var(--s));
-  padding:calc(6px * var(--s)) 30px calc(14px * var(--s));
+  gap:calc(9px * var(--s));
+  padding:calc(8px * var(--s)) 26px calc(16px * var(--s));
  }
 
  /* ---------- title block ---------- */
@@ -36,7 +33,7 @@
 
  /* ---------- head-centred field ---------- */
  .field{
-  --field: clamp(132px, calc(300px - (var(--s) - 1) * 168px), 244px);
+  --field: clamp(128px, calc(300px - (var(--s) - 1) * 172px), 244px);
   --r: calc(var(--field) * 0.375);
   position:relative; flex:none;
   width:var(--field); height:var(--field); border-radius:50%;
@@ -56,16 +53,19 @@
  .field.mono{ cursor:default }
  .field svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible }
 
- .rose{ position:absolute; inset:0; pointer-events:none }
+ /* cardinal words live on an inner ring the orb can never reach: the orb
+    orbits at --r, the words sit at --lr, and --lr + word < --r - orb. */
+ .rose{ position:absolute; inset:0; pointer-events:none; --lr:calc(var(--field) * 0.17) }
  .rose span{
-  position:absolute; left:50%; transform:translateX(-50%);
-  font-size:calc(11px * var(--s)); font-weight:650; letter-spacing:0.09em;
-  color:var(--ink-40); text-transform:lowercase; white-space:nowrap;
+  position:absolute; left:50%; top:50%;
+  font-size:calc(11px * var(--s)); font-weight:650; letter-spacing:0.08em;
+  color:var(--ink-60); text-transform:lowercase; white-space:nowrap;
+  text-shadow:0 1px 3px rgba(4,8,14,0.85);
  }
- .rose .n{ top:calc(6px * var(--s)) }
- .rose .s{ bottom:calc(6px * var(--s)) }
- .rose .w{ left:calc(8px * var(--s)); top:50%; transform:translateY(-50%) }
- .rose .e{ left:auto; right:calc(8px * var(--s)); top:50%; transform:translateY(-50%) }
+ .rose .n{ transform:translate(-50%, calc(-50% - var(--lr))) }
+ .rose .s{ transform:translate(-50%, calc(-50% + var(--lr))) }
+ .rose .w{ transform:translate(calc(-100% - var(--lr) * 0.55), -50%) }
+ .rose .e{ transform:translate(calc(var(--lr) * 0.55), -50%) }
 
  .spoke{
   position:absolute; inset:0; pointer-events:none;
@@ -121,11 +121,19 @@
  }
  .field.mono .spread{ opacity:1 }
 
+ /* its own band, between the rose and the touch pill: the only glyphs in it */
  .bearing{
-  position:absolute; left:50%; bottom:calc(16px * var(--s)); transform:translateX(-50%);
-  font-size:calc(13px * var(--s)); font-weight:650; letter-spacing:0.01em;
-  color:var(--ink-80); white-space:nowrap;
+  display:flex; align-items:center; gap:calc(7px * var(--s));
+  font-size:calc(14px * var(--s)); font-weight:600; letter-spacing:0.01em;
+  color:var(--ink-80); text-align:center; text-wrap:balance;
+  font-variant-numeric:tabular-nums;
  }
+ .bearing::before{
+  content:""; flex:none; width:calc(6px * var(--s)); height:calc(6px * var(--s));
+  border-radius:50%; background:var(--accent); opacity:0.85;
+  box-shadow:0 0 8px rgba(86,184,255,0.55);
+ }
+ .col.tactile .bearing, .field.mono ~ .bearing{ opacity:0.55 }
 
  /* ---------- haptic score ---------- */
  .score{
@@ -173,7 +181,8 @@
 
  /* ---------- action + footer ---------- */
  .play{
-  min-width:calc(168px * var(--s)); min-height:calc(44px * var(--s));
+  min-width:min(calc(168px * var(--s)), 100%); max-width:100%;
+  min-height:calc(44px * var(--s));
   font-size:calc(var(--fs-body) * var(--s));
  }
  .note{
@@ -223,8 +232,14 @@
  .col.tactile .score{ opacity:1; transform:scale(1.06) }
  .col.tactile .score .lbl{ color:var(--ink-60) }
 
- /* ---------- large text: drop the index strip, let the field shrink ---------- */
- .col.lg .index, .col.lg .note{ display:none }
+ /* ---------- large text: shed the quiet layers, keep every meaning ----------
+    At 130% the flavour line and the cardinal words go — the bearing sentence
+    already says the same thing in full words. At 175% the vocabulary strip and
+    the definition go too, leaving name, place, touch, action. */
+ .col.md .note, .col.md .rose, .col.md .score .lbl{ display:none }
+ .col.md .meaning{ max-width:calc(300px * var(--s)) }
+ .col.lg .index, .col.lg .meaning{ display:none }
+ .col.lg{ justify-content:flex-start; gap:calc(12px * var(--s)) }
 
  [data-reduced-motion] .sweep{ animation:none }
  [data-reduced-motion] *{ transition-duration:1ms !important }
@@ -247,7 +262,7 @@ mountWorld(stage, 'street');
 
 stage.appendChild(os.statusbar(`<div class="cluster"><span data-route style="opacity:.62">Open-ear</span></div>`));
 const surface = document.createElement('main');
-surface.className = 'surface';
+surface.className = 'surface stage-scroll';
 stage.appendChild(surface);
 const routeEl = () => stage.querySelector('[data-route]');
 
@@ -472,6 +487,7 @@ function render(){
   clearTimeout(render._t);
   const col = el('div', 'col');
   if (S.tactile && S.view === 'Ready') col.classList.add('tactile');
+  if (S.scale >= 1.3) col.classList.add('md');
   if (S.scale >= 1.75) col.classList.add('lg');
   surface.appendChild(col);
   ({
@@ -536,12 +552,13 @@ function viewReady(col){
     </div>
     <div class="spread" aria-hidden="true"></div>
     <div class="marker" aria-hidden="true"><i></i></div>
-    <div class="spoke" aria-hidden="true"><span class="ripple"></span><span class="orb"></span></div>
-    <span class="bearing"></span>`;
+    <div class="spoke" aria-hidden="true"><span class="ripple"></span><span class="orb"></span></div>`;
+
+  const bearingRow = el('p', 'bearing');
 
   const spoke = field.querySelector('.spoke');
   const marker = field.querySelector('.marker');
-  const bear = field.querySelector('.bearing');
+  const bear = bearingRow;
   const setAz = (az) => {
     c.az = ((az + 540) % 360) - 180;
     spoke.style.setProperty('--az', `${c.az}deg`);
@@ -631,7 +648,7 @@ function viewReady(col){
     index.appendChild(t);
   });
 
-  col.append(head, field, score, play, note, index);
+  col.append(head, field, bearingRow, score, play, note, index);
 }
 
 /* ---------- fire the cue for real ---------- */
