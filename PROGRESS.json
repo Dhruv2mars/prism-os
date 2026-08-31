@@ -123,10 +123,10 @@
       "name": "motion & transition language",
       "wave": 0,
       "surface": "Every transition the OS uses, shown on real surfaces: rise, sheet, dismiss, handoff, interrupt.",
-      "status": "building",
+      "status": "judging",
       "round": 1,
-      "verdict": "builder respawned after rate limit",
-      "gap": null,
+      "verdict": "gate-pass, awaiting critic",
+      "gap": "",
       "consecutivePasses": 0,
       "path": "components/16-motion/index.html"
     },
@@ -496,6 +496,10 @@
     {
       "t": "2026-08-31T07:35:24",
       "event": "SYSTEMIC FIX: both critics independently named the gaze reticle occluding glyphs \u2014 it originates in frozen core.js, so it would have hit all 26 pieces. Fixed at altitude in os/shared/lab.js (hardenGaze: hidden until first gaze/pointer, composited as a ring not a filled disc), applied automatically by mountLab. Probe gate now enforces it in every captured frame plus the reticle rest point; negative-tested to confirm it bites."
+    },
+    {
+      "t": "2026-08-31T07:37:14",
+      "event": "16-motion built from scratch and re-gated independently: GATE PASS. One focal element (a live message card), all six transitions on the Web Animations API including a genuine mid-flight retarget. Fresh blind critic dispatched."
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os",
