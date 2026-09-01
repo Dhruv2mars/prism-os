@@ -81,6 +81,13 @@ const apps = [
   {id:'13', slug:'13-a11y', label:'A11y', sub:'Scale + motion', tint:'linear-gradient(180deg,#a58bff,#3a2a8a)', icon:'♿'},
   {id:'14', slug:'14-onboarding', label:'Onboard', sub:'Pairing', tint:'linear-gradient(180deg,#56b8ff,#0b5ed7)', icon:'→'},
   {id:'15', slug:'15-hud', label:'HUD', sub:'Perf', tint:'linear-gradient(180deg,#2b3242,#0c1424)', icon:'▣'},
+  {id:'16', slug:'16-motion', label:'Motion', sub:'Curves', tint:'linear-gradient(180deg,#a58bff,#5a3ad0)', icon:'∿'},
+  {id:'17', slug:'17-audio-haptics', label:'Feel', sub:'Sound + touch', tint:'linear-gradient(180deg,#ff9e6b,#c9452a)', icon:'◐'},
+  {id:'23', slug:'23-appstore', label:'Apps', sub:'Install', tint:'linear-gradient(180deg,#7ee0a6,#2a9d6a)', icon:'⊞'},
+  {id:'25', slug:'25-devsim', label:'Simulator', sub:'Run a build', tint:'linear-gradient(180deg,#2b3242,#161c28)', icon:'▶'},
+  /* The developer portal is a desktop page, not a 600x600 lens, so it opens in
+     its own tab instead of inside a window that would crop it. */
+  {id:'24', slug:'24-devsdk', label:'Develop', sub:'SDK + docs', tint:'linear-gradient(180deg,#56b8ff,#0b5ed7)', icon:'{}', external:true},
 ];
 
 const viewport = document.createElement('div');
@@ -92,10 +99,39 @@ const now=new Date();
 const hh = String(now.getHours()%12||12).padStart(2,'0'), mm=String(now.getMinutes()).padStart(2,'0'), am=now.getHours()<12?'AM':'PM';
 hero.innerHTML = `
   <div class="shell-hero-icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3.5l6.2 10.8H5.8L12 3.5z" stroke="white" stroke-width="1.7" stroke-linejoin="round"/><path d="M6 11h7.5" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-  <div><div class="shell-title">Prism OS</div><div class="shell-sub tabular">16 pieces · gaze + keys · 600×600</div></div>
+  <div><div class="shell-title">Prism OS</div><div class="shell-sub tabular">21 pieces · gaze + keys · 600×600</div></div>
   <div class="shell-time tabular" aria-live="polite" aria-label="Current time ${hh}:${mm} ${am}">${hh}<span style="opacity:0.7">:</span>${mm} <span class="ampm">${am}</span></div>
 `;
 viewport.appendChild(hero);
+
+/* The three pieces that make the platform a platform are numbered last, which
+   puts them below the fold in a numbered grid. A wearer opening this for the
+   first time should not have to scroll to find the part that actually runs
+   third-party code. */
+const START = [
+  { slug:'23-appstore', label:'Apps', line:'Install a third-party app and grant what it asks for.' },
+  { slug:'25-devsim', label:'Simulator', line:'Run a build against the real system and watch every call.' },
+  { slug:'24-devsdk', label:'Develop', line:'The manifest, the SDK, and how a submission is reviewed.' },
+];
+const startHead = document.createElement('div');
+startHead.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:0 2px';
+startHead.innerHTML='<span style="font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-60)">Start here</span>';
+viewport.appendChild(startHead);
+
+const startList = document.createElement('div');
+startList.style.cssText='display:grid;gap:8px';
+START.forEach(s=>{
+  const a = apps.find(x=> x.slug===s.slug);
+  const btn=document.createElement('button');
+  btn.className='app-btn';
+  btn.setAttribute('data-focusable','');
+  btn.setAttribute('aria-label', `${s.label}. ${s.line}`);
+  btn.style.cssText='display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;text-align:left;padding:10px 14px;min-height:0;border-radius:14px';
+  btn.innerHTML=`<span class="app-icon" style="background:${a.tint};width:38px;height:38px;border-radius:11px" aria-hidden="true">${a.icon}</span><span style="min-width:0"><span class="app-label" style="display:block;font-size:13px;color:var(--ink-100);margin-bottom:3px">${s.label}</span><span style="display:block;font-size:11px;color:var(--ink-60);font-weight:600">${s.line}</span></span>`;
+  btn.addEventListener('click', ()=> openApp(a));
+  startList.appendChild(btn);
+});
+viewport.appendChild(startList);
 
 const head = document.createElement('div');
 head.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:0 2px';
@@ -156,24 +192,38 @@ function closeAll(){
 }
 
 function openApp(a){
-  const href=`/components/${a.slug}/index.html`;
+  const href=`/components/${a.slug}/index.html?lab=0`;
+  if(a.external){ window.open(`/components/${a.slug}/index.html`,'_blank'); return; }
   // prefer iframe sheet for live demo; fallback to banner if blocked
   os.wm.open(a.slug, (layer)=>{
     layer.classList.add('wm-layer-host');
-    layer.style.cssText+=';display:grid;place-items:center;padding:10px;';
+    /* The shell keeps its own status bar; the window starts below it rather than under it. */
+    layer.style.cssText+=';display:grid;place-items:center;padding:46px 10px 10px;';
     const card=document.createElement('div');
     card.className='card raised sheet-in';
-    card.style.cssText='width:100%;max-width:560px;height:520px;display:flex;flex-direction:column;overflow:hidden;padding:0';
+    card.style.cssText='width:100%;max-width:580px;height:100%;display:flex;flex-direction:column;overflow:hidden;padding:0';
     const bar=document.createElement('div');
-    bar.style.cssText='height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 12px;border-bottom:1px solid rgba(255,255,255,0.07);flex:none;background:linear-gradient(180deg,rgba(255,255,255,0.04),transparent)';
+    bar.style.cssText='height:30px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 12px;border-bottom:1px solid rgba(255,255,255,0.07);flex:none;background:linear-gradient(180deg,rgba(255,255,255,0.04),transparent)';
     bar.innerHTML=`<span style="display:flex;align-items:center;gap:8px"><span style="width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:${a.tint};color:#fff;font-size:13px">${a.icon}</span><span style="font-weight:700;font-size:13px">${a.label}</span><span class="caption" style="color:var(--ink-60)">/${a.slug}</span></span><span style="display:flex;gap:6px"><button class="btn ghost" data-focusable aria-label="Open full page" style="min-height:28px;padding:0 10px;font-size:11px">Pop out</button><button class="btn" data-focusable aria-label="Close" style="min-height:28px;padding:0 10px;font-size:11px">Close</button></span>`;
     const [pop, close]=bar.querySelectorAll('button');
     pop.addEventListener('click', ()=> window.open(href,'_blank'));
     close.addEventListener('click', ()=> os.wm.close(a.slug));
+    /* A piece is a 600x600 lens. The window that holds it is smaller than the
+       lens itself, so the frame is rendered at full size and scaled down to
+       fit — cropping it would hide exactly the bottom edge where every piece
+       puts its decisions. Pop out gives it back at 1:1. */
+    const fit=document.createElement('div');
+    fit.style.cssText='flex:1;min-height:0;position:relative;overflow:hidden';
     const frame=document.createElement('iframe');
-    frame.className='wm-iframe'; frame.src=href; frame.title=a.label; frame.setAttribute('loading','lazy');
+    frame.className='wm-iframe'; frame.src=href; frame.title=a.label;
     frame.setAttribute('allow','');
-    card.append(bar, frame);
+    frame.style.cssText='position:absolute;top:50%;left:50%;width:600px;height:600px;border:none;border-radius:0;background:#020407';
+    fit.appendChild(frame);
+    card.append(bar, fit);
+    requestAnimationFrame(()=>{
+      const k=Math.min(fit.clientWidth/600, fit.clientHeight/600);
+      frame.style.transform=`translate(-50%,-50%) scale(${k})`;
+    });
     layer.appendChild(card);
     layer.addEventListener('click', (e)=>{ if(e.target===layer) os.wm.close(a.slug); });
   });

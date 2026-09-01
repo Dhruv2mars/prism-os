@@ -724,7 +724,7 @@ function renderAll(){
  }
  // update os statusbar battery visual (outside our control but we patch)
  const sbBatteryRect = document.querySelector('.statusbar rect[fill="#fff"]');
- const sbBatteryText = document.querySelector('.statusbar .');
+ const sbBatteryText = document.querySelector('.statusbar span.tabular');
  if(sbBatteryRect) sbBatteryRect.setAttribute('width', String(16.2 * (battery/100)));
  if(sbBatteryText && sbBatteryText.textContent.includes('%')) sbBatteryText.textContent = Math.round(battery)+'%';
 

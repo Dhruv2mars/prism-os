@@ -167,7 +167,12 @@ export function mountLab(cfg = {}) {
   } = cfg;
 
   const p = params();
-  document.body.classList.add('has-lab');
+  /* ?lab=0 drops the developer rail. The shell embeds pieces at close to their
+     real size, and 248px of simulator controls inside that window would be
+     both cropped and beside the point — the wearer never sees them. URL state
+     still drives the piece, so a critic can still screenshot any state. */
+  const showRail = p.get('lab') !== '0';
+  if (showRail) document.body.classList.add('has-lab');
 
   if (!document.querySelector('link[data-lab-css]')) {
     const link = document.createElement('link');
@@ -319,7 +324,7 @@ export function mountLab(cfg = {}) {
   note.textContent = 'Simulator chrome. Never rendered on device. Arrows swipe · Enter press · Space capture · Esc back · Tab cycle.';
   rail.appendChild(note);
 
-  document.body.appendChild(rail);
+  if (showRail) document.body.appendChild(rail);
 
   /* apply URL-driven initial conditions */
   applyScale(api.scale);
