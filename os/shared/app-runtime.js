@@ -365,9 +365,22 @@ export class AppRuntime {
       inst.calls++;
       this.emit('call', { id: inst.id, method: m.method, params: m.params });
       let settled = false;
+      /* Every brokered call is timed and its outcome announced. A developer
+         inspecting an app needs to see the verdict and the latency, not just
+         that a call was attempted, and the host is the only place both are
+         known — the app sees its own promise, never the broker's decision. */
+      const started = performance.now();
       const reply = (ok, payload) => {
         if (settled) return;
         settled = true;
+        this.emit('call-done', {
+          id: inst.id,
+          method: m.method,
+          ok,
+          code: ok ? 'ok' : (payload && payload.code) || 'error',
+          message: ok ? '' : (payload && payload.message) || '',
+          ms: Math.round(performance.now() - started),
+        });
         this._send(inst, ok
           ? { type: 'host:reply', id: m.id, ok: true, data: payload }
           : { type: 'host:reply', id: m.id, ok: false, error: payload });
