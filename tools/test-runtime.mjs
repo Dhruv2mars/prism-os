@@ -233,6 +233,37 @@ console.log('\nsuspend + resume + kill');
   check('kill removes the frame from the document', gone.frames === 0, `frames=${gone.frames}`);
 }
 
+/* ---------- system accessibility reaches inside the sandbox ---------- */
+console.log('\nsystem accessibility');
+{
+  await page.evaluate(() => window.rt.launch('transit'));
+  await page.waitForFunction(() => window.rt.instances.get('transit')?.status === 'running', null, { timeout: 9000 });
+
+  await page.evaluate(() => window.rt.setDisplay({ textScale: 2.4, reducedMotion: true }));
+  await page.waitForTimeout(200);
+  const frame = page.frames().find((f) => f.url().includes('/os/apps/transit/'));
+  const inside = await frame?.evaluate(() => ({
+    scale: getComputedStyle(document.documentElement).getPropertyValue('--a11y-scale').trim(),
+    rm: document.documentElement.hasAttribute('data-reduced-motion'),
+  }));
+  check('system text scale reaches inside the app frame', inside?.scale === '2.4', String(inside?.scale));
+  check('system reduced motion reaches inside the app frame', inside?.rm === true, String(inside?.rm));
+
+  /* The whole point of the window sizing itself: bigger text must make the
+     window taller, not clip the app. */
+  const grew = await page.waitForFunction(
+    () => window.rt.instances.get('transit')?.height > 200 ? window.rt.instances.get('transit').height : false,
+    null, { timeout: 4000 },
+  ).then((h) => h.jsonValue()).catch(() => 0);
+  check('the window grows when the wearer enlarges text', grew > 200, `height=${grew}`);
+
+  const clamped = await page.evaluate(() => window.rt.instances.get('transit')?.height);
+  check('a self-reported height is clamped by the host', clamped <= 430, `height=${clamped}`);
+
+  await page.evaluate(() => window.rt.setDisplay({ textScale: 1, reducedMotion: false }));
+  await page.evaluate(() => window.rt.kill('transit'));
+}
+
 /* ---------- watchdog ---------- */
 console.log('\nwatchdog');
 {

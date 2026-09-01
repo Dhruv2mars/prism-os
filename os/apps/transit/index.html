@@ -9,7 +9,6 @@
      platform UI kit, then styles itself. It cannot reach the host page: the
      frame is sandboxed without allow-same-origin, so everything below runs on
      an opaque origin and every capability is asked for across postMessage. */
-  html, body { height: 100%; }
   body {
     margin: 0;
     font: var(--t-body, 400 15px/1.35) var(--font-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif);
@@ -21,9 +20,8 @@
   .app {
     padding: calc(14px * var(--a11y-scale, 1)) calc(16px * var(--a11y-scale, 1));
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto auto;
     gap: calc(10px * var(--a11y-scale, 1));
-    min-height: 0;
   }
   .row { display: flex; align-items: baseline; gap: 8px; justify-content: space-between; }
   .line {

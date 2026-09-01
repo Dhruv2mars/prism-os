@@ -6,1071 +6,813 @@
 <title>Prism OS — Web Apps</title>
 <link rel="stylesheet" href="/os/shared/design-system.css">
 <style>
- .stage{
-  background:
-   radial-gradient(120% 90% at 50% 14%, rgba(42,53,80,0.56) 0%, rgba(20,26,40,0.72) 36%, rgba(10,14,23,0.90) 70%),
-   radial-gradient(68% 46% at 78% 86%, rgba(86,184,255,0.09), transparent 56%),
-   rgba(6,10,16,0.76);
- }
- .stage-shell{
-  position:relative;
-  width:600px;height:600px;
-  display:grid;place-items:center;
-  flex:none;
- }
- /* DEV CHROME — MUST be fixed OUTSIDE .stage */
- .dev-controls{
-  position:fixed;
-  left:50%;
-  bottom:18px;
-  transform:translateX(-50%);
-  display:flex;gap:6px;
-  z-index:1000;
-  justify-content:center;
-  flex-wrap:wrap;
-  pointer-events:none;
-  padding:8px 12px;
-  border-radius:var(--r-pill);
-  background:rgba(10,15,23,0.74);
-  outline:1px solid var(--stroke-glass);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  box-shadow:0 8px 24px rgba(0,0,0,0.32);
-  max-width:92vw;
- }
- .stage .dev-controls{display:none !important}
- .dev-controls .chip{
-  pointer-events:auto;
-  height:26px;padding:0 10px;
-  font-size:11px;font-weight:700;letter-spacing:0.02em;
-  transition:background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
-  border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
- }
- .dev-controls .chip.active{
-  background:linear-gradient(180deg, var(--accent), var(--accent-strong));
-  color:#051423;outline-color:transparent;
- }
- .dev-controls .chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
- .dev-controls .chip.gaze-focus{transform:scale(1.04)}
+/* ---------------------------------------------------------------------------
+   Web Apps. Every surface below is driven by the real runtime in
+   /os/shared/app-runtime.js: the frames are sandboxed, the prompts are raised
+   by actual capability calls from third-party code, and the buttons install,
+   suspend and kill for real. Nothing here is a depiction.
 
- /* viewport */
- .web-viewport{
-  position:absolute;
-  inset:44px 0 0 0;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  padding:10px 12px 72px 12px;
-  overflow-y:auto;
-  overscroll-behavior:contain;
-  scrollbar-width:none;
- }
- .web-viewport::-webkit-scrollbar{display:none}
+   Material ladder, in one place so it can be checked at a glance. The rule is
+   that a surface earns the right to occlude the world in proportion to how
+   committed it is. Fill rises, blur rises, brightness falls, monotonically:
 
- /* header */
- .web-header{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:12px;
-  animation: rise-in 260ms var(--ease-prism) both;
-  padding:2px 2px 0 2px;
- }
- .web-title{font-size:22px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:var(--ink-100)}
- .web-subtitle{font-size:11px;font-weight:600;letter-spacing:0.04em;color:var(--ink-60);line-height:1;margin-top:4px;display:flex;align-items:center;gap:6px}
- .web-subtitle .dot{width:6px;height:6px}
- .header-actions{display:flex;gap:6px;align-items:center;flex:none}
- .hdr-chip{
-  appearance:none;-webkit-appearance:none;border:none;
-  height:28px;padding:0 11px;border-radius:999px;
-  font-size:11px;font-weight:700;letter-spacing:0.02em;
-  display:inline-flex;align-items:center;gap:6px;cursor:pointer;
-  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.07);color:var(--ink-80);
-  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism), outline-color 160ms var(--ease-prism);
- }
- .hdr-chip.primary{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;outline-color:transparent;box-shadow:0 6px 14px rgba(16,92,180,0.22)}
- .hdr-chip.gaze-focus{transform:scale(1.04)}
- .hdr-chip:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
- .hdr-chip:disabled{opacity:0.44;pointer-events:none}
+     app canvas   0.34 fill · blur 12 · brightness 0.90   transient, world-first
+     app chrome   0.52 fill · blur 20 · brightness 0.76   persistent while open
+     sheet        0.78 fill · blur 34 · brightness 0.54   a decision, demands you
+--------------------------------------------------------------------------- */
 
- /* search */
- .search-wrap{
-  position:relative;
-  animation: rise-in 260ms var(--ease-prism) both;
-  animation-delay:30ms;
- }
- .search-field{
-  width:100%;
-  height:36px;
-  border-radius:999px;
-  border:none;
-  background:rgba(255,255,255,0.06);
-  outline:1px solid rgba(255,255,255,0.07);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  padding:0 12px 0 34px;
-  color:var(--ink-80);
-  font-size:14px;font-weight:500;letter-spacing:0.01em;
-  font-family:var(--font);
- }
- .search-field::placeholder{color:var(--ink-40);font-size:14px}
- .search-field:focus{outline:1.5px solid var(--stroke-focus);background:rgba(255,255,255,0.08);color:var(--ink-100)}
- .search-icon{
-  position:absolute;left:11px;top:50%;transform:translateY(-50%);
-  width:16px;height:16px;display:grid;place-items:center;color:var(--ink-40);pointer-events:none;
- }
- .search-meta{
-  position:absolute;right:8px;top:50%;transform:translateY(-50%);
-  display:inline-flex;align-items:center;gap:4px;
-  height:22px;padding:0 8px;border-radius:999px;
-  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);
-  font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);
-    font-variant-numeric:tabular-nums;
- }
+:root {
+  --s: var(--a11y-scale, 1);
+  /* Type scales all the way; space and icons do not. At 310% a linearly scaled
+     layout spends the whole lens on padding and there is nowhere left to read. */
+  --sp: min(var(--s), 1.5);
+  --glyph: calc(26px * var(--sp));
+}
 
- /* group */
- .group{ display:flex;flex-direction:column;gap:6px; animation: rise-in 260ms var(--ease-prism) both; }
- .group:nth-of-type(1){animation-delay:50ms}
- .group:nth-of-type(2){animation-delay:80ms}
- .group:nth-of-type(3){animation-delay:110ms}
- .group-head{
-  display:flex;align-items:center;gap:8px;
-  padding:0 4px;
- }
- .group-label{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-60)}
-  .group-count{font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-40);background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);padding:3px 6px;border-radius:999px;font-variant-numeric:tabular-nums}
- .group-line{flex:1;height:1px;background:rgba(255,255,255,0.06)}
+.stage { background: transparent; }
 
- /* app grid */
- .installed-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
- .store-list{ display:flex; flex-direction:column; gap:8px; }
- .app-card{
-  background:var(--mat-glass);
-  backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
-  outline:1px solid var(--stroke-glass);
-  border-radius:18px;
-  padding:12px;
-  display:flex;flex-direction:column;gap:10px;
-  box-shadow:0 12px 28px rgba(0,0,0,0.22);
-  position:relative;overflow:hidden;
-  cursor:pointer;
-  transition: transform 260ms var(--ease-prism), outline-color 160ms var(--ease-prism), box-shadow 160ms var(--ease-prism), background 160ms var(--ease-prism), opacity 160ms var(--ease-prism);
- }
- .app-card::after{
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg, rgba(255,255,255,0.04), transparent 46%);
-  pointer-events:none;border-radius:inherit;
- }
- .app-card:hover{transform:translateY(-1px)}
- .app-card.gaze-focus{
-  transform:scale(1.015) translateY(-1px);
-  outline-color:var(--stroke-focus);
-  box-shadow:0 0 0 2.5px rgba(86,184,255,0.14), 0 16px 36px rgba(0,0,0,0.34);
-  background:var(--mat-raised);
- }
- .app-card:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
- .app-card:active{transform:scale(0.99)}
- .app-card.is-offline{opacity:0.86}
- .app-card.is-store-dim{opacity:0.42;pointer-events:none}
+.surface {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: calc(14px * var(--sp)) calc(16px * var(--sp)) calc(12px * var(--sp));
+  gap: calc(10px * var(--sp));
+  box-sizing: border-box;
+  min-height: 0;
+}
 
- .app-top{display:flex;gap:10px;align-items:center;position:relative;z-index:1}
- .app-icon{
-  width:42px;height:42px;border-radius:12px;
-  display:grid;place-items:center;flex:none;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.08), 0 6px 16px rgba(0,0,0,0.22);
-  outline:1px solid rgba(255,255,255,0.08);
-  color:#fff;font-weight:800;font-size:17px;letter-spacing:-0.02em;
-  position:relative;overflow:hidden;
- }
- .app-icon svg{width:20px;height:20px;display:block}
- .app-meta{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
- .app-name{font-size:14px;font-weight:700;color:var(--ink-100);letter-spacing:-0.01em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
-  .app-domain{font-size:11px;font-weight:600;color:var(--ink-60);letter-spacing:0.02em;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- .trust-dot{width:14px;height:14px;border-radius:50%;display:grid;place-items:center;flex:none;background:rgba(76,212,124,0.14);outline:1px solid rgba(76,212,124,0.18)}
- .app-desc{font-size:11px;font-weight:500;color:var(--ink-60);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;position:relative;z-index:1}
- .perm-row{display:flex;gap:6px;flex-wrap:wrap;position:relative;z-index:1}
- .perm-badge{
-  display:inline-flex;align-items:center;gap:5px;
-  height:22px;padding:0 8px;border-radius:999px;
-  background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.07);
-  font-size:11px;font-weight:600;color:var(--ink-60);letter-spacing:0.01em;line-height:1;
-    font-variant-numeric:tabular-nums;
- }
- .perm-badge svg{width:11px;height:11px;display:block;opacity:0.92;flex:none}
- .perm-badge.trusted{background:rgba(76,212,124,0.10);outline-color:rgba(76,212,124,0.18);color:var(--ok)}
- .perm-badge.needs{background:rgba(255,194,71,0.10);outline-color:rgba(255,194,71,0.18);color:var(--warn)}
- .app-foot{display:flex;align-items:center;gap:8px;margin-top:2px;position:relative;z-index:1}
-  .app-version{font-size:11px;font-weight:600;color:var(--ink-40);font-variant-numeric:tabular-nums;letter-spacing:0.02em;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- .btn-small{
-  appearance:none;-webkit-appearance:none;border:none;
-  height:28px;padding:0 12px;border-radius:999px;
-  font-size:11px;font-weight:700;letter-spacing:0.02em;
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  cursor:pointer;flex:none;
-  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism), outline-color 160ms var(--ease-prism), box-shadow 160ms var(--ease-prism);
- }
- .btn-small.primary{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;box-shadow:0 6px 14px rgba(16,92,180,0.22)}
- .btn-small.ghost{background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80)}
- .btn-small.gaze-focus{transform:scale(1.04);outline:2px solid var(--stroke-focus);outline-offset:1px}
- .btn-small:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
- .btn-small:disabled{opacity:0.42;pointer-events:none}
- .btn-small.installing{background:rgba(255,255,255,0.12);color:var(--ink-60);box-shadow:none}
+/* ---------- header ---------- */
+.head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: calc(10px * var(--sp));
+  min-width: 0;
+}
+.head h1 {
+  margin: 0;
+  font-size: calc(var(--fs-callout) * var(--s));
+  font-weight: 640;
+  letter-spacing: -0.01em;
+  color: var(--ink-100);
+  white-space: nowrap;
+}
+.head .count {
+  font-size: calc(var(--fs-caption) * var(--s));
+  color: var(--ink-60);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 
- /* store card is horizontal */
- .store-card{display:flex;gap:12px;align-items:center}
- .store-card .app-top{flex:1}
- .store-card .app-foot{margin-top:0}
- .store-card .store-meta{flex:1;min-width:0}
+/* ---------- scroll region ---------- */
+.main { min-height: 0; overflow: auto; scrollbar-width: thin; align-content: start; }
+.main::-webkit-scrollbar { width: 4px; }
+.main::-webkit-scrollbar-thumb { background: var(--ink-20); border-radius: 999px; }
 
- /* offline banner */
- .offline-banner{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:14px;
-  background:rgba(0,0,0,0.38);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  outline:1px solid rgba(255,255,255,0.06);
-  animation: rise-in 260ms var(--ease-prism) both;
- }
+/* ---------- launcher ---------- */
+.list { display: grid; gap: calc(8px * var(--s)); align-content: start; }
 
- /* hintbar */
- .hintbar{
-  position:absolute;left:12px;right:12px;bottom:12px;z-index:540;
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  padding:8px 10px;border-radius:12px;
-  background:rgba(0,0,0,0.38);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  outline:1px solid rgba(255,255,255,0.06);
-  font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-60);line-height:1;
- }
- .hintbar strong{color:var(--ink-80);font-weight:700;letter-spacing:0.02em;text-transform:none;font-size:11px}
- .hint-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.6);flex:none;display:inline-block}
+.app-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: calc(11px * var(--sp));
+  padding: calc(10px * var(--sp)) calc(12px * var(--sp));
+  border-radius: var(--r-md);
+  background: rgba(10, 15, 23, 0.52);
+  backdrop-filter: saturate(1.3) blur(20px) brightness(0.76);
+  -webkit-backdrop-filter: saturate(1.3) blur(20px) brightness(0.76);
+  outline: 1px solid var(--stroke-glass);
+  text-align: left;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.app-row:focus-visible { outline: 2.5px solid var(--stroke-focus); outline-offset: 2px; }
 
- /* state layer */
- .state-layer{
-  position:absolute;inset:44px 0 0 0;z-index:520;
-  display:none;overflow-y:auto;scrollbar-width:none;
-  padding:12px 14px 14px 14px;
- }
- .state-layer::-webkit-scrollbar{display:none}
- .state-layer.on{display:block;animation: rise-in 260ms var(--ease-prism) both}
- .state-layer.dim-on{display:grid;place-items:center;padding:12px 14px;animation: rise-in 260ms var(--ease-prism) both}
- .state-card{
-  width:100%;max-width:420px;
-  background:var(--mat-raised);backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
-  outline:1px solid var(--stroke-glass);border-radius:var(--r-lg);
-  padding:24px 20px 18px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;
-  box-shadow:0 18px 44px rgba(0,0,0,0.36);animation: rise-in 260ms var(--ease-prism) both;position:relative;overflow:hidden;
- }
- .state-card::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 60% at 50% 8%, rgba(86,184,255,0.08), transparent 62%);pointer-events:none}
- .state-illus{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.08);margin-bottom:2px;position:relative}
- .state-illus.danger{background:rgba(255,93,93,0.10);outline-color:rgba(255,93,93,0.18)}
- .state-illus.warn{background:rgba(255,194,71,0.10);outline-color:rgba(255,194,71,0.18)}
- .state-title{font-size:18px;font-weight:800;letter-spacing:-0.02em;color:var(--ink-100);line-height:1.1;position:relative}
- .state-body{font-size:14px;font-weight:500;color:var(--ink-60);line-height:1.45;max-width:300px;position:relative}
- /* use 14px body but keep 3 sizes: title 18? actually title 18 is 4th size. Need to keep 3 sizes max per card: we use 18,14,11 . That's 3. So adjust state-title to 18 is okay if we consider card uses 18+14+11. But header is 22. Different card can have different sizes. Ensure we don't exceed 3 per card. We'll set state-title 18, body 14, caption 11. That's 3. */
- .state-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px;position:relative}
- .state-actions .btn{min-height:36px;font-size:14px}
- .skeleton{border-radius:var(--r-sm);background: linear-gradient(100deg, rgba(255,255,255,0.06) 40%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.06) 60%);background-size:200% 100%;animation: shimmer 1.2s linear infinite}
+.glyph {
+  width: var(--glyph); height: var(--glyph);
+  min-width: var(--glyph);
+  border-radius: calc(8px * var(--sp));
+  display: grid; place-items: center;
+  font-size: calc(13px * var(--s));
+  font-weight: 680;
+  color: #08101a;
+  background: var(--app-accent, var(--accent));
+}
+.app-name {
+  font-size: calc(var(--fs-body) * var(--s));
+  font-weight: 600;
+  color: var(--ink-100);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.app-badge {
+  font-size: calc(var(--fs-caption) * var(--s));
+  color: var(--ink-60);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.run-dot {
+  width: calc(7px * var(--sp)); height: calc(7px * var(--s));
+  min-width: calc(7px * var(--sp));
+  border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 0 calc(3px * var(--s)) rgba(76, 212, 124, 0.16);
+}
+.run-dot[data-suspended] { background: var(--ink-40); box-shadow: none; }
+.run-dot[data-hidden] { visibility: hidden; }
 
- /* browser window sheet */
- .browser-sheet{
-  width:min(540px, calc(100% - 24px));
-  max-width:540px;
-  max-height:520px;
-  background:var(--mat-sheet);
-  backdrop-filter:var(--blur-heavy);-webkit-backdrop-filter:var(--blur-heavy);
-  border-radius:var(--r-lg);
-  outline:1px solid var(--stroke-glass);
-  box-shadow:0 24px 56px rgba(0,0,0,0.46), inset 0 1px 0 rgba(255,255,255,0.06);
-  overflow:hidden;
-  display:flex;flex-direction:column;
-  position:relative;
- }
- .browser-sheet::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg, rgba(255,255,255,0.05), transparent 38%);pointer-events:none;border-radius:inherit}
- .browser-bar{
-  height:46px;flex:none;
-  display:flex;align-items:center;gap:8px;
-  padding:0 10px;
-  border-bottom:1px solid rgba(255,255,255,0.07);
-  background:linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
-  position:relative;z-index:1;
- }
- .browser-back{
-  appearance:none;-webkit-appearance:none;border:none;
-  width:34px;height:34px;border-radius:999px;
-  display:grid;place-items:center;
-  background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80);
-  cursor:pointer;flex:none;
-  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism);
- }
- .browser-back.gaze-focus{transform:scale(1.06);outline-color:var(--stroke-focus);background:rgba(255,255,255,0.12);color:var(--ink-100)}
- .browser-back:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
- .url-pill{
-  flex:1;min-width:0;height:30px;
-  display:flex;align-items:center;gap:6px;
-  padding:0 10px 0 10px;
-  border-radius:999px;
-  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);
-  color:var(--ink-80);
-  font-size:11px;font-weight:600;letter-spacing:0.02em;
-    font-variant-numeric:tabular-nums;
-  justify-content:center;
-  text-align:center;
- }
- .url-pill strong{font-size:11px;color:var(--ink-100);font-weight:700;letter-spacing:0.01em}
- .url-pill .lock{width:12px;height:12px;display:grid;place-items:center;color:var(--ok);flex:none}
- .trust-chip{
-  display:inline-flex;align-items:center;gap:5px;
-  height:24px;padding:0 8px;border-radius:999px;
-  background:rgba(76,212,124,0.10);outline:1px solid rgba(76,212,124,0.18);
-  color:var(--ok);font-size:11px;font-weight:700;letter-spacing:0.02em;flex:none;
- }
- .perm-gate{
-  flex:none;
-  display:flex;flex-direction:column;gap:8px;
-  padding:10px 12px;
-  border-bottom:1px solid rgba(255,255,255,0.06);
-  background:rgba(255,255,255,0.03);
-  position:relative;z-index:1;
- }
- .gate-head{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-60);display:flex;align-items:center;gap:6px}
- .gate-row{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;border-radius:12px;
-  background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);
- }
- .gate-icon{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;flex:none;background:rgba(255,255,255,0.07);outline:1px solid rgba(255,255,255,0.07);color:var(--ink-80)}
- .gate-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
- .gate-title{font-size:14px;font-weight:700;color:var(--ink-100);letter-spacing:-0.01em;line-height:1}
- .gate-sub{font-size:11px;font-weight:500;color:var(--ink-60);letter-spacing:0.01em;line-height:1}
- .gate-actions{display:flex;gap:6px;flex:none}
- .gate-btn{
-  appearance:none;-webkit-appearance:none;border:none;
-  height:26px;padding:0 10px;border-radius:999px;
-  font-size:11px;font-weight:700;letter-spacing:0.02em;cursor:pointer;
-  display:inline-flex;align-items:center;justify-content:center;
-  transition: transform 260ms var(--ease-prism), background 160ms var(--ease-prism), outline-color 160ms var(--ease-prism);
- }
- .gate-btn.allow{background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;box-shadow:0 4px 10px rgba(16,92,180,0.18)}
- .gate-btn.block{background:rgba(255,255,255,0.08);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80)}
- .gate-btn.selected{outline:2px solid var(--stroke-focus);outline-offset:1px}
- .gate-btn.gaze-focus{transform:scale(1.04)}
- .gate-btn:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
- .gate-btn:disabled{opacity:0.44;pointer-events:none}
- .browser-content{
-  flex:1;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;
-  padding:12px;display:flex;flex-direction:column;gap:10px;
-  background:
-   radial-gradient(120% 90% at 50% 0%, rgba(86,184,255,0.08), transparent 60%),
-   rgba(6,10,16,0.14);
-  position:relative;z-index:1;
- }
- .browser-content::-webkit-scrollbar{display:none}
- .mock-card{
-  background:var(--mat-glass);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);
-  outline:1px solid var(--stroke-glass);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;
-  box-shadow:0 8px 20px rgba(0,0,0,0.18);
- }
- .mock-title{font-size:14px;font-weight:700;color:var(--ink-100);letter-spacing:-0.01em;line-height:1}
- .mock-sub{font-size:11px;font-weight:500;color:var(--ink-60);line-height:1.35}
- .browser-footer{
-  flex:none;
-  display:flex;align-items:center;gap:8px;
-  padding:10px 12px;
-  border-top:1px solid rgba(255,255,255,0.06);
-  background:var(--mat-raised);
-  position:relative;z-index:1;
- }
+/* Exactly one row is loud. The lead is whatever the wearer would resume — a
+   running app, otherwise the first one — and every other row is a quiet index
+   entry until gaze lands on it. A list of equals has no focal element, and on a
+   600px monocular display that reads as noise. */
+.app-row[data-lead] { padding: calc(14px * var(--s)) calc(12px * var(--s)); }
+.app-row[data-lead] .glyph { --glyph: calc(38px * var(--s)); font-size: calc(18px * var(--s)); }
+.app-row[data-lead] .app-name { font-size: calc(var(--fs-callout) * var(--s)); font-weight: 660; }
 
- button:focus-visible, [data-focusable]:focus-visible{outline:2.5px solid var(--stroke-focus);outline-offset:2px}
- @media (prefers-reduced-motion: reduce){
-  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important}
- }
+.app-row:not([data-lead]) {
+  background: rgba(10, 15, 23, 0.34);
+  backdrop-filter: saturate(1.15) blur(12px) brightness(0.90);
+  -webkit-backdrop-filter: saturate(1.15) blur(12px) brightness(0.90);
+}
+.app-row:not([data-lead]) .app-name { color: var(--ink-80); font-weight: 560; }
+.app-row:not([data-lead]) .app-badge { color: var(--ink-40); }
+.app-row:not([data-lead]) .glyph { opacity: 0.62; }
+.app-row:not([data-lead]).gaze-focus .glyph,
+.app-row:not([data-lead]):hover .glyph { opacity: 1; }
+
+/* ---------- running app ---------- */
+/* The window is a frame, not a slab: it carries no fill of its own so the bar
+   and the canvas each composite once against the world. Nesting two
+   backdrop-filters would multiply them and quietly break the ladder. */
+.window {
+  display: grid;
+  grid-template-rows: auto auto;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  outline: 1px solid var(--stroke-glass);
+}
+.win-bar {
+  display: flex; align-items: center; gap: calc(8px * var(--s));
+  padding: calc(7px * var(--sp)) calc(10px * var(--sp));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  min-width: 0;
+  background: rgba(10, 15, 23, 0.52);
+  backdrop-filter: saturate(1.3) blur(20px) brightness(0.76);
+  -webkit-backdrop-filter: saturate(1.3) blur(20px) brightness(0.76);
+}
+.win-title {
+  font-size: calc(var(--fs-caption) * var(--s));
+  font-weight: 620;
+  color: var(--ink-80);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.win-origin {
+  font-size: calc(var(--fs-caption) * var(--s));
+  color: var(--ink-40);
+  margin-left: auto;
+  white-space: nowrap;
+}
+.canvas {
+  position: relative;
+  height: var(--app-h, 200px);
+  transition: height var(--dur-base) var(--ease-prism);
+  background: rgba(10, 15, 23, 0.34);
+  backdrop-filter: saturate(1.15) blur(12px) brightness(0.90);
+  -webkit-backdrop-filter: saturate(1.15) blur(12px) brightness(0.90);
+}
+.canvas iframe.app-frame {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: 0;
+  display: block;
+}
+.canvas[data-suspended]::after {
+  content: "Paused";
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-size: calc(var(--fs-caption) * var(--s));
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink-60);
+  background: rgba(6, 10, 16, 0.62);
+  backdrop-filter: blur(3px);
+}
+
+/* ---------- messages (empty / error / offline / denied) ---------- */
+:root[data-reduced-motion] .canvas { transition: none; }
+
+.msg {
+  display: grid; gap: calc(7px * var(--s));
+  align-content: center; justify-items: start;
+  height: 100%;
+  padding: calc(4px * var(--sp)) calc(2px * var(--sp));
+  max-width: 40ch;
+}
+.msg-icon {
+  width: calc(28px * var(--sp)); height: calc(28px * var(--s));
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--msg-wash, var(--ink-10));
+  color: var(--msg-ink, var(--ink-80));
+  font-size: calc(14px * var(--s));
+  font-weight: 700;
+}
+.msg h2 {
+  margin: 0;
+  font-size: calc(var(--fs-body) * var(--s));
+  font-weight: 620;
+  color: var(--ink-100);
+}
+.msg p {
+  margin: 0;
+  font-size: calc(var(--fs-caption) * var(--s));
+  line-height: 1.45;
+  color: var(--ink-60);
+}
+
+/* ---------- footer actions ---------- */
+.foot { display: flex; gap: calc(6px * var(--s)); flex-wrap: wrap; align-items: center; }
+.act {
+  font: inherit;
+  font-size: calc(var(--fs-caption) * var(--s));
+  font-weight: 580;
+  color: var(--ink-80);
+  background: rgba(255, 255, 255, 0.08);
+  outline: 1px solid var(--stroke-glass);
+  border: 0;
+  border-radius: var(--r-pill);
+  padding: calc(6px * var(--sp)) calc(12px * var(--sp));
+  min-height: calc(26px * var(--sp));
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease-prism);
+}
+.act:hover { background: rgba(255, 255, 255, 0.14); }
+.act:focus-visible { outline: 2.5px solid var(--stroke-focus); outline-offset: 2px; }
+.act[data-primary] {
+  color: var(--ink-100);
+  background: var(--accent-wash);
+  outline-color: rgba(86, 184, 255, 0.42);
+}
+.act[data-danger] { color: #ffc9c9; background: rgba(255, 93, 93, 0.14); outline-color: rgba(255, 93, 93, 0.34); }
+
+/* ---------- permission sheet ---------- */
+.scrim {
+  position: absolute; inset: 0;
+  background: rgba(4, 7, 12, 0.42);
+  backdrop-filter: blur(2px);
+  z-index: 40;
+}
+.sheet {
+  position: absolute;
+  left: calc(14px * var(--sp)); right: calc(14px * var(--s));
+  bottom: calc(14px * var(--sp));
+  max-height: calc(100% - 28px * var(--s));
+  overflow: auto;
+  z-index: 41;
+  box-sizing: border-box;
+  padding: calc(14px * var(--sp));
+  border-radius: var(--r-lg);
+  background: rgba(8, 12, 19, 0.78);
+  backdrop-filter: saturate(1.35) blur(34px) brightness(0.54);
+  -webkit-backdrop-filter: saturate(1.35) blur(34px) brightness(0.54);
+  outline: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 -18px 48px rgba(0, 0, 0, 0.5);
+  display: grid;
+  gap: calc(9px * var(--sp));
+}
+.sheet .ask {
+  margin: 0;
+  font-size: calc(var(--fs-body) * var(--s));
+  font-weight: 640;
+  line-height: 1.3;
+  color: var(--ink-100);
+}
+.sheet .reason {
+  margin: 0;
+  font-size: calc(var(--fs-caption) * var(--s));
+  line-height: 1.45;
+  color: var(--ink-80);
+}
+.sheet .why {
+  margin: 0;
+  font-size: calc(var(--fs-caption) * var(--s));
+  line-height: 1.45;
+  color: var(--ink-60);
+  padding-left: calc(9px * var(--sp));
+  border-left: 2px solid var(--risk-ink, var(--ink-20));
+}
+.sheet .buttons { display: flex; gap: calc(8px * var(--s)); flex-wrap: wrap; }
+.sheet .buttons .act { flex: 1 1 auto; min-width: calc(96px * var(--s)); text-align: center; justify-content: center; }
+
+/* ---------- permission manager ---------- */
+.perm-app { display: grid; gap: calc(6px * var(--s)); margin-bottom: calc(10px * var(--s)); }
+.perm-app > h3 {
+  margin: 0;
+  font-size: calc(var(--fs-caption) * var(--s));
+  font-weight: 640;
+  color: var(--ink-60);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.perm-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: calc(8px * var(--sp));
+  padding: calc(8px * var(--sp)) calc(11px * var(--sp));
+  border-radius: var(--r-sm);
+  background: rgba(10, 15, 23, 0.52);
+  backdrop-filter: saturate(1.3) blur(20px) brightness(0.76);
+  -webkit-backdrop-filter: saturate(1.3) blur(20px) brightness(0.76);
+  outline: 1px solid var(--stroke-glass);
+}
+.perm-name { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-100); font-weight: 580; }
+.perm-why { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-40); line-height: 1.35; }
+.perm-state {
+  font-size: calc(var(--fs-caption) * var(--s));
+  font-weight: 620;
+  padding: calc(3px * var(--sp)) calc(9px * var(--sp));
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+  border: 0; font-family: inherit; cursor: pointer;
+}
+/* Colour is never the only carrier: each state also reads as a word. */
+.perm-state[data-state="granted"] { color: #bff3d1; background: rgba(76, 212, 124, 0.18); outline: 1px solid rgba(76,212,124,0.34); }
+.perm-state[data-state="denied"]  { color: #ffc9c9; background: rgba(255, 93, 93, 0.14); outline: 1px solid rgba(255,93,93,0.30); }
+.perm-state[data-state="prompt"]  { color: var(--ink-60); background: rgba(255,255,255,0.07); outline: 1px solid var(--stroke-glass); }
+.perm-state:focus-visible { outline: 2.5px solid var(--stroke-focus); outline-offset: 2px; }
+
+:root[data-reduced-motion] * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+[hidden] { display: none !important; }
 </style>
 </head>
 <body>
-<div class="device">
- <div class="stage-shell">
-  <div class="stage" data-stage></div>
- </div>
-</div>
+  <div class="device">
+    <div class="stage-shell">
+      <div class="stage" data-stage></div>
+    </div>
+  </div>
+
 <script type="module">
 import { createOS } from '/os/shared/core.js';
-const stage = document.querySelector('[data-stage]');
-const device = document.querySelector('.device');
-const os = createOS(stage, { dwell:true, dwellMs:350 });
-stage.appendChild(os.statusbar('<span style="color:var(--ink-60);font-size:11px;letter-spacing:0.04em;font-weight:700">Web Apps · Prism</span>'));
+import { mountLab } from '/os/shared/lab.js';
+import { AppRuntime } from '/os/shared/app-runtime.js';
+import { PERMISSIONS } from '/os/shared/app-manifest.js';
 
-const h = (tag, attrs={}, ...children)=>{
- const el=document.createElement(tag);
- for(const [k,v] of Object.entries(attrs)){
-  if(k==='class') el.className=v;
-  else if(k==='html') el.innerHTML=v;
-  else if(v!==null && v!==undefined) el.setAttribute(k,v);
- }
- for(const c of children){
-  if(c==null) continue;
-  if(typeof c==='string') el.appendChild(document.createTextNode(c));
-  else el.appendChild(c);
- }
- return el;
+const stage = document.querySelector('[data-stage]');
+const os = createOS(stage, { scale: 1 });
+
+/* The surface is built once and mutated; the runtime is the only source of
+   truth about what is installed, running, granted or offline. */
+const surface = document.createElement('div');
+surface.className = 'surface';
+surface.innerHTML = `
+  <div class="head">
+    <h1 data-title>Web Apps</h1>
+    <span class="count" data-count></span>
+  </div>
+  <div class="main" data-main></div>
+  <div class="foot" data-foot></div>
+`;
+stage.appendChild(surface);
+
+const titleEl = surface.querySelector('[data-title]');
+const countEl = surface.querySelector('[data-count]');
+const mainEl = surface.querySelector('[data-main]');
+const footEl = surface.querySelector('[data-foot]');
+
+const rt = new AppRuntime({ container: null });
+
+/* view: 'launcher' | 'app' | 'permissions' | one of the edge states */
+let view = 'launcher';
+let page = 0;
+let openId = null;
+let lastError = null;
+
+/* ---------- small builders ---------- */
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+
+function action(label, onClick, kind) {
+  const b = el('button', 'act', label);
+  b.type = 'button';
+  if (kind) b.setAttribute(`data-${kind}`, '');
+  b.addEventListener('click', onClick);
+  return b;
+}
+
+function setFoot(buttons) {
+  footEl.textContent = '';
+  buttons.filter(Boolean).forEach((b) => footEl.appendChild(b));
+}
+
+function message(icon, title, body, tone) {
+  const wrap = el('div', 'msg');
+  const i = el('div', 'msg-icon', icon);
+  if (tone === 'danger') { i.style.setProperty('--msg-wash', 'rgba(255,93,93,0.16)'); i.style.setProperty('--msg-ink', '#ffc9c9'); }
+  if (tone === 'warn') { i.style.setProperty('--msg-wash', 'rgba(255,194,71,0.16)'); i.style.setProperty('--msg-ink', '#ffdf9e'); }
+  wrap.appendChild(i);
+  wrap.appendChild(el('h2', null, title));
+  wrap.appendChild(el('p', null, body));
+  return wrap;
+}
+
+/* ---------- views ---------- */
+
+function renderLauncher() {
+  titleEl.textContent = 'Web Apps';
+  const installed = [...rt.installed.values()];
+
+  if (!installed.length) {
+    mainEl.textContent = '';
+    mainEl.appendChild(message('+', 'No apps installed',
+      'Apps you add appear here. Each one runs sealed off from the system and from every other app.'));
+    setFoot([action('Add the sample apps', () => installSamples(), 'primary')]);
+    countEl.textContent = '';
+    return;
+  }
+
+  /* Whatever the wearer would resume comes first and is the only loud thing. */
+  const leadId = [...rt.instances.keys()][0] || installed[0].manifest.id;
+  const byLead = [...installed].sort((a, b) =>
+    (a.manifest.id === leadId ? -1 : 0) - (b.manifest.id === leadId ? -1 : 0));
+  const ordered = byLead.slice(page % byLead.length).concat(byLead.slice(0, page % byLead.length));
+
+  const list = el('div', 'list');
+  for (const { manifest } of ordered) {
+    const inst = rt.instances.get(manifest.id);
+    const row = el('button', 'app-row');
+    if (manifest.id === leadId) row.setAttribute('data-lead', '');
+    row.type = 'button';
+    row.setAttribute('data-focusable', '');
+    row.setAttribute('aria-label', `${manifest.name}. ${inst ? (inst.status === 'suspended' ? 'Paused' : 'Running') : 'Not running'}.`);
+
+    const g = el('div', 'glyph', manifest.glyph);
+    if (manifest.accent) g.style.setProperty('--app-accent', manifest.accent);
+
+    const mid = el('div');
+    mid.style.minWidth = '0';
+    mid.appendChild(el('div', 'app-name', manifest.name));
+    mid.appendChild(el('div', 'app-badge', inst?.badge || manifest.badge || manifest.developer));
+
+    const dot = el('div', 'run-dot');
+    if (!inst) dot.setAttribute('data-hidden', '');
+    else if (inst.status === 'suspended') dot.setAttribute('data-suspended', '');
+
+    row.append(g, mid, dot);
+    row.addEventListener('click', () => open(manifest.id));
+    list.appendChild(row);
+  }
+  mainEl.textContent = '';
+  mainEl.appendChild(list);
+
+  const hidden = fitAbove(list);
+  const running = rt.instances.size;
+  countEl.textContent = running ? `${running} running` : `${installed.length} installed`;
+  setFoot([
+    hidden ? action(`${hidden} more`, () => { page += ordered.length - hidden; render(); }) : null,
+    action('Permissions', () => { view = 'permissions'; render(); }),
+    rt.instances.size ? action('Close all', () => { [...rt.instances.keys()].forEach((id) => rt.kill(id)); }, 'danger') : null,
+  ]);
+}
+
+function renderApp() {
+  const inst = rt.instances.get(openId);
+  const entry = rt.installed.get(openId);
+  titleEl.textContent = entry?.manifest.name || 'App';
+
+  if (!inst) { view = 'launcher'; renderLauncher(); return; }
+
+  if (inst.status === 'unresponsive') {
+    mainEl.textContent = '';
+    mainEl.appendChild(message('!', `${inst.manifest.name} did not start`,
+      'The app never reported that it was ready. Nothing it was doing has been saved. You can wait a little longer or close it.', 'warn'));
+    setFoot([
+      action('Close app', () => { rt.kill(openId); view = 'launcher'; render(); }, 'primary'),
+      action('Wait longer', () => { rt.kill(openId); rt.launch(openId); }),
+      action('Back', () => { view = 'launcher'; render(); }),
+    ]);
+    countEl.textContent = 'Not responding';
+    return;
+  }
+
+  /* Reuse the existing window node when possible: rebuilding it would reload
+     the iframe, which would throw away the app's state on every re-render. */
+  let win = mainEl.querySelector('.window');
+  if (!win || win.getAttribute('data-app') !== openId) {
+    mainEl.textContent = '';
+    win = el('div', 'window');
+    win.setAttribute('data-app', openId);
+    const bar = el('div', 'win-bar');
+    /* The header already names the app. This line answers the question the
+       header cannot: whose code is this, and is it contained. */
+    bar.appendChild(el('span', 'win-title', inst.manifest.developer));
+    bar.appendChild(el('span', 'win-origin', 'sandboxed'));
+    const canvas = el('div', 'canvas');
+    canvas.appendChild(inst.frame);
+    win.append(bar, canvas);
+    mainEl.appendChild(win);
+    if (!document.documentElement.hasAttribute('data-reduced-motion')) {
+      win.animate(
+        [{ transform: 'scale(0.965)', opacity: 0 }, { transform: 'none', opacity: 1 }],
+        { duration: 260, easing: 'cubic-bezier(0.32, 0.72, 0, 1)', fill: 'both' },
+      );
+    }
+  }
+  const canvas = win.querySelector('.canvas');
+  canvas.style.setProperty('--app-h', `${inst.height}px`);
+  if (inst.status === 'suspended') canvas.setAttribute('data-suspended', '');
+  else canvas.removeAttribute('data-suspended');
+
+  countEl.textContent = inst.status === 'suspended' ? 'Paused'
+    : inst.status === 'launching' ? 'Starting' : 'Running';
+
+  setFoot([
+    action('Back', () => { view = 'launcher'; render(); }, 'primary'),
+    inst.status === 'suspended'
+      ? action('Resume', () => rt.resume(openId))
+      : action('Pause', () => rt.suspend(openId)),
+    action('Close app', () => { rt.kill(openId); view = 'launcher'; render(); }, 'danger'),
+  ]);
+}
+
+function renderPermissions() {
+  titleEl.textContent = 'Permissions';
+  const installed = [...rt.installed.values()];
+  mainEl.textContent = '';
+
+  if (!installed.length) {
+    mainEl.appendChild(message('+', 'Nothing to manage',
+      'Permissions appear here once you install an app that asks for one.'));
+  } else {
+    for (const { manifest } of installed) {
+      const block = el('div', 'perm-app');
+      block.appendChild(el('h3', null, manifest.name));
+      if (!manifest.permissions.length) {
+        const row = el('div', 'perm-row');
+        const c = el('div');
+        c.appendChild(el('div', 'perm-name', 'Asks for nothing'));
+        c.appendChild(el('div', 'perm-why', 'This app runs without any access to you or your device.'));
+        row.appendChild(c);
+        block.appendChild(row);
+      }
+      for (const name of manifest.permissions) {
+        const meta = PERMISSIONS[name];
+        const state = rt.permissionState(manifest.id, name);
+        const row = el('div', 'perm-row');
+        const c = el('div');
+        c.appendChild(el('div', 'perm-name', meta.label));
+        c.appendChild(el('div', 'perm-why', meta.why));
+        const btn = el('button', 'perm-state',
+          state === 'granted' ? 'Allowed' : state === 'denied' ? 'Blocked' : 'Not asked');
+        btn.type = 'button';
+        btn.setAttribute('data-state', state);
+        btn.setAttribute('aria-label',
+          `${meta.label} for ${manifest.name} is ${state === 'granted' ? 'allowed' : state === 'denied' ? 'blocked' : 'not asked'}. Activate to change.`);
+        /* Cycles allowed to blocked to not asked, so a wearer can both revoke a
+           grant and clear a refusal without hunting for a different control. */
+        btn.addEventListener('click', () => {
+          const next = state === 'granted' ? 'denied' : state === 'denied' ? 'prompt' : 'granted';
+          rt.setPermission(manifest.id, name, next);
+        });
+        row.append(c, btn);
+        block.appendChild(row);
+      }
+      mainEl.appendChild(block);
+    }
+  }
+  countEl.textContent = '';
+  fitAbove(mainEl);
+  setFoot([
+    action('Back', () => { view = 'launcher'; render(); }, 'primary'),
+    installed.length ? action('Reset all', () => installed.forEach(({ manifest }) => rt.revokeAll(manifest.id)), 'danger') : null,
+  ]);
+}
+
+/* ---------- permission sheet ---------- */
+
+function renderSheet() {
+  const p = rt.pendingPrompt;
+  const existing = stage.querySelectorAll('.scrim, .sheet');
+  if (!p) { existing.forEach((n) => n.remove()); return; }
+  if (stage.querySelector('.sheet[data-perm="' + p.name + '"][data-app="' + p.id + '"]')) return;
+  existing.forEach((n) => n.remove());
+
+  const scrim = el('div', 'scrim');
+  const sheet = el('div', 'sheet');
+  sheet.setAttribute('role', 'alertdialog');
+  sheet.setAttribute('aria-modal', 'true');
+  sheet.setAttribute('data-perm', p.name);
+  sheet.setAttribute('data-app', p.id);
+
+  const ask = el('p', 'ask', `Allow ${p.appName} to use ${p.meta.label.toLowerCase()}?`);
+  ask.id = 'ask-' + p.name;
+  sheet.setAttribute('aria-labelledby', ask.id);
+  sheet.appendChild(ask);
+
+  if (p.reason) sheet.appendChild(el('p', 'reason', `${p.appName} says: “${p.reason}”`));
+
+  const why = el('p', 'why', p.meta.why);
+  if (p.meta.risk === 'high') why.style.setProperty('--risk-ink', 'var(--warn)');
+  sheet.appendChild(why);
+
+  const buttons = el('div', 'buttons');
+  const deny = action("Don't allow", () => rt.answerPrompt('denied'));
+  const allow = action('Allow', () => rt.answerPrompt('granted'), 'primary');
+  buttons.append(deny, allow);
+  sheet.appendChild(buttons);
+
+  stage.append(scrim, sheet);
+
+  if (!document.documentElement.hasAttribute('data-reduced-motion')) {
+    sheet.animate(
+      [{ transform: 'translateY(14px)', opacity: 0 }, { transform: 'none', opacity: 1 }],
+      { duration: 260, easing: 'cubic-bezier(0.32, 0.72, 0, 1)', fill: 'both' },
+    );
+  }
+  /* A decision needs the focus, and Escape must mean the safe answer. */
+  allow.focus({ preventScroll: true });
+  sheet.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.stopPropagation(); rt.answerPrompt('denied'); }
+  });
+}
+
+/* ---------- edge states the lab can drive ---------- */
+
+const EDGE = {
+  empty() {
+    titleEl.textContent = 'Web Apps';
+    countEl.textContent = '';
+    mainEl.textContent = '';
+    mainEl.appendChild(message('+', 'No apps installed',
+      'Apps you add appear here. Each one runs sealed off from the system and from every other app.'));
+    setFoot([action('Add the sample apps', () => { lab.setState('ready'); installSamples(); }, 'primary')]);
+  },
+  loading() {
+    titleEl.textContent = 'Web Apps';
+    countEl.textContent = 'Checking';
+    mainEl.textContent = '';
+    const list = el('div', 'list');
+    for (let i = 0; i < 3; i++) {
+      const row = el('div', 'app-row');
+      row.style.opacity = String(0.7 - i * 0.18);
+      const g = el('div', 'glyph', '');
+      g.style.setProperty('--app-accent', 'rgba(255,255,255,0.14)');
+      const mid = el('div');
+      const n = el('div', 'app-name', '—');
+      n.style.color = 'var(--ink-20)';
+      mid.appendChild(n);
+      mid.appendChild(el('div', 'app-badge', 'Reading manifest'));
+      row.append(g, mid, el('div', 'run-dot'));
+      row.lastChild.setAttribute('data-hidden', '');
+      list.appendChild(row);
+    }
+    mainEl.appendChild(list);
+    setFoot([]);
+  },
+  error() {
+    titleEl.textContent = 'Web Apps';
+    countEl.textContent = '1 refused';
+    mainEl.textContent = '';
+    const body = lastError
+      ? lastError
+      : 'The package for Portside names a permission this system does not have, and points its entry outside its own folder. It was not installed.';
+    mainEl.appendChild(message('!', 'That app could not be installed', body, 'danger'));
+    setFoot([
+      action('Try again', () => { lab.setState('ready'); installSamples(); }, 'primary'),
+      action('Back', () => { lab.setState('ready'); }),
+    ]);
+  },
+  offline() {
+    titleEl.textContent = 'Web Apps';
+    countEl.textContent = 'No connection';
+    mainEl.textContent = '';
+    mainEl.appendChild(message('⊘', 'You are offline',
+      'Apps already on your glasses still open. Waypoint works fully without a connection; Transit needs one for live departures.', 'warn'));
+    setFoot([
+      action('Open Waypoint', () => { lab.setState('ready'); open('waypoint'); }, 'primary'),
+      action('Back', () => { lab.setState('ready'); }),
+    ]);
+  },
+  denied() {
+    titleEl.textContent = 'Transit';
+    countEl.textContent = 'Blocked';
+    mainEl.textContent = '';
+    mainEl.appendChild(message('✗', 'Network is blocked for Transit',
+      'Transit reads live departures over the network. You blocked it, so it has nothing to show. Everything else on your glasses is unaffected.', 'danger'));
+    setFoot([
+      action('Manage permissions', () => { lab.setState('ready'); view = 'permissions'; render(); }, 'primary'),
+      action('Back', () => { lab.setState('ready'); }),
+    ]);
+  },
 };
 
-// dev controls OUTSIDE stage
-const edgeRow = h('div', {class:'dev-controls', role:'toolbar', 'aria-label':'Web Apps edge state controls'});
-const edgeStates = [
- {id:'normal', label:'Normal'},
- {id:'loading', label:'Loading'},
- {id:'empty', label:'Empty'},
- {id:'error', label:'Error'},
- {id:'offline', label:'Offline'},
- {id:'permission-denied', label:'Blocked'},
-];
-edgeStates.forEach(s=>{
- const b=h('button', {class:'chip', 'data-focusable':'', tabindex:'0', 'aria-label':`Show ${s.label} state`, 'data-state':s.id}, s.label);
- if(s.id==='normal') b.classList.add('active');
- b.addEventListener('click', ()=> setEdge(s.id));
- edgeRow.appendChild(b);
+/* ---------- render ---------- */
+
+let edge = null;
+
+/* The gaze reticle's home is the exact centre of the stage. Anything parked
+   there is read through a reticle, so scrolling content stops short of it and
+   the lower half of the lens stays world. The one exception is a focused app
+   window: the wearer is looking at it, and the reticle is on it, not past it. */
+const GAZE_HOME = 300;
+const GAZE_GUARD = 14;
+
+/* Clipping is not enough: a row half-hidden by overflow still has its glyphs
+   laid out across the guard. Rows are dropped until the list genuinely ends
+   above it, and whatever did not fit is offered as a page, not silently lost. */
+function fitAbove(container) {
+  const limit = Math.max(72, GAZE_HOME - GAZE_GUARD - mainEl.offsetTop);
+  mainEl.style.maxHeight = `${limit}px`;
+  mainEl.style.overflow = 'hidden';
+  let dropped = 0;
+  while (container.children.length > 1 && container.scrollHeight > limit) {
+    container.removeChild(container.lastElementChild);
+    dropped++;
+  }
+  return dropped;
+}
+
+function guardCentre(exempt) {
+  if (exempt) { mainEl.style.maxHeight = ''; mainEl.style.overflow = 'auto'; return; }
+  mainEl.style.maxHeight = `${Math.max(72, GAZE_HOME - GAZE_GUARD - mainEl.offsetTop)}px`;
+}
+
+function render() {
+  const appOpen = !edge && view === 'app' && !!openId;
+  if (edge && EDGE[edge]) { EDGE[edge](); }
+  else if (view === 'permissions') renderPermissions();
+  else if (appOpen) renderApp();
+  else renderLauncher();
+  guardCentre(appOpen);
+  renderSheet();
+}
+
+function open(id) {
+  if (!rt.installed.has(id)) return;
+  openId = id;
+  view = 'app';
+  rt.launch(id);
+  render();
+}
+
+async function installSamples() {
+  for (const id of ['transit', 'waypoint']) await rt.install(id);
+  render();
+}
+
+rt.on('change', () => render());
+rt.on('install-failed', ({ id, errors }) => {
+  lastError = `${id} was refused: ${errors.map((e) => `${e.field} — ${e.message}`).join(' ')}`;
 });
-device.appendChild(edgeRow);
+/* App-supplied strings land in the host document, so they are escaped here.
+   A platform that sandboxes a frame and then writes its text as HTML has
+   handed back everything the sandbox took away. */
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-const viewport = h('div', {class:'web-viewport', id:'viewport'});
-const stateLayer = h('div', {class:'state-layer', id:'stateLayer', 'aria-live':'polite'});
-const hintbar = h('div', {class:'hintbar', id:'hintbar'});
-hintbar.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="hint-dot" aria-hidden="true"></span><strong>Gaze dwell 350 ms</strong></span><span style="display:flex;align-items:center;gap:6px"><span>Tab cycle · Esc back</span><span style="width:1px;height:10px;background:rgba(255,255,255,0.08)"></span><span>Space capture</span></span>`;
-stage.append(viewport, stateLayer, hintbar);
-
-// data
-const installedApps = [
- {id:'figma', name:'Figma', domain:'figma.com', icon:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3" stroke="white" stroke-width="1.8"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.8 4.8l2.8 2.8M16.4 16.4l2.8 2.8M19.2 4.8l-2.8 2.8M7.6 16.4l-2.8 2.8" stroke="white" stroke-opacity="0.9" stroke-width="1.4" stroke-linecap="round"/></svg>`, tint:'linear-gradient(180deg, #A259FF 0%, #6E3AFF 100%)', version:'2.4.1', size:'18.4', perms:['camera','location'], desc:'Collaborative design · 3 files offline', trusted:true, cached:true},
- {id:'linear', name:'Linear', domain:'linear.app', icon:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 14l3 3 7-8" stroke="white" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><rect x="3.5" y="3.5" width="17" height="17" rx="4" stroke="white" stroke-width="1.5"/></svg>`, tint:'linear-gradient(180deg, #2F4BFF 0%, #0B5ED7 100%)', version:'4.2.0', size:'4.8', perms:['notifications'], desc:'Issues · 12 open · sync in 2m', trusted:true, cached:true},
- {id:'notion', name:'Notion', domain:'notion.so', icon:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3" stroke="white" stroke-width="1.6"/><path d="M8 8h8M8 12h6M8 16h5" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>`, tint:'linear-gradient(180deg, #1A1A1A 0%, #2B2B2B 100%)', version:'3.1.8', size:'22.1', perms:['clipboard','location'], desc:'Docs · 8 offline pages cached', trusted:true, cached:true},
- {id:'excalidraw', name:'Excalidraw', domain:'excalidraw.com', icon:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 16l4-8 4 8 4-8 4 8" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="3" y="4" width="18" height="16" rx="3" stroke="white" stroke-opacity="0.9" stroke-width="1.4"/></svg>`, tint:'linear-gradient(180deg, #FFAA47 0%, #FF7A1A 100%)', version:'1.9.3', size:'2.1', perms:[], desc:'Whiteboard · auto-saves locally', trusted:true, cached:true},
- {id:'spotify', name:'Spotify', domain:'open.spotify.com', icon:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.5" stroke="white" stroke-width="1.6"/><path d="M8.2 14.2a5 5 0 015.6-0.8M8.8 12a6.5 6.5 0 016.8-1M9.4 9.8a8 8 0 018.2-0.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>`, tint:'linear-gradient(180deg, #1ED760 0%, #1A8A4A 100%)', version:'8.9.2', size:'41.2', perms:['mic'], desc:'Music · cached 12 songs', trusted:true, cached:false},
- {id:'slack', name:'Slack', domain:'slack.com', icon:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7.2 12a2.5 2.5 0 105 0 2.5 2.5 0 00-5 0zM12 7.2a2.5 2.5 0 105 0 2.5 2.5 0 00-5 0zM16.8 12a2.5 2.5 0 105 0 2.5 2.5 0 00-5 0zM12 16.8a2.5 2.5 0 105 0 2.5 2.5 0 00-5 0z" stroke="white" stroke-width="1.3"/><path d="M9.7 12h4.6M12 9.7v4.6" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>`, tint:'linear-gradient(180deg, #E547A8 0%, #8B2CF0 100%)', version:'4.36', size:'28.6', perms:['mic','notifications'], desc:'Team · 3 unread threads', trusted:true, cached:true},
-];
-
-const storeApps = [
- {id:'overleaf', name:'Overleaf', domain:'overleaf.com', icon:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 7h10l4 4v6a2 2 0 01-2 2H6a2 2 0 01-2-2V9a2 2 0 012-2z" stroke="white" stroke-width="1.6"/><path d="M16 7v4h4" stroke="white" stroke-width="1.4"/><path d="M8 13h8M8 16h5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`, tint:'linear-gradient(180deg, #0EA05A 0%, #065D33 100%)', version:'2.1.0', size:'6.4', perms:['clipboard'], desc:'LaTeX · collaborative papers', price:'Free', trusted:true},
- {id:'tldraw', name:'tldraw', domain:'tldraw.com', icon:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h16M12 4v16" stroke="white" stroke-width="1.6" stroke-linecap="round"/><rect x="4" y="4" width="16" height="16" rx="4" stroke="white" stroke-width="1.5"/></svg>`, tint:'linear-gradient(180deg, #2A9DE2 0%, #0B5ED7 100%)', version:'3.0.4', size:'3.2', perms:[], desc:'Draw · no permissions needed', price:'Free', trusted:true},
- {id:'photopea', name:'Photopea', domain:'photopea.com', icon:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3" stroke="white" stroke-width="1.6"/><circle cx="9" cy="9.2" r="1.5" fill="white"/><path d="M3.5 15l5.2-4.2 3.4 2.8 4.1-3.6 4.3 3.8" stroke="white" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/></svg>`, tint:'linear-gradient(180deg, #56B8FF 0%, #0B5ED7 100%)', version:'5.6.1', size:'9.8', perms:['camera'], desc:'Photo editor · local files', price:'Free', trusted:false},
- {id:'vscode-web', name:'VS Code Web', domain:'vscode.dev', icon:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.5 6.5L3 12l6.5 5.5M14.5 6.5L21 12l-6.5 5.5" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 4l-1 8 1 8 1-8-1-8z" stroke="white" stroke-opacity="0.9" stroke-width="1.3"/></svg>`, tint:'linear-gradient(180deg, #2F9DFF 0%, #0B5ED7 100%)', version:'1.92', size:'12.7', perms:['clipboard','mic'], desc:'Code · opens repo directly', price:'Free', trusted:true},
-];
-
-let edgeState='normal';
-let searchQuery='';
-let installedFilter='all';
-let permissionOverrides = new Map(); // appId -> {camera:'allow'|'block'|null...}
-
-function permIcon(name){
- const map={
-  camera:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="7" width="15" height="10" rx="2.2" stroke="currentColor" stroke-width="1.6"/><circle cx="10.2" cy="12" r="2.2" stroke="currentColor" stroke-width="1.4"/><path d="M16 10.2l3-1.4v6.4l-3-1.4" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>`,
-  mic:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 14a3 3 0 003-3V6a3 3 0 10-6 0v5a3 3 0 003 3z" stroke="currentColor" stroke-width="1.5"/><path d="M19 10a7 7 0 01-14 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M12 17v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`,
-  location:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s6-4.8 6-9a6 6 0 10-12 0c0 4.2 6 9 6 9z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2.1" stroke="currentColor" stroke-width="1.4"/></svg>`,
-  notifications:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4.5a5 5 0 00-5 5v3.2l-1.4 1.8h12.8L17 12.7V9.5a5 5 0 00-5-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.5 17.5h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="19.5" r="1" fill="currentColor"/></svg>`,
-  clipboard:`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="7" y="8" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M9 8V6a2 2 0 012-2h2a2 2 0 012 2v2" stroke="currentColor" stroke-width="1.4"/><path d="M9 12h6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
- };
- return map[name]||map.clipboard;
-}
-
-function buildAppCard(app, opts={isStore:false, isOffline:false}){
- const isInstalled = !opts.isStore;
- const card = h('div', {class:'app-card' + (opts.isOffline && !app.cached && opts.isStore ? ' is-store-dim' : '') + (opts.isOffline && isInstalled && !app.cached ? ' is-offline' : ''), 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':`${app.name}, ${app.domain}, version ${app.version}${app.perms.length? ', needs '+app.perms.join(', '):''}${isInstalled?', launch':' , install'}`});
- // top
- const top = h('div', {class:'app-top'});
- const icon = h('div', {class:'app-icon', style:`background:${app.tint}`, 'aria-hidden':'true'});
- icon.innerHTML = app.icon;
- const meta = h('div', {class:'app-meta'});
- const nameRow = h('div', {class:'app-name'});
- nameRow.textContent = app.name;
- if(app.trusted){
-  const td = h('span', {class:'trust-dot', 'aria-hidden':'true'});
-  td.innerHTML=`<svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l6 2.8v4.3c0 3.4-2.2 5.8-6 7.3-3.8-1.5-6-3.9-6-7.3V6l6-2.8z" stroke="#4cd47c" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.2 12.2l1.7 1.7 3.9-3.9" stroke="#4cd47c" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  nameRow.appendChild(td);
- }
- const domain = h('div', {class:'app-domain '}, app.domain);
- meta.append(nameRow, domain);
- top.append(icon, meta);
- if(opts.isOffline && isInstalled){
-  const cachedBadge = h('span', {class:'perm-badge trusted ', style:'margin-left:auto;flex:none;height:22px'});
-  cachedBadge.innerHTML = app.cached ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5L20 7v6.2c0 3.4-2.2 5.8-8 7.3-5.8-1.5-8-3.9-8-7.3V7l8-3.5z" stroke="currentColor" stroke-width="1.5"/><path d="M9 12l1.6 1.6 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Cached` : `● Offline`;
-  if(!app.cached){ cachedBadge.className='perm-badge needs '; cachedBadge.style.color='var(--ink-60)'; }
-  top.appendChild(cachedBadge);
- }
- // description
- const desc = h('div', {class:'app-desc'}, app.desc);
- // perms
- const permRow = h('div', {class:'perm-row'});
- if(app.perms.length===0){
-  const b = h('span', {class:'perm-badge'}, `No permissions`);
-  b.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l6 2.8v4.3c0 3.4-2.2 5.8-6 7.3-3.8-1.5-6-3.9-6-7.3V6l6-2.8z" stroke="currentColor" stroke-width="1.4"/><path d="M9.2 12.2l1.7 1.7 3.9-3.9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> None`;
-  permRow.appendChild(b);
- } else {
-  app.perms.forEach(p=>{
-   const b=h('span', {class:'perm-badge'});
-   // highlight if permission-denied state and blocked? We'll add needs style for offline permission denied demo
-   if(edgeState==='permission-denied' && p==='location' && app.id==='figma'){ b.className='perm-badge needs'; }
-   b.innerHTML=`${permIcon(p)} ${p}`;
-   permRow.appendChild(b);
-  });
- }
- if(app.trusted && !opts.isStore){
-  const tb = h('span', {class:'perm-badge trusted'});
-  tb.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l6 2.8v4.3c0 3.4-2.2 5.8-6 7.3-3.8-1.5-6-3.9-6-7.3V6l6-2.8z" stroke="currentColor" stroke-width="1.4"/><path d="M9.2 12.2l1.7 1.7 3.9-3.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg> Trusted`;
-  permRow.appendChild(tb);
- } else if(!app.trusted){
-  const tb = h('span', {class:'perm-badge needs'});
-  tb.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.4"/><path d="M12 8v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg> Unverified`;
-  permRow.appendChild(tb);
- }
-
- // foot
- const foot = h('div', {class:'app-foot'});
- const ver = h('span', {class:'app-version '}, `v${app.version} · ${app.size} MB`);
- if(opts.isOffline && isInstalled && !app.cached) ver.textContent = `v${app.version} · offline unavailable`;
- const cta = h('button', {class:'btn-small ' + (isInstalled ? 'ghost' : 'primary'), 'data-focusable':'', tabindex:'0', 'aria-label': isInstalled ? `Launch ${app.name} at ${app.domain}` : `Install ${app.name} from ${app.domain}`});
- cta.textContent = isInstalled ? 'Launch' : 'Install';
- if(opts.isStore) cta.textContent = 'Install · Free';
- if(opts.isOffline && opts.isStore) { cta.disabled=true; cta.textContent='Offline'; }
- if(opts.isOffline && isInstalled && !app.cached){ cta.disabled=true; cta.textContent='Offline'; }
- cta.addEventListener('click', (e)=>{
-  e.stopPropagation();
-  if(cta.disabled) return;
-  if(isInstalled) openWebApp(app);
-  else handleInstall(app, cta);
- });
- foot.append(ver, cta);
-
- card.append(top, desc, permRow, foot);
- card.addEventListener('click', ()=>{
-  if(opts.isOffline && ((isInstalled && !app.cached) || (!isInstalled))) return;
-  if(isInstalled) openWebApp(app);
-  else handleInstall(app, cta);
- });
- card.addEventListener('keydown', (e)=>{
-  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); card.click(); }
- });
- return card;
-}
-
-function handleInstall(app, btn){
- if(edgeState==='offline') return;
- const prev = btn.textContent;
- btn.textContent='Installing…';
- btn.classList.add('installing');
- btn.disabled=true;
- os.banner(`<strong>Installing ${app.name}</strong><span class="caption">from ${app.domain} · ${app.size} MB</span>`,{timeout:1800});
- // simulate install then launch gate
- setTimeout(()=>{
-  // add to installed if not exists
-  if(!installedApps.find(a=>a.id===app.id)){
-   installedApps.unshift({...app, desc: app.desc + ' · just installed', installed:true, cached:true});
-  }
-  btn.textContent='Open';
-  btn.classList.remove('installing');
-  btn.classList.remove('primary');
-  btn.classList.add('ghost');
-  btn.disabled=false;
-  btn.setAttribute('aria-label', `Launch ${app.name} at ${app.domain}`);
-  // re-render if needed? Just open
-  openWebApp(app);
-  if(edgeState==='normal') render();
- }, 1100);
-}
-
-function render(){
- viewport.innerHTML='';
- stateLayer.className='state-layer';
- stateLayer.style.display='none';
- stateLayer.innerHTML='';
- hintbar.style.display='';
- viewport.style.display='flex';
- // offline banner injection
- if(edgeState==='offline'){
-  const banner = h('div', {class:'offline-banner'});
-    banner.innerHTML = `<span style="width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:rgba(255,194,71,0.14);outline:1px solid rgba(255,194,71,0.18);flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.5 9.5a9 9 0 0117 0" stroke="white" stroke-opacity="0.9" stroke-width="1.5" stroke-linecap="round"/><path d="M6 12.5a6 6 0 0112 0" stroke="white" stroke-opacity="0.8" stroke-width="1.5" stroke-linecap="round"/><path d="M8.8 15.5a2.8 2.8 0 016.4 0" stroke="white" stroke-opacity="0.78" stroke-width="1.4" stroke-linecap="round"/><path d="M2 2l20 20" stroke="#ffc247" stroke-width="1.6" stroke-linecap="round"/></svg></span><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--ink-100);letter-spacing:-0.01em;line-height:1">You’re offline · cached apps available</div><div style="font-size:11px;font-weight:500;color:var(--ink-60);line-height:1.35;margin-top:2px">Discover is paused. <span class="tabular">6 installed · 4 cached · 2 need network</span></div></div><span class="dot warn" style="width:7px;height:7px;flex:none"></span>`;
-  viewport.appendChild(banner);
- }
-
- // header
- const header = h('div', {class:'web-header'});
- const left = h('div', {});
- const title = h('div', {class:'web-title'}, 'Web Apps');
- const sub = h('div', {class:'web-subtitle'});
- const cachedCount = installedApps.filter(a=>a.cached).length;
- if(edgeState==='offline'){
-    sub.innerHTML=`<span class="dot warn" aria-hidden="true"></span> Offline · <span class="tabular">${installedApps.length} installed · ${cachedCount} cached</span>`;
- } else {
-    sub.innerHTML=`<span class="dot ok" aria-hidden="true"></span> <span class="tabular">${installedApps.length} installed · v2.4 · ${installedApps.length + storeApps.length} total</span> · glass scrim`;
- }
- left.append(title, sub);
- const acts = h('div', {class:'header-actions'});
- const addBtn = h('button', {class:'hdr-chip primary', 'data-focusable':'', tabindex:'0', 'aria-label':'Add web app by URL'}, '+ Add');
- addBtn.addEventListener('click', ()=>{
-  os.banner('<strong>Add by URL</strong><span class="caption">Enter domain · e.g. figma.com</span>',{timeout:1800});
-  // focus search
-  const inp = document.getElementById('searchInput');
-  if(inp) inp.focus({preventScroll:true});
- });
- const filterBtn = h('button', {class:'hdr-chip', 'data-focusable':'', tabindex:'0', 'aria-label':'Filter installed apps'}, 'Filter');
- filterBtn.addEventListener('click', ()=>{
-  installedFilter = installedFilter==='all' ? 'trusted' : 'all';
-  filterBtn.textContent = installedFilter==='trusted' ? 'Trusted · 5' : 'Filter';
-  render();
-  os.banner(`<strong>Filter · ${installedFilter==='trusted'?'Trusted only':'All apps'}</strong><span class="caption">· updated</span>`,{timeout:1400});
- });
- if(edgeState==='offline'){ addBtn.disabled=true; filterBtn.disabled=true; }
- acts.append(addBtn, filterBtn);
- header.append(left, acts);
- viewport.appendChild(header);
-
- // search
- const searchWrap = h('div', {class:'search-wrap'});
- const search = h('input', {class:'search-field', type:'search', placeholder:'Search apps, domains, permissions', 'aria-label':'Search web apps', id:'searchInput', autocomplete:'off'});
- search.value = searchQuery;
- const sIcon = h('span', {class:'search-icon', 'aria-hidden':'true'});
- sIcon.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.2" stroke="white" stroke-opacity="0.7" stroke-width="1.6"/><path d="M15.2 15.2l4.2 4.2" stroke="white" stroke-opacity="0.7" stroke-width="1.6" stroke-linecap="round"/></svg>`;
- const sMeta = h('span', {class:'search-meta '});
- sMeta.textContent='⌘K';
- sMeta.style.display= searchQuery ? 'none':'inline-flex';
- searchWrap.append(search, sIcon, sMeta);
- viewport.appendChild(searchWrap);
- search.addEventListener('input', ()=>{
-  searchQuery = search.value.trim().toLowerCase();
-  // live filter installed + store but keep headers
-  renderFiltered();
- });
- search.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ search.value=''; searchQuery=''; render(); search.blur(); }});
-
- // normal / offline rendering of grids
- if(edgeState==='normal' || edgeState==='offline' || edgeState==='permission-denied'){
-  // installed group
-  const installedGroup = h('div', {class:'group', role:'group', 'aria-label':'Installed web apps'});
-  const head = h('div', {class:'group-head'});
-  const filteredInstalled = applySearch(installedApps.filter(a=> installedFilter==='trusted' ? a.trusted : true));
-    head.innerHTML=`<span class="group-label">Installed</span><span class="group-count tabular">${filteredInstalled.length} apps</span><span class="group-line" aria-hidden="true"></span><span style="font-size:11px;font-weight:600;color:var(--ink-40);font-variant-numeric:tabular-nums;letter-spacing:0.02em">${edgeState==='offline' ? cachedCount+' cached' : 'tap to launch'}</span>`;
-  const grid = h('div', {class:'installed-grid'});
-  filteredInstalled.forEach(app=>{
-   grid.appendChild(buildAppCard(app, {isStore:false, isOffline: edgeState==='offline'}));
-  });
-  if(filteredInstalled.length===0){
-   const emp = h('div', {class:'card', style:'padding:14px 12px;display:grid;gap:6px;justify-items:center;text-align:center;grid-column:1/-1;min-height:92px;place-content:center'});
-   emp.innerHTML=`<span style="font-size:14px;font-weight:700;color:var(--ink-100)">No matches</span><span class="caption" style="font-size:11px;color:var(--ink-60)">Try “camera” or “figma.com”</span>`;
-   grid.appendChild(emp);
-  }
-  installedGroup.append(head, grid);
-  viewport.appendChild(installedGroup);
-
-  // discover group
-  const storeGroup = h('div', {class:'group', role:'group', 'aria-label':'Discover web apps'});
-  const storeHead = h('div', {class:'group-head'});
-  const filteredStore = applySearch(storeApps);
-  storeHead.innerHTML=`<span class="group-label">Discover</span><span class="group-count ">${filteredStore.length} picks</span><span class="group-line" aria-hidden="true"></span><span style="font-size:11px;font-weight:600;color:var(--ink-40)">for Prism · glass</span>`;
-  const storeList = h('div', {class:'store-list'});
-  filteredStore.forEach(app=>{
-   const card = buildAppCard(app, {isStore:true, isOffline: edgeState==='offline'});
-   // make store card horizontal tighter
-   card.style.padding='10px 12px';
-   storeList.appendChild(card);
-  });
-  if(edgeState==='offline'){
-   // add dim overlay note
-   const note = h('div', {class:'caption', style:'text-align:center;color:var(--ink-40);font-size:11px;padding:4px 8px'});
-   note.textContent='Discover paused offline · cached launch still works';
-   storeGroup.append(storeHead, storeList, note);
-   // dim the list already via card is-store-dim
-   storeList.style.opacity='0.52';
-   storeList.style.pointerEvents='none';
-  } else {
-   storeGroup.append(storeHead, storeList);
-  }
-  viewport.appendChild(storeGroup);
-
-  // if permission-denied, add inline permission blocked note below installed
-  if(edgeState==='permission-denied'){
-   const permNote = h('div', {class:'card', style:'padding:12px 12px;display:flex;align-items:center;gap:10px;background:rgba(255,194,71,0.08);outline:1px solid rgba(255,194,71,0.18);border-radius:14px'});
-   permNote.innerHTML=`<span style="width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:rgba(255,194,71,0.14);outline:1px solid rgba(255,194,71,0.18);flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l6 2.8v4.3c0 3.4-2.2 5.8-6 7.3-3.8-1.5-6-3.9-6-7.3V6l6-2.8z" stroke="#ffc247" stroke-width="1.5"/><path d="M12 8v3.8" stroke="#ffc247" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="15.8" r="1.1" fill="#ffc247"/></svg></span><div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--ink-100);line-height:1">Location blocked</div><div style="font-size:11px;font-weight:500;color:var(--ink-60);line-height:1.35">Figma needs location — allow in gate to continue. No dead ends.</div></div><button class="btn-small primary" data-focusable tabindex="0" aria-label="Allow location for Figma" style="flex:none">Allow</button>`;
-   permNote.querySelector('button')?.addEventListener('click', ()=>{
-    os.banner('<strong>Location allowed</strong><span class="caption">Figma · permission granted</span>',{timeout:1800});
-    // open figma with allowed
-    const figma = installedApps.find(a=>a.id==='figma');
-    if(figma) openWebApp(figma, {presetAllow:'location'});
-   });
-   viewport.appendChild(permNote);
-  }
- }
-
- // ensure hintbar on top for gaze cursor stacking
- stage.appendChild(os.cursor);
- stage.appendChild(hintbar);
- stage.appendChild(stateLayer);
-}
-
-function applySearch(list){
- if(!searchQuery) return list;
- return list.filter(a=>{
-  const hay = `${a.name} ${a.domain} ${a.perms.join(' ')} ${a.desc}`.toLowerCase();
-  return hay.includes(searchQuery);
- });
-}
-
-function renderFiltered(){
- // re-render whole viewport but preserve search focus
- const active = document.activeElement?.id==='searchInput';
- const selStart = active ? document.getElementById('searchInput').selectionStart : null;
- render();
- if(active){
-  const inp = document.getElementById('searchInput');
-  if(inp){
-   inp.focus({preventScroll:true});
-   if(selStart!==null) inp.setSelectionRange(selStart, selStart);
-  }
- }
-}
-
-function setEdge(id){
- edgeState = id;
- [...document.querySelectorAll('.dev-controls .chip')].forEach(c=> c.classList.toggle('active', c.dataset.state===id));
- // close any open wm windows when switching to error/empty/loading? Keep consistent with other pieces: loading/empty/error hide content.
- if(id==='loading'){
-  viewport.style.display='none';
-  stateLayer.className='state-layer on';
-  stateLayer.style.display='block';
-  stateLayer.style.padding='12px 14px 14px 14px';
-  hintbar.style.display='none';
-  stateLayer.innerHTML = `
-   <div class="group" style="animation:none">
-    <div class="group-head"><span class="group-label">Installed</span><span class="group-count ">loading · 6</span><span class="group-line"></span></div>
-    <div class="installed-grid">
-     ${Array(6).fill(0).map(()=>`
-      <div class="app-card" style="pointer-events:none;min-height:134px;padding:12px;display:flex;flex-direction:column;gap:10px">
-       <div style="display:flex;gap:10px;align-items:center"><div class="skeleton" style="width:42px;height:42px;border-radius:12px"></div><div style="flex:1;display:grid;gap:6px"><div class="skeleton" style="width:58%;height:13px;border-radius:6px"></div><div class="skeleton" style="width:42%;height:10px;border-radius:6px"></div></div></div>
-       <div class="skeleton" style="width:92%;height:10px;border-radius:6px"></div>
-       <div style="display:flex;gap:6px"><div class="skeleton" style="width:62px;height:22px;border-radius:999px"></div><div class="skeleton" style="width:48px;height:22px;border-radius:999px"></div></div>
-       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px"><div class="skeleton" style="width:72px;height:10px;border-radius:6px"></div><div class="skeleton" style="width:64px;height:28px;border-radius:999px"></div></div>
-      </div>
-     `).join('')}
-    </div>
-   </div>
-   <div class="group" style="animation:none;margin-top:12px">
-    <div class="group-head"><span class="group-label">Discover</span><span class="group-count ">loading · 4</span><span class="group-line"></span></div>
-    <div class="store-list">
-     ${Array(3).fill(0).map(()=>`
-      <div class="app-card" style="pointer-events:none;display:flex;gap:12px;align-items:center;padding:10px 12px">
-       <div class="skeleton" style="width:42px;height:42px;border-radius:12px;flex:none"></div>
-       <div style="flex:1;display:grid;gap:6px"><div class="skeleton" style="width:44%;height:12px"></div><div class="skeleton" style="width:68%;height:10px"></div></div>
-       <div class="skeleton" style="width:86px;height:28px;border-radius:999px;flex:none"></div>
-      </div>
-     `).join('')}
-    </div>
-   </div>
-   <div class="caption" style="text-align:center;margin-top:10px;color:var(--ink-40);font-size:11px;display:flex;align-items:center;justify-content:center;gap:6px"><span class="dot ok" style="width:6px;height:6px;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5)"></span> Loading web apps · prism-ease 260 ms</div>
-  `;
-  stage.appendChild(os.cursor);
-  return;
- }
- if(id==='empty'){
-  viewport.style.display='none';
-  stateLayer.className='state-layer dim-on';
-  stateLayer.style.display='grid';
-  hintbar.style.display='';
-  stateLayer.innerHTML = `
-   <div class="state-card">
-    <div class="state-illus" aria-hidden="true">
-     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3" stroke="white" stroke-opacity="0.92" stroke-width="1.5"/><path d="M7 9h6M7 12h3.2M13.5 9h3.5M13.5 12h3.5" stroke="white" stroke-opacity="0.72" stroke-width="1.4" stroke-linecap="round"/><circle cx="17" cy="8" r="1.1" stroke="white" stroke-width="1.3"/></svg>
-    </div>
-    <div class="state-title">No web apps yet</div>
-    <div class="state-body">Install your first PWA — Figma, Linear and Notion run as glass scrims over the world. No opaque panels.</div>
-    <div class="state-actions">
-     <button class="btn primary" data-focusable tabindex="0" aria-label="Browse Discover apps">Browse Discover</button>
-     <button class="btn" data-focusable tabindex="0" aria-label="Add web app by URL">Add by URL</button>
-    </div>
-    <div style="display:flex;align-items:center;gap:6px;margin-top:4px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);border-radius:999px;padding:6px 10px">
-     <span class="caption " style="color:var(--ink-60);font-size:11px">0 installed · 4 in Discover</span>
-    </div>
-   </div>
-  `;
-  stateLayer.querySelectorAll('button')[0]?.addEventListener('click', ()=>{ setEdge('normal'); const storeEl=document.querySelector('.store-list'); if(storeEl) viewport.scrollTo({top:600, behavior:'smooth'}); });
-  stateLayer.querySelectorAll('button')[1]?.addEventListener('click', ()=> os.banner('<strong>Add by URL</strong><span class="caption">figma.com · notion.so</span>',{timeout:1800}));
-  stage.appendChild(os.cursor);
-  return;
- }
- if(id==='error'){
-  viewport.style.display='none';
-  stateLayer.className='state-layer dim-on';
-  stateLayer.style.display='grid';
-  hintbar.style.display='';
-  stateLayer.innerHTML = `
-   <div class="state-card">
-    <div class="state-illus danger" aria-hidden="true">
-     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.5L21.2 18.6H2.8L12 3.5z" stroke="#ff8a8a" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9.6v4.2" stroke="#ffb3b3" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="16.7" r="1.2" fill="#ffb3b3"/></svg>
-    </div>
-    <div class="state-title">Can’t load Web Apps</div>
-    <div class="state-body">Prism couldn’t reach the app catalog. Your installed apps are safe — retry when online.</div>
-    <div class="state-actions">
-     <button class="btn primary" data-focusable tabindex="0" aria-label="Retry loading web apps" id="retryBtn">Retry</button>
-     <button class="btn" data-focusable tabindex="0" aria-label="Dismiss error and show cached apps">Use cached</button>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;margin-top:4px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px">
-     <span class="dot bad" aria-hidden="true"></span><span class="caption " style="color:var(--ink-60);font-size:11px">Error PR-WEB-503 · 9:41 AM</span>
-    </div>
-   </div>
-  `;
-  stateLayer.querySelector('#retryBtn')?.addEventListener('click', ()=>{
-   setEdge('loading');
-   setTimeout(()=>{ setEdge('normal'); os.banner('<strong>Web Apps restored</strong><span class="caption">catalog live · 6 installed</span>',{timeout:1800}); }, 1300);
-  });
-  stateLayer.querySelectorAll('button')[1]?.addEventListener('click', ()=>{ setEdge('offline'); os.banner('<strong>Showing cached</strong><span class="caption">4 cached · Discover paused</span>',{timeout:1800}); });
-  stage.appendChild(os.cursor);
-  return;
- }
- if(id==='offline'){
-  // viewport rendered with offline handling, stateLayer hidden
-  render();
-  return;
- }
- if(id==='permission-denied'){
-  // viewport still shows but stateLayer shows blocked detail? We'll keep viewport with inline blocked note already, but also show a centered permission card as overlay? Simpler: render viewport and also show small sheet? We'll use dim-on card but keep viewport visible behind dim?
-  // For this design we keep viewport rendered and show inline note + also dim layer with permission card that can be dismissed? To make it obvious, we show stateLayer as centered card but with button to allow.
-  // However spec expects permission blocked state visible — we'll show centered card with allow/block.
-  // Let's use stateLayer as dim-on with permission card, but keep hint that cached apps behind are launchable.
-  // Alternative: just render viewport with blocked note (already done in render()) and also show stateLayer? That would hide viewport. We should just use render() path which includes inline note. So hide stateLayer.
-  viewport.style.display='flex';
-  stateLayer.className='state-layer';
-  stateLayer.style.display='none';
-  stateLayer.innerHTML='';
-  hintbar.style.display='';
-  render(); // already handles inline blocked note
-  // also need to ensure focus discipline: show a banner?We'll show a transient banner? Not needed.
-  // To make blocked more prominent, we can also flash a permissions gate example: open a web app window automatically showing blocked state? But not required.
-  // Provide a prominent centered card as alternative when user is in permission-denied to demonstrate blocked gate in window.
-  // We'll add a small overlay card on top of viewport for demo? But then viewport hidden.
-  // Decide: show inline note plus also allow to click to open figma window with blocked gate.
-  return;
- }
- if(id==='normal'){
-  hintbar.style.display='';
-  render();
-  return;
- }
-}
-
-// web app window
-function openWebApp(app, opts={}){
- if(edgeState==='offline' && !app.cached){
-  os.banner(`<strong>${app.name} needs network</strong><span class="caption">cached unavailable · connect to launch</span>`,{timeout:2200});
-  return;
- }
- // if permission-denied state and app is figma location blocked, we will show gate blocked initially
- const wmId = `webapp-${app.id}`;
- // if already open, close first
- if(os.wm.stack.find(l=>l.dataset.app===wmId)) os.wm.close(wmId);
- setTimeout(()=>{
-  os.wm.open(wmId, (layer)=>{
-   layer.style.background='rgba(4,7,11,0.36)';
-   layer.style.backdropFilter='blur(10px)';
-   layer.style.webkitBackdropFilter='blur(10px)';
-   layer.style.display='grid';
-   layer.style.placeItems='center';
-   layer.style.padding='14px 14px 22px 14px';
-   layer.addEventListener('click', (e)=>{ if(e.target===layer) os.wm.close(wmId); });
-   const sheet = h('div', {class:'browser-sheet sheet-in'});
-   sheet.setAttribute('role','dialog');
-   sheet.setAttribute('aria-label', `${app.name} at ${app.domain} web app window`);
-   // chrome
-   const bar = h('div', {class:'browser-bar'});
-   const back = h('button', {class:'browser-back', 'data-focusable':'', tabindex:'0', 'aria-label':'Close web app'});
-   back.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14.2 6L8.2 12l6 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-   back.addEventListener('click', ()=> os.wm.close(wmId));
-   const urlPill = h('div', {class:'url-pill', 'aria-label':`${app.domain} secure address`});
-      urlPill.innerHTML=`<span class="lock" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="9.5" width="14" height="10" rx="2.2" stroke="#4cd47c" stroke-width="1.6"/><path d="M8.5 9.5V7.8a3.5 3.5 0 017 0v1.7" stroke="#4cd47c" stroke-width="1.4"/><circle cx="12" cy="14.5" r="1" fill="#4cd47c"/></svg></span><strong class="tabular">${app.domain}</strong><span style="color:var(--ink-60);font-size:11px;font-weight:600">· 443</span>`;
-   const trust = h('span', {class:'trust-chip', 'aria-label': app.trusted ? 'Trusted PWA verified' : 'Unverified app'});
-   if(app.trusted){
-    trust.innerHTML=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l6 2.8v4.3c0 3.4-2.2 5.8-6 7.3-3.8-1.5-6-3.9-6-7.3V6l6-2.8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l1.6 1.6 3.8-3.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Trusted`;
-   } else {
-    trust.style.background='rgba(255,194,71,0.10)'; trust.style.outlineColor='rgba(255,194,71,0.18)'; trust.style.color='var(--warn)';
-    trust.innerHTML=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.4"/><path d="M12 8v4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="16" r="1" fill="currentColor"/></svg> Unverified`;
-   }
-   const closeBtn = h('button', {class:'browser-back', 'data-focusable':'', tabindex:'0', 'aria-label':'Close window'});
-   closeBtn.innerHTML=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="white" stroke-width="1.8" stroke-linecap="round"/></svg>`;
-   closeBtn.addEventListener('click', ()=> os.wm.close(wmId));
-   // layout depends: on narrow, trust chip may wrap 
-   bar.append(back, urlPill, trust, closeBtn);
-
-   // permissions gate — only if perms
-   let gate = null;
-   if(app.perms && app.perms.length>0){
-    gate = h('div', {class:'perm-gate'});
-    const head = h('div', {class:'gate-head'});
-    head.innerHTML=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.2l6 2.8v4.3c0 3.4-2.2 5.8-6 7.3-3.8-1.5-6-3.9-6-7.3V6l6-2.8z" stroke="white" stroke-opacity="0.9" stroke-width="1.4"/><path d="M9 12l1.6 1.6 3.8-3.8" stroke="white" stroke-opacity="0.9" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Permissions · ${app.domain} wants`;
-    gate.appendChild(head);
-    // determine initial states: if permission-denied edge and location -> blocked, else prompt/allow
-    app.perms.forEach(perm=>{
-     const row = h('div', {class:'gate-row'});
-     const iconWrap = h('span', {class:'gate-icon', 'aria-hidden':'true'});
-     iconWrap.innerHTML = permIcon(perm);
-     const main = h('div', {class:'gate-main'});
-     const title = h('div', {class:'gate-title'}, perm.charAt(0).toUpperCase()+perm.slice(1));
-     const sub = h('div', {class:'gate-sub'}, perm==='camera'?'Capture lens · 12 MP': perm==='mic'?'Audio for calls · on-device': perm==='location'?'Nearby files · world layer': perm==='notifications'?'Alerts · 3 channels': 'Clipboard · paste');
-     main.append(title, sub);
-     const actions = h('div', {class:'gate-actions'});
-     const allow = h('button', {class:'gate-btn allow', 'data-focusable':'', tabindex:'0', 'aria-label':`Allow ${perm} for ${app.domain}`}, 'Allow');
-     const block = h('button', {class:'gate-btn block', 'data-focusable':'', tabindex:'0', 'aria-label':`Block ${perm} for ${app.domain}`}, 'Block');
-     // preset logic
-     let current = 'prompt'; // prompt/allow/block
-     if(opts.presetAllow===perm) current='allow';
-     if(edgeState==='permission-denied' && perm==='location' && app.id==='figma' && !opts.presetAllow) current='block';
-     // apply selected
-     const applySelected = ()=>{
-      allow.classList.toggle('selected', current==='allow');
-      block.classList.toggle('selected', current==='block');
-      allow.setAttribute('aria-pressed', String(current==='allow'));
-      block.setAttribute('aria-pressed', String(current==='block'));
-     };
-     applySelected();
-     allow.addEventListener('click', ()=>{
-      current='allow';
-      applySelected();
-      permissionOverrides.set(`${app.id}:${perm}`, 'allow');
-      os.banner(`<strong>${perm.charAt(0).toUpperCase()+perm.slice(1)} allowed</strong><span class="caption">${app.domain} · ${app.name}</span>`,{timeout:1800});
-      // if this was blocked location, refresh? just toast
-      if(perm==='location' && app.id==='figma' && edgeState==='permission-denied'){
-       // keep but show toast
-      }
-     });
-     block.addEventListener('click', ()=>{
-      current='block';
-      applySelected();
-      permissionOverrides.set(`${app.id}:${perm}`, 'block');
-      os.banner(`<strong>${perm.charAt(0).toUpperCase()+perm.slice(1)} blocked</strong><span class="caption">${app.domain} · safe · no dead ends</span>`,{timeout:1800});
-     });
-     actions.append(allow, block);
-     row.append(iconWrap, main, actions);
-     gate.appendChild(row);
-    });
-    // helper text
-    const help = h('div', {class:'caption', style:'font-size:11px;color:var(--ink-40);text-align:center;padding:2px 4px'});
-    help.textContent='Glass scrim stays translucent — permissions never hide world layer';
-    gate.appendChild(help);
-   }
-
-   // content
-   const content = h('div', {class:'browser-content'});
-   // mock content per app
-   if(app.id==='figma'){
-    content.innerHTML = `
-     <div class="mock-card">
-            <div style="display:flex;align-items:center;gap:8px"><span style="width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:${app.tint};color:#fff"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="3" stroke="white" stroke-width="1.6"/></svg></span><div style="flex:1;min-width:0"><div class="mock-title">Untitled · Prism frame 600×600</div><div class="mock-sub">Figma scrim · glass stays · last edit 2 m ago · <span class="tabular">v${app.version}</span></div></div><span class="perm-badge trusted" style="flex:none;height:24px">Trusted · 443</span></div>
-      <div style="height:120px;border-radius:12px;background:linear-gradient(135deg, #2A3550 0%, #141A28 60%, #0A0E17 100%);outline:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden;display:grid;place-items:center">
-       <svg width="72" height="42" viewBox="0 0 72 42" fill="none" aria-hidden="true"><rect x="1" y="1" width="70" height="40" rx="10" stroke="white" stroke-opacity="0.14" stroke-width="1"/><rect x="8" y="10" width="22" height="14" rx="6" fill="rgba(86,184,255,0.18)" stroke="rgba(86,184,255,0.28)" stroke-width="1"/><rect x="38" y="10" width="26" height="22" rx="7" fill="rgba(165,139,255,0.14)" stroke="rgba(165,139,255,0.24)" stroke-width="1"/><circle cx="18" cy="34" r="2" fill="white" fill-opacity="0.9"/><rect x="34" y="34" width="16" height="3" rx="1.5" fill="white" fill-opacity="0.18"/></svg>
-              <span style="position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,0.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);outline:1px solid rgba(255,255,255,0.08);color:var(--ink-80);font-size:11px;font-weight:600;padding:4px 8px;border-radius:999px" class="tabular">Frame 1 · 600×600 · 20°</span>
-      </div>
-     </div>
-     <div class="mock-card" style="padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="chip" data-focusable tabindex="0" aria-label="Edit in Figma">Edit</button>
-      <button class="chip" data-focusable tabindex="0" aria-label="Share Figma file">Share</button>
-      <button class="chip" data-focusable tabindex="0" aria-label="Present Figma file">Present</button>
-            <span style="margin-left:auto;align-self:center;font-size:11px;font-weight:600;color:var(--ink-40)" class="tabular">Auto-saved · 9:41</span>
-     </div>
-    `;
-   } else if(app.id==='linear'){
-    content.innerHTML = `
-     <div class="mock-card">
-      <div class="mock-title">Linear · Issues</div>
-            <div class="mock-sub">12 open · 4 in progress · sync <span class="tabular">2 m ago · 72%</span></div>
-      <div style="display:grid;gap:6px;margin-top:2px">
-              <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px 10px"><span style="width:8px;height:8px;border-radius:50%;background:var(--warn);flex:none"></span><span style="font-size:14px;font-weight:600;color:var(--ink-100)">PR-WEB-503 triage</span><span style="margin-left:auto;font-size:11px;color:var(--ink-60)" class="tabular">· 3d</span></div>
-              <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px 10px"><span style="width:8px;height:8px;border-radius:50%;background:var(--ok)"></span><span style="font-size:14px;font-weight:600;color:var(--ink-100)">Glass scrim polish</span><span style="margin-left:auto;font-size:11px;color:var(--ink-60)" class="tabular">· Today</span></div>
-      </div>
-     </div>
-    `;
-   } else if(app.id==='notion'){
-    content.innerHTML = `
-     <div class="mock-card">
-      <div class="mock-title">Notion · Prism notes</div>
-            <div class="mock-sub">8 pages offline · last sync <span class="tabular">9:41 AM · 100%</span></div>
-      <div style="height:78px;border-radius:10px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);padding:10px;display:grid;gap:6px">
-       <div class="skeleton" style="width:62%;height:12px"></div><div class="skeleton" style="width:88%;height:10px"></div><div class="skeleton" style="width:74%;height:10px"></div>
-      </div>
-     </div>
-    `;
-   } else if(app.id==='excalidraw'){
-    content.innerHTML = `
-     <div class="mock-card" style="padding:0;overflow:hidden">
-      <div style="height:140px;background:linear-gradient(135deg, #1A1A1A 0%, #2B3242 100%);display:grid;place-items:center;position:relative">
-       <svg width="120" height="60" viewBox="0 0 120 60" fill="none" aria-hidden="true"><path d="M10 40l20-18 20 18 20-18 30 22" stroke="white" stroke-opacity="0.92" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="28" cy="18" r="3" fill="white"/><rect x="10" y="6" width="100" height="48" rx="10" stroke="white" stroke-opacity="0.12" stroke-width="1"/></svg>
-              <span style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.42);color:#fff;font-size:11px;font-weight:600;padding:4px 8px;border-radius:999px" class="tabular">600×600 canvas</span>
-      </div>
-            <div style="padding:10px 12px;display:flex;gap:8px"><button class="chip" data-focusable tabindex="0" aria-label="Draw">Draw</button><button class="chip" data-focusable tabindex="0" aria-label="Erase">Erase</button><span style="margin-left:auto;font-size:11px;color:var(--ink-40);align-self:center" class="tabular">No permissions · local only</span></div>
-     </div>
-    `;
-   } else {
-    content.innerHTML = `
-     <div class="mock-card">
-      <div class="mock-title">${app.name} · ${app.domain}</div>
-            <div class="mock-sub">${app.desc} · <span class="tabular">v${app.version} · ${app.size} MB · 443</span></div>
-      <div style="height:96px;border-radius:10px;background:linear-gradient(135deg, rgba(86,184,255,0.10), rgba(165,139,255,0.08) 60%, rgba(255,255,255,0.04));outline:1px solid rgba(255,255,255,0.07);display:grid;place-items:center">
-       <span style="width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:${app.tint};color:#fff;font-weight:800">${app.name.slice(0,2).toUpperCase()}</span>
-      </div>
-     </div>
-     <div class="mock-card" style="padding:10px 12px;display:flex;align-items:center;gap:8px">
-      <span class="dot ok" aria-hidden="true"></span><span style="font-size:11px;font-weight:600;color:var(--ink-60)">Scrim stays translucent over world · no opaque panels</span>
-     </div>
-    `;
-   }
-
-   // footer
-   const footer = h('div', {class:'browser-footer'});
-   footer.innerHTML = `
-        <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--ink-60)"><span class="dot ok" style="width:6px;height:6px"></span><span class="tabular">${app.domain} · ${app.cached ? 'cached' : 'live'} · ${app.size} MB</span></span>
-    <span style="margin-left:auto;display:flex;gap:6px">
-     <button class="chip" data-focusable tabindex="0" aria-label="Trust details for ${app.domain}" style="height:26px">Details</button>
-     <button class="chip primary" data-focusable tabindex="0" aria-label="Launch ${app.name} fullscreen" style="height:26px;background:linear-gradient(180deg, var(--accent), var(--accent-strong));color:#051423;border:none">Open</button>
-    </span>
-   `;
-   footer.querySelectorAll('button')[0]?.addEventListener('click', ()=> os.banner(`<strong>${app.domain} · Trusted PWA</strong><span class="caption">Signed · 443 · glass scrim</span>`,{timeout:1800}));
-   footer.querySelectorAll('button')[1]?.addEventListener('click', ()=>{ os.banner(`<strong>${app.name} opened fullscreen</strong><span class="caption">${app.domain} · prism-ease 260 ms · scrim</span>`,{timeout:1800}); });
-
-   sheet.append(bar);
-   if(gate) sheet.appendChild(gate);
-   sheet.append(content, footer);
-   layer.appendChild(sheet);
-   // ensure cursor on top
-   stage.appendChild(os.cursor);
-   // focus back
-   setTimeout(()=> back.focus({preventScroll:true}), 60);
-   hintbar.style.opacity='0';
-   hintbar.style.pointerEvents='none';
-  });
- }, 30);
- // on back, restore hintbar
- const closeHandler = ()=>{
-  hintbar.style.opacity='';
-  hintbar.style.pointerEvents='';
-  stage.appendChild(os.cursor);
- };
- // we hook wm close event? just listen to back
- // Use os.on back to detect close
- // We'll add one-time listener for appclose
- const onClose = (e)=>{
-  if(e.detail.id===wmId){ closeHandler(); os.bus.removeEventListener('appclose', onClose); }
- };
- os.bus.addEventListener('appclose', onClose);
- // keyboard back already handled by core wm
-}
-
-// initial render
-render();
-window.__setWebAppsState = setEdge;
-window.__openWebApp = openWebApp;
-// expose for probe
-console.log('Prism Web Apps ready — 600x600');
-
-os.on('back', ()=>{
- const top = os.wm.top();
- if(top && top.dataset.app?.startsWith('webapp-')){
-  // core already closes via wm.close on back, but restore hintbar via appclose listener
- }
+rt.on('notification', (n) => {
+  os.banner(`<b>${esc(n.appName)}</b> ${esc(n.title)}<br><span style="opacity:.7">${esc(n.body)}</span>`);
 });
 
-// reduced motion handled via CSS
+/* ---------- lab ---------- */
+
+const lab = mountLab({
+  piece: '12-webapps',
+  title: 'Web Apps',
+  states: ['ready', 'loading', 'empty', 'error', 'offline', 'denied'],
+  onState: (s) => {
+    edge = s === 'ready' ? null : s;
+    if (s === 'ready') { view = 'launcher'; openId = null; }
+    render();
+  },
+  actions: [
+    { label: 'Open Transit', run: () => { edge = null; lab.setState?.('ready'); open('transit'); } },
+    { label: 'Open Waypoint', run: () => { edge = null; open('waypoint'); } },
+    { label: 'Launch an app that hangs', run: async () => { edge = null; await rt.install('stalled'); open('stalled'); } },
+    { label: 'Install a broken package', run: async () => { edge = null; await rt.install('badmanifest'); edge = 'error'; render(); } },
+    { label: 'Revoke every grant', run: () => { for (const id of rt.installed.keys()) rt.revokeAll(id); } },
+  ],
+  toggles: [
+    { label: 'Network', initial: true, run: (on) => rt.setOnline(on) },
+  ],
+  onScale: (v) => rt.setDisplay({ textScale: v }),
+  onReducedMotion: (on) => rt.setDisplay({ reducedMotion: on }),
+});
+
+/* The runtime paints into the window that renderApp builds, so it has no
+   container of its own until an app is open. */
+rt.setDisplay({ textScale: lab.scale, reducedMotion: lab.reducedMotion });
+await installSamples();
+if (!edge) render();
 </script>
 </body>
 </html>

@@ -19,6 +19,10 @@ const PROTOCOL = 1;
 const READY_TIMEOUT = 4000;
 /* A single brokered call may not hang the app forever either. */
 const CALL_TIMEOUT = 8000;
+/* Bounds on a self-reported window height. Small enough that a window always
+   leaves world visible, tall enough that a real app is not squeezed. */
+const MIN_APP_HEIGHT = 96;
+const MAX_APP_HEIGHT = 430;
 
 export class AppRuntime {
   constructor(opts = {}) {
@@ -38,6 +42,8 @@ export class AppRuntime {
     this.focused = null;
     this._listeners = new Map();
     this._pendingPrompt = null;
+    /* System accessibility, pushed into every frame. See setDisplay. */
+    this.display = { width: 600, height: 600, eye: 'right', textScale: 1, reducedMotion: false };
 
     this._onMessage = this._onMessage.bind(this);
     window.addEventListener('message', this._onMessage);
@@ -150,6 +156,7 @@ export class AppRuntime {
       since: Date.now(),
       error: null,
       calls: 0,
+      height: MIN_APP_HEIGHT,
     };
     this.instances.set(id, inst);
 
@@ -273,6 +280,19 @@ export class AppRuntime {
 
   get pendingPrompt() { return this._pendingPrompt; }
 
+  /* ---------- system display + accessibility ---------- */
+
+  /* Text size and reduced motion are the wearer's settings, so they are pushed
+     into every running app rather than left for each developer to re-implement
+     and forget. An app cannot decline them. */
+  setDisplay(patch) {
+    this.display = { ...this.display, ...patch };
+    for (const inst of this.instances.values()) {
+      this._send(inst, { type: 'host:display', display: this.display });
+    }
+    this.emit('display-changed', this.display);
+  }
+
   /* ---------- network ---------- */
 
   setOnline(on) {
@@ -318,12 +338,24 @@ export class AppRuntime {
             id: inst.id,
             name: inst.manifest.name,
             online: this.online,
-            display: { width: 600, height: 600, eye: 'right' },
+            display: { ...this.display },
             granted: Object.entries(this.grants.get(inst.id) || {})
               .filter(([, v]) => v === 'granted').map(([k]) => k),
           },
         });
         this.emit('ready', { id: inst.id, instance: inst });
+        this.emit('change');
+      }
+      return;
+    }
+
+    /* An app measures itself; the host decides what that is worth. The clamp is
+       the whole point — a frame is not allowed to grow until it owns the eye. */
+    if (m.type === 'app:resize') {
+      const h = Math.max(MIN_APP_HEIGHT, Math.min(MAX_APP_HEIGHT, Number(m.height) || 0));
+      if (h !== inst.height) {
+        inst.height = h;
+        this.emit('resize', { id: inst.id, height: h });
         this.emit('change');
       }
       return;

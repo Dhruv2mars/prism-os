@@ -68,6 +68,49 @@
     });
   }
 
+  /* The wearer's text size and motion preference belong to the system, not to
+     each app. A CSS custom property on the host root cannot cross a document
+     boundary, so the host pushes the values in and the SDK applies them here.
+     An app that styles against --a11y-scale and prefers-reduced-motion gets
+     system accessibility for free and cannot accidentally opt out of it. */
+  function applyDisplay(display) {
+    if (!display) return;
+    var root = document.documentElement;
+    if (typeof display.textScale === 'number') {
+      root.style.setProperty('--a11y-scale', String(display.textScale));
+    }
+    root.toggleAttribute('data-reduced-motion', !!display.reducedMotion);
+  }
+
+  /* Windows are sized by their content, not by the viewport. On a 600px display
+     an app that fills the frame occludes the world for no reason, so the app
+     measures itself and the OS sizes the window around it. The app never gets to
+     ask for more than it needs, and the host clamps whatever it reports. */
+  var lastH = 0;
+  function measure() {
+    /* Deliberately <body>, not <html>. The root element's box is the frame the
+       host gave us, so measuring it would report back whatever height the host
+       just set — a loop that always agrees with itself. The body grows with its
+       own content and is the only honest number here. */
+    var h = Math.ceil(document.body.scrollHeight);
+    if (!h || Math.abs(h - lastH) < 2) return;
+    lastH = h;
+    post({ type: 'app:resize', height: h });
+  }
+  function watchSize() {
+    /* The OS sizes the window to the document, so the document must be free to
+       size to its content. Any inherited `height: 100%` would peg the body to
+       whatever the host last set and make every measurement agree with itself. */
+    var st = document.createElement('style');
+    st.textContent = 'html,body{height:auto!important;min-height:0!important;}';
+    document.head.appendChild(st);
+    measure();
+    if (typeof ResizeObserver === 'function') {
+      new ResizeObserver(measure).observe(document.body);
+    }
+    window.addEventListener('load', measure);
+  }
+
   window.addEventListener('message', function (e) {
     /* The only window that may drive this app is the one that embedded it. */
     if (e.source !== HOST) return;
@@ -76,7 +119,17 @@
 
     if (m.type === 'host:ready') {
       context = m.context;
+      applyDisplay(context.display);
       readyResolve(context);
+      watchSize();
+      return;
+    }
+
+    if (m.type === 'host:display') {
+      if (context) context.display = m.display;
+      applyDisplay(m.display);
+      emit('displaychange', m.display);
+      requestAnimationFrame(measure);
       return;
     }
 

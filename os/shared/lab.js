@@ -101,6 +101,13 @@ export function hardenGaze(stage = document.querySelector('.stage')) {
         transition: opacity var(--dur-fast) var(--ease-prism);
       }
       .stage .gaze-cursor[data-awake] { opacity: 1; }
+      /* When gaze lands on something, that thing lights up and the reticle steps
+         out of the way. A dot painted over a word the wearer is trying to read is
+         the reticle competing with the content it exists to point at. */
+      .stage:has(.gaze-focus) .gaze-cursor { opacity: 0; }
+      /* Over words, the reticle has nothing to point at and everything to
+         obscure, so it only ever paints over open space. */
+      .stage .gaze-cursor[data-over-content] { opacity: 0; }
       :root[data-reduced-motion] .stage .gaze-cursor { transition: none; }
     `;
     document.head.appendChild(st);
@@ -121,6 +128,35 @@ export function hardenGaze(stage = document.querySelector('.stage')) {
     stage.addEventListener(ev, wake, { passive: true });
   }
   window.addEventListener('keydown', wake, { passive: true });
+
+  /* core.js hit-tests with stage-local coordinates against a viewport-space API,
+     so the stage transform shifts what it thinks the wearer is looking at. It is
+     frozen, so the correction lives here: hit-test in viewport space and settle
+     .gaze-focus on the element actually under the gaze. Registered after core's
+     own listener, so it always has the last word. */
+  const HIT = '[data-focusable],button,a,[role="button"],[role="tab"],input,select';
+  let hot = null;
+  const settle = (el) => {
+    if (hot === el) return;
+    hot = el;
+    for (const n of stage.querySelectorAll('.gaze-focus')) {
+      if (n !== hot) n.classList.remove('gaze-focus');
+    }
+    if (hot) hot.classList.add('gaze-focus');
+  };
+  const aim = (e) => {
+    cursor.style.visibility = 'hidden';
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    cursor.style.visibility = '';
+    const t = under?.closest(HIT);
+    settle(t && stage.contains(t) ? t : null);
+    const openSpace = !under || under === stage || under.hasAttribute('data-world')
+      || ![...under.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim());
+    cursor.toggleAttribute('data-over-content', !openSpace);
+  };
+  stage.addEventListener('pointermove', aim, { passive: true });
+  stage.addEventListener('pointerdown', aim, { passive: true });
+  stage.addEventListener('pointerleave', () => settle(null), { passive: true });
 }
 
 export function mountLab(cfg = {}) {
