@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stalled</title>
+</head>
+<body style="margin:0;background:transparent">
+<!-- A fixture, not a product. It loads the SDK and deliberately never calls
+     prism.ready(), so the host watchdog is exercised against a real frame
+     rather than a simulated one. Every OS needs a way out of an app that
+     never starts; this is what proves Prism has one. -->
+<script src="/os/shared/prism-sdk.js"></script>
+</body>
+</html>

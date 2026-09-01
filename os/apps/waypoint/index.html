@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Waypoint</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font: 400 15px/1.35 var(--font-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif);
+    color: var(--ink-100, #f2f5fa);
+    background: transparent;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    height: 100%;
+    box-sizing: border-box;
+    padding: calc(14px * var(--a11y-scale, 1)) calc(16px * var(--a11y-scale, 1));
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: calc(10px * var(--a11y-scale, 1));
+  }
+  .title { font-size: calc(14px * var(--a11y-scale, 1)); font-weight: 620; }
+  .focal { display: grid; gap: calc(4px * var(--a11y-scale, 1)); align-content: center; }
+  .dist {
+    font-size: calc(54px * var(--a11y-scale, 1));
+    line-height: 0.92;
+    font-weight: 680;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    color: #ffb454;
+  }
+  .where { font-size: calc(13px * var(--a11y-scale, 1)); color: var(--ink-60, rgba(233,240,250,0.62)); }
+  .msg { align-self: center; display: grid; gap: calc(6px * var(--a11y-scale,1)); max-width: 34ch; }
+  .msg h2 { margin: 0; font-size: calc(16px * var(--a11y-scale,1)); font-weight: 620; }
+  .msg p { margin: 0; font-size: calc(13px * var(--a11y-scale,1)); line-height: 1.35; color: var(--ink-60, rgba(233,240,250,0.62)); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    font: inherit; font-size: calc(13px * var(--a11y-scale,1)); font-weight: 560;
+    color: var(--ink-100, #f2f5fa);
+    background: rgba(255,255,255,0.10); border: 0;
+    outline: 1px solid rgba(255,255,255,0.16);
+    border-radius: 999px;
+    padding: calc(7px * var(--a11y-scale,1)) calc(14px * var(--a11y-scale,1));
+    min-height: calc(30px * var(--a11y-scale,1));
+    cursor: pointer;
+  }
+  button.primary { background: rgba(255,180,84,0.20); outline-color: rgba(255,180,84,0.44); }
+  button:focus-visible { outline: 2px solid #ffb454; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 1ms !important; transition-duration: 1ms !important; } }
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="title">Waypoint</div>
+    <div id="body"></div>
+    <div class="actions" id="actions"></div>
+  </div>
+
+<script src="/os/shared/prism-sdk.js"></script>
+<script>
+(function () {
+  'use strict';
+  var bodyEl = document.getElementById('body');
+  var actionsEl = document.getElementById('actions');
+  var mark = null;
+
+  function setActions(list) {
+    actionsEl.textContent = '';
+    list.forEach(function (a) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = a.label;
+      if (a.primary) b.className = 'primary';
+      b.addEventListener('click', a.onClick);
+      actionsEl.appendChild(b);
+    });
+  }
+  function message(title, text, actions) {
+    bodyEl.textContent = '';
+    var w = document.createElement('div'); w.className = 'msg';
+    var h = document.createElement('h2'); h.textContent = title;
+    var p = document.createElement('p'); p.textContent = text;
+    w.appendChild(h); w.appendChild(p); bodyEl.appendChild(w);
+    setActions(actions || []);
+  }
+  function render() {
+    bodyEl.textContent = '';
+    var f = document.createElement('div'); f.className = 'focal';
+    var d = document.createElement('div'); d.className = 'dist'; d.textContent = '0 m';
+    var w = document.createElement('div'); w.className = 'where'; w.textContent = 'Marked at ' + mark.label;
+    f.appendChild(d); f.appendChild(w); bodyEl.appendChild(f);
+    prism.setBadge('Marked · ' + mark.label.split(',')[0]);
+    setActions([
+      { label: 'Clear', primary: true, onClick: clear },
+      { label: 'Re-mark', onClick: markHere },
+    ]);
+  }
+  function empty() {
+    message('Nothing marked',
+      'Mark where you are standing and Waypoint will walk you back to it.',
+      [{ label: 'Mark this spot', primary: true, onClick: markHere }]);
+    prism.setBadge('Nothing marked');
+  }
+  function markHere() {
+    message('Finding you', 'Waiting for a location fix.', []);
+    prism.location.get().then(function (fix) {
+      mark = fix;
+      render();
+      return prism.storage.set('mark', fix).catch(function () {});
+    }).catch(function (err) {
+      if (err.code === 'permission-denied') {
+        message('Location is off',
+          'Waypoint marks a spot by reading where you are. Without location there is nothing it can do.',
+          [{ label: 'Ask again', primary: true, onClick: markHere }, { label: 'Back', onClick: empty }]);
+      } else {
+        message('Could not get a fix', err.message,
+          [{ label: 'Try again', primary: true, onClick: markHere }, { label: 'Back', onClick: empty }]);
+      }
+    });
+  }
+  function clear() {
+    mark = null;
+    prism.storage.remove('mark').catch(function () {});
+    empty();
+  }
+
+  prism.on('permissionchange', function (p) {
+    if (p.name === 'location' && p.state !== 'granted' && mark) {
+      /* The grant went away, so the reading behind this number is no longer
+         something the app is allowed to have. Drop it rather than keep a stale
+         position on screen. */
+      mark = null;
+      message('Location was turned off',
+        'The spot you marked was cleared because Waypoint can no longer read your position.',
+        [{ label: 'OK', primary: true, onClick: empty }]);
+    }
+  });
+
+  prism.ready().then(function () {
+    return prism.storage.get('mark').catch(function () { return null; });
+  }).then(function (saved) {
+    if (saved) { mark = saved; render(); } else empty();
+  }).catch(empty);
+})();
+</script>
+</body>
+</html>

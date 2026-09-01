@@ -1,0 +1,18 @@
+{
+  "manifestVersion": 1,
+  "id": "waypoint",
+  "name": "Waypoint",
+  "version": "0.9.1",
+  "entry": "index.html",
+  "category": "travel",
+  "developer": "Ora Studio",
+  "glyph": "W",
+  "accent": "#ffb454",
+  "badge": "Nothing marked",
+  "offline": true,
+  "permissions": ["location", "storage"],
+  "permissionReasons": {
+    "location": "Marks the spot you are standing on so you can walk back to it.",
+    "storage": "Keeps your marked spot after you take the glasses off."
+  }
+}

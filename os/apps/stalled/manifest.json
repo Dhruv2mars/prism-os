@@ -1,0 +1,13 @@
+{
+  "manifestVersion": 1,
+  "id": "stalled",
+  "name": "Stalled",
+  "version": "1.0.0",
+  "entry": "index.html",
+  "category": "utility",
+  "developer": "Test Fixture",
+  "glyph": "S",
+  "badge": "Never starts",
+  "offline": true,
+  "permissions": []
+}

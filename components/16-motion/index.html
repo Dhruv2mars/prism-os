@@ -27,22 +27,45 @@
   position:relative; width:min(452px, 100%);
   padding:calc(20px * var(--pm)) calc(22px * var(--pm)) calc(18px * var(--pm));
   border-radius:var(--r-lg);
-  /* thin enough that the street behind the lens keeps reading through it */
-  background:linear-gradient(158deg, rgba(20,29,43,0.64), rgba(9,14,22,0.77));
-  backdrop-filter:saturate(1.6) blur(26px);
-  -webkit-backdrop-filter:saturate(1.6) blur(26px);
-  outline:1px solid rgba(255,255,255,0.13);
+  /* thin enough that the street behind the lens keeps reading through it:
+     the ground stays warm under the card and the sky stays cool above it */
+  background:
+   linear-gradient(158deg, rgba(19,28,42,0.54) 0%, rgba(10,16,25,0.68) 62%, rgba(7,11,18,0.72) 100%);
+  backdrop-filter:saturate(1.9) contrast(1.04) blur(22px);
+  -webkit-backdrop-filter:saturate(1.9) contrast(1.04) blur(22px);
+  outline:1px solid rgba(255,255,255,0.12);
   box-shadow:
-   0 1px 0 rgba(255,255,255,0.28) inset,
-   0 -1px 0 rgba(255,255,255,0.06) inset,
-   0 26px 62px rgba(0,0,0,0.46),
-   0 4px 14px rgba(0,0,0,0.32);
+   0 1px 0 rgba(255,255,255,0.30) inset,
+   0 -1px 0 rgba(255,255,255,0.07) inset,
+   0 22px 56px rgba(0,0,0,0.40),
+   0 3px 12px rgba(0,0,0,0.26);
   text-align:left; overflow:hidden;
   transition:
    transform var(--dur-base) var(--ease-prism),
    outline-color var(--dur-fast) var(--ease-prism),
    background var(--dur-base) var(--ease-prism);
  }
+ /* the lens bends light at the edge: a thin refracted band that is clearer
+    than the body of the glass, so the world visibly continues through the rim */
+ .msg::before{
+  content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  padding:1.4px;
+  background:linear-gradient(158deg,
+   rgba(190,222,255,0.42) 0%, rgba(255,255,255,0.05) 30%,
+   rgba(255,255,255,0.03) 66%, rgba(255,196,128,0.24) 100%);
+  -webkit-mask-image:linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  -webkit-mask-clip:content-box, border-box;
+  -webkit-mask-composite:xor;
+  mask-image:linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  mask-clip:content-box, border-box;
+  mask-composite:exclude;
+ }
+ /* ground light leaking up through the underside of the lens */
+ .msg::after{
+  content:''; position:absolute; inset:auto 0 0 0; height:46%; border-radius:inherit;
+  pointer-events:none; background:linear-gradient(0deg, rgba(255,186,116,0.075), transparent 78%);
+ }
+ .msg > *{ position:relative; z-index:1 }
  .msg.leaving{ position:absolute; left:50%; top:0; transform:translateX(-50%); pointer-events:none }
 
  /* gaze / hover / keyboard land on the same visible state, and it survives
@@ -83,7 +106,12 @@
  }
  .quote b{ font-weight:600; color:var(--ink-80) }
 
- .acts{ display:flex; flex-wrap:wrap; align-items:center; gap:calc(8px * var(--pm)); margin-top:calc(16px * var(--pm)) }
+ /* the actions stay out of the composition until the wearer actually looks
+    at the card; the card grows around them, continuously and interruptibly */
+ .tray{ height:0; overflow:hidden; visibility:hidden; opacity:0 }
+ .tray.showing, .msg.lit .tray{ visibility:visible }
+ .msg.lit .tray{ opacity:1 }
+ .acts{ display:flex; flex-wrap:wrap; align-items:center; gap:calc(8px * var(--pm)); padding-top:calc(16px * var(--pm)) }
  .act{
   appearance:none; font-family:inherit; cursor:pointer;
   display:inline-flex; align-items:center; gap:calc(7px * var(--s));
@@ -249,14 +277,20 @@ const heightAnims = (el) => el.getAnimations()
    running height animation, and only then measure the new resting height.
    Measuring before the release lets the in-flight animation force the reading,
    the delta collapses to zero, and the interruption is silently dropped. */
-function resize(el, mutate, dur = D.change) {
-  const h0 = el.getBoundingClientRect().height;
-  heightAnims(el).forEach((a) => a.cancel());
+function resizeMany(els, mutate, dur = D.change) {
+  const h0 = els.map((e) => e.getBoundingClientRect().height);
+  els.forEach((e) => heightAnims(e).forEach((a) => a.cancel()));
   mutate();
-  const h1 = el.getBoundingClientRect().height;
-  if (reduced() || Math.abs(h1 - h0) < 1) return null;
-  return el.animate([{ height: `${h0}px` }, { height: `${h1}px` }],
-    { duration: dur, easing: EASE });
+  const h1 = els.map((e) => e.getBoundingClientRect().height);
+  if (reduced()) return [];
+  return els
+    .map((e, i) => (Math.abs(h1[i] - h0[i]) < 1 ? null
+      : e.animate([{ height: `${h0[i]}px` }, { height: `${h1[i]}px` }],
+        { duration: dur, easing: EASE })))
+    .filter(Boolean);
+}
+function resize(el, mutate, dur = D.change) {
+  return resizeMany([el], mutate, dur)[0] ?? null;
 }
 
 /* -------------------------------------------------------------------- data -- */
@@ -304,10 +338,10 @@ function cardHTML(m) {
      <div class="detail" data-detail><div class="inner">
        ${m.prior.map(([w, t]) => `<p class="quote"><b>${w}</b> — ${t}</p>`).join('')}
      </div></div>
-     <div class="acts">
+     <div class="tray" data-tray><div class="acts">
        <button class="act" data-reply type="button">Reply by voice</button>
        <button class="act quiet" data-done type="button">Done</button>
-     </div>
+     </div></div>
    </article>`;
 }
 
@@ -439,6 +473,39 @@ function wireCard(card) {
   });
   card.querySelector('[data-reply]').addEventListener('click', () => sendReply(card));
   card.querySelector('[data-done]').addEventListener('click', () => step('done'));
+
+  /* gaze lift: looking at the card is what asks for its actions */
+  card.addEventListener('pointerenter', () => lit(card, true));
+  card.addEventListener('pointerleave', () => { if (!S.expanded) lit(card, false); });
+  card.addEventListener('focusin', () => lit(card, true));
+  card.addEventListener('focusout', (e) => {
+    if (S.expanded || card.contains(e.relatedTarget) || card.matches(':hover')) return;
+    lit(card, false);
+  });
+}
+
+/* The signature move. Nothing but the message is on the glass until gaze
+   lands; then the card grows around its actions and they rise out of its
+   lower edge. Look away and it closes again. Both directions retarget from
+   the live height, so flicking your eyes on and off never snaps. */
+function lit(card, on) {
+  if (!card || card.classList.contains('leaving')) return;
+  if (card.classList.contains('lit') === on) return;
+  const tray = card.querySelector('[data-tray]');
+  if (!tray) return;
+  const from = pose(tray);
+  tray.getAnimations().forEach((a) => a.cancel());
+  tray.classList.add('showing');
+  resizeMany([tray, card], () => {
+    tray.style.height = on ? 'auto' : '0';
+    card.classList.toggle('lit', on);
+  });
+  const anim = play(tray, [from, { opacity: on ? 1 : 0 }], D.change);
+  anim.finished.then(() => {
+    if (anim.playState !== 'finished') return;
+    anim.cancel();
+    if (!card.classList.contains('lit')) tray.classList.remove('showing');
+  }).catch(() => {});
 }
 
 /* the live card, never the one that is already on its way out */
@@ -447,17 +514,31 @@ const liveCard = () => surface.querySelector('[data-card]:not(.leaving)');
 /* change: the card grows around its new content, continuously, and a second
    press mid-grow re-aims from wherever the edge currently is */
 function toggleDetail(card) {
+  if (!card || card.classList.contains('leaving')) return;
   const detail = card.querySelector('[data-detail]');
+  const tray = card.querySelector('[data-tray]');
   S.expanded = !S.expanded;
   card.setAttribute('aria-expanded', String(S.expanded));
-  resize(card, () => { detail.style.height = S.expanded ? 'auto' : '0'; });
+  tray.classList.add('showing');
+  const trayFrom = pose(tray);
+  tray.getAnimations().forEach((a) => a.cancel());
+  /* the card, the thread and the action tray all grow on the same clock,
+     each one re-aimed from the height it currently has */
+  resizeMany([detail, tray, card], () => {
+    detail.style.height = S.expanded ? 'auto' : '0';
+    tray.style.height = 'auto';
+    card.classList.add('lit');
+  });
   retarget(detail, { opacity: S.expanded ? 1 : 0 }, D.change);
+  const anim = play(tray, [trayFrom, { opacity: 1 }], D.change);
+  anim.finished.then(() => { if (anim.playState === 'finished') anim.cancel(); }).catch(() => {});
 }
 
 /* an action that can fail, inline, without losing the card */
 function sendReply(card) {
   if (S.busy || card.classList.contains('leaving')) return;
   S.busy = true;
+  lit(card, true);
   const reply = card.querySelector('[data-reply]');
   reply.textContent = 'Listening…';
   setTimeout(() => {
@@ -592,7 +673,14 @@ const lab = mountLab({
   onState: (s) => { clearTimeout(go._t); if (s === 'ready') { S.idx = 0; S.expanded = false; } S.view = s; paint(s); if (s === 'loading') go('loading'); },
   actions: [
     { label: 'A message arrives', run: () => { if (S.view !== 'ready') { S.idx = 0; go('ready'); } else step('done'); } },
-    { label: 'Open the thread', run: () => { const c = liveCard(); if (c) toggleDetail(c); } },
+    { label: 'Gaze lands on the card', run: () => { toReady(); lit(liveCard(), true); } },
+    { label: 'Gaze leaves the card', run: () => {
+        const c = liveCard();
+        if (!c) return;
+        if (S.expanded) toggleDetail(c);
+        lit(c, false);
+      } },
+    { label: 'Open the thread', run: () => { toReady(); toggleDetail(liveCard()); } },
     { label: 'Dismiss with a flick', run: () => { if (S.view === 'ready') step('done'); } },
     { label: 'Undo the dismiss', run: () => { hideUndo(); step('undo'); } },
     { label: 'Reply fails to send', run: () => { S.failed = true; const c = liveCard(); if (c) sendReply(c); } },
@@ -601,19 +689,27 @@ const lab = mountLab({
         const c = liveCard();
         if (!c) return;
         if (S.expanded) toggleDetail(c);
-        setTimeout(() => { const a = liveCard(); if (a) toggleDetail(a); }, 60);
-        setTimeout(() => { const b = liveCard(); if (b) toggleDetail(b); }, 170);
+        setTimeout(() => toggleDetail(liveCard()), 60);
+        setTimeout(() => toggleDetail(liveCard()), 170);
+      } },
+    { label: 'Interrupt the gaze lift', run: () => {
+        toReady();
+        const c = liveCard();
+        if (!c) return;
+        if (S.expanded) toggleDetail(c);
+        lit(liveCard(), false);
+        setTimeout(() => lit(liveCard(), true), 40);
+        setTimeout(() => lit(liveCard(), false), 150);
       } },
     { label: 'Interrupt the exit', run: () => {
         toReady();
-        const c = liveCard();
-        if (c) toggleDetail(c);
-        setTimeout(() => { const d = liveCard(); if (d) step('done'); }, 90);
+        toggleDetail(liveCard());
+        setTimeout(() => { if (liveCard()) step('done'); }, 90);
       } },
     { label: 'Two dismisses at once', run: () => {
         toReady();
         step('done');
-        setTimeout(() => step('done'), 200);
+        setTimeout(() => step('done'), 120);
       } },
   ],
   onScale: () => paint(S.view, false),

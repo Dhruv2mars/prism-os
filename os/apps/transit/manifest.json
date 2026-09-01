@@ -1,0 +1,19 @@
+{
+  "manifestVersion": 1,
+  "id": "transit",
+  "name": "Transit",
+  "version": "1.2.0",
+  "entry": "index.html",
+  "category": "travel",
+  "developer": "Halfmoon Labs",
+  "glyph": "T",
+  "accent": "#7ee0b8",
+  "badge": "No departures yet",
+  "offline": false,
+  "permissions": ["network", "notifications", "storage"],
+  "permissionReasons": {
+    "network": "Fetches live departure times for your saved stop.",
+    "notifications": "Tells you when it is time to leave.",
+    "storage": "Remembers the stop you ride from."
+  }
+}

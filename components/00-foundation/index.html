@@ -18,10 +18,10 @@
   --as: var(--a11y-scale, 1);
   --t-eyebrow: max(10.5px, calc(11px * var(--as)));
   --t-word:    calc(46px * min(var(--as), 2.2));
-  --t-line:    calc(15px * var(--as));
+  --t-line:    calc(15px * min(var(--as), 1.75));
   --t-hero:    calc(48px * min(var(--as), 2.2));
-  --t-mid:     calc(18px * var(--as));
-  --t-small:   calc(13px * var(--as));
+  --t-mid:     calc(18px * min(var(--as), 1.9));
+  --t-small:   calc(13px * min(var(--as), 1.9));
 }
 .surface button { font: inherit; color: inherit; background: none; border: 0; }
 
@@ -62,7 +62,7 @@
   pointer-events: none;
 }
 .surface[data-veil="dim"] .veil { opacity: 1; background: rgba(4, 7, 11, 0.46); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
-.surface[data-veil="off"] .veil { opacity: 1; background: rgba(7, 10, 15, 0.9); }
+.surface[data-veil="off"] .veil { opacity: 1; background: rgba(6, 10, 16, 0.34); }
 
 .eyebrow {
   position: absolute; top: calc(20px * min(var(--as), 1.4)); left: 26px; z-index: 2;
@@ -79,19 +79,25 @@
 }
 .layers { position: relative; width: 100%; min-height: 240px; display: grid; }
 
-/* ----------------------------------------------------------------- glass ---
-   Low fill, high saturation, and the world darkened by multiplication rather
-   than buried under paint — so the structure behind the lens survives, which
-   is the only way a plate reads as glass instead of as a painted rectangle. */
+/* -------------------------------------------------------------- materials ---
+   One physical model for every surface: a tinted absorber over the world plus
+   a diffuser. --fill-a/--fill-b is how much light the tint absorbs, --diffuse
+   is how far it scatters what is left. Density runs one way only —
+   Glass passes the most world, then Raised, then Sheet, then Sunken — and the
+   ladder is verified by sampling pixels through each surface, not by eye. */
+.plate, .riser, .well, .sheetm, .ftile {
+  background: linear-gradient(158deg,
+    rgba(14, 22, 35, var(--fill-a)) 0%, rgba(6, 11, 18, var(--fill-b)) 100%);
+  backdrop-filter: saturate(var(--sat)) blur(var(--diffuse));
+  -webkit-backdrop-filter: saturate(var(--sat)) blur(var(--diffuse));
+}
 .plate {
+  --fill-a: 0.10; --fill-b: 0.18; --diffuse: 5px; --sat: 1.16;
   grid-area: 1 / 1; position: relative;
   width: 100%; min-height: 240px;
   display: grid; place-items: center;
   padding: calc(22px * min(var(--as), 1.5)) calc(26px * min(var(--as), 1.3));
   border-radius: var(--r-lg);
-  background: linear-gradient(158deg, rgba(16, 25, 39, 0.30) 0%, rgba(7, 12, 20, 0.46) 100%);
-  backdrop-filter: saturate(1.9) blur(13px) brightness(0.56);
-  -webkit-backdrop-filter: saturate(1.9) blur(13px) brightness(0.56);
   border: 1px solid rgba(255, 255, 255, 0.13);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.34), 0 30px 64px -16px rgba(0, 0, 0, 0.6);
   transition: opacity var(--dur-base) var(--ease-prism),
@@ -130,9 +136,9 @@
 /* denied fallback: sensing off, so the tint is fixed and the world is held down */
 .surface[data-tint="fixed"] .plate,
 .surface[data-tint="fixed"] .riser,
+.surface[data-tint="fixed"] .well,
 .surface[data-tint="fixed"] .sheetm {
-  background: linear-gradient(158deg, rgba(19, 26, 38, 0.74) 0%, rgba(9, 13, 20, 0.8) 100%);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  --fill-a: 0.46; --fill-b: 0.54; --diffuse: 10px; --sat: 1;
 }
 
 /* gaze focus keeps the material shadow and adds the ring + lift */
@@ -151,16 +157,14 @@
 .sheetm:focus-visible, .ftile:focus-visible { outline: none; }
 
 /* ---------------------------------------------------------------- raised ---
-   Lifted off the glass: brighter tint, deeper blur, so the world behind it is
-   softer and further away than the world behind the plate underneath. */
+   Lifted off the glass, so it absorbs more than the plate under it: the world
+   behind it is dimmer and softer than the world behind the plate. */
 .riser {
   grid-area: 1 / 1; place-self: center;
   width: 74%; min-height: calc(116px * min(var(--as), 1.5));
   display: grid; place-items: center;
   border-radius: var(--r-md);
-  background: linear-gradient(158deg, rgba(64, 84, 118, 0.40) 0%, rgba(26, 38, 58, 0.56) 100%);
-  backdrop-filter: saturate(2) blur(30px) brightness(0.74);
-  -webkit-backdrop-filter: saturate(2) blur(30px) brightness(0.74);
+  --fill-a: 0.34; --fill-b: 0.44; --diffuse: 11px; --sat: 1.3;
   border: 1px solid rgba(255, 255, 255, 0.19);
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.36), 0 36px 72px -18px rgba(0, 0, 0, 0.7);
   transform: translateY(-4px);
@@ -168,16 +172,14 @@
 }
 
 /* ---------------------------------------------------------------- sunken ---
-   A hole in the glass: the world is still there but dim, flat and unsaturated,
-   with no rim light of its own. */
+   The deepest absorber in the language and the only surface with no rim light:
+   the world survives as a trace of its own brightness and nothing more. */
 .well {
   grid-area: 1 / 1; place-self: center;
   width: 78%; min-height: calc(112px * min(var(--as), 1.5));
   display: grid; place-items: center;
   border-radius: var(--r-md);
-  background: rgba(3, 6, 11, 0.42);
-  backdrop-filter: saturate(0.7) blur(4px) brightness(0.34);
-  -webkit-backdrop-filter: saturate(0.7) blur(4px) brightness(0.34);
+  --fill-a: 0.86; --fill-b: 0.90; --diffuse: 16px; --sat: 0.45;
   box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.7),
               inset 0 -1px 0 rgba(255, 255, 255, 0.06),
               inset 0 0 0 1px rgba(0, 0, 0, 0.4);
@@ -191,9 +193,7 @@
   grid-area: 1 / 1; place-self: stretch;
   display: grid; place-items: center;
   border-radius: var(--r-lg);
-  background: linear-gradient(170deg, rgba(20, 30, 45, 0.6) 0%, rgba(9, 15, 24, 0.72) 100%);
-  backdrop-filter: saturate(1.25) blur(44px) brightness(0.5);
-  -webkit-backdrop-filter: saturate(1.25) blur(44px) brightness(0.5);
+  --fill-a: 0.60; --fill-b: 0.70; --diffuse: 26px; --sat: 0.85;
   border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.38), 0 40px 80px -20px rgba(0, 0, 0, 0.72);
   transition: transform var(--dur-base) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
@@ -219,10 +219,33 @@
 .t-small{ font-size: var(--t-small); font-weight: 500; color: var(--ink-60); }
 
 /* -------------------------------------------------------------- controls --- */
-.ctl { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; gap: calc(14px * min(var(--as),1.4)); flex-wrap: wrap; }
-.ctl .btn { min-height: 44px; }
-.ctl .chip { height: calc(30px * min(var(--as), 1.5)); font-size: max(10.5px, calc(11px * var(--as))); }
-.ctl .toggle { appearance: none; -webkit-appearance: none; border: 0; cursor: pointer; }
+.ctl {
+  --cs: min(var(--as), 1.75);            /* controls grow with the text size */
+  position: relative; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  gap: calc(14px * min(var(--as), 1.4)); flex-wrap: wrap;
+}
+.ctl .btn {
+  min-height: calc(44px * var(--cs));
+  padding: 0 calc(22px * var(--cs));
+  font-size: calc(14px * var(--cs));
+}
+.ctl .chip {
+  height: calc(30px * var(--cs)); padding: 0 calc(12px * var(--cs));
+  font-size: max(10.5px, calc(11px * var(--cs)));
+}
+.ctl .toggle {
+  appearance: none; -webkit-appearance: none; border: 0; cursor: pointer;
+  width: calc(52px * var(--cs)); height: calc(32px * var(--cs));
+}
+.ctl .toggle::after {
+  top: calc(3px * var(--cs)); left: calc(3px * var(--cs));
+  width: calc(26px * var(--cs)); height: calc(26px * var(--cs));
+}
+.ctl .toggle[aria-checked="true"]::after { transform: translateX(calc(20px * var(--cs))); }
+/* at large text the row stops being a row: one target per line, full width */
+.surface[data-big="1"] .ctl { flex-direction: column; gap: calc(10px * var(--cs)); }
+.surface[data-big="1"] .ctl .btn { width: 100%; }
 .ctl-note { position: relative; z-index: 2; margin-top: calc(14px * var(--as)); font-size: var(--t-small); color: rgba(255,255,255,0.46); text-align: center; }
 
 /* ----------------------------------------------------------------- focus --- */
@@ -231,9 +254,7 @@
   width: calc(228px * min(var(--as), 1.4)); min-height: calc(96px * min(var(--as), 1.5));
   display: grid; place-items: center;
   border-radius: 24px;
-  background: linear-gradient(158deg, rgba(64, 84, 118, 0.42), rgba(26, 38, 58, 0.58));
-  backdrop-filter: saturate(2) blur(26px) brightness(0.78);
-  -webkit-backdrop-filter: saturate(2) blur(26px) brightness(0.78);
+  --fill-a: 0.34; --fill-b: 0.44; --diffuse: 11px; --sat: 1.3;
   border: 1px solid rgba(134, 198, 255, 0.55);
   box-shadow: 0 3px 9px rgba(0,0,0,0.36), 0 0 0 2.5px rgba(86,184,255,0.85), 0 0 36px rgba(86,184,255,0.38);
   font-size: var(--t-mid); font-weight: 600; color: var(--ink-100);
@@ -275,11 +296,7 @@
 .pips[hidden] { display: none; }
 
 /* ------------------------------------------------------------ edge states --- */
-.edge-plate {
-  background: linear-gradient(158deg, rgba(18, 27, 42, 0.5) 0%, rgba(8, 13, 21, 0.66) 100%);
-  backdrop-filter: saturate(1.5) blur(30px) brightness(0.46);
-  -webkit-backdrop-filter: saturate(1.5) blur(30px) brightness(0.46);
-}
+.edge-plate { --fill-a: 0.60; --fill-b: 0.70; --diffuse: 26px; --sat: 0.85; }
 .edge { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; gap: calc(9px * min(var(--as),1.5)); }
 .edge-glyph { width: 32px; height: 32px; opacity: 0.78; }
 .edge-title { font-size: var(--t-mid); font-weight: 600; letter-spacing: -0.012em; color: rgba(255,255,255,0.94); }
