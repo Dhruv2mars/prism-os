@@ -1,7 +1,7 @@
 {
   "project": "Prism OS",
-  "tagline": "Prism OS — the operating system for smart glasses.",
-  "updated": "2026-08-31T18:07:57",
+  "tagline": "Prism OS \u2014 the operating system for smart glasses.",
+  "updated": "2026-09-01T15:21:50",
   "wave": 0,
   "runId": "gauntlet-2",
   "doneDefinition": "Every piece carries two consecutive PASS verdicts from two different fresh critics; the coherence integrator signs off on the whole system; the web apps runtime actually runs a third-party app; the developer platform is real; the dashboard shows N/N passed.",
@@ -20,7 +20,7 @@
     "rootCauses": [
       "The loop never looped: 10 of 16 pieces sat at FAIL with no builder ever sent back.",
       "Focus discipline named the biggest gap on 9 pieces across 11 verdicts, fixed on none.",
-      "Engineering tokens ('tabular', 'prism-ease · 260ms') shipped in user-visible copy on 5 pieces.",
+      "Engineering tokens ('tabular', 'prism-ease \u00b7 260ms') shipped in user-visible copy on 5 pieces.",
       "Web Apps was a picture of a platform: zero iframe, zero sandbox, zero manifest, zero postMessage.",
       "The Meta developer platform was in scope and was silently dropped.",
       "328MB of screenshots across 411 PNGs; nothing committed for 8 hours of work."
@@ -101,11 +101,11 @@
       "id": "00-foundation",
       "name": "foundation & materials",
       "wave": 0,
-      "surface": "A single real surface that demonstrates glass over world, type scale, and controls in use — not a token catalog.",
+      "surface": "A single real surface that demonstrates glass over world, type scale, and controls in use \u2014 not a token catalog.",
       "status": "building",
       "round": 3,
       "verdict": "FAIL r2 (tie at 71 with named gaps)",
-      "gap": "Density ladder inverted in rendered pixels: Glass transmits 0.53 of world luminance, Sheet transmits 1.04 — backwards. On Outdoor the streetlamp reads as a hard shape through Sheet, whose own caption says the world stays as colour not shapes, while Glass erases it and reads as a sunglasses tint. Also: .ctl .btn and .toggle are hardcoded px and do not scale with --a11y-scale, ending up half the size of the copy at scale 2.",
+      "gap": "Density ladder inverted in rendered pixels: Glass transmits 0.53 of world luminance, Sheet transmits 1.04 \u2014 backwards. On Outdoor the streetlamp reads as a hard shape through Sheet, whose own caption says the world stays as colour not shapes, while Glass erases it and reads as a sunglasses tint. Also: .ctl .btn and .toggle are hardcoded px and do not scale with --a11y-scale, ending up half the size of the copy at scale 2.",
       "consecutivePasses": 0,
       "path": "components/00-foundation/index.html",
       "history": [
@@ -124,7 +124,7 @@
           "verdict": "fail"
         }
       ],
-      "ratchet": "under 75 and went backwards (74 to 71) — one round under +5, round 3 must reach 78 or the approach gets discarded"
+      "ratchet": "under 75 and went backwards (74 to 71) \u2014 one round under +5, round 3 must reach 78 or the approach gets discarded"
     },
     {
       "id": "16-motion",
@@ -134,7 +134,7 @@
       "status": "building",
       "round": 2,
       "verdict": "FAIL r1 (tie at 73 with named gaps)",
-      "gap": "resize() measures the post-mutation height before cancelling the in-flight height animation, so h1-h0 < 1px, the guard returns early, and interruption is ignored — then a 61px single-frame snap. Plus: card hover feedback is dead because the enter animation holds fill:'both'; and advance() matches the leaving card, so two fast dismisses silently eat a message.",
+      "gap": "resize() measures the post-mutation height before cancelling the in-flight height animation, so h1-h0 < 1px, the guard returns early, and interruption is ignored \u2014 then a 61px single-frame snap. Plus: card hover feedback is dead because the enter animation holds fill:'both'; and advance() matches the leaving card, so two fast dismisses silently eat a message.",
       "consecutivePasses": 0,
       "path": "components/16-motion/index.html",
       "history": [
@@ -146,7 +146,7 @@
           "verdict": "fail"
         }
       ],
-      "ratchet": "under 75 — round 2 must reach 78 or higher"
+      "ratchet": "under 75 \u2014 round 2 must reach 78 or higher"
     },
     {
       "id": "17-audio-haptics",
@@ -209,7 +209,7 @@
       "id": "04-gestures",
       "name": "gesture & input model",
       "wave": 1,
-      "surface": "Gaze, dwell, temple touchpad, capture button — taught and practiced.",
+      "surface": "Gaze, dwell, temple touchpad, capture button \u2014 taught and practiced.",
       "status": "queued",
       "round": 0,
       "verdict": null,
@@ -293,7 +293,7 @@
       "id": "13-a11y",
       "name": "accessibility",
       "wave": 2,
-      "surface": "Text scale, contrast, reduced motion, mono audio — applied system-wide, not previewed.",
+      "surface": "Text scale, contrast, reduced motion, mono audio \u2014 applied system-wide, not previewed.",
       "status": "queued",
       "round": 0,
       "verdict": null,
@@ -378,18 +378,19 @@
       "name": "web apps runtime",
       "wave": 4,
       "surface": "A real sandboxed iframe host: manifest, lifecycle, postMessage bridge, offline.",
-      "status": "queued",
-      "round": 0,
+      "status": "built-awaiting-critic",
+      "round": 1,
       "verdict": null,
       "gap": null,
       "consecutivePasses": 0,
-      "path": "components/12-webapps/index.html"
+      "path": "components/12-webapps/index.html",
+      "note": "Rebuilt end-to-end on the real AppRuntime. Probe PASS at 1.0/1.8/3.1, all five edge states, reduced motion, outdoor world. RUNTIME GATE: PASS - 45 checks. Awaiting r1 critic."
     },
     {
       "id": "22-permissions",
       "name": "permission broker",
       "wave": 4,
-      "surface": "Grant, deny, and revoke — user-facing, persistent, and enforced by the runtime.",
+      "surface": "Grant, deny, and revoke \u2014 user-facing, persistent, and enforced by the runtime.",
       "status": "queued",
       "round": 0,
       "verdict": null,
@@ -450,8 +451,8 @@
     {
       "item": "Sub-agent reasoning effort = medium, set via .claude/agents/*.md frontmatter",
       "status": "RESOLVED as of session restart 2026-08-31",
-      "detail": "The four agent definitions exist on disk with `model: opus` and `effort: medium`. The Claude Code harness registers .claude/agents/*.md at SESSION START, so definitions authored mid-session are not selectable as subagent_type in this run — a spawn with subagent_type 'prism-builder' errors with 'Agent type not found'.",
-      "workaround": "Spawning the generic agent with an explicit model override (verified: reports claude-opus-5) and prepending the full role definition — including the critic's disqualification rule — to every spawn prompt. Behaviour matches the definitions; only the effort knob is not settable per-spawn.",
+      "detail": "The four agent definitions exist on disk with `model: opus` and `effort: medium`. The Claude Code harness registers .claude/agents/*.md at SESSION START, so definitions authored mid-session are not selectable as subagent_type in this run \u2014 a spawn with subagent_type 'prism-builder' errors with 'Agent type not found'.",
+      "workaround": "Spawning the generic agent with an explicit model override (verified: reports claude-opus-5) and prepending the full role definition \u2014 including the critic's disqualification rule \u2014 to every spawn prompt. Behaviour matches the definitions; only the effort knob is not settable per-spawn.",
       "residual": "Reasoning effort cannot be pinned to medium from inside this session and is not introspectable by a subagent. The frontmatter takes effect on the next session start. Verified via throwaway spawn: model is claude-opus-5; effort was not determinable.",
       "resolution": "Session restarted, so .claude/agents/*.md registered. prism-builder / prism-critic / prism-sweep / prism-integrator are now selectable as subagent_type, carrying `model: opus` + `effort: medium` from frontmatter. No per-spawn override needed; the workaround is retired."
     },
@@ -462,29 +463,43 @@
       "resolution": "Limit reset. Both written files were re-gated on resume and both exit 0 (GATE: PASS), so no work was lost. 16-motion respawned from scratch."
     },
     {
-      "item": "Opus 5 session rate limit — second hit, killed all three live agents",
+      "item": "Opus 5 session rate limit \u2014 second hit, killed all three live agents",
       "status": "RESOLVED, but recurring; recorded as a known operating constraint",
       "detail": "All three agents (00-foundation r2 builder, 17-audio-haptics r2 builder, 16-motion critic) terminated with HTTP 429 rate_limit, reset 12:10pm Asia/Calcutta. Three parallel Opus agents exhaust the session limit in roughly 30-40 minutes of work.",
-      "resolution": "Both builders had already written complete files before dying — the Write lands atomically, so no work was lost either time. Each file failed exactly one gate check (00-foundation: stage overflow 648>600; 17-audio-haptics: glyphs in the reticle rest zone) because neither builder reached its self-verify step. Both respawned to finish from the current file state rather than from scratch. The 16-motion critic had written no verdict and was respawned clean.",
+      "resolution": "Both builders had already written complete files before dying \u2014 the Write lands atomically, so no work was lost either time. Each file failed exactly one gate check (00-foundation: stage overflow 648>600; 17-audio-haptics: glyphs in the reticle rest zone) because neither builder reached its self-verify step. Both respawned to finish from the current file state rather than from scratch. The 16-motion critic had written no verdict and was respawned clean.",
       "mitigation": "Every killed agent's partial output is re-gated by the orchestrator before it is trusted or discarded. The gate is what makes an interrupted run recoverable instead of a loss."
     },
     {
-      "item": "Opus 5 session rate limit — third hit, killed all three live agents",
+      "item": "Opus 5 session rate limit \u2014 third hit, killed all three live agents",
       "status": "RESOLVED at 18:04 Asia/Calcutta",
-      "detail": "Rate limit fired again at ~12:50pm Asia/Calcutta with reset at 5:30pm. Killed 'Fix 00-foundation r3' (had read nothing yet), 'Judge 17-audio-haptics r2' (no verdict written), and 'Fix 16-motion r2' (died at the write boundary, mid-sentence on 'Now I'll rewrite the piece'). Working tree was clean on resume, so 16-motion had written nothing — unlike hits #1 and #2, no partial file to re-gate.",
+      "detail": "Rate limit fired again at ~12:50pm Asia/Calcutta with reset at 5:30pm. Killed 'Fix 00-foundation r3' (had read nothing yet), 'Judge 17-audio-haptics r2' (no verdict written), and 'Fix 16-motion r2' (died at the write boundary, mid-sentence on 'Now I'll rewrite the piece'). Working tree was clean on resume, so 16-motion had written nothing \u2014 unlike hits #1 and #2, no partial file to re-gate.",
       "resolution": "Waited out the reset, re-gated disk state (git status clean, no source file touched), respawned all three. Standing protocol confirmed for a third time: on any kill, check git status and re-run the probe gate on every file a dead agent could have written before trusting or discarding it."
     },
     {
       "item": "Static server on :4310 died between sessions, silently failing every spawned agent",
       "status": "RESOLVED",
-      "detail": "The `python3 -m http.server 4310` process did not survive the process restart. Three agents spawned against a dead server: curl returned connection-refused (exit 7) and no agent could load a page or run the probe. They left two empty probe dirs and no verdicts. The failure is silent from the orchestrator's side — the agents just stop with no completion record.",
+      "detail": "The `python3 -m http.server 4310` process did not survive the process restart. Three agents spawned against a dead server: curl returned connection-refused (exit 7) and no agent could load a page or run the probe. They left two empty probe dirs and no verdicts. The failure is silent from the orchestrator's side \u2014 the agents just stop with no completion record.",
       "resolution": "Restarted detached (pid confirmed via pgrep, /index.html returns 200) and verified it survives the background-task completion notification. Every spawn prompt now carries the curl health check plus the restart command, so an agent repairs a dead server itself instead of dying on it. Server is re-verified before each wave and after any process restart."
+    },
+    {
+      "item": "Rate-limit hit #4 on the Opus 5 session quota",
+      "status": "OPEN",
+      "detail": "Sub-agent spawns unavailable until the 22:50 Asia/Calcutta reset. No builder or critic can run in the interim.",
+      "workaround": "Orchestrator-side work continues in the main session: the Web Apps surface was rebuilt, probed and committed without a sub-agent. Critics are queued for the reset.",
+      "residual": "Verdicts for 00-foundation r3, 16-motion r2, 17-audio-haptics r2 and 12-webapps r1 are all waiting on the reset."
+    },
+    {
+      "item": "Coordinate bug inside frozen os/shared/core.js (targetFromPoint)",
+      "status": "PARTIALLY WORKED AROUND",
+      "detail": "core.js converts the pointer to stage-local coordinates by dividing by state.scale, then passes those to document.elementFromPoint(), which expects viewport coordinates. Under any stage transform the hit test resolves to the wrong element or to none, so .gaze-focus never lands where the wearer is looking.",
+      "workaround": "Section 10 freezes core.js, so the correction lives in hardenGaze() in os/shared/lab.js: a viewport-space hit test registered after core's own listener, which therefore has the last word on .gaze-focus. Every piece already calls hardenGaze, so the fix is systemic rather than per-piece. Verified: .gaze-focus now settles on the element under the gaze at 310% text scale.",
+      "residual": "The ACTIVATION path is still wrong. core.js pointerdown calls focused.click() against its own mis-resolved element, so a click can fire on an element the wearer was not looking at. The lab-side listener corrects the highlight, not the dispatch. Fixing it needs either an edit to frozen core.js or a capture-phase interceptor that swallows core's pointerdown, and neither is in scope without permission to touch the frozen file. Recorded here rather than dropped."
     }
   ],
   "log": [
     {
       "t": "t+0m",
-      "msg": "read 22 prior verdicts · root-caused the plateau to in-stage dev chrome, undemoted foci, and leaked tokens"
+      "msg": "read 22 prior verdicts \u00b7 root-caused the plateau to in-stage dev chrome, undemoted foci, and leaked tokens"
     },
     {
       "t": "t+0m",
@@ -492,23 +507,23 @@
     },
     {
       "t": "t+0m",
-      "msg": "os/shared/lab.js + lab.css added — dev controls in an outside rail, 5 edge states URL-drivable, world layer behind the glass"
+      "msg": "os/shared/lab.js + lab.css added \u2014 dev controls in an outside rail, 5 edge states URL-drivable, world layer behind the glass"
     },
     {
       "t": "t+0m",
-      "msg": "agent definitions written: builder, critic, sweep, integrator (opus/medium) · critic carries its own disqualification rule"
+      "msg": "agent definitions written: builder, critic, sweep, integrator (opus/medium) \u00b7 critic carries its own disqualification rule"
     },
     {
       "t": "t+0m",
-      "msg": "piece list expanded 16 -> 26 across 5 waves · web apps runtime, permission broker, catalog, SDK, devtools, text input, search, privacy, media, audio/haptics, motion all now explicit pieces"
+      "msg": "piece list expanded 16 -> 26 across 5 waves \u00b7 web apps runtime, permission broker, catalog, SDK, devtools, text input, search, privacy, media, audio/haptics, motion all now explicit pieces"
     },
     {
       "t": "t+1h",
-      "msg": "wave 0 open: 3 builders live on foundation, motion, audio+haptics — all on the new gate"
+      "msg": "wave 0 open: 3 builders live on foundation, motion, audio+haptics \u2014 all on the new gate"
     },
     {
       "t": "t+1h",
-      "msg": "live progress page published · regenerated from PROGRESS.json by tools/build-live.mjs after every verdict"
+      "msg": "live progress page published \u00b7 regenerated from PROGRESS.json by tools/build-live.mjs after every verdict"
     },
     {
       "t": "2026-08-31T07:26:54",
@@ -516,7 +531,7 @@
     },
     {
       "t": "2026-08-31T07:26:54",
-      "event": "Agent definitions registered at session start — prism-builder/critic/sweep/integrator now spawn natively at opus+medium. Spawn-prompt workaround retired."
+      "event": "Agent definitions registered at session start \u2014 prism-builder/critic/sweep/integrator now spawn natively at opus+medium. Spawn-prompt workaround retired."
     },
     {
       "t": "2026-08-31T07:26:54",
@@ -524,15 +539,15 @@
     },
     {
       "t": "2026-08-31T07:35:24",
-      "event": "00-foundation r1 PASS — ours 74, visionOS 71, Horizon 48. Wins focus discipline, typography, edge states, dependability."
+      "event": "00-foundation r1 PASS \u2014 ours 74, visionOS 71, Horizon 48. Wins focus discipline, typography, edge states, dependability."
     },
     {
       "t": "2026-08-31T07:35:24",
-      "event": "17-audio-haptics r1 PASS — ours 68, visionOS 67, Horizon 46. Audio verified genuinely spatialized (HRTF panner, synthesized cues), not depicted."
+      "event": "17-audio-haptics r1 PASS \u2014 ours 68, visionOS 67, Horizon 46. Audio verified genuinely spatialized (HRTF panner, synthesized cues), not depicted."
     },
     {
       "t": "2026-08-31T07:35:24",
-      "event": "SYSTEMIC FIX: both critics independently named the gaze reticle occluding glyphs — it originates in frozen core.js, so it would have hit all 26 pieces. Fixed at altitude in os/shared/lab.js (hardenGaze: hidden until first gaze/pointer, composited as a ring not a filled disc), applied automatically by mountLab. Probe gate now enforces it in every captured frame plus the reticle rest point; negative-tested to confirm it bites."
+      "event": "SYSTEMIC FIX: both critics independently named the gaze reticle occluding glyphs \u2014 it originates in frozen core.js, so it would have hit all 26 pieces. Fixed at altitude in os/shared/lab.js (hardenGaze: hidden until first gaze/pointer, composited as a ring not a filled disc), applied automatically by mountLab. Probe gate now enforces it in every captured frame plus the reticle rest point; negative-tested to confirm it bites."
     },
     {
       "t": "2026-08-31T07:37:14",
@@ -544,23 +559,28 @@
     },
     {
       "t": "2026-08-31T12:40:41",
-      "event": "00-foundation r2 finished and independently re-gated: PASS. Real fixes, not cosmetics — the stage overflow was uncrapped scenery, and the dwell sweep was measured with getBoundingClientRect through the stage's 1.15 scale so the traced corners drifted off the tile; switched to offsetWidth. Materials now differ by how much world comes through, not by grey value. Second fresh critic dispatched for the consecutive pass."
+      "event": "00-foundation r2 finished and independently re-gated: PASS. Real fixes, not cosmetics \u2014 the stage overflow was uncrapped scenery, and the dwell sweep was measured with getBoundingClientRect through the stage's 1.15 scale so the traced corners drifted off the tile; switched to offsetWidth. Materials now differ by how much world comes through, not by grey value. Second fresh critic dispatched for the consecutive pass."
     },
     {
       "t": "2026-08-31T12:41:37",
-      "event": "16-motion r1 FAIL — ours 73, tied visionOS 73, Horizon 52. Tie with three named gaps is a fail. Critic monkey-patched Element.prototype.animate and traced frames: WAAPI, easing, durations and transform retargeting all verified genuinely correct, but the card's own grow/shrink cannot be interrupted at all. Builder respawned with the measured trace; ratchet armed at 78."
+      "event": "16-motion r1 FAIL \u2014 ours 73, tied visionOS 73, Horizon 52. Tie with three named gaps is a fail. Critic monkey-patched Element.prototype.animate and traced frames: WAAPI, easing, durations and transform retargeting all verified genuinely correct, but the card's own grow/shrink cannot be interrupted at all. Builder respawned with the measured trace; ratchet armed at 78."
     },
     {
       "t": "2026-08-31T12:47:50",
-      "event": "00-foundation r2 FAIL — ours 71, tied visionOS 71, Horizon 51. Score went DOWN from 74. Critic measured pixel luminance transmission on the Outdoor backdrop and found the density ladder inverted: the r2 builder tuned materials by eye on Street and believed them honest. Builder respawned and required to print a measured transmission table instead."
+      "event": "00-foundation r2 FAIL \u2014 ours 71, tied visionOS 71, Horizon 51. Score went DOWN from 74. Critic measured pixel luminance transmission on the Outdoor backdrop and found the density ladder inverted: the r2 builder tuned materials by eye on Street and believed them honest. Builder respawned and required to print a measured transmission table instead."
     },
     {
       "t": "2026-08-31T12:48:37",
-      "event": "17-audio-haptics r2 finished and independently re-gated: PASS. The r2 draft had moved cardinal labels to an inner radius, parking 'behind' on the stage centre; builder inverted the geometry so words sit outside the rim and the orb orbits inside it, and the two can never meet. Column now fits 556 in 556 at every scale from 0.8 to 3.1 — edge states were previously 1157px tall and unreachable. Audio engine verified untouched by diff. Second fresh critic dispatched."
+      "event": "17-audio-haptics r2 finished and independently re-gated: PASS. The r2 draft had moved cardinal labels to an inner radius, parking 'behind' on the stage centre; builder inverted the geometry so words sit outside the rim and the orb orbits inside it, and the two can never meet. Column now fits 556 in 556 at every scale from 0.8 to 3.1 \u2014 edge states were previously 1157px tall and unreachable. Audio engine verified untouched by diff. Second fresh critic dispatched."
     },
     {
       "at": "2026-08-31T18:07:57",
       "event": "Resumed after rate-limit reset and a dead static server. Respawned all three wave-0 agents: 00-foundation r3 builder (ratchet 78), 16-motion r2 builder (ratchet 78), 17-audio-haptics r2 critic."
+    },
+    {
+      "at": "2026-09-01T15:21:50",
+      "event": "12-webapps rebuilt on the real runtime; gates green; committed cec4c3a",
+      "detail": "Content-sized app windows (app measures body.scrollHeight, host clamps to 96..430), system text scale and reduced motion pushed across the sandbox boundary over host:display, gaze hit-test corrected in lab.js, spacing capped at 1.5x while type scales to 3.1x. Probe PASS on every state; RUNTIME GATE: PASS - 45 checks; no regression on 00-foundation, 16-motion, 17-audio-haptics."
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os",
@@ -582,6 +602,20 @@
       "detail": "The probe's reticle rest-point check runs at default scale only. The builder self-reported a residual: at exactly 200-240% text the bearing line passes through the stage-centre rest point.",
       "decision": "Left for the critic to judge rather than gated. The rest-zone rule is a proxy for the real requirement, which is that the reticle must never occlude a glyph; the systemic fix already composites it as a hollow ring that stays invisible until gaze. Extending an absolute centre-clear rule to 240% text would force layouts to keep a hole in the middle of the screen at the exact scale where space is scarcest.",
       "risk": "If a critic names it, it becomes a real gap and gets fixed."
+    }
+  ],
+  "decisions": [
+    {
+      "at": "2026-09-01T15:21:50",
+      "by": "user",
+      "decision": "Scope = demoable vertical slice",
+      "detail": "Wave 0 foundation passing, plus the two things the spec says were silently dropped last run: a real Web Apps runtime that actually runs a third-party app, and the developer platform. Remaining pieces stay in PROGRESS.json, not dropped."
+    },
+    {
+      "at": "2026-09-01T15:21:50",
+      "by": "user",
+      "decision": "Subagents stay on Opus 5; wait out the rate limit rather than downgrade to Sonnet",
+      "detail": "Spec section 3 requires Opus 5 at medium effort for every sub-agent. User chose to wait for the 22:50 Asia/Calcutta reset instead of relaxing it."
     }
   ]
 }
