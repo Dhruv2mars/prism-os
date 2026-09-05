@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prism OS — the gauntlet</title>
+<style>
+:root{--bg:#0a0e17;--ink:#eef1f7;--dim:#8b93a7;--faint:#59627a;--line:rgba(255,255,255,.08);--acc:#56b8ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:52px 22px 90px}
+h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-.03em;margin:0 0 6px;line-height:1.1}
+h1 span{color:var(--acc)}
+.sub{color:var(--dim);margin:0 0 26px;font-size:16px}
+.meta{color:var(--faint);font-size:13px;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:22px 0 12px}
+.stat{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:13px;padding:13px 15px}
+.stat b{display:block;font-size:24px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat span{color:var(--faint);font-size:11px;text-transform:uppercase;letter-spacing:.11em;font-weight:700}
+.bar{height:9px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;margin:16px 0 8px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#2f9dff,#56b8ff);border-radius:99px}
+.rule{color:var(--faint);font-size:13px;line-height:1.6;margin:0 0 34px;max-width:76ch}
+.wave{margin-bottom:30px}
+.wave header{display:flex;align-items:baseline;gap:10px;margin-bottom:3px;flex-wrap:wrap}
+.wn{color:var(--faint);font-size:11px;text-transform:uppercase;letter-spacing:.13em;font-weight:700}
+.wave h3{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
+.wc{margin-left:auto;color:var(--faint);font-weight:700;font-variant-numeric:tabular-nums;font-size:14px}
+.wc.all{color:#4cd47c}
+.why{color:var(--faint);font-size:13px;margin:0 0 11px;max-width:80ch;line-height:1.55}
+.tw{overflow-x:auto;background:rgba(255,255,255,.025);border:1px solid var(--line);border-radius:15px}
+table{width:100%;border-collapse:collapse;min-width:660px}
+th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);font-weight:700;padding:11px 14px;border-bottom:1px solid var(--line)}
+td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle;font-size:13.5px}
+tr:last-child td{border-bottom:0}
+.pid b{display:block;font-weight:700;font-size:13px}
+.pid span{color:var(--dim);font-size:12.5px}
+.badge{padding:3px 10px;border-radius:99px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}
+.num{color:var(--dim);font-variant-numeric:tabular-nums}
+.pips{display:inline-flex;gap:4px}
+.pips i{width:8px;height:8px;border-radius:50%;display:block}
+.spark{display:inline-flex;align-items:center;gap:8px}
+.spark b{font-variant-numeric:tabular-nums;font-weight:700;font-size:14px}
+.spark b span{color:var(--faint);font-weight:600;font-size:11px}
+.spark em{font-style:normal;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+.spark em.up{color:#4cd47c}.spark em.down{color:#ff5d5d}
+.gap span{color:#ffb989;font-size:12.5px;line-height:1.45;display:block;max-width:34ch}
+.dash{color:var(--faint)}
+h2{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--faint);margin:34px 0 11px;font-weight:700}
+.blk{border:1px solid rgba(255,157,93,.28);background:rgba(255,157,93,.06);border-radius:13px;padding:14px 16px;margin-bottom:10px}
+.blk b{color:#ffb989;font-size:14px}
+.blk .bs{color:var(--dim);font-size:12px;margin-left:8px}
+.blk p{margin:7px 0 0;color:#aab2c5;font-size:13px;line-height:1.6}
+.blk em{color:#dfe4ee;font-style:normal;font-weight:700}
+ul.log{list-style:none;padding:0;margin:0;background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+ul.log li{display:flex;gap:13px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;line-height:1.55}
+ul.log li:last-child{border-bottom:0}
+ul.log .t{color:var(--faint);font-variant-numeric:tabular-nums;white-space:nowrap;min-width:52px}
+ul.log li span:last-child{color:#aab2c5}
+ol.why2{color:#aab2c5;font-size:13.5px;line-height:1.65;padding-left:20px;margin:0}
+ol.why2 li{margin-bottom:6px}
+footer{color:var(--faint);font-size:12.5px;line-height:1.65;margin-top:40px;border-top:1px solid var(--line);padding-top:18px;max-width:80ch}
+a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,.35)}
+</style></head>
+<body><div class="wrap">
+<h1>Prism OS <span>the gauntlet</span></h1>
+<p class="sub">Prism OS — the operating system for smart glasses.</p>
+<p class="meta">Updated 2026-09-05T17:08:00 UTC · run gauntlet-2 · <a href="https://github.com/Dhruv2mars/prism-os">https://github.com/Dhruv2mars/prism-os</a></p>
+
+<div class="stats">
+  <div class="stat"><b>0<span style="color:var(--faint);font-size:15px">/26</span></b><span>passed</span></div>
+  <div class="stat"><b>0</b><span>agents live</span></div>
+  <div class="stat"><b>22</b><span>rounds run</span></div>
+  <div class="stat"><b>5</b><span>waves</span></div>
+</div>
+<div class="bar"><i style="width:0.0%"></i></div>
+<p class="rule">PASS requires, twice consecutively from two DIFFERENT fresh critics: ours ranked first overall, or tied-first with zero named gaps. One pass is luck. Two is real.</p>
+
+<section class="wave">
+    <header>
+      <span class="wn">Wave 0</span><h3>foundation</h3>
+      <span class="wc ">0/3</span>
+    </header>
+    <p class="why">The visual, motion, and sensory language every other piece inherits. Nothing else may start until these pass, because a wrong foundation is what produced a 55/90 plateau last time.</p>
+    <div class="tw"><table>
+      <thead><tr><th>piece</th><th>status</th><th>round</th><th>passes</th><th>score</th><th>open gap</th></tr></thead>
+      <tbody>
+    <tr>
+      <td class="pid"><b>00-foundation</b><span>foundation &amp; materials</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R2</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="spark"><svg width="108" height="30" viewBox="0 0 108 30" aria-hidden="true">
+    <line x1="0" y1="8.1" x2="108" y2="8.1" stroke="rgba(255,255,255,.2)" stroke-dasharray="2 3" stroke-width="1"/>
+    <path d="M2.0,7.3 L106.0,8.1" fill="none" stroke="#56b8ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="2.0" cy="7.3" r="1.6" fill="#4cd47c"/><circle cx="106.0" cy="8.1" r="2.6" fill="#56b8ff"/>
+  </svg><b>71<span>/90</span></b><em class="down">-3</em></span></td>
+      <td class="gap"><span>Density ladder is inverted in the rendered pixels · components/00-foundation/index.html:93 (.plate backdrop-filter: saturate(1.9) blur(13px) brightness(0.56)) vs :195 (.sheetm backdrop-filter: saturat</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>16-motion</b><span>motion &amp; transition language</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R2</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="spark"><svg width="108" height="30" viewBox="0 0 108 30" aria-hidden="true">
+    <line x1="0" y1="7.5" x2="108" y2="7.5" stroke="rgba(255,255,255,.2)" stroke-dasharray="2 3" stroke-width="1"/>
+    <path d="M54.0,7.5" fill="none" stroke="#56b8ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="54.0" cy="7.5" r="2.6" fill="#56b8ff"/>
+  </svg><b>73<span>/90</span></b></span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>17-audio-haptics</b><span>spatial audio &amp; haptics</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R2</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:#4cd47c"></i></span></td>
+      <td class="sp"><span class="spark"><svg width="108" height="30" viewBox="0 0 108 30" aria-hidden="true">
+    <line x1="0" y1="9.1" x2="108" y2="9.1" stroke="rgba(255,255,255,.2)" stroke-dasharray="2 3" stroke-width="1"/>
+    <path d="M54.0,8.9" fill="none" stroke="#56b8ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="54.0" cy="8.9" r="2.6" fill="#4cd47c"/>
+  </svg><b>68<span>/90</span></b></span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr></tbody>
+    </table></div>
+  </section><section class="wave">
+    <header>
+      <span class="wn">Wave 1</span><h3>shell</h3>
+      <span class="wc ">0/5</span>
+    </header>
+    <p class="why">Boot, home, window management, input, and text entry. Every app surface depends on these interaction primitives.</p>
+    <div class="tw"><table>
+      <thead><tr><th>piece</th><th>status</th><th>round</th><th>passes</th><th>score</th><th>open gap</th></tr></thead>
+      <tbody>
+    <tr>
+      <td class="pid"><b>01-boot</b><span>boot &amp; recovery</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Text scale is a dead control on this piece · components/01-boot/boot.css (all font-sizes hardcoded, e.g. :128 caption 13px, :181-182 .b-diag dt 13px/dd 15px) + os/shared/lab.js:277 · expected every st</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>02-home</b><span>home environment</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>At-rest vertical overflow — viewHome content stack (components/02-home/index.html:739, .recents at :357) · expected the four zones (hero ~160px + launcher rows ~2x210px + recents rail) to fit the fixe</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>03-wm</b><span>window manager</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Close-all dead end · components/03-wm/index.html:385-388 (closeWindow -&gt; refresh) and :614 (refresh) · expected: closing the LAST window through the real UI (sheet × button or wrist-flick swipe, verif</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>04-gestures</b><span>gesture &amp; input model</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Gaze focus + dwell — the interaction this trainer exists to teach — never engages on real pointer input. os/shared/core.js:50-52 computes stage-local coords ((clientX-rect.left)/scale) and passes them</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>18-textinput</b><span>text input &amp; dictation</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R0</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr></tbody>
+    </table></div>
+  </section><section class="wave">
+    <header>
+      <span class="wn">Wave 2</span><h3>system surfaces</h3>
+      <span class="wc ">0/6</span>
+    </header>
+    <p class="why">Cross-cutting system UI. Notifications, assistant, search, privacy, settings, accessibility. Apps assume these exist.</p>
+    <div class="tw"><table>
+      <thead><tr><th>piece</th><th>status</th><th>round</th><th>passes</th><th>score</th><th>open gap</th></tr></thead>
+      <tbody>
+    <tr>
+      <td class="pid"><b>05-notifications</b><span>notifications</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Focus discipline at rest · components/05-notifications/index.html:197-205 (.notif-card.is-top) · expected: one unmistakable focal card at rest on a 600x600 lens — non-top cards recessive (dimmed ~0.7,</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>06-assistant</b><span>AI assistant</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R0</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>19-search</b><span>universal search &amp; command</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R0</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>20-privacy</b><span>privacy &amp; capture indicators</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R0</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>11-settings</b><span>settings</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Search field · components/11-settings/index.html:736-749 (dead filter), renderSettings() gating at :949 · expected: typing filters groups live and shows the inline 'No results' card (already built at </span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>13-a11y</b><span>accessibility</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Text scale control scales only the demo card, not the surface · components/13-a11y/index.html:432-447 (updateStageScale sets --a11y-scale, consumed solely by .preview-kicker/.preview-title/.preview-bo</span></td>
+    </tr></tbody>
+    </table></div>
+  </section><section class="wave">
+    <header>
+      <span class="wn">Wave 3</span><h3>first-party apps</h3>
+      <span class="wc ">0/6</span>
+    </header>
+    <p class="why">The apps that prove the shell works. Each is an independent surface a critic can rank alone.</p>
+    <div class="tw"><table>
+      <thead><tr><th>piece</th><th>status</th><th>round</th><th>passes</th><th>score</th><th>open gap</th></tr></thead>
+      <tbody>
+    <tr>
+      <td class="pid"><b>07-camera</b><span>camera &amp; capture</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Recents strip clipped at stage bottom · components/07-camera/index.html:58-66 (.cam-viewport inset + overflow:hidden) and :69-72 (.vf-card fixed 338px) · expected the Recents strip fully inside the 60</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>08-captions</b><span>live captions</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Caption content stream (the transcript itself, the one thing this surface produces) · components/08-captions/index.html:588-594 (SCRIPT) and :761-767 (extra-line reuse in startNextLine) · expected: ca</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>09-nav</b><span>navigation</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Gaze hover-focus and dwell activation (the platform's primary input per VISION.md) never engage on this surface - os/shared/core.js:41-53 (targetFromPoint) - expected: moving head-gaze over the turn c</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>10-messages</b><span>messages &amp; calls</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R0</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>21-media</b><span>media &amp; now playing</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R0</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>15-hud</b><span>performance HUD</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Engineering tokens and builder self-narration rendered as user-visible copy · components/15-hud/index.html:495 ('TARGET 90 FPS · PRISM-EASE 260MS' on the hero axis), :578 ('prism-ease · 260ms' in the </span></td>
+    </tr></tbody>
+    </table></div>
+  </section><section class="wave">
+    <header>
+      <span class="wn">Wave 4</span><h3>platform</h3>
+      <span class="wc ">0/6</span>
+    </header>
+    <p class="why">The third-party story that was silently dropped last time: a runtime that actually runs foreign code, a permission broker that actually enforces, a catalog, an SDK, a simulator, and the out-of-box flow that ties it together.</p>
+    <div class="tw"><table>
+      <thead><tr><th>piece</th><th>status</th><th>round</th><th>passes</th><th>score</th><th>open gap</th></tr></thead>
+      <tbody>
+    <tr>
+      <td class="pid"><b>12-webapps</b><span>web apps runtime</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>22-permissions</b><span>permission broker</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R0</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>23-appstore</b><span>app catalog &amp; install</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Zombie app window · components/23-appstore/index.html:170 (.window { display: grid }) vs line 282 (regions(): winEl.hidden = true) · expected the sandboxed app window to disappear when the wearer leav</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>24-devsdk</b><span>developer SDK &amp; manifest spec</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>25-devsim</b><span>developer simulator &amp; devtools</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span class="dash">—</span></td>
+    </tr>
+    <tr>
+      <td class="pid"><b>14-onboarding</b><span>onboarding &amp; pairing</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="sp"><span class="dash">—</span></td>
+      <td class="gap"><span>Pairing digits feedback is dead code · components/14-onboarding/index.html:364,424,435,439 · expected: 'Rotate pairing code' (and the 45s countdown) visibly rotates digits, and on pairing found the si</span></td>
+    </tr></tbody>
+    </table></div>
+  </section>
+
+<h2>Why the previous run stalled</h2>
+<p class="why">22 verdicts, every one a fail. Ours scored 47-59/90 against visionOS at 81-83/90.</p>
+<ol class="why2"><li>The loop never looped: 10 of 16 pieces sat at FAIL with no builder ever sent back.</li><li>Focus discipline named the biggest gap on 9 pieces across 11 verdicts, fixed on none.</li><li>Engineering tokens ('tabular', 'prism-ease · 260ms') shipped in user-visible copy on 5 pieces.</li><li>Web Apps was a picture of a platform: zero iframe, zero sandbox, zero manifest, zero postMessage.</li><li>The Meta developer platform was in scope and was silently dropped.</li><li>328MB of screenshots across 411 PNGs; nothing committed for 8 hours of work.</li></ol>
+
+<h2>What is different this time</h2>
+<ol class="why2"><li>tools/probe.mjs is now an enforcing GATE (exit 1 on violation), not a reporter. It fails the build on dev chrome inside the stage, engineering tokens in rendered text, stage overflow, unhonored reduced motion, unnamed focusables, and any console or page error.</li><li>os/shared/lab.js moves every developer control OUT of the 600x600 stage into a fixed rail, and drives all five edge states from the URL so critics can screenshot them.</li><li>os/shared/lab.js also paints a world layer behind the glass, so material honesty is judgeable instead of assumed.</li><li>The critic's disqualification rule lives in .claude/agents/prism-critic.md frontmatter, so it survives a spawn prompt that forgets to repeat it.</li><li>No piece is ever left at FAIL without a live builder on it.</li></ol>
+
+<h2>Blocked &amp; deviations</h2><div class="blk">
+  <b>Sub-agent reasoning effort = medium, set via .claude/agents/*.md frontmatter</b><span class="bs">RESOLVED as of session restart 2026-08-31</span>
+  <p>The four agent definitions exist on disk with `model: opus` and `effort: medium`. The Claude Code harness registers .claude/agents/*.md at SESSION START, so definitions authored mid-session are not selectable as subagent_type in this run — a spawn with subagent_type 'prism-builder' errors with 'Agent type not found'.</p>
+  <p><em>Workaround.</em> Spawning the generic agent with an explicit model override (verified: reports claude-opus-5) and prepending the full role definition — including the critic's disqualification rule — to every spawn prompt. Behaviour matches the definitions; only the effort knob is not settable per-spawn.</p>
+  <p><em>Residual.</em> Reasoning effort cannot be pinned to medium from inside this session and is not introspectable by a subagent. The frontmatter takes effect on the next session start. Verified via throwaway spawn: model is claude-opus-5; effort was not determinable.</p>
+</div><div class="blk">
+  <b>Opus 5 session rate limit halted all three wave-0 builders mid-run</b><span class="bs">RESOLVED</span>
+  <p>All three wave-0 builders terminated with HTTP 429 rate_limit ('You've hit your session limit', model claude-opus-5). 00-foundation and 17-audio-haptics had already written complete files; 16-motion had written nothing.</p>
+  
+  
+</div><div class="blk">
+  <b>Opus 5 session rate limit — second hit, killed all three live agents</b><span class="bs">RESOLVED, but recurring; recorded as a known operating constraint</span>
+  <p>All three agents (00-foundation r2 builder, 17-audio-haptics r2 builder, 16-motion critic) terminated with HTTP 429 rate_limit, reset 12:10pm Asia/Calcutta. Three parallel Opus agents exhaust the session limit in roughly 30-40 minutes of work.</p>
+  
+  
+</div><div class="blk">
+  <b>Opus 5 session rate limit — third hit, killed all three live agents</b><span class="bs">RESOLVED at 18:04 Asia/Calcutta</span>
+  <p>Rate limit fired again at ~12:50pm Asia/Calcutta with reset at 5:30pm. Killed 'Fix 00-foundation r3' (had read nothing yet), 'Judge 17-audio-haptics r2' (no verdict written), and 'Fix 16-motion r2' (died at the write boundary, mid-sentence on 'Now I'll rewrite the piece'). Working tree was clean on resume, so 16-motion had written nothing — unlike hits #1 and #2, no partial file to re-gate.</p>
+  
+  
+</div><div class="blk">
+  <b>Static server on :4310 died between sessions, silently failing every spawned agent</b><span class="bs">RESOLVED</span>
+  <p>The `python3 -m http.server 4310` process did not survive the process restart. Three agents spawned against a dead server: curl returned connection-refused (exit 7) and no agent could load a page or run the probe. They left two empty probe dirs and no verdicts. The failure is silent from the orchestrator's side — the agents just stop with no completion record.</p>
+  
+  
+</div><div class="blk">
+  <b>Rate-limit hit #4 on the Opus 5 session quota</b><span class="bs">OPEN</span>
+  <p>Sub-agent spawns unavailable until the 22:50 Asia/Calcutta reset. No builder or critic can run in the interim.</p>
+  <p><em>Workaround.</em> Orchestrator-side work continues in the main session: the Web Apps surface was rebuilt, probed and committed without a sub-agent. Critics are queued for the reset.</p>
+  <p><em>Residual.</em> Verdicts for 00-foundation r3, 16-motion r2, 17-audio-haptics r2 and 12-webapps r1 are all waiting on the reset.</p>
+</div><div class="blk">
+  <b>Coordinate bug inside frozen os/shared/core.js (targetFromPoint)</b><span class="bs">PARTIALLY WORKED AROUND</span>
+  <p>core.js converts the pointer to stage-local coordinates by dividing by state.scale, then passes those to document.elementFromPoint(), which expects viewport coordinates. Under any stage transform the hit test resolves to the wrong element or to none, so .gaze-focus never lands where the wearer is looking.</p>
+  <p><em>Workaround.</em> Section 10 freezes core.js, so the correction lives in hardenGaze() in os/shared/lab.js: a viewport-space hit test registered after core's own listener, which therefore has the last word on .gaze-focus. Every piece already calls hardenGaze, so the fix is systemic rather than per-piece. Verified: .gaze-focus now settles on the element under the gaze at 310% text scale.</p>
+  <p><em>Residual.</em> The ACTIVATION path is still wrong. core.js pointerdown calls focused.click() against its own mis-resolved element, so a click can fire on an element the wearer was not looking at. The lab-side listener corrects the highlight, not the dispatch. Fixing it needs either an edit to frozen core.js or a capture-phase interceptor that swallows core's pointerdown, and neither is in scope without permission to touch the frozen file. Recorded here rather than dropped.</p>
+</div>
+
+<h2>Build log</h2>
+<ul class="log"><li><span class="t"></span><span></span></li><li><span class="t"></span><span></span></li><li><span class="t"></span><span></span></li><li><span class="t">2026-08-31T12:48:37</span><span></span></li><li><span class="t">2026-08-31T12:47:50</span><span></span></li><li><span class="t">2026-08-31T12:41:37</span><span></span></li><li><span class="t">2026-08-31T12:40:41</span><span></span></li><li><span class="t">2026-08-31T12:36:00</span><span></span></li><li><span class="t">2026-08-31T07:37:14</span><span></span></li><li><span class="t">2026-08-31T07:35:24</span><span></span></li><li><span class="t">2026-08-31T07:35:24</span><span></span></li><li><span class="t">2026-08-31T07:35:24</span><span></span></li><li><span class="t">2026-08-31T07:26:54</span><span></span></li><li><span class="t">2026-08-31T07:26:54</span><span></span></li><li><span class="t">2026-08-31T07:26:54</span><span></span></li><li><span class="t">t+1h</span><span>live progress page published · regenerated from PROGRESS.json by tools/build-live.mjs after every verdict</span></li><li><span class="t">t+1h</span><span>wave 0 open: 3 builders live on foundation, motion, audio+haptics — all on the new gate</span></li><li><span class="t">t+0m</span><span>piece list expanded 16 -&gt; 26 across 5 waves · web apps runtime, permission broker, catalog, SDK, devtools, text input, search, privacy, media, audio/haptics, motion all now explicit pieces</span></li><li><span class="t">t+0m</span><span>agent definitions written: builder, critic, sweep, integrator (opus/medium) · critic carries its own disqualification rule</span></li><li><span class="t">t+0m</span><span>os/shared/lab.js + lab.css added — dev controls in an outside rail, 5 edge states URL-drivable, world layer behind the glass</span></li><li><span class="t">t+0m</span><span>probe.mjs rewritten as an enforcing gate: exit 1 on dev chrome in stage, token leaks, overflow, reduced-motion, console errors</span></li><li><span class="t">t+0m</span><span>read 22 prior verdicts · root-caused the plateau to in-stage dev chrome, undemoted foci, and leaked tokens</span></li></ul>
+
+<footer>Every piece is built by one agent and judged by a fresh-context critic that runs the probe itself and reads only its own screenshots — never a builder's words. Each is scored blind as System A/B/C against a specifically named visionOS screen and a specifically named Horizon OS screen, across nine criteria worth 90 points: glanceability, focus discipline, material honesty, motion, typography, edge states, dependability, accessibility, delight.<br><br>Every piece carries two consecutive PASS verdicts from two different fresh critics; the coherence integrator signs off on the whole system; the web apps runtime actually runs a third-party app; the developer platform is real; the dashboard shows N/N passed.</footer>
+</div></body></html>

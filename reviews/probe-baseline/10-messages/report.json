@@ -1,0 +1,121 @@
+{
+  "url": "http://localhost:4310/components/10-messages/index.html",
+  "probedAt": "2026-09-05T06:44:37.192Z",
+  "gate": {
+    "pass": false,
+    "violations": [
+      "gaze reticle collides with 3 text run(s) — e.g. \"Build 26A ready — window chrome now respects scr\" in div.thread-preview (at rest, painted reticle). Keep the stage centre clear of glyphs, composite the reticle as a ring rather than a filled disc, and hide it until the first gaze or pointer event."
+    ],
+    "warnings": [
+      "no lab rail mounted — critics cannot reach edge states; import mountLab from /os/shared/lab.js",
+      "14 in-stage focusables at rest — dense for a 600x600 glasses display",
+      "focus discipline: 9 elements read as loud at rest, target is 1 — div.msg-title, button.header-chip, button.seg-btn, div.thread-card, div.thread-card, div.thread-card, div.thread-card, div.thread-card"
+    ]
+  },
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "reducedMotion": {
+    "ok": true,
+    "infiniteAnimations": 0,
+    "contentPresent": true
+  },
+  "screenshots": [
+    "full.png",
+    "stage.png",
+    "stage-reduced-motion.png"
+  ],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "inStageFocusables": 14,
+  "labFocusables": 0,
+  "totalFocusables": 20,
+  "labInsideStage": 0,
+  "devTokenLeaks": [],
+  "loudElementCount": 9,
+  "loudElements": [
+    "div.msg-title",
+    "button.header-chip",
+    "button.seg-btn",
+    "div.thread-card",
+    "div.thread-card",
+    "div.thread-card",
+    "div.thread-card",
+    "div.thread-card",
+    "div.hintbar"
+  ],
+  "surfaces": [
+    {
+      "el": "div.msg-viewport",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.thread-group",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.thread-list",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.thread-card",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(28, 38, 54, 0.88), rgba(14, 21, 32, 0.92)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    },
+    {
+      "el": "div.thread-card",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(28, 38, 54, 0.88), rgba(14, 21, 32, 0.92)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    },
+    {
+      "el": "div.thread-group",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.thread-list",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.thread-card",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    },
+    {
+      "el": "div.thread-card",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    },
+    {
+      "el": "div.thread-card",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    }
+  ],
+  "unlabeledIconButtons": [],
+  "subTenPxTextCount": 0,
+  "reducedMotionSupport": true,
+  "hasLab": false,
+  "labControls": [],
+  "overflow": {
+    "stageScrollH": 600,
+    "stageClientH": 600,
+    "innerScrollH": null,
+    "innerClientH": null
+  },
+  "title": "Prism OS — Messages"
+}

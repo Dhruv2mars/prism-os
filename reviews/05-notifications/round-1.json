@@ -1,0 +1,99 @@
+{
+  "piece": "05-notifications",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T11:05:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/05-notifications/index.html reviews/05-notifications/judge-r1",
+    "outDir": "reviews/05-notifications/judge-r1",
+    "screenshotsRead": [
+      "stage.png",
+      "full.png",
+      "stage-reduced-motion.png",
+      "states/empty.png",
+      "states/loading.png",
+      "states/error.png",
+      "states/offline.png",
+      "states/permission.png",
+      "states/expanded.png",
+      "states/undo.png",
+      "states/textscale-hack.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 22,
+    "notes": "Probe gate FAILED: gaze reticle rests on the expanded-card caption 'Tap View to open Gallery · space = capture · expanded with 12 MP' at stage centre. Probe claims no lab rail, but the piece mounts its own edge-state rail outside the stage (Normal/Empty/Loading/Error/Offline/No access) and exposes window.__notif.setEdge — I drove all six states plus expand/dismiss/undo myself and screenshotted each. Zero console/page errors. Reduced motion: 0 infinite animations, content present. Edge states all render and all recovery paths work (Retry loops honestly report 'Still offline'; Allow/Not now return to normal). Undo bar appears on single dismiss and restores. Two real defects found in pixels: (1) os.banner toast paints over the header title/subtitle in expanded.png — text collision; (2) dev captions painted to users: 'shimmer 1.2s times' in loading, 'Humane empty · nothing missed' in empty, 'Error PR-NOTIF-503' in error. Text-scale hack: bodies stay line-clamped, icons fixed 36px — no true reflow. Dependability hole found in code+pixels: Clear all banners 'undo available' but dismisses with silent=true so no undo bar ever shows — the promised undo does not exist for clear-all."
+  },
+  "blind": {
+    "A": "visionOS Notification Center + incoming notification banner (visionOS 2.x, 2024)",
+    "B": "Meta Horizon OS universal-menu Notification Center panel (Horizon OS v60+, Quest 3, 2024)",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "One glass banner at a time floats over the shared space: strong frosted blur, ~28px radius, app icon top-left, app name + timestamp caption above a semibold title and 1-2 body lines. Hovering with eyes expands it slightly and dims everything else — focus is unmistakable. Pull-down Notification Center is a single glass column that dims the whole space behind it; rows repeat icon+title+time in small type. Loading is a bare spinner; empty Notification Center is just the wallpaper; dismissals are final with no undo.",
+    "B": "Toasts and a Notification Center panel in near-opaque dark gray (#1C1C1F-class) — a slab floating in the room, minimal blur, so it reads as a panel not glass. Rows: icon left, bold white title, one gray body line, relative time, X appears on controller hover with a highlight rectangle. Empty state is a small bell glyph with 'No notifications' — minimal but designed. Loading is a spinner. Motion is quick functional fades, some abrupt. No offline or permission-specific composition.",
+    "C": "A grouped stack under a glanceable header: 'Notifications 4 new', green dot, '2 now · 2 earlier', Clear all + Focus chips; NOW/EARLIER group rails with counts and a PRIORITY tag. Cards are real glass (gradient scrim, 22px blur, saturate) with 36px gradient icon tiles, 14px titles, 11px tabular times, 13px clamped bodies, and TWO always-visible action chips plus an X on every card — 22 focusables, 10 loud elements at rest. Undo bar replaces the hint bar on dismiss. All six edge states are fully composed cards with recovery paths. Signature moment: rubber-band swipe dismissal with an undo pulse on restore."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS 2.x Notification Center pull-down plus a single incoming banner (2024). The banner is a frosted-glass rounded rect ~480px wide, app icon 40px top-left, app name and 'now' in a small caption row, SF Pro semibold ~19px title, ~15px secondary body; eye hover raises it ~2% and everything behind dims — one focal element, unmistakable. The Center itself is a tall glass column over a full-space dim, rows of icon+title+time; loading is a bare spinner, empty is just the wallpaper — edge states are not designed.",
+    "horizonOS": "Horizon OS v60+ (Quest 3, 2024) notification toast and the universal-menu Notification Center panel. A dark near-opaque rounded panel (#1C1C1F-class, slight blur) floating in the room; rows show app icon left, bold white title, one gray line of body, relative time, hover-highlight row with an X. Empty is a centered bell glyph and 'No notifications' text. Controller laser + hover rectangle is the focus model; motion is 150-200ms functional fades; no composed offline/error/permission states."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 8,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 5,
+      "dependability": 7,
+      "accessibility": 9,
+      "delight": 7
+    },
+    "horizonOS": {
+      "glanceability": 7,
+      "focusDiscipline": 7,
+      "materialHonesty": 5,
+      "motion": 6,
+      "typography": 8,
+      "edgeStates": 5,
+      "dependability": 6,
+      "accessibility": 6,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 6,
+      "focusDiscipline": 4,
+      "materialHonesty": 8,
+      "motion": 7,
+      "typography": 5,
+      "edgeStates": 9,
+      "dependability": 6,
+      "accessibility": 6,
+      "delight": 8
+    }
+  },
+  "totals": {
+    "visionOS": 72,
+    "horizonOS": 54,
+    "ours": 59
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "ours"
+  },
+  "overallRanking": ["visionOS", "ours", "horizonOS"],
+  "biggestGap": "Focus discipline at rest · components/05-notifications/index.html:197-205 (.notif-card.is-top) · expected: one unmistakable focal card at rest on a 600x600 lens — non-top cards recessive (dimmed ~0.7, chips de-emphasized or revealed only on gaze/expansion, the treatment already implemented for gaze-hover at lines 207-216) · got: '.is-top' differs by scale(1.01)/opacity(.92) — imperceptible in stage.png — so all cards read equal and the probe counts 10 loud elements (every card shouting title + 2 chips + X + time), with no single obvious focal element anywhere on the surface",
+  "reason": "Ran the probe and drove all six edge states plus expand/dismiss/undo myself; zero console errors, reduced motion honored. The piece genuinely beats Horizon OS (59 vs 54) and wins edge states (best-in-class breadth: empty/loading/error/offline/permission all composed, with honest retry loops and queued-offline semantics) and delight (earned swipe-undo signature). But it loses to visionOS on six criteria and the losses are structural, not cosmetic. Focus discipline is the fatal one: 22 focusables and 10 loud elements at rest with an invisible 1% 'is-top' hierarchy is the opposite of what a 20-degree monocular lens needs — visionOS shows one banner and dims the world. Typography ships engineering vocabulary to users: 'Loading · shimmer 1.2s times', 'Humane empty · nothing missed', 'Error PR-NOTIF-503', 'expanded with 12 MP' are all painted copy. Dependability has a dead-end promise: Clear all banners 'undo available' (index.html:607) while dismissing with silent=true so no undo bar ever appears — the promised recovery does not exist. Accessibility has no true text-scale reflow (clamped bodies, fixed 36px tiles) and a stub cue() where mono-audio cues are claimed. The os.banner toast also collides with the header title (expanded.png), and the probe gate fails on a reticle-over-caption collision. Not ranked first; fail.",
+  "passCondition": "Ours ranked SECOND (59 of 90, behind visionOS at 72, ahead of Horizon OS at 54). Gaps remain: focus discipline at rest (named as biggest), painted dev captions, clear-all undo dead end, text-scale reflow, banner/header collision. Fail."
+}

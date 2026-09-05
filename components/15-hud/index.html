@@ -409,6 +409,7 @@
 </div>
 <script type="module">
 import { createOS } from '/os/shared/core.js';
+import { hardenGaze } from '/os/shared/lab.js';
 const stage = document.querySelector('[data-stage]');
 const device = document.querySelector('.device');
 const os = createOS(stage, { dwell:true, dwellMs:350 });
@@ -451,7 +452,7 @@ device.appendChild(devRow);
 const viewport = h('div', {class:'hud-viewport', id:'viewport'});
 const stateLayer = h('div', {class:'state-layer', id:'stateLayer', 'aria-live':'polite'});
 const hintbar = h('div', {class:'hintbar', id:'hintbar'});
-hintbar.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="hint-dot" aria-hidden="true"></span><strong>Scrub graph · dwell 350 ms</strong></span><span style="display:flex;align-items:center;gap:6px">Tab cycle · Space stress · 260 ms</span>`;
+hintbar.innerHTML = `<span style="display:flex;align-items:center;gap:6px"><span class="hint-dot" aria-hidden="true"></span><strong>Scrub graph · dwell 350 ms</strong></span><span style="display:flex;align-items:center;gap:6px">Tab to move · Space to stress</span>`;
 stage.append(viewport, stateLayer, hintbar);
 
 /* helper icons */
@@ -492,7 +493,7 @@ hero.innerHTML = `
   <div class="scrub-dot" id="fpsScrubDot" aria-hidden="true"></div>
   <div class="scrub-tip " id="fpsScrubTip">—</div>
  </div>
-  <div class="spark-axis"><span>last 30s · <strong class="tabular" id="fpsMinMax">86 – 92 FPS</strong></span><span>target <strong>90 FPS</strong> · prism-ease 260ms</span></div>
+  <div class="spark-axis"><span>last 30s · <strong class="tabular" id="fpsMinMax">86 – 92 FPS</strong></span><span>target <strong>90 FPS</strong></span></div>
 `;
 viewport.appendChild(hero);
 
@@ -575,7 +576,7 @@ const sim = h('div', {class:'sim-card'});
 sim.innerHTML = `
  <div class="sim-head">
   <span class="sim-title">Simulate · live HUD</span>
-  <span class="caption " style="font-size:10px;color:var(--ink-40)">prism-ease · 260ms</span>
+  <span class="caption " style="font-size:10px;color:var(--ink-40)">smooth · glass scrub</span>
  </div>
  <div class="sim-grid">
   <div class="sim-row" id="loadRow" data-focusable tabindex="0" role="button" aria-label="Load level, low or high">
@@ -724,7 +725,7 @@ function renderAll(){
  }
  // update os statusbar battery visual (outside our control but we patch)
  const sbBatteryRect = document.querySelector('.statusbar rect[fill="#fff"]');
- const sbBatteryText = document.querySelector('.statusbar .');
+ const sbBatteryText = document.querySelector('.statusbar span.tabular');
  if(sbBatteryRect) sbBatteryRect.setAttribute('width', String(16.2 * (battery/100)));
  if(sbBatteryText && sbBatteryText.textContent.includes('%')) sbBatteryText.textContent = Math.round(battery)+'%';
 
@@ -1044,7 +1045,7 @@ function setEdge(id){
      <p class="caption" style="color:var(--ink-40)">Loading uses .skeleton + shimmer — no spinner</p>
     </div>
     <div class="cached-strip" style="max-width:420px;justify-content:center">
-          <span class="dot warn" aria-hidden="true"></span><span class="tabular">Probe: loading · shimmer 1.2s</span>
+          <span class="dot warn" aria-hidden="true"></span><span class="tabular">Collecting samples…</span>
     </div>
    </div>
   `;
@@ -1072,7 +1073,7 @@ function setEdge(id){
       <button class="btn primary" data-focusable tabindex="0" aria-label="Start sampling">Start sampling</button>
       <button class="btn ghost" data-focusable tabindex="0" aria-label="Learn about metrics">Learn</button>
      </div>
-     <p class="caption" style="color:var(--ink-40);font-size:11px">Empty · 600×600 stage pending</p>
+     <p class="caption" style="color:var(--ink-40);font-size:11px">Metrics appear once an app starts sampling</p>
     </div>
     <div class="cached-strip" style="justify-content:center"><span class="dot ok" aria-hidden="true"></span><span>Empty state · not error · recoverable</span></div>
    </div>
@@ -1154,7 +1155,7 @@ function setEdge(id){
       <button class="btn primary" data-focusable tabindex="0" aria-label="Retry offline">Retry</button>
       <button class="btn" data-focusable tabindex="0" aria-label="Use cached metrics">Use cached</button>
      </div>
-     <p class="caption" style="color:var(--ink-40)">Offline uses stale + banner · recoverable · no dead end</p>
+     <p class="caption" style="color:var(--ink-40)">Reconnect to refresh live</p>
     </div>
    </div>
   `;
@@ -1200,7 +1201,7 @@ function setEdge(id){
       <button class="btn primary" data-focusable tabindex="0" aria-label="Allow performance sensors">Allow access</button>
       <button class="btn ghost" data-focusable tabindex="0" aria-label="Not now, dismiss">Not now</button>
      </div>
-     <p class="caption" style="color:var(--ink-40)">Settings → Privacy → Performance · no dead ends</p>
+     <p class="caption" style="color:var(--ink-40)">Settings → Privacy → Performance</p>
      <div style="width:100%;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;text-align:left">
       <span class="dot warn" aria-hidden="true"></span><span style="font-size:12px;font-weight:600;color:var(--ink-80)">Performance blocked</span><button class="chip" data-focusable tabindex="0" aria-label="Open Settings" style="margin-left:auto;height:28px">Open Settings</button>
      </div>
@@ -1257,6 +1258,8 @@ setTimeout(()=> {
  const first = viewport.querySelector('[data-focusable]');
  if(first) first.focus({preventScroll:true});
 }, 300);
+
+hardenGaze();
 
 console.log('Prism HUD ready — FPS , thermal dot, battery/mem/lat spark, histo, throttling, scrub delight, 6 edge states, probe clean');
 </script>

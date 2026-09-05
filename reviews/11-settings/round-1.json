@@ -1,0 +1,102 @@
+{
+  "piece": "11-settings",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T10:55:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/11-settings/index.html reviews/11-settings/judge-r1",
+    "outDir": "reviews/11-settings/judge-r1",
+    "screenshotsRead": [
+      "stage.png",
+      "full.png",
+      "stage-reduced-motion.png",
+      "states/loading.png",
+      "states/empty.png",
+      "states/error.png",
+      "states/offline.png",
+      "states/permission.png",
+      "states/sheet-display2.png",
+      "states/sheet-lens.png",
+      "states/rest-full.png",
+      "states/toggle-feedback.png",
+      "states/search-empty2.png",
+      "states/search-empty3.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 30,
+    "notes": "Gate FAIL: gaze reticle painted at stage centre collides with text run 'World scrim · 68% · auto on' on the Prism glass preview card; reticle is not hidden until first gaze. 16 elements read as loud at rest (target 1). All six edge states driven via the page's own dev rail (custom, not shared lab.js) and screenshotted: loading skeletons are near-invisible with no label; empty card carries broken copy 'Search is on-device and .' plus debug caption 'Empty · 0 matches · no dead ends'; error/offline/permission cards are well structured with working recovery actions (offline Retry honestly fails with 'Still offline · changes stay queued'). Display and Lens-permissions detail sheets open correctly, match stage bounds, close via Esc. DEPENDABILITY KILLER: the search field is a no-op — typed 'zzzz', groupCount stayed 5, no inline empty card, no feedback; the input handler (index.html:736-749) only sets searchQuery and shows a banner for magic strings ['zx','qqq','xyz']; the filter block at :949 only runs inside renderSettings(), which is never called on input. Rubric vocabulary 'no dead ends' leaks into user-visible copy 6+ times (Lens sheet intro :664, Reset row :939, empty :1023/:1028, offline, permission :1113). Copy bug 'Gaze hold to activate ms' (:822). Zero console/page errors. Reduced motion honored (0 infinite animations)."
+  },
+  "blind": {
+    "A": "visionOS Settings app window in Home View, Apple Vision Pro, HorizonOS 1.x 2024 — glass sidebar+detail over Shared Space",
+    "B": "Meta Quest Settings, Horizon OS v70+ — dark opaque panel with left icon nav rail over passthrough",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "A single large translucent glass window floating in a lit room; blurred world visibly passes through it. Left sidebar: search field, then a high-contrast list (Airplane Mode, Wi-Fi, Bluetooth...) with green iOS toggles; right pane shows the selected detail. SF Pro throughout, two text levels per row, values right-aligned in secondary gray. Exactly one white focus ring on the looked-at row; no persistent pointer artifact at rest. Section headers small uppercase. Loading is rare; when present it is a bare spinner. Delight comes from the material: the glass picks up room lighting.",
+    "B": "A near-black opaque rounded panel occluding the passthrough world entirely. Left vertical icon nav rail (System, Display, Wi-Fi, Apps...), content pane of large flat section cards, white-on-dark rows, blue toggles, controller laser cursor as a small ring with row-highlight on focus. Rubik-class type, three sizes. Loading is a centre spinner; errors are modal dialogs with Retry. Contrast is excellent; material honesty is nil — it is a flat screen pasted into a room.",
+    "C": "A 600x600 monocular stage of dark glass group cards (OPTICS, GESTURES) over a world gradient: Display nav row with 68% badge, inline Brightness slider with DIM/BRIGHT rail labels, Night Shift and World dim toggles, Dwell time slider, search field with Cmd-K hint, header 'Prism OS 1.0 · 68% brightness'. A white gaze reticle with halo sits parked at stage centre over the hero preview card's text at rest. Six edge states reachable from a dev rail: skeleton loading (faint), empty card (broken sentence + debug caption), error/offline/permission cards with real recovery actions and an honest failing retry. Two detail sheets (Display brightness with live preview card, Lens permissions with per-app toggles and Allow/Deny all). Banner toasts confirm every toggle/save. Search does nothing when typed into."
+  },
+  "referenceScreens": {
+    "visionOS": "Settings app on Apple Vision Pro (visionOS 1.x, 2024): one large glass window in the Shared Space, Lake or Mount Hood environment visible blurred through the material. Left sidebar with search field and a short settings list (Wi-Fi, Bluetooth, Appearance, Accessibility...), right detail pane; SF Pro, large title, ~60px rows, right-aligned gray values, green switches, a single white focus ring with gentle scale on the gazed row. Reference detail: the window edge has a soft specular rim and the material visibly brightens over light parts of the room — glass, not a panel.",
+    "horizonOS": "Settings on Meta Quest 3 / Horizon OS v69-v71 (2024): dark #1C1C1E opaque window over grayscale passthrough, left icon-only nav rail with labels on hover (System, Display, Input, Wi-Fi, Apps, Notifications, Privacy), content pane of full-width flat cards with 3-4 sizes of Quest Sans-class type, blue iOS-style toggles, laser-pointer cursor with rounded-rect row highlight. Reference detail: no transparency anywhere in the settings surface; loading is a bare white spinner centre-pane; permission prompts are stacked verbose modals."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 6,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 8
+    },
+    "horizonOS": {
+      "glanceability": 8,
+      "focusDiscipline": 8,
+      "materialHonesty": 4,
+      "motion": 7,
+      "typography": 7,
+      "edgeStates": 6,
+      "dependability": 8,
+      "accessibility": 7,
+      "delight": 5
+    },
+    "ours": {
+      "glanceability": 7,
+      "focusDiscipline": 5,
+      "materialHonesty": 8,
+      "motion": 8,
+      "typography": 4,
+      "edgeStates": 8,
+      "dependability": 5,
+      "accessibility": 8,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 77,
+    "horizonOS": 60,
+    "ours": 59
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": ["visionOS", "horizonOS", "ours"],
+  "biggestGap": "Search field · components/11-settings/index.html:736-749 (dead filter), renderSettings() gating at :949 · expected: typing filters groups live and shows the inline 'No results' card (already built at :960-965) when zero groups match, with a working Clear affordance · got: a no-op — the input handler only stores searchQuery and fires a banner for magic strings ['zx','qqq','xyz']; renderSettings() is never called on input, so verified by DOM probe: typing 'zzzz' left groupCount at 5 with zero visual change. The primary navigation control of a Settings surface dead-ends silently.",
+  "reason": "Ours ranks last (59 vs Horizon 60 vs visionOS 77) and loses eight of nine criteria, so this is a fail. The edge-state work is genuinely the best of the three systems — six designed states with honest retries (offline Retry fails truthfully and queues changes; error offers Retry + Use cached) beats both references' bare spinners, and material honesty (8) beats Horizon's opaque panels. But the surface is undone by self-inflicted wounds visible in pixels and DOM: the gaze reticle parks over the hero card's text at rest (probe gate FAIL), 16 elements read loud at rest against a target of 1, the search field — the fastest way to reach any setting on 30-focusable surface — silently does nothing when typed into, and the copy leaks the rubric's own vocabulary ('no dead ends' six-plus times), a debug caption ('Empty · 0 matches · no dead ends'), a dangling sentence ('Search is on-device and .'), and a broken sub-label ('Gaze hold to activate ms'). Typography scores 4 because copy quality is typography. Fix search end-to-end, hide the reticle until first gaze, quiet the rest-state accents, and humanize the copy — the bones are platform-grade, the finish is not.",
+  "passCondition": "Ours ranked third of three; 1 named gap (search dead-end); verdict fail."
+}

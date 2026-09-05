@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Transit</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+  /* A third-party app. It inherits the OS tokens the way an app inherits a
+     platform UI kit, then styles itself. It cannot reach the host page: the
+     frame is sandboxed without allow-same-origin, so everything below runs on
+     an opaque origin and every capability is asked for across postMessage. */
+  body {
+    margin: 0;
+    font: var(--t-body, 400 15px/1.35) var(--font-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif);
+    color: var(--ink-100, #f2f5fa);
+    background: transparent;
+    display: grid;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    padding: calc(14px * var(--a11y-scale, 1)) calc(16px * var(--a11y-scale, 1));
+    display: grid;
+    grid-template-rows: auto auto auto;
+    gap: calc(10px * var(--a11y-scale, 1));
+  }
+  .row { display: flex; align-items: baseline; gap: 8px; justify-content: space-between; }
+  .line {
+    font-size: calc(14px * var(--a11y-scale, 1));
+    font-weight: 620;
+    letter-spacing: 0.01em;
+    color: var(--ink-100, #f2f5fa);
+  }
+  .stop {
+    font-size: calc(12px * var(--a11y-scale, 1));
+    color: var(--ink-60, rgba(233,240,250,0.62));
+  }
+
+  /* The one focal element. Everything else on this surface is context for it. */
+  .focal { display: flex; align-items: baseline; gap: calc(8px * var(--a11y-scale, 1)); min-width: 0; }
+  .mins {
+    font-size: calc(58px * var(--a11y-scale, 1));
+    line-height: 0.9;
+    font-weight: 680;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+    color: #7ee0b8;
+  }
+  .unit {
+    font-size: calc(15px * var(--a11y-scale, 1));
+    font-weight: 560;
+    color: var(--ink-60, rgba(233,240,250,0.62));
+  }
+  .then {
+    font-size: calc(12px * var(--a11y-scale, 1));
+    color: var(--ink-60, rgba(233,240,250,0.62));
+    font-variant-numeric: tabular-nums;
+  }
+
+  .msg {
+    align-self: center;
+    display: grid;
+    gap: calc(6px * var(--a11y-scale, 1));
+    max-width: 34ch;
+  }
+  .msg h2 {
+    margin: 0;
+    font-size: calc(16px * var(--a11y-scale, 1));
+    font-weight: 620;
+    color: var(--ink-100, #f2f5fa);
+  }
+  .msg p {
+    margin: 0;
+    font-size: calc(13px * var(--a11y-scale, 1));
+    line-height: 1.35;
+    color: var(--ink-60, rgba(233,240,250,0.62));
+  }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    font: inherit;
+    font-size: calc(13px * var(--a11y-scale, 1));
+    font-weight: 560;
+    color: var(--ink-100, #f2f5fa);
+    background: rgba(255,255,255,0.10);
+    border: 0;
+    outline: 1px solid rgba(255,255,255,0.16);
+    border-radius: 999px;
+    padding: calc(7px * var(--a11y-scale, 1)) calc(14px * var(--a11y-scale, 1));
+    cursor: pointer;
+    min-height: calc(30px * var(--a11y-scale, 1));
+    transition: background 160ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  button:hover { background: rgba(255,255,255,0.16); }
+  button:focus-visible { outline: 2px solid #7ee0b8; outline-offset: 2px; }
+  button.primary { background: rgba(126,224,184,0.20); outline-color: rgba(126,224,184,0.44); }
+
+  .skel {
+    height: calc(56px * var(--a11y-scale, 1));
+    width: 60%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.13), rgba(255,255,255,0.06));
+    background-size: 220% 100%;
+    animation: sweep 1200ms linear infinite;
+  }
+  @keyframes sweep { to { background-position: -220% 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .skel { animation: none; }
+    * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="row">
+      <span class="line" id="line">Transit</span>
+      <span class="stop" id="stop">—</span>
+    </div>
+
+    <div id="body">
+      <div class="skel" aria-label="Loading departures"></div>
+    </div>
+
+    <div class="actions" id="actions"></div>
+  </div>
+
+<script src="/os/shared/prism-sdk.js"></script>
+<script>
+(function () {
+  'use strict';
+  var bodyEl = document.getElementById('body');
+  var actionsEl = document.getElementById('actions');
+  var stopEl = document.getElementById('stop');
+  var STOP = 'Duboce & Church';
+  var ticker = null;
+  var data = null;
+
+  function setActions(list) {
+    actionsEl.textContent = '';
+    list.forEach(function (a) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = a.label;
+      if (a.primary) b.className = 'primary';
+      b.addEventListener('click', a.onClick);
+      actionsEl.appendChild(b);
+    });
+  }
+
+  function showMessage(title, text, actions) {
+    bodyEl.textContent = '';
+    var wrap = document.createElement('div');
+    wrap.className = 'msg';
+    var h = document.createElement('h2'); h.textContent = title;
+    var p = document.createElement('p'); p.textContent = text;
+    wrap.appendChild(h); wrap.appendChild(p);
+    bodyEl.appendChild(wrap);
+    setActions(actions || []);
+  }
+
+  function showLoading(label) {
+    bodyEl.textContent = '';
+    var s = document.createElement('div');
+    s.className = 'skel';
+    s.setAttribute('aria-label', label || 'Loading');
+    bodyEl.appendChild(s);
+    setActions([]);
+  }
+
+  function render() {
+    bodyEl.textContent = '';
+    var focal = document.createElement('div');
+    focal.className = 'focal';
+    var m = document.createElement('span');
+    m.className = 'mins';
+    m.textContent = String(data.minutes[0]);
+    var u = document.createElement('span');
+    u.className = 'unit';
+    u.textContent = 'min';
+    focal.appendChild(m); focal.appendChild(u);
+
+    var then = document.createElement('div');
+    then.className = 'then';
+    then.textContent = data.minutes.length > 1
+      ? 'then ' + data.minutes.slice(1).join(' and ') + ' min'
+      : 'last one for a while';
+
+    bodyEl.appendChild(focal);
+    bodyEl.appendChild(then);
+    document.getElementById('line').textContent = data.line;
+    stopEl.textContent = STOP;
+
+    prism.setBadge(data.line + ' in ' + data.minutes[0] + ' min');
+
+    setActions([
+      { label: 'Notify me to leave', primary: true, onClick: notifyLeave },
+      { label: 'Refresh', onClick: load },
+    ]);
+  }
+
+  function notifyLeave() {
+    prism.notify({
+      title: data.line + ' in ' + data.minutes[0] + ' min',
+      body: 'Leave now to make it to ' + STOP + '.',
+    }).catch(function (err) {
+      if (err.code === 'permission-denied') {
+        showMessage('Notifications are off',
+          'Transit cannot alert you until you allow notifications. Departures still update on screen.',
+          [{ label: 'Back', primary: true, onClick: render }]);
+      } else {
+        showMessage('Could not set the alert', err.message,
+          [{ label: 'Back', primary: true, onClick: render }]);
+      }
+    });
+  }
+
+  function load() {
+    showLoading('Loading departures');
+    prism.fetch('https://api.prism.dev/transit/next').then(function (res) {
+      data = res.body;
+      render();
+      startTicker();
+    }).catch(function (err) {
+      stopTicker();
+      if (err.code === 'offline') {
+        showMessage('No connection',
+          'Departure times need a network. The last times seen were ' +
+            (data ? data.minutes.join(', ') + ' min' : 'not loaded yet') + '.',
+          [{ label: 'Try again', primary: true, onClick: load }]);
+      } else if (err.code === 'permission-denied') {
+        showMessage('Network is off',
+          'Transit needs the network to read live departures. Nothing else in the app works without it.',
+          [{ label: 'Ask again', primary: true, onClick: load }]);
+      } else if (err.code === 'blocked') {
+        showMessage('Blocked by the network broker', err.detail || err.message,
+          [{ label: 'Try again', primary: true, onClick: load }]);
+      } else {
+        showMessage('Something went wrong', err.message,
+          [{ label: 'Try again', primary: true, onClick: load }]);
+      }
+    });
+  }
+
+  /* A countdown is only honest if it counts. Suspended means stopped. */
+  function startTicker() {
+    stopTicker();
+    ticker = setInterval(function () {
+      if (!data) return;
+      data.minutes = data.minutes.map(function (n) { return n - 1; }).filter(function (n) { return n > 0; });
+      if (!data.minutes.length) {
+        stopTicker();
+        showMessage('Nothing scheduled',
+          'No more ' + data.line + ' departures from ' + STOP + ' tonight.',
+          [{ label: 'Refresh', primary: true, onClick: load }]);
+        prism.setBadge('No more departures');
+        return;
+      }
+      render();
+    }, 60000);
+  }
+  function stopTicker() { if (ticker) { clearInterval(ticker); ticker = null; } }
+
+  prism.on('suspend', stopTicker);
+  prism.on('resume', function () { if (data) startTicker(); });
+  prism.on('offline', function () {
+    stopTicker();
+    showMessage('No connection',
+      'Departure times need a network. They will refresh when the link returns.',
+      [{ label: 'Try again', primary: true, onClick: load }]);
+  });
+  prism.on('online', load);
+  prism.on('permissionchange', function (p) {
+    if (p.name === 'network' && p.state === 'granted') load();
+  });
+
+  /* Boot asks for nothing. The first thing the wearer sees is the app doing the
+     one thing it exists to do, and the only prompt raised is for the capability
+     that attempt actually needs. Reading saved state at launch would front a
+     storage prompt before a single pixel of the app had earned it. */
+  prism.ready().then(function () {
+    stopEl.textContent = STOP;
+    if (prism.context && prism.context.granted.indexOf('storage') !== -1) {
+      return prism.storage.get('stop').catch(function () { return null; });
+    }
+    return null;
+  }).then(function (saved) {
+    if (saved) { STOP = saved; stopEl.textContent = STOP; }
+    load();
+  }).catch(load);
+})();
+</script>
+</body>
+</html>

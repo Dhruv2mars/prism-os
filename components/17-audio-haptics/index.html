@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Spatial Audio &amp; Haptics</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+ :root{ --s: var(--a11y-scale, 1); }
+
+ /* ---------- surface shell ---------- */
+ /* the stage never scrolls; this band does, so large text can never strand
+    content outside the lens. Centred only while there is room to centre. */
+ .surface{ z-index:2 }
+ .col{
+  box-sizing:border-box; width:100%; min-height:100%;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:calc(9px * var(--s));
+  padding:calc(8px * var(--s)) 26px calc(16px * var(--s));
+ }
+
+ /* ---------- title block ---------- */
+ .name{
+  font-size:calc(var(--fs-display) * var(--s));
+  font-weight:700; letter-spacing:-0.022em; line-height:1.06;
+  color:var(--ink-100); text-align:center;
+ }
+ .meaning{
+  font-size:calc(var(--fs-body) * var(--s));
+  font-weight:500; line-height:1.34; color:var(--ink-80);
+  text-align:center; max-width:calc(340px * var(--s)); margin-top:calc(3px * var(--s));
+ }
+
+ /* ---------- head-centred field ---------- */
+ .field{
+  --field: clamp(120px, calc(256px - (var(--s) - 1) * 160px), 208px);
+  --r: calc(var(--field) * 0.375);
+  --orb: clamp(17px, calc(var(--field) * 0.144), 30px);
+  position:relative; flex:none;
+  width:var(--field); height:var(--field); border-radius:50%;
+  background:
+   radial-gradient(circle at 50% 28%, rgba(36,52,74,0.58), rgba(10,16,25,0.74) 74%);
+  backdrop-filter:saturate(1.5) blur(18px);
+  -webkit-backdrop-filter:saturate(1.5) blur(18px);
+  outline:1px solid rgba(255,255,255,0.12);
+  box-shadow:
+   0 26px 58px rgba(0,0,0,0.44),
+   inset 0 1px 0 rgba(255,255,255,0.11),
+   inset 0 0 70px rgba(86,184,255,0.05);
+  touch-action:none; cursor:grab;
+  transition:opacity var(--dur-base) var(--ease-prism), filter var(--dur-base) var(--ease-prism);
+ }
+ .col:not(.md) .field{ margin:calc(15px * var(--s)) 0 calc(17px * var(--s)) }
+ .field:active{ cursor:grabbing }
+ .field.mono{ cursor:default }
+ .field svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible }
+
+ /* Cardinal words sit OUTSIDE the disc, on the rim margin. The orb orbits at
+    --r = 0.375 of the field, so its farthest edge stays inside the rim while
+    every word starts beyond it: word and orb can never meet, and the middle of
+    the field — where the gaze reticle rests — holds no glyph at all. */
+ .rose{
+  position:absolute; inset:0; pointer-events:none;
+  --rim: calc(var(--field) / 2);
+ }
+ .rose span{
+  position:absolute; left:50%; top:50%;
+  font-size:calc(11.5px * var(--s)); font-weight:700; letter-spacing:0.09em;
+  color:rgba(255,255,255,0.74); text-transform:lowercase; white-space:nowrap;
+  text-shadow:0 1px 3px rgba(2,6,12,0.92), 0 0 10px rgba(2,6,12,0.7);
+ }
+ .rose .n{ transform:translate(-50%, calc(-50% - var(--rim) - 11px)) }
+ .rose .s{ transform:translate(-50%, calc(-50% + var(--rim) + 11px)) }
+ .rose .w{ transform:translate(calc(-100% - var(--rim) - 9px), -50%) }
+ .rose .e{ transform:translate(calc(var(--rim) + 9px), -50%) }
+
+ .spoke{
+  position:absolute; inset:0; pointer-events:none;
+  transform:rotate(var(--az,0deg));
+  transition:transform var(--dur-base) var(--ease-prism);
+ }
+ .spoke.dragging{ transition:none }
+ .spoke::before{
+  content:""; position:absolute; left:50%; top:calc(50% - var(--r));
+  width:1px; height:calc(var(--r) - var(--orb) / 2);
+  transform:translateX(-50%);
+  background:linear-gradient(180deg, rgba(86,184,255,0.55), rgba(86,184,255,0.04));
+ }
+ .orb{
+  position:absolute; left:50%; top:calc(50% - var(--r));
+  width:var(--orb); height:var(--orb);
+  margin:calc(var(--orb) / -2) 0 0 calc(var(--orb) / -2); border-radius:50%;
+  background:radial-gradient(circle at 38% 32%, #d7efff, var(--accent) 46%, var(--accent-deep) 100%);
+  filter:drop-shadow(0 0 16px rgba(86,184,255,0.55));
+  transition:opacity var(--dur-base) var(--ease-prism), transform var(--dur-base) var(--ease-prism);
+ }
+ .orb::after{
+  content:""; position:absolute; inset:-5px; border-radius:50%;
+  border:1.5px solid rgba(86,184,255,0.34);
+ }
+ .ripple{
+  position:absolute; left:50%; top:calc(50% - var(--r));
+  width:var(--orb); height:var(--orb);
+  margin:calc(var(--orb) / -2) 0 0 calc(var(--orb) / -2); border-radius:50%;
+  border:2px solid rgba(86,184,255,0.75); opacity:0; pointer-events:none;
+ }
+ .field.mono .orb{ transform:translateY(var(--r)) scale(0.62); opacity:0.42 }
+ .field.mono .spoke::before{ opacity:0.15 }
+
+ .marker{
+  position:absolute; inset:0; pointer-events:none; opacity:0;
+  transform:rotate(var(--az,0deg));
+  transition:opacity var(--dur-base) var(--ease-prism), transform var(--dur-base) var(--ease-prism);
+ }
+ .field.mono .marker{ opacity:1 }
+ .marker i{
+  position:absolute; left:50%; top:calc(50% - var(--r) - 15px);
+  width:11px; height:11px; margin-left:-5.5px;
+  border-left:2px solid var(--accent); border-top:2px solid var(--accent);
+  transform:rotate(45deg); border-radius:2px 0 0 0;
+ }
+ .spread{
+  position:absolute; left:50%; top:50%;
+  width:calc(var(--r) * 2); height:calc(var(--r) * 2);
+  margin:calc(var(--r) * -1) 0 0 calc(var(--r) * -1);
+  border-radius:50%; border:1px dashed rgba(86,184,255,0.30);
+  background:radial-gradient(circle, rgba(86,184,255,0.14), rgba(86,184,255,0.02) 70%);
+  opacity:0; pointer-events:none;
+  transition:opacity var(--dur-base) var(--ease-prism);
+ }
+ .field.mono .spread{ opacity:1 }
+
+ /* its own band, between the rose and the touch pill: the only glyphs in it */
+ .bearing{
+  display:flex; align-items:center; gap:calc(7px * var(--s));
+  font-size:calc(14px * var(--s)); font-weight:600; letter-spacing:0.01em;
+  color:var(--ink-80); text-align:center; text-wrap:balance;
+  font-variant-numeric:tabular-nums;
+ }
+ .bearing::before{
+  content:""; flex:none; width:calc(6px * var(--s)); height:calc(6px * var(--s));
+  border-radius:50%; background:var(--accent); opacity:0.85;
+  box-shadow:0 0 8px rgba(86,184,255,0.55);
+ }
+ .col.tactile .bearing, .field.mono ~ .bearing{ opacity:0.55 }
+
+ /* ---------- haptic score ---------- */
+ .score{
+  position:relative;
+  display:flex; align-items:center; gap:calc(14px * var(--s));
+  padding:calc(9px * var(--s)) calc(15px * var(--s));
+  border-radius:var(--r-md);
+  background:linear-gradient(160deg, rgba(20,29,42,0.70), rgba(11,17,26,0.80));
+  backdrop-filter:saturate(1.45) blur(20px);
+  -webkit-backdrop-filter:saturate(1.45) blur(20px);
+  outline:1px solid rgba(255,255,255,0.10);
+  box-shadow:0 18px 40px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.09);
+  opacity:0.45;
+  transition:opacity var(--dur-base) var(--ease-prism), transform var(--dur-base) var(--ease-prism);
+ }
+ .score.lit{ opacity:1 }
+ .score .lbl{
+  font-size:calc(11px * var(--s)); font-weight:700; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--ink-40); white-space:nowrap;
+ }
+ .track{
+  position:relative; display:flex; align-items:flex-end; gap:0;
+  height:calc(34px * var(--s));
+  border-bottom:1px solid rgba(255,255,255,0.13);
+ }
+ .pulse{
+  border-radius:3px 3px 0 0;
+  background-image:linear-gradient(180deg, rgba(140,208,255,0.45), rgba(86,184,255,0.22));
+  background-color:transparent;
+  transition:background-image var(--dur-fast) linear, filter var(--dur-fast) linear;
+ }
+ .pulse.hit{
+  background-image:linear-gradient(180deg, #cfeaff, var(--accent-strong));
+  filter:drop-shadow(0 0 10px rgba(86,184,255,0.6));
+ }
+ .gap{ flex:none }
+ .playhead{
+  position:absolute; top:0; bottom:0; left:0; width:1.5px;
+  background:rgba(215,239,255,0.85); opacity:0;
+ }
+ .dur{
+  font-size:calc(12px * var(--s)); font-weight:650; color:var(--ink-60);
+  white-space:nowrap; min-width:calc(50px * var(--s)); text-align:right;
+ }
+
+ /* ---------- action + footer ---------- */
+ .play{
+  min-width:min(calc(168px * var(--s)), 100%); max-width:100%;
+  min-height:calc(44px * var(--s));
+  font-size:calc(var(--fs-body) * var(--s));
+ }
+ .note{
+  font-size:calc(12px * var(--s)); line-height:1.35; font-weight:500;
+  color:var(--ink-60); text-align:center; max-width:calc(360px * var(--s));
+ }
+ .index{ display:flex; align-items:center; gap:calc(4px * var(--s)); flex-wrap:wrap; justify-content:center }
+ .tab{
+  appearance:none; border:0; background:none; font-family:inherit;
+  padding:calc(4px * var(--s)) calc(9px * var(--s)); border-radius:var(--r-pill);
+  font-size:calc(11px * var(--s)); font-weight:650; letter-spacing:0.03em;
+  color:var(--ink-100); opacity:0.44; cursor:pointer;
+  transition:opacity var(--dur-fast) var(--ease-prism), background var(--dur-fast) var(--ease-prism);
+ }
+ .tab:hover{ opacity:0.72 }
+ .tab[aria-selected="true"]{ opacity:0.92; background:rgba(255,255,255,0.09) }
+
+ /* ---------- edge states ---------- */
+ .edge{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:calc(9px * var(--s)); text-align:center; padding:0 calc(6px * var(--s));
+ }
+ /* A notice is top-anchored, not centred, so its geometry is deterministic:
+    the mark ends just above the middle of the lens and the headline starts just
+    below it. The band of quiet between them is exactly where the gaze reticle
+    comes to rest, so the reticle never lands on a word. */
+ .col.notice{ justify-content:flex-start }
+ .col.notice .edge{ margin-top:max(0px, calc(244px - 120px * var(--s))) }
+ .edge .glyph{
+  position:relative; width:calc(112px * var(--s)); height:calc(112px * var(--s));
+  margin-bottom:calc(26px * var(--s));
+ }
+ .edge .glyph svg{ width:100%; height:100% }
+ .edge h2{
+  font-size:calc(var(--fs-title) * var(--s));
+  font-weight:700; letter-spacing:-0.014em; line-height:1.2; color:var(--ink-100);
+  max-width:calc(380px * var(--s));
+ }
+ .edge p{
+  font-size:calc(var(--fs-body) * var(--s)); font-weight:500; line-height:1.36;
+  color:var(--ink-60); max-width:calc(330px * var(--s));
+ }
+ .edge .foot{
+  font-size:calc(12px * var(--s)); color:var(--ink-40); max-width:calc(330px * var(--s));
+ }
+ .edge .btn{ margin-top:calc(6px * var(--s)); min-height:calc(44px * var(--s)); font-size:calc(var(--fs-body) * var(--s)) }
+
+ /* the lens is transparent and the sun is behind it: every line carries a
+    shadow of its own so nothing depends on the world staying dark. */
+ .meaning, .note, .bearing, .tab, .edge h2, .edge p, .edge .foot, .dur, .score .lbl{
+  text-shadow:0 1px 3px rgba(2,6,12,0.75);
+ }
+
+ .sweep{ transform-origin:50% 50%; animation:spin 1.5s linear infinite }
+ @keyframes spin{ to{ transform:rotate(360deg) } }
+
+ /* ---------- tactile (haptic-only) mode: focus moves to the score ---------- */
+ .col.tactile .field{ opacity:0.30; filter:saturate(0.4) }
+ .col.tactile .score{ opacity:1; transform:scale(1.06) }
+ .col.tactile .score .lbl{ color:var(--ink-60) }
+
+ /* ---------- large text: shed the quiet layers, keep every meaning ----------
+    At 130% the flavour line, the cardinal words and the vocabulary strip go —
+    the bearing sentence already says in full words what the rose draws, and
+    every cue stays reachable by swipe. At 175% the definition goes too, leaving
+    name, place, touch, action. Nothing is ever clipped: past 300% the band
+    scrolls and says so. */
+ .col.md .edge .foot{ display:none }
+ .col.md .edge .glyph{ width:calc(76px * var(--s)); height:calc(76px * var(--s)); margin-bottom:calc(16px * var(--s)) }
+ .col.lg .edge .glyph{ display:none }
+ .col.md .note, .col.md .rose, .col.md .score .lbl, .col.md .index{ display:none }
+ .col.md .meaning{ max-width:calc(300px * var(--s)) }
+ .col.lg .meaning{ display:none }
+ .col.lg{ justify-content:flex-start; gap:calc(10px * var(--s)); padding:calc(8px * var(--s)) 22px calc(10px * var(--s)) }
+ /* past 175% the drawn waveform and the button stop growing: they are shapes
+    and targets, already far past any legible or reachable minimum. */
+ .col.lg .track{ height:clamp(34px, calc(30px * var(--s)), 56px) }
+ .col.lg .score{ padding:calc(7px * var(--s)) calc(12px * var(--s)) }
+ .col.lg .play{ min-height:clamp(44px, calc(40px * var(--s)), 84px) }
+ /* at the largest text the plan view goes: the bearing line already says the
+    direction in words, and the action must stay on screen. */
+ .col.xl .field{ display:none }
+
+ /* the band scrolls only when text is set so large that it must; when it does,
+    the edge softens so the wearer can see there is more below. */
+ .surface.more::after{
+  content:""; position:absolute; left:0; right:0; bottom:0; height:46px;
+  background:linear-gradient(180deg, rgba(6,10,16,0), rgba(6,10,16,0.55));
+  pointer-events:none;
+ }
+
+ [data-reduced-motion] .sweep{ animation:none }
+ [data-reduced-motion] *{ transition-duration:1ms !important }
+ @media (prefers-reduced-motion: reduce){
+  .sweep{ animation:none }
+  .spoke, .orb, .score, .field, .tab{ transition-duration:1ms !important }
+ }
+</style>
+</head>
+<body>
+ <div class="device"><div class="stage-shell"><div class="stage" data-stage></div></div></div>
+
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+import { mountLab, mountWorld } from '/os/shared/lab.js';
+
+const stage = document.querySelector('[data-stage]');
+const os = createOS(stage, { scale: 1 });
+mountWorld(stage, 'street');
+
+stage.appendChild(os.statusbar(`<div class="cluster"><span data-route style="opacity:.62">Open-ear</span></div>`));
+const surface = document.createElement('main');
+surface.className = 'surface stage-scroll';
+stage.appendChild(surface);
+const routeEl = () => stage.querySelector('[data-route]');
+
+/* =====================================================================
+   AUDIO ENGINE — real Web Audio. Every cue is synthesised at play time
+   from oscillators and procedurally generated noise. No files, no network.
+   ===================================================================== */
+let ctx = null, master = null, panner = null, monoBus = null;
+const R_NEAR = 1.7;
+
+function ensureAudio(){
+  if (ctx) return ctx;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  ctx = new AC();
+  master = ctx.createGain();
+  master.gain.value = 0.85;
+  master.connect(ctx.destination);
+
+  /* spatial path: HRTF panner around a listener sitting at the origin,
+     facing -Z (the Web Audio default), which is "in front of the wearer". */
+  panner = ctx.createPanner();
+  panner.panningModel = 'HRTF';
+  panner.distanceModel = 'inverse';
+  panner.refDistance = 1;
+  panner.maxDistance = 14;
+  panner.rolloffFactor = 0.55;
+  panner.connect(master);
+
+  /* mono path: one channel, explicitly, then up-mixed identically to both
+     ears. Nothing can arrive at one ear and not the other. */
+  monoBus = ctx.createGain();
+  monoBus.channelCount = 1;
+  monoBus.channelCountMode = 'explicit';
+  monoBus.channelInterpretation = 'speakers';
+  monoBus.gain.value = 1;
+  monoBus.connect(master);
+
+  place(cue().az, ctx.currentTime, 0, R_NEAR);
+  return ctx;
+}
+
+/* azimuth in degrees: 0 = straight ahead, +90 = right ear, -90 = left ear */
+function xz(az, dist){
+  const r = az * Math.PI / 180;
+  return { x: Math.sin(r) * dist, z: -Math.cos(r) * dist };
+}
+function place(az, when, ramp = 0, dist = R_NEAR){
+  if (!panner) return;
+  const { x, z } = xz(az, dist);
+  if (panner.positionX){
+    const p = [panner.positionX, panner.positionY, panner.positionZ];
+    const v = [x, 0, z];
+    p.forEach((param, i) => {
+      if (ramp > 0){
+        param.cancelScheduledValues(when);
+        param.setValueAtTime(param.value, when);
+        param.linearRampToValueAtTime(v[i], when + ramp);
+      } else {
+        param.setValueAtTime(v[i], when);
+      }
+    });
+  }
+}
+
+function env(node, t, dur, peak, attack = 0.004){
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(Math.max(peak, 0.0002), t + attack);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  node.connect(g);
+  return g;
+}
+function blip(t, hz, dur, peak, dest, type = 'sine', attack = 0.004, glide = 0){
+  const o = ctx.createOscillator();
+  o.type = type;
+  o.frequency.setValueAtTime(hz, t);
+  if (glide) o.frequency.exponentialRampToValueAtTime(glide, t + dur);
+  const g = env(o, t, dur, peak, attack);
+  if (type === 'square' || type === 'sawtooth'){
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 2600; lp.Q.value = 0.6;
+    g.connect(lp); lp.connect(dest);
+  } else g.connect(dest);
+  o.start(t); o.stop(t + dur + 0.06);
+}
+function noise(t, dur, peak, dest, { type = 'bandpass', f = 1200, q = 1 } = {}){
+  const n = Math.max(1, Math.floor(ctx.sampleRate * dur));
+  const buf = ctx.createBuffer(1, n, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.2);
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const bp = ctx.createBiquadFilter();
+  bp.type = type; bp.frequency.value = f; bp.Q.value = q;
+  const g = env(src, t, dur, peak, 0.002);
+  g.connect(bp); bp.connect(dest);
+  src.start(t); src.stop(t + dur + 0.02);
+}
+
+/* =====================================================================
+   THE VOCABULARY — six cues. Each is a sound, a touch and a meaning.
+   ===================================================================== */
+const CUES = [
+  {
+    id:'confirm', name:'Confirm', az:0,
+    meaning:'A selection landed.',
+    note:'The quietest thing the glasses can say. It never talks over speech.',
+    haptic:[{ms:14,i:0.45},{gap:38},{ms:22,i:0.7}],
+    audio(t, dest){ blip(t, 659.25, 0.055, 0.34, dest); blip(t + 0.062, 987.77, 0.09, 0.28, dest); },
+  },
+  {
+    id:'arrive', name:'Arrive', az:-50, approach:true,
+    meaning:'A notification entered your space.',
+    note:'It sounds from wherever it came from, so your eyes already know where to go.',
+    haptic:[{ms:10,i:0.28},{gap:26},{ms:12,i:0.44},{gap:26},{ms:26,i:0.64}],
+    audio(t, dest){
+      blip(t, 523.25, 0.36, 0.26, dest, 'triangle', 0.03);
+      blip(t + 0.10, 783.99, 0.44, 0.19, dest, 'triangle', 0.04);
+    },
+  },
+  {
+    id:'alert', name:'Alert', az:0,
+    meaning:'Something needs you right now.',
+    note:'The only cue allowed to raise its voice. Three strikes, then it stops asking.',
+    haptic:[{ms:42,i:0.9},{gap:58},{ms:42,i:0.9},{gap:58},{ms:96,i:1}],
+    audio(t, dest){
+      for (let i = 0; i < 3; i++)
+        blip(t + i * 0.145, i === 2 ? 1174.66 : 880, 0.11, 0.30, dest, 'square', 0.003);
+    },
+  },
+  {
+    id:'fail', name:'Fail', az:0,
+    meaning:'That did not work.',
+    note:'It falls in pitch. Nothing else in the system falls, so a fall can only mean this.',
+    haptic:[{ms:88,i:0.8},{gap:44},{ms:88,i:0.6}],
+    audio(t, dest){
+      blip(t, 330, 0.30, 0.30, dest, 'sine', 0.006, 148);
+      blip(t + 0.01, 327, 0.26, 0.10, dest, 'triangle', 0.008, 150);
+    },
+  },
+  {
+    id:'boundary', name:'Boundary', az:90,
+    meaning:'You reached the end.',
+    note:'A wall, not a warning. Short enough that it costs no attention at all.',
+    haptic:[{ms:30,i:0.72}],
+    audio(t, dest){
+      noise(t, 0.07, 0.22, dest, { type:'bandpass', f:430, q:1.1 });
+      blip(t, 132, 0.10, 0.26, dest, 'sine', 0.003);
+    },
+  },
+  {
+    id:'capture', name:'Capture', az:0, locked:true,
+    meaning:'The shutter fired.',
+    note:'Law requires this one on real glasses. It cannot be silenced, lowered, or turned off.',
+    haptic:[{ms:22,i:0.8},{gap:34},{ms:56,i:1}],
+    audio(t, dest){
+      noise(t, 0.022, 0.34, dest, { type:'bandpass', f:2400, q:1.4 });
+      blip(t, 1600, 0.02, 0.14, dest, 'square', 0.001);
+      noise(t + 0.055, 0.035, 0.28, dest, { type:'bandpass', f:1500, q:1.1 });
+      blip(t + 0.055, 220, 0.05, 0.16, dest, 'sine', 0.002);
+    },
+  },
+];
+
+const INTENSITY = {
+  light:    { label:'Light',    t:0.7,  a:0.6 },
+  standard: { label:'Standard', t:1,    a:1 },
+  strong:   { label:'Strong',   t:1.35, a:1.25 },
+};
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+const S = {
+  cue: 0,
+  mono: false,
+  tactile: false,       /* haptic-only: audio graph is never fed */
+  haptics: true,
+  intensity: 'standard',
+  view: 'Ready',
+  scale: 1,
+};
+const cue = () => CUES[S.cue];
+const reduced = () =>
+  matchMedia('(prefers-reduced-motion: reduce)').matches ||
+  document.documentElement.hasAttribute('data-reduced-motion');
+
+function shaped(c){
+  const k = c.locked ? 1 : INTENSITY[S.intensity].t;
+  const a = c.locked ? 1 : INTENSITY[S.intensity].a;
+  return c.haptic.map((p) => p.gap != null
+    ? { gap: Math.round(p.gap * k) }
+    : { ms: Math.round(p.ms * k), i: Math.min(1, p.i * a) });
+}
+const totalMs = (list) => list.reduce((n, p) => n + (p.gap != null ? p.gap : p.ms), 0);
+
+function bearing(az){
+  const a = Math.round(az);
+  const side = a === 0 ? 'ahead of you'
+    : Math.abs(a) === 180 ? 'behind you'
+    : a > 0 ? 'to your right' : 'to your left';
+  const deg = Math.abs(a);
+  if (S.mono) return deg === 0 ? 'Centred · marked ahead' : `Centred · marked ${side}`;
+  return deg === 0 || deg === 180 ? side[0].toUpperCase() + side.slice(1) : `${deg}° ${side.replace('to your ', '')}`;
+}
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+const PX_PER_MS = 1.15;
+
+function el(tag, cls, html){
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (html != null) n.innerHTML = html;
+  return n;
+}
+
+function render(){
+  surface.innerHTML = '';
+  clearTimeout(render._t);
+  const col = el('div', 'col');
+  if (S.tactile && S.view === 'Ready') col.classList.add('tactile');
+  if (S.view !== 'Ready') col.classList.add('notice');
+  if (S.scale >= 1.3) col.classList.add('md');
+  if (S.scale >= 1.75) col.classList.add('lg');
+  if (S.scale >= 2.8) col.classList.add('xl');
+  surface.appendChild(col);
+  ({
+    'Ready': viewReady,
+    'Loading': viewLoading,
+    'Sound blocked': viewBlocked,
+    'No output': viewNoOutput,
+    'No motor': viewNoMotor,
+    'Offline': viewOffline,
+  }[S.view] || viewReady)(col);
+  syncRoute();
+  requestAnimationFrame(() => {
+    surface.classList.toggle('more', surface.scrollHeight > surface.clientHeight + 2);
+  });
+}
+
+function syncRoute(){
+  const r = routeEl();
+  if (!r) return;
+  r.textContent = S.tactile ? 'Touch only' : S.mono ? 'Mono' : 'Open-ear';
+}
+
+/* ---------- the resting surface ---------- */
+function viewReady(col){
+  const c = cue();
+
+  const head = el('div');
+  head.style.textAlign = 'center';
+  const name = el('h1', 'name');
+  name.textContent = c.name;
+  const mean = el('p', 'meaning');
+  mean.textContent = c.meaning;
+  head.append(name, mean);
+
+  /* --- head-centred plan view --- */
+  const field = el('div', 'field');
+  field.setAttribute('data-focusable', '');
+  field.setAttribute('role', 'slider');
+  field.setAttribute('tabindex', '0');
+  field.setAttribute('aria-label', 'Where the cue sits around your head');
+  field.setAttribute('aria-valuemin', '-180');
+  field.setAttribute('aria-valuemax', '180');
+  if (S.mono) field.classList.add('mono');
+
+  field.innerHTML = `
+    <svg viewBox="0 0 244 244" aria-hidden="true">
+      <circle cx="122" cy="122" r="91.5" fill="none" stroke="rgba(255,255,255,0.15)"/>
+      <circle cx="122" cy="122" r="58" fill="none" stroke="rgba(255,255,255,0.07)" stroke-dasharray="2 6"/>
+      <g stroke="rgba(255,255,255,0.26)" stroke-linecap="round">
+        <line x1="122" y1="24" x2="122" y2="32"/>
+        <line x1="122" y1="212" x2="122" y2="220"/>
+        <line x1="24" y1="122" x2="32" y2="122"/>
+        <line x1="212" y1="122" x2="220" y2="122"/>
+      </g>
+      <g>
+        <circle cx="122" cy="124" r="17" fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.40)"/>
+        <path d="M115 110.5 L122 101 L129 110.5" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M108 118.5 h28" stroke="rgba(86,184,255,0.75)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M106.5 118.5 v9 M137.5 118.5 v9" stroke="rgba(255,255,255,0.32)" stroke-width="1.4" stroke-linecap="round"/>
+      </g>
+    </svg>
+    <div class="rose" aria-hidden="true">
+      <span class="n">front</span><span class="s">behind</span>
+      <span class="w">left</span><span class="e">right</span>
+    </div>
+    <div class="spread" aria-hidden="true"></div>
+    <div class="marker" aria-hidden="true"><i></i></div>
+    <div class="spoke" aria-hidden="true"><span class="ripple"></span><span class="orb"></span></div>`;
+
+  const bearingRow = el('p', 'bearing');
+
+  const spoke = field.querySelector('.spoke');
+  const marker = field.querySelector('.marker');
+  const bear = bearingRow;
+  const setAz = (az) => {
+    c.az = ((az + 540) % 360) - 180;
+    spoke.style.setProperty('--az', `${c.az}deg`);
+    marker.style.setProperty('--az', `${c.az}deg`);
+    bear.textContent = bearing(c.az);
+    field.setAttribute('aria-valuenow', String(Math.round(c.az)));
+    field.setAttribute('aria-valuetext', bearing(c.az));
+    if (ctx && panner) place(c.az, ctx.currentTime, 0.04);
+  };
+  setAz(c.az);
+
+  /* drag to move the cue around the head — this moves the real panner */
+  let drag = false;
+  const angleFrom = (e) => {
+    const r = field.getBoundingClientRect();
+    const dx = e.clientX - (r.left + r.width / 2);
+    const dy = e.clientY - (r.top + r.height / 2);
+    return Math.atan2(dx, -dy) * 180 / Math.PI;
+  };
+  field.addEventListener('pointerdown', (e) => {
+    if (S.mono) return;
+    drag = true; S.dragAt = Date.now();
+    spoke.classList.add('dragging');
+    field.setPointerCapture?.(e.pointerId);
+    setAz(angleFrom(e));
+  });
+  field.addEventListener('pointermove', (e) => { if (drag) setAz(angleFrom(e)); });
+  const endDrag = () => {
+    if (!drag) return;
+    drag = false; S.dragAt = Date.now();
+    spoke.classList.remove('dragging');
+  };
+  field.addEventListener('pointerup', endDrag);
+  field.addEventListener('pointercancel', endDrag);
+  field.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault(); e.stopPropagation();
+    if (S.mono) return;
+    setAz(c.az + (e.key === 'ArrowRight' ? 15 : -15));
+  });
+
+  /* --- haptic score: duration and intensity drawn as shape --- */
+  const list = shaped(c);
+  const score = el('div', 'score');
+  const lbl = el('span', 'lbl'); lbl.textContent = 'Touch';
+  const track = el('div', 'track');
+  list.forEach((p) => {
+    if (p.gap != null){
+      const g = el('span', 'gap');
+      g.style.width = `${Math.max(3, p.gap * PX_PER_MS)}px`;
+      track.appendChild(g);
+    } else {
+      const b = el('span', 'pulse');
+      b.style.width = `${Math.max(7, p.ms * PX_PER_MS)}px`;
+      b.style.height = `${(9 + p.i * 24).toFixed(1)}px`;
+      track.appendChild(b);
+    }
+  });
+  const head_ = el('span', 'playhead');
+  track.appendChild(head_);
+  const dur = el('span', 'dur tabular');
+  dur.textContent = `${totalMs(list)} ms`;
+  score.append(lbl, track, dur);
+
+  /* --- the one action --- */
+  const play = el('button', 'btn primary play');
+  play.type = 'button';
+  play.textContent = S.tactile ? 'Feel cue' : 'Play cue';
+  play.addEventListener('click', () => fire(field, score, track, head_));
+
+  const note = el('p', 'note');
+  note.textContent = S.mono && !S.tactile
+    ? 'Panning is off. Direction is spoken in words instead, so nothing is lost.'
+    : S.tactile ? 'Sound is off. Every cue still arrives through the temple.'
+    : c.note;
+
+  const index = el('nav', 'index');
+  index.setAttribute('role', 'tablist');
+  index.setAttribute('aria-label', 'Cue vocabulary');
+  CUES.forEach((k, i) => {
+    const t = el('button', 'tab');
+    t.type = 'button';
+    t.setAttribute('role', 'tab');
+    t.setAttribute('aria-selected', String(i === S.cue));
+    t.textContent = k.name;
+    t.addEventListener('click', () => select(i));
+    index.appendChild(t);
+  });
+
+  col.append(head, field, bearingRow, score, play, note, index);
+}
+
+/* ---------- fire the cue for real ---------- */
+async function fire(field, score, track, playhead){
+  const c = cue();
+
+  if (!S.tactile){
+    const ok = await armAudio();
+    if (!ok) return;
+    const t = ctx.currentTime + 0.02;
+    const dest = S.mono ? monoBus : panner;
+    if (!S.mono){
+      if (c.approach){
+        place(c.az, t, 0, 4.6);
+        place(c.az, t + 0.02, 0.42, R_NEAR);
+      } else {
+        place(c.az, t, 0, R_NEAR);
+      }
+    }
+    c.audio(t, dest);
+  }
+
+  buzz(c);
+  animate(field, score, track, playhead, c);
+}
+
+function buzz(c){
+  if (!S.haptics && !c.locked) return;
+  const pat = shaped(c).map((p) => (p.gap != null ? p.gap : p.ms));
+  try { navigator.vibrate?.(pat); } catch { /* no motor on this body */ }
+}
+
+function animate(field, score, track, playhead, c){
+  const list = shaped(c);
+  const bars = [...track.querySelectorAll('.pulse')];
+  score.classList.add('lit');
+
+  const orb = field?.querySelector('.orb');
+  const ripple = field?.querySelector('.ripple');
+  if (ripple && !reduced() && !S.tactile){
+    ripple.animate(
+      [{ transform:'scale(1)', opacity:0.75 }, { transform:'scale(3.4)', opacity:0 }],
+      { duration: 620, easing:'cubic-bezier(0.32,0.72,0,1)' });
+    orb?.animate(
+      [{ transform:'scale(1)' }, { transform:'scale(1.28)' }, { transform:'scale(1)' }],
+      { duration: 300, easing:'cubic-bezier(0.32,0.72,0,1)' });
+  }
+
+  if (reduced()){
+    bars.forEach((b) => b.classList.add('hit'));
+    clearTimeout(animate._t);
+    animate._t = setTimeout(() => {
+      bars.forEach((b) => b.classList.remove('hit'));
+      if (!S.tactile) score.classList.remove('lit');
+    }, 260);
+    return;
+  }
+
+  const total = totalMs(list) || 1;
+  const starts = [];
+  let acc = 0, bi = 0;
+  list.forEach((p) => {
+    if (p.gap != null) acc += p.gap;
+    else { starts[bi++] = acc; acc += p.ms; }
+  });
+  const t0 = performance.now();
+  const w = track.clientWidth;
+  playhead.style.opacity = '1';
+  cancelAnimationFrame(animate._raf);
+  const step = () => {
+    const e = performance.now() - t0;
+    const k = Math.min(1, e / total);
+    playhead.style.transform = `translateX(${(w * k).toFixed(1)}px)`;
+    bars.forEach((b, i) => b.classList.toggle('hit', e >= starts[i] && e < starts[i] + list.filter((p) => p.gap == null)[i].ms + 90));
+    if (k < 1){ animate._raf = requestAnimationFrame(step); return; }
+    playhead.style.opacity = '0';
+    bars.forEach((b) => b.classList.remove('hit'));
+    if (!S.tactile) score.classList.remove('lit');
+  };
+  animate._raf = requestAnimationFrame(step);
+}
+
+/* ---------- audio arming: the autoplay wall is real ---------- */
+async function armAudio(){
+  try {
+    ensureAudio();
+    if (!ctx){ go('No output'); return false; }
+    if (ctx.state !== 'running') await ctx.resume();
+    if (ctx.state !== 'running'){ go('Sound blocked'); return false; }
+  } catch { go('Sound blocked'); return false; }
+  if (!(await hasOutput())){ go('No output'); return false; }
+  return true;
+}
+async function hasOutput(){
+  try {
+    if (!navigator.mediaDevices?.enumerateDevices) return true;
+    const d = await navigator.mediaDevices.enumerateDevices();
+    if (!d.length) return true;
+    return d.some((x) => x.kind === 'audiooutput');
+  } catch { return true; }
+}
+
+/* =====================================================================
+   EDGE STATES — five, each designed, each with a way out
+   ===================================================================== */
+function edge({ glyph, title, body, foot, action, run }){
+  const box = el('div', 'edge');
+  const g = el('div', 'glyph', glyph);
+  const h = el('h2'); h.textContent = title;
+  const p = el('p'); p.textContent = body;
+  box.append(g, h, p);
+  if (action){
+    const b = el('button', 'btn primary');
+    b.type = 'button';
+    b.textContent = action;
+    b.addEventListener('click', run);
+    box.appendChild(b);
+  }
+  if (foot){
+    const f = el('p', 'foot');
+    f.textContent = foot;
+    box.appendChild(f);
+  }
+  return box;
+}
+
+function viewLoading(col){
+  col.appendChild(edge({
+    glyph:`<svg viewBox="0 0 112 112" aria-hidden="true">
+      <circle cx="56" cy="56" r="42" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="3"/>
+      <g class="sweep"><path d="M56 14 a42 42 0 0 1 36 21" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/></g>
+      <circle cx="56" cy="56" r="11" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.32)"/>
+    </svg>`,
+    title:'Tuning to your head',
+    body:'The glasses measure how sound reaches each ear before any cue can be placed.',
+    foot:'A few seconds, once per wearer.',
+  }));
+  render._t = setTimeout(() => { if (S.view === 'Loading') go('Ready', true); }, 2400);
+}
+
+function viewBlocked(col){
+  col.appendChild(edge({
+    glyph:`<svg viewBox="0 0 112 112" aria-hidden="true">
+      <path d="M34 44 h12 l16-13 v50 l-16-13 H34z" fill="rgba(255,255,255,0.10)" stroke="rgba(255,255,255,0.45)" stroke-width="2.4" stroke-linejoin="round"/>
+      <rect x="74" y="40" width="7" height="32" rx="3.5" fill="var(--warn)"/>
+      <rect x="87" y="40" width="7" height="32" rx="3.5" fill="var(--warn)"/>
+    </svg>`,
+    title:'Sound is holding',
+    body:'This browser keeps audio silent until you touch the glasses once. Nothing is broken.',
+    action:'Turn on sound',
+    run: async () => {
+      const ok = await armAudio();
+      if (!ok) return;
+      go('Ready', true);
+      requestAnimationFrame(() => {
+        const f = surface.querySelector('.field'), s = surface.querySelector('.score');
+        if (f && s) fire(f, s, s.querySelector('.track'), s.querySelector('.playhead'));
+      });
+    },
+    foot:'Touch is unaffected — cues you can feel still arrive.',
+  }));
+}
+
+function viewNoOutput(col){
+  col.appendChild(edge({
+    glyph:`<svg viewBox="0 0 112 112" aria-hidden="true">
+      <path d="M32 44 h12 l16-13 v50 l-16-13 H32z" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.30)" stroke-width="2.4" stroke-linejoin="round"/>
+      <path d="M72 42 L94 70 M94 42 L72 70" stroke="var(--danger)" stroke-width="3" stroke-linecap="round"/>
+    </svg>`,
+    title:'Sound has nowhere to go',
+    body:'No speaker and no headset are connected, so every cue would land in silence.',
+    action:'Switch to touch only',
+    run: () => { setTactile(true); go('Ready', true); },
+    foot:'The shutter cue keeps its sound the moment a speaker returns.',
+  }));
+}
+
+function viewNoMotor(col){
+  col.appendChild(edge({
+    glyph:`<svg viewBox="0 0 112 112" aria-hidden="true">
+      <line x1="18" y1="76" x2="94" y2="76" stroke="rgba(255,255,255,0.16)" stroke-width="2"/>
+      <g fill="none" stroke="rgba(255,255,255,0.40)" stroke-width="2.2" stroke-dasharray="3 4">
+        <rect x="26" y="52" width="13" height="24" rx="3"/>
+        <rect x="52" y="40" width="13" height="36" rx="3"/>
+        <rect x="78" y="58" width="13" height="18" rx="3"/>
+      </g>
+    </svg>`,
+    title:'Shown, not felt',
+    body:'This body has no temple motor, so every pattern is drawn instead of played.',
+    action:'Keep sound only',
+    run: () => { S.haptics = false; setTactile(false); go('Ready', true); },
+    foot:'Nothing is lost: no cue in this system depends on touch alone.',
+  }));
+}
+
+function viewOffline(col){
+  col.appendChild(edge({
+    glyph:`<svg viewBox="0 0 112 112" aria-hidden="true">
+      <circle cx="56" cy="56" r="40" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+      ${[0,60,120,180,240,300].map((a) => {
+        const r = (a - 90) * Math.PI / 180;
+        return `<circle cx="${(56 + Math.cos(r) * 40).toFixed(1)}" cy="${(56 + Math.sin(r) * 40).toFixed(1)}" r="6.5" fill="var(--accent)" opacity="0.85"/>`;
+      }).join('')}
+      <circle cx="56" cy="56" r="11" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.32)"/>
+    </svg>`,
+    title:'All six cues are on board',
+    body:'Sound and touch are made on the glasses, so losing the network costs you nothing here.',
+    action:'Play Confirm',
+    run: () => { S.cue = 0; go('Ready', true); requestAnimationFrame(() => {
+      const f = surface.querySelector('.field'), s = surface.querySelector('.score');
+      if (f && s) fire(f, s, s.querySelector('.track'), s.querySelector('.playhead'));
+    }); },
+    foot:'Only a spoken reply has to wait for the network. Its arrival cue does not.',
+  }));
+}
+
+/* =====================================================================
+   WIRING
+   ===================================================================== */
+function select(i){
+  S.cue = (i + CUES.length) % CUES.length;
+  if (S.view !== 'Ready') S.view = 'Ready';
+  render();
+  syncCueButtons();
+}
+function go(view, silent){
+  S.view = view;
+  render();
+  if (!silent) return;
+  lab?.setState?.(view);
+}
+function setTactile(on){
+  S.tactile = on;
+  if (on) S.mono = false;
+  syncToggles();
+}
+function setMono(on){
+  S.mono = on;
+  if (on) S.tactile = false;
+  syncToggles();
+}
+
+os.on('swipeleft', () => { if (Date.now() - (S.dragAt || 0) > 260 && S.view === 'Ready') select(S.cue + 1); });
+os.on('swiperight', () => { if (Date.now() - (S.dragAt || 0) > 260 && S.view === 'Ready') select(S.cue - 1); });
+os.on('capture', () => {
+  select(CUES.findIndex((c) => c.id === 'capture'));
+  requestAnimationFrame(() => {
+    const f = surface.querySelector('.field'), s = surface.querySelector('.score');
+    if (f && s) fire(f, s, s.querySelector('.track'), s.querySelector('.playhead'));
+  });
+});
+
+/* ---------------------------- lab rail ---------------------------- */
+const lab = mountLab({
+  piece: '17-audio-haptics',
+  title: 'Spatial audio & haptics',
+  states: ['Ready', 'Loading', 'Sound blocked', 'No output', 'No motor', 'Offline'],
+  onState: (s) => { S.view = s; render(); },
+  actions: [
+    { label: 'Notification from behind', run: () => {
+        S.cue = 1; CUES[1].az = 168; go('Ready'); syncCueButtons();
+        requestAnimationFrame(() => {
+          const f = surface.querySelector('.field'), s = surface.querySelector('.score');
+          if (f && s) fire(f, s, s.querySelector('.track'), s.querySelector('.playhead'));
+        });
+      } },
+    { label: 'Hit the end of a list', run: () => {
+        select(4);
+        requestAnimationFrame(() => {
+          const f = surface.querySelector('.field'), s = surface.querySelector('.score');
+          if (f && s) fire(f, s, s.querySelector('.track'), s.querySelector('.playhead'));
+        });
+      } },
+  ],
+  toggles: [
+    { label: 'Mono audio', initial: false, run: (on) => { setMono(on); render(); } },
+    { label: 'Haptics only', initial: false, run: (on) => { setTactile(on); render(); } },
+  ],
+  onScale: (v) => { S.scale = v; render(); },
+  onReducedMotion: () => render(),
+});
+
+/* custom rail groups: cue selection + haptic intensity, inserted AFTER the
+   state group so the probe still finds states first. */
+function railGroup(heading, items, pick){
+  const g = document.createElement('div');
+  g.className = 'lab-group';
+  const h = document.createElement('h4');
+  h.textContent = heading;
+  g.appendChild(h);
+  const btns = items.map((it, i) => {
+    const b = document.createElement('button');
+    b.className = 'lab-btn'; b.type = 'button';
+    b.textContent = it;
+    b.addEventListener('click', () => pick(i, btns));
+    g.appendChild(b);
+    return b;
+  });
+  lab.rail.querySelector('.lab-note').before(g);
+  return btns;
+}
+const cueBtns = railGroup('Cue', CUES.map((c) => c.name), (i) => select(i));
+const intBtns = railGroup('Haptic intensity', ['Light', 'Standard', 'Strong'], (i, btns) => {
+  S.intensity = ['light', 'standard', 'strong'][i];
+  btns.forEach((b, j) => b.setAttribute('aria-pressed', String(j === i)));
+  render();
+});
+function syncCueButtons(){ cueBtns.forEach((b, i) => b.setAttribute('aria-pressed', String(i === S.cue))); }
+function syncToggles(){
+  [...lab.rail.querySelectorAll('.lab-btn')].forEach((b) => {
+    if (b.textContent === 'Mono audio') b.setAttribute('aria-pressed', String(S.mono));
+    if (b.textContent === 'Haptics only') b.setAttribute('aria-pressed', String(S.tactile));
+  });
+}
+intBtns.forEach((b, j) => b.setAttribute('aria-pressed', String(j === 1)));
+syncCueButtons();
+
+render();
+</script>
+</body>
+</html>

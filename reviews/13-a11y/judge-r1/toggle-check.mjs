@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 900, height: 900 }, deviceScaleFactor: 3 });
+await p.goto('http://localhost:4310/components/13-a11y/index.html', { waitUntil: 'networkidle' });
+await p.waitForTimeout(500);
+const t = p.locator('#contrastToggle');
+await t.screenshot({ path: 'reviews/13-a11y/judge-r1/toggle-off.png' });
+console.log('off aria-checked:', await t.getAttribute('aria-checked'));
+await p.locator('.a11y-row', { hasText: 'High contrast' }).first().click();
+await p.waitForTimeout(400);
+await t.screenshot({ path: 'reviews/13-a11y/judge-r1/toggle-on.png' });
+console.log('on aria-checked:', await t.getAttribute('aria-checked'));
+await b.close();

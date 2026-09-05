@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Developer Mode</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+/* ---------------------------------------------------------------------------
+   Developer Mode. A developer runs their own app against the real OS and
+   watches what the OS actually did with it: which brokered calls were made,
+   what the broker answered, how long each took, and what the app is currently
+   allowed to touch. Every number below comes from the running system — the
+   call log is fed by the runtime's own broker, the frame figure is measured
+   from real frames, and the permission rows read and write live grants.
+
+   Material ladder, same as every other surface, so a developer surface does
+   not quietly invent a fourth material:
+
+     app preview  0.34 fill · blur 12 · brightness 0.90   the thing under test
+     chrome/rows  0.52 fill · blur 20 · brightness 0.76   persistent while open
+     sheet        0.78 fill · blur 34 · brightness 0.54   a decision, demands you
+--------------------------------------------------------------------------- */
+
+:root {
+  --s: var(--a11y-scale, 1);
+  /* Type scales all the way; space and icons do not. At 310% a linearly scaled
+     layout spends the whole lens on padding and there is nowhere left to read. */
+  --sp: min(var(--s), 1.5);
+}
+
+.stage { background: transparent; }
+
+.surface {
+  position: absolute; inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: calc(14px * var(--sp)) calc(16px * var(--sp)) calc(12px * var(--sp));
+  gap: calc(10px * var(--sp));
+  box-sizing: border-box;
+}
+
+.head { display: flex; align-items: baseline; justify-content: space-between; gap: calc(10px * var(--sp)); }
+h1 {
+  margin: 0;
+  font-size: calc(var(--fs-callout) * var(--s));
+  font-weight: 620;
+  letter-spacing: -0.01em;
+  color: var(--ink-100);
+}
+.status {
+  display: inline-flex; align-items: center; gap: calc(6px * var(--sp));
+  font-size: calc(var(--fs-caption) * var(--s));
+  color: var(--ink-60);
+  white-space: nowrap;
+}
+.dot {
+  width: calc(7px * var(--sp)); height: calc(7px * var(--sp));
+  min-width: calc(7px * var(--sp));
+  border-radius: 999px;
+  background: var(--ok);
+}
+.dot[data-tone="warn"] { background: var(--warn); }
+.dot[data-tone="danger"] { background: var(--danger); }
+.dot[data-tone="idle"] { background: var(--ink-40); }
+
+/* The app sits at the top of the lens and the readout at the bottom, with the
+   world left open between them. That gap is not wasted space: it is where the
+   reticle rests and where the wearer sees the street. */
+.main { display: grid; align-content: space-between; gap: calc(10px * var(--sp)); min-height: 0; }
+.main[data-single] { align-content: start; }
+
+/* ---- the app under test: the one loud thing on this surface ---- */
+
+.preview {
+  display: grid;
+  grid-template-rows: auto auto;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  outline: 1px solid var(--stroke-glass);
+}
+.pv-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: calc(8px * var(--sp));
+  padding: calc(6px * var(--sp)) calc(11px * var(--sp));
+  background: rgba(10,15,23,0.52);
+  backdrop-filter: saturate(1.3) blur(20px) brightness(0.76);
+  -webkit-backdrop-filter: saturate(1.3) blur(20px) brightness(0.76);
+}
+.pv-title { font-size: calc(var(--fs-caption) * var(--s)); font-weight: 600; color: var(--ink-80); }
+.pv-note { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-40); }
+/* No fill of its own on the wrapper: a fill here would multiply with the
+   canvas fill underneath and the ladder would stop meaning anything. */
+.pv-canvas {
+  position: relative;
+  height: var(--app-h, 150px);
+  transition: height var(--dur-base) var(--ease-prism);
+  background: rgba(10,15,23,0.34);
+  backdrop-filter: saturate(1.15) blur(12px) brightness(0.90);
+  -webkit-backdrop-filter: saturate(1.15) blur(12px) brightness(0.90);
+}
+:root[data-reduced-motion] .pv-canvas { transition: none; }
+.pv-canvas iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; }
+
+/* ---- the quiet readout ---- */
+
+/* No fill and no chrome. These are three small numbers read at a glance next
+   to the thing they describe; giving them a panel would put a second loud
+   object on a surface that is allowed exactly one. */
+.figures {
+  display: flex; gap: calc(16px * var(--sp)); flex-wrap: wrap;
+  padding: calc(2px * var(--sp)) calc(2px * var(--sp));
+}
+.fig { display: grid; gap: calc(1px * var(--sp)); min-width: 0; }
+.fig-n {
+  font-size: calc(var(--fs-caption) * var(--s));
+  font-weight: 620;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-80);
+  letter-spacing: -0.01em;
+}
+.fig-n[data-tone="warn"] { color: var(--warn); }
+.fig-n[data-tone="danger"] { color: var(--danger); }
+.fig-k { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-40); }
+
+/* ---- rows shared by the log and the permission list ---- */
+
+.rows { display: grid; gap: calc(4px * var(--sp)); }
+.row {
+  display: flex; align-items: center; gap: calc(9px * var(--sp));
+  padding: calc(7px * var(--sp)) calc(10px * var(--sp));
+  border-radius: var(--r-sm);
+  background: rgba(10,15,23,0.34);
+  backdrop-filter: saturate(1.15) blur(12px) brightness(0.90);
+  -webkit-backdrop-filter: saturate(1.15) blur(12px) brightness(0.90);
+  text-align: left;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+button.row { cursor: pointer; outline: 1px solid transparent; }
+button.row:hover, button.row.gaze-focus, button.row:focus-visible {
+  outline-color: var(--stroke-focus);
+  background: rgba(86,184,255,0.13);
+}
+.row-txt { flex: 1; min-width: 0; display: grid; gap: calc(1px * var(--sp)); }
+.row-sub { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-40); }
+.row-name { flex: 1; min-width: 0; font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-80); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-val { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-60); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.row-val[data-tone="ok"] { color: var(--ok); }
+.row-val[data-tone="danger"] { color: var(--danger); }
+.row-val[data-tone="idle"] { color: var(--ink-40); }
+
+/* ---- messages for the states where there is nothing to inspect ---- */
+
+.msg { display: grid; gap: calc(6px * var(--sp)); justify-items: start; padding: calc(4px * var(--sp)) calc(2px * var(--sp)); }
+.msg-icon {
+  width: calc(28px * var(--sp)); height: calc(28px * var(--sp));
+  display: grid; place-items: center;
+  border-radius: 999px;
+  font-size: calc(14px * var(--s));
+  background: var(--msg-wash, rgba(255,255,255,0.10));
+  color: var(--msg-ink, var(--ink-80));
+}
+.msg h2 { margin: 0; font-size: calc(var(--fs-body) * var(--s)); font-weight: 620; color: var(--ink-100); }
+.msg p { margin: 0; font-size: calc(var(--fs-caption) * var(--s)); line-height: 1.4; color: var(--ink-60); max-width: 40ch; }
+
+/* ---- footer actions ---- */
+
+.foot { display: flex; gap: calc(8px * var(--sp)); flex-wrap: wrap; }
+.act {
+  font: inherit;
+  font-size: calc(var(--fs-caption) * var(--s));
+  font-weight: 560;
+  color: var(--ink-80);
+  background: rgba(255,255,255,0.09);
+  border: 0;
+  outline: 1px solid var(--stroke-glass);
+  border-radius: 999px;
+  padding: calc(6px * var(--sp)) calc(12px * var(--sp));
+  min-height: calc(26px * var(--sp));
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-prism);
+}
+.act:hover, .act.gaze-focus, .act:focus-visible { background: rgba(255,255,255,0.16); outline-color: var(--stroke-focus); }
+.act[data-primary] { color: var(--ink-100); background: rgba(86,184,255,0.20); outline-color: rgba(86,184,255,0.44); }
+:root[data-reduced-motion] .act { transition: none; }
+
+/* ---- sheet ---- */
+
+/* While a decision is up it is the only live thing on the lens. The scrim
+   darkens the world behind it and the surface itself recedes, so there is one
+   loud object rather than a decision competing with the app it is about. */
+.scrim { position: absolute; inset: 0; background: rgba(3,6,11,0.30); }
+/* Dimmed leaf by leaf rather than by dropping the whole surface's opacity:
+   a container at 55% still leaves every child reading at full strength, and
+   what recedes has to be the things the eye actually lands on. */
+.surface[data-behind] h1,
+.surface[data-behind] .status,
+.surface[data-behind] .pv-bar,
+.surface[data-behind] .pv-canvas,
+.surface[data-behind] .figures,
+.surface[data-behind] .fig-n,
+.surface[data-behind] .msg,
+.surface[data-behind] .act {
+  opacity: 0.55;
+  transition: opacity var(--dur-fast) var(--ease-prism);
+}
+:root[data-reduced-motion] .surface[data-behind] * { transition: none; }
+.sheet {
+  position: absolute;
+  left: calc(14px * var(--sp)); right: calc(14px * var(--sp));
+  bottom: calc(14px * var(--sp));
+  border-radius: var(--r-lg);
+  padding: calc(14px * var(--sp));
+  background: rgba(10,15,23,0.78);
+  backdrop-filter: saturate(1.5) blur(34px) brightness(0.54);
+  -webkit-backdrop-filter: saturate(1.5) blur(34px) brightness(0.54);
+  outline: 1px solid var(--stroke-glass);
+  display: grid;
+  gap: calc(9px * var(--sp));
+  max-height: calc(74% - 8px);
+  overflow: auto;
+}
+.sheet h2 { margin: 0; font-size: calc(var(--fs-body) * var(--s)); font-weight: 620; color: var(--ink-100); }
+.sheet .ask { margin: 0; font-size: calc(var(--fs-body) * var(--s)); font-weight: 620; color: var(--ink-100); }
+.sheet .reason, .sheet .why { margin: 0; font-size: calc(var(--fs-caption) * var(--s)); line-height: 1.4; color: var(--ink-60); }
+.sheet .why { color: var(--risk-ink, var(--ink-60)); padding-left: calc(9px * var(--sp)); border-left: 2px solid var(--stroke-glass); }
+.buttons { display: flex; gap: calc(8px * var(--sp)); flex-wrap: wrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="device">
+    <div class="stage-shell">
+      <div class="stage" data-stage></div>
+    </div>
+  </div>
+
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+import { mountLab } from '/os/shared/lab.js';
+import { AppRuntime } from '/os/shared/app-runtime.js';
+import { PERMISSIONS } from '/os/shared/app-manifest.js';
+
+const stage = document.querySelector('[data-stage]');
+const os = createOS(stage, { scale: 1 });
+
+const surface = document.createElement('div');
+surface.className = 'surface';
+surface.innerHTML = `
+  <div class="head">
+    <h1>Developer Mode</h1>
+    <span class="status"><span class="dot" data-dot></span><span data-status></span></span>
+  </div>
+  <div class="main" data-main></div>
+  <div class="foot" data-foot></div>
+`;
+stage.appendChild(surface);
+
+const dotEl = surface.querySelector('[data-dot]');
+const statusEl = surface.querySelector('[data-status]');
+const mainEl = surface.querySelector('[data-main]');
+const footEl = surface.querySelector('[data-foot]');
+
+const rt = new AppRuntime({ container: null });
+
+/* Which build Developer Mode is pointed at. It moves, because pointing it at
+   a deliberately broken build is the fastest way to see what the system does
+   with one. */
+let underTest = 'transit';
+let attached = false;
+let edge = null;
+let sheet = null;            /* null | 'log' | 'permissions' */
+let installErrors = null;
+const log = [];              /* newest first, capped */
+const LOG_CAP = 40;
+/* When the wearer was deciding, the clock was still running. A call that took
+   two seconds because a human was reading a grant sheet is not slow code, and
+   a log that does not say so sends a developer optimising the wrong thing. */
+const decisions = [];        /* [{ start, end }] */
+let decisionOpen = 0;
+
+/* The gaze reticle rests at the exact centre of the lens, so nothing but the
+   app under test is allowed to sit under it. Same rule and same numbers as
+   every other surface — a developer surface does not get its own physics. */
+const GAZE_HOME = 300;
+const GAZE_GUARD = 14;
+
+/* ---------- small builders ---------- */
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+
+function action(label, onClick, kind) {
+  const b = el('button', 'act', label);
+  b.type = 'button';
+  if (kind) b.setAttribute(`data-${kind}`, '');
+  b.addEventListener('click', onClick);
+  return b;
+}
+
+function setFoot(buttons) {
+  footEl.textContent = '';
+  buttons.filter(Boolean).forEach((b) => footEl.appendChild(b));
+}
+
+function message(icon, title, body, tone) {
+  const wrap = el('div', 'msg');
+  const i = el('div', 'msg-icon', icon);
+  if (tone === 'danger') { i.style.setProperty('--msg-wash', 'rgba(255,93,93,0.16)'); i.style.setProperty('--msg-ink', '#ffc9c9'); }
+  if (tone === 'warn') { i.style.setProperty('--msg-wash', 'rgba(255,194,71,0.16)'); i.style.setProperty('--msg-ink', '#ffe0a3'); }
+  wrap.append(i, el('h2', null, title), el('p', null, body));
+  return wrap;
+}
+
+function setStatus(text, tone) {
+  statusEl.textContent = text;
+  if (tone) dotEl.setAttribute('data-tone', tone); else dotEl.removeAttribute('data-tone');
+}
+
+/* ---------- real frame timing ---------- */
+
+/* Measured, not asserted. The figure is the slowest frame in the last second,
+   because an average hides exactly the stutter a developer is hunting. */
+let worstFrame = 0;
+let shownFrame = 0;
+let lastT = performance.now();
+/* Frames are not counted until the build has settled. The first second after a
+   launch is dominated by parsing and first paint, and reporting that spike as
+   the app's frame cost would send a developer hunting a stall that is the
+   loader's, not theirs. */
+let countFramesAfter = performance.now() + 1500;
+function tick(now) {
+  const dt = now - lastT;
+  lastT = now;
+  if (dt < 200 && now > countFramesAfter) worstFrame = Math.max(worstFrame, dt);
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+setInterval(() => {
+  shownFrame = worstFrame;
+  worstFrame = 0;
+  if (attached && !edge && !sheet) paintFigures();
+}, 1000);
+
+/* ---------- the surface ---------- */
+
+function instance() { return rt.instances.get(underTest) || null; }
+
+function figures() {
+  const inst = instance();
+  const grants = rt.grants.get(underTest) || {};
+  const denied = Object.values(grants).filter((v) => v === 'denied').length;
+  const refused = log.filter((e) => !e.ok).length;
+  const ms = Math.round(shownFrame) || 0;
+  return [
+    { k: 'slowest frame', v: ms ? `${ms} ms` : '—', tone: ms > 24 ? 'danger' : ms > 18 ? 'warn' : null },
+    { k: 'calls', v: String(inst ? inst.calls : 0) },
+    { k: 'refused', v: String(refused + denied), tone: refused + denied > 0 ? 'warn' : null },
+  ];
+}
+
+function paintFigures() {
+  const box = mainEl.querySelector('[data-figures]');
+  if (!box) return;
+  box.textContent = '';
+  for (const f of figures()) {
+    const cell = el('div', 'fig');
+    const n = el('div', 'fig-n', f.v);
+    if (f.tone) n.setAttribute('data-tone', f.tone);
+    cell.append(n, el('div', 'fig-k', f.k));
+    box.appendChild(cell);
+  }
+}
+
+function renderAttached() {
+  const inst = instance();
+  if (!inst) { renderIdle(); return; }
+
+  setStatus(
+    inst.status === 'running' ? 'Running'
+      : inst.status === 'suspended' ? 'Paused'
+      : inst.status === 'unresponsive' ? 'Not responding' : 'Starting',
+    inst.status === 'running' ? 'ok'
+      : inst.status === 'unresponsive' ? 'danger'
+      : inst.status === 'suspended' ? 'warn' : 'idle',
+  );
+
+  /* The preview node is reused so the frame is never re-parented — moving an
+     iframe in the DOM reloads it, and reloading the app under test would
+     destroy the very session the developer is inspecting. */
+  let pv = mainEl.querySelector('.preview');
+  if (!pv) {
+    mainEl.textContent = '';
+    pv = el('div', 'preview');
+    const bar = el('div', 'pv-bar');
+    /* Not the app's name — the app paints that itself, and a platform that
+       labels a window with the same word the window already says has spent a
+       line saying nothing. A developer wants the id and the version they
+       just built, and confirmation that it is contained. */
+    bar.append(
+      el('span', 'pv-title', `${inst.manifest.id} ${inst.manifest.version}`),
+      el('span', 'pv-note', 'your build · sandboxed'),
+    );
+    const canvas = el('div', 'pv-canvas');
+    canvas.appendChild(inst.frame);
+    pv.append(bar, canvas);
+    mainEl.appendChild(pv);
+    mainEl.appendChild(el('div', 'figures')).setAttribute('data-figures', '');
+  }
+  mainEl.removeAttribute('data-single');
+  pv.querySelector('.pv-canvas').style.setProperty('--app-h', `${inst.height}px`);
+  paintFigures();
+
+  setFoot([
+    action(`Calls (${log.length})`, () => { sheet = 'log'; render(); }),
+    action('Permissions', () => { sheet = 'permissions'; render(); }),
+    inst.status === 'suspended'
+      ? action('Resume', () => rt.resume(underTest))
+      : action('Pause', () => rt.suspend(underTest)),
+    action('Stop', () => { rt.kill(underTest); attached = false; render(); }),
+  ]);
+}
+
+function renderIdle() {
+  setStatus('Nothing running', 'idle');
+  mainEl.textContent = '';
+  mainEl.setAttribute('data-single', '');
+  mainEl.appendChild(message('▶', 'No app under test',
+    'Point Developer Mode at a build and it runs here, on the real system, with every capability call brokered exactly as it would be for anyone else.'));
+  setFoot([action('Run my build', () => attach(), 'primary')]);
+}
+
+/* ---------- sheets ---------- */
+
+function verdictTone(e) { return e.ok ? 'ok' : 'danger'; }
+
+function renderLogSheet() {
+  const s = el('div', 'sheet');
+  s.setAttribute('role', 'dialog');
+  s.setAttribute('aria-modal', 'true');
+  const h = el('h2', null, 'Capability calls');
+  h.id = 'sheet-log';
+  s.setAttribute('aria-labelledby', h.id);
+  s.appendChild(h);
+
+  if (!log.length) {
+    s.appendChild(el('p', 'reason', 'Nothing yet. Every call your app makes across the sandbox boundary lands here with the answer the system gave and how long it took.'));
+  } else {
+    const rows = el('div', 'rows');
+    for (const e of log.slice(0, 12)) {
+      const r = el('div', 'row');
+      const txt = el('div', 'row-txt');
+      txt.appendChild(el('div', 'row-name', e.method));
+      if (e.waited) txt.appendChild(el('div', 'row-sub', 'includes the time you spent deciding'));
+      const val = el('div', 'row-val', e.ok ? `${e.ms} ms` : e.code);
+      val.setAttribute('data-tone', verdictTone(e));
+      r.append(txt, val);
+      r.title = e.ok ? `${e.method} succeeded in ${e.ms} ms` : `${e.method} was refused: ${e.message}`;
+      rows.appendChild(r);
+    }
+    s.appendChild(rows);
+  }
+  const buttons = el('div', 'buttons');
+  buttons.append(action('Clear', () => { log.length = 0; render(); }), action('Done', () => { sheet = null; render(); }, 'primary'));
+  s.appendChild(buttons);
+  return s;
+}
+
+const PERM_LABEL = { granted: 'Allowed', denied: 'Blocked', prompt: 'Not asked' };
+const PERM_TONE = { granted: 'ok', denied: 'danger', prompt: 'idle' };
+
+function renderPermSheet() {
+  const s = el('div', 'sheet');
+  s.setAttribute('role', 'dialog');
+  s.setAttribute('aria-modal', 'true');
+  const h = el('h2', null, 'What this build may touch');
+  h.id = 'sheet-perm';
+  s.setAttribute('aria-labelledby', h.id);
+  s.appendChild(h);
+
+  const entry = rt.installed.get(underTest);
+  const declared = entry ? entry.manifest.permissions : [];
+  if (!declared.length) {
+    s.appendChild(el('p', 'reason', 'This build declares no capabilities, so there is nothing for the wearer to grant.'));
+  } else {
+    const rows = el('div', 'rows');
+    for (const name of declared) {
+      const state = rt.permissionState(underTest, name);
+      const b = el('button', 'row');
+      b.type = 'button';
+      const label = PERMISSIONS[name] ? PERMISSIONS[name].label : name;
+      const val = el('div', 'row-val', PERM_LABEL[state]);
+      val.setAttribute('data-tone', PERM_TONE[state]);
+      b.append(el('div', 'row-name', label), val);
+      /* The word carries the state, not the colour — a developer who cannot
+         tell red from green still has to be able to read this list. */
+      b.setAttribute('aria-label', `${label}: ${PERM_LABEL[state]}. Change.`);
+      b.addEventListener('click', () => {
+        const next = state === 'granted' ? 'denied' : state === 'denied' ? 'prompt' : 'granted';
+        rt.setPermission(underTest, name, next);
+      });
+      rows.appendChild(b);
+    }
+    s.appendChild(rows);
+  }
+  const buttons = el('div', 'buttons');
+  buttons.append(action('Revoke all', () => rt.revokeAll(underTest)), action('Done', () => { sheet = null; render(); }, 'primary'));
+  s.appendChild(buttons);
+  return s;
+}
+
+function renderPromptSheet(p) {
+  const s = el('div', 'sheet');
+  s.setAttribute('role', 'alertdialog');
+  s.setAttribute('aria-modal', 'true');
+  s.setAttribute('data-prompt', p.name);
+  const ask = el('p', 'ask', `Allow ${p.appName} to use ${p.meta.label.toLowerCase()}?`);
+  ask.id = 'ask-' + p.name;
+  s.setAttribute('aria-labelledby', ask.id);
+  s.appendChild(ask);
+  if (p.reason) {
+    const reason = el('p', 'reason', `${p.appName} says: “${p.reason}”`);
+    reason.setAttribute('data-optional', '');
+    s.appendChild(reason);
+  }
+  const why = el('p', 'why', p.meta.why);
+  why.setAttribute('data-optional', '');
+  if (p.meta.risk === 'high') why.style.setProperty('--risk-ink', 'var(--warn)');
+  s.appendChild(why);
+  const buttons = el('div', 'buttons');
+  const deny = action("Don't allow", () => rt.answerPrompt('denied'));
+  const allow = action('Allow', () => rt.answerPrompt('granted'), 'primary');
+  buttons.append(deny, allow);
+  s.appendChild(buttons);
+  return s;
+}
+
+/* A sheet is bottom-anchored, so as text grows it climbs toward the middle of
+   the lens — which is exactly where the gaze reticle rests. At 310% text there
+   is genuinely not room for the ask, the app's reason, the system's risk line
+   and two buttons above the world. Rather than let a sentence sit under the
+   reticle, the least essential lines are lifted out and offered behind "Why?".
+   The decision itself is never what gets dropped. */
+function fitBand(node) {
+  const sb = stage.getBoundingClientRect();
+  const top = sb.top + sb.height / 2 - GAZE_GUARD;
+  const dropped = [];
+  let guard = 0;
+  while (node.getBoundingClientRect().top < top && guard++ < 8) {
+    const optional = node.querySelectorAll('[data-optional]');
+    if (!optional.length) break;
+    const last = optional[optional.length - 1];
+    dropped.unshift(last.textContent);
+    last.remove();
+  }
+  if (!dropped.length) return;
+  const buttons = node.querySelector('.buttons');
+  const why = action('Why?', () => {
+    sheet = null;
+    render();
+    const s2 = el('div', 'sheet');
+    s2.setAttribute('role', 'dialog');
+    const h = el('h2', null, 'Why you are being asked');
+    h.id = 'sheet-why';
+    s2.setAttribute('aria-labelledby', h.id);
+    s2.appendChild(h);
+    for (const t of dropped) s2.appendChild(el('p', 'reason', t));
+    const b2 = el('div', 'buttons');
+    b2.appendChild(action('Back', () => render(), 'primary'));
+    s2.appendChild(b2);
+    mountSheet(s2);
+  });
+  buttons.insertBefore(why, buttons.firstChild);
+}
+
+function mountSheet(node) {
+  const scrim = el('div', 'scrim');
+  stage.append(scrim, node);
+  surface.setAttribute('data-behind', '');
+  fitBand(node);
+  if (!document.documentElement.hasAttribute('data-reduced-motion')) {
+    node.animate(
+      [{ transform: 'translateY(14px)', opacity: 0 }, { transform: 'none', opacity: 1 }],
+      { duration: 260, easing: 'cubic-bezier(0.32, 0.72, 0, 1)', fill: 'both' },
+    );
+  }
+  const first = node.querySelector('[data-primary]') || node.querySelector('button');
+  first?.focus({ preventScroll: true });
+  node.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    e.stopPropagation();
+    /* Escape means the safe answer. For a grant that is deny; for an inspector
+       panel it is simply closing the panel. */
+    if (node.hasAttribute('data-prompt')) rt.answerPrompt('denied');
+    else { sheet = null; render(); }
+  });
+}
+
+/* ---------- edge states ---------- */
+
+const EDGE = {
+  empty() {
+    setStatus('Nothing running', 'idle');
+    mainEl.textContent = '';
+    mainEl.setAttribute('data-single', '');
+    mainEl.appendChild(message('▶', 'No app under test',
+      'Point Developer Mode at a build and it runs here, on the real system, with every capability call brokered exactly as it would be for anyone else.'));
+    setFoot([action('Run my build', () => { lab.setState('ready'); }, 'primary')]);
+  },
+  loading() {
+    setStatus('Starting', 'idle');
+    mainEl.textContent = '';
+    mainEl.setAttribute('data-single', '');
+    mainEl.appendChild(message('◌', 'Starting your build',
+      'Loading the package and waiting for it to report in. A build that never reports in is shown as not responding rather than left spinning.'));
+    setFoot([action('Cancel', () => { lab.setState('empty'); })]);
+  },
+  error() {
+    setStatus('Refused', 'danger');
+    mainEl.textContent = '';
+    const detail = installErrors
+      ? installErrors.map((e) => `${e.field}: ${e.message}`).join(' ')
+      : 'The package description is missing required fields, so the system will not install it.';
+    mainEl.appendChild(message('!', 'This build was refused', detail, 'danger'));
+    setFoot([action('Try a valid build', () => { installErrors = null; lab.setState('ready'); }, 'primary')]);
+  },
+  offline() {
+    setStatus('No link', 'warn');
+    mainEl.textContent = '';
+    mainEl.setAttribute('data-single', '');
+    mainEl.appendChild(message('⤫', 'The link is down',
+      'Your build keeps running. Network calls are refused with a reason it can read, so you can see exactly how it behaves offline.', 'warn'));
+    setFoot([action('Bring the link back', () => { rt.setOnline(true); lab.setState('ready'); }, 'primary')]);
+  },
+  denied() {
+    setStatus('Blocked', 'warn');
+    mainEl.textContent = '';
+    mainEl.setAttribute('data-single', '');
+    mainEl.appendChild(message('⦸', 'Every capability is blocked',
+      'The wearer said no to all of them. This is the state most builds are never tested in, so it is one click away here.', 'warn'));
+    setFoot([action('Restore and run', () => { rt.revokeAll(underTest); lab.setState('ready'); }, 'primary')]);
+  },
+};
+
+/* ---------- render ---------- */
+
+function guardCentre(exempt) {
+  /* The preview is exempt for the same reason the focused app window is
+     exempt everywhere else: the wearer is looking AT it, so the reticle is on
+     it, not past it. Everything else stops short of the rest point. */
+  if (exempt) { mainEl.style.maxHeight = ''; mainEl.style.overflow = ''; return; }
+  mainEl.style.maxHeight = `${Math.max(72, GAZE_HOME - GAZE_GUARD - mainEl.offsetTop)}px`;
+  mainEl.style.overflow = 'hidden';
+}
+
+function render() {
+  const live = !edge && attached && !!instance();
+  if (edge && EDGE[edge]) EDGE[edge]();
+  else if (live) renderAttached();
+  else renderIdle();
+
+  guardCentre(live);
+
+  for (const n of stage.querySelectorAll('.scrim, .sheet')) n.remove();
+  const prompt = rt.pendingPrompt;
+  if (prompt) mountSheet(renderPromptSheet(prompt));
+  else if (sheet === 'log') mountSheet(renderLogSheet());
+  else if (sheet === 'permissions') mountSheet(renderPermSheet());
+  surface.toggleAttribute('data-behind', !!stage.querySelector('.sheet'));
+}
+
+/* ---------- wiring ---------- */
+
+async function attach(id) {
+  edge = null;
+  installErrors = null;
+  if (id && id !== underTest) { rt.kill(underTest); underTest = id; }
+  const res = await rt.install(underTest);
+  if (!res.valid) { installErrors = res.errors; edge = 'error'; render(); return; }
+  attached = true;
+  worstFrame = 0;
+  shownFrame = 0;
+  countFramesAfter = performance.now() + 1500;
+  rt.launch(underTest);
+  render();
+}
+
+rt.on('change', () => { if (!edge) render(); });
+rt.on('permission-request', () => { decisionOpen = performance.now(); });
+rt.on('prompt-closed', () => {
+  if (decisionOpen) decisions.push({ start: decisionOpen, end: performance.now() });
+  decisionOpen = 0;
+  if (decisions.length > LOG_CAP) decisions.shift();
+});
+rt.on('call-done', (e) => {
+  const end = performance.now();
+  const start = end - e.ms;
+  e.waited = decisionOpen > 0 || decisions.some((d) => d.end > start && d.start < end);
+  log.unshift(e);
+  if (log.length > LOG_CAP) log.length = LOG_CAP;
+  if (!edge) render();
+});
+rt.on('install-failed', ({ errors }) => { installErrors = errors; });
+
+const lab = mountLab({
+  piece: '25-devsim',
+  title: 'Developer Mode',
+  states: ['ready', 'loading', 'empty', 'error', 'offline', 'denied'],
+  onState: (s) => {
+    edge = s === 'ready' ? null : s;
+    sheet = null;
+    if (s === 'ready' && !attached) { attach(); return; }
+    if (s === 'offline') rt.setOnline(false);
+    if (s === 'denied') {
+      const entry = rt.installed.get(underTest);
+      for (const name of entry ? entry.manifest.permissions : []) rt.setPermission(underTest, name, 'denied');
+    }
+    render();
+  },
+  actions: [
+    { label: 'Open the call log', run: () => { edge = null; sheet = 'log'; render(); } },
+    { label: 'Open permissions', run: () => { edge = null; sheet = 'permissions'; render(); } },
+    { label: 'Run a build that hangs', run: () => { sheet = null; attach('stalled'); } },
+    { label: 'Run the sample build', run: () => { sheet = null; attach('transit'); } },
+    { label: 'Run a refused build', run: async () => {
+      sheet = null;
+      const res = await rt.install('badmanifest');
+      installErrors = res.errors;
+      edge = 'error';
+      render();
+    } },
+    { label: 'Stop the build', run: () => { rt.kill(underTest); attached = false; edge = null; render(); } },
+  ],
+  toggles: [
+    { label: 'Network', initial: true, run: (on) => rt.setOnline(on) },
+  ],
+  onScale: (v) => rt.setDisplay({ textScale: v }),
+  onReducedMotion: (on) => rt.setDisplay({ reducedMotion: on }),
+});
+
+rt.setDisplay({ textScale: lab.scale, reducedMotion: lab.reducedMotion });
+if (lab.state === 'ready') await attach();
+else { edge = lab.state; render(); }
+</script>
+</body>
+</html>

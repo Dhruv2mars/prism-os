@@ -1,0 +1,67 @@
+{
+  "piece": "17-audio-haptics",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-08-31T02:05:00Z",
+  "verdict": "pass",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/17-audio-haptics/index.html reviews/probe-17-audio-haptics-critic-r1",
+    "outDir": "reviews/probe-17-audio-haptics-critic-r1",
+    "screenshotsRead": [
+      "stage.png",
+      "full.png",
+      "s-Loading.png",
+      "s-Sound-blocked.png",
+      "s-No-output.png",
+      "s-No-motor.png",
+      "s-Offline.png",
+      "s-Notification-from-behind.png",
+      "s-Hit-the-end-of-a-list.png",
+      "s-Mono-audio.png",
+      "s-Haptics-only.png",
+      "s-scale-160.png",
+      "s-scale-200.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 8,
+    "notes": "Gate PASS, zero console/page errors, no dev-token leaks, reduced motion kills the loading sweep. Audio verified real in source, not depicted: index.html:263-305 builds an AudioContext with createPanner(), panningModel='HRTF', inverse distance model, and schedules positionX/Y/Z with linearRampToValueAtTime; cues are synthesised per-play from createOscillator + procedurally filled noise buffers through biquad filters (index.html:325-348), and haptics call navigator.vibrate (index.html:664). A separate explicit-mono bus (channelCount 1, channelCountMode 'explicit') backs the Mono-audio option, so that setting is a real signal-path change, not a label. Defects seen in pixels: (a) the bearing readout collides with the rose 'behind' label in EVERY cue state ('Ahead of you' over 'behind' in stage.png; '168 deg right' over both 'behind' and the source orb in s-Notification-from-behind.png; the orb eats the 'right' label leaving a stray 't' in s-Hit-the-end-of-a-list.png); (b) at ?scale=1.6 the surface overflows the stage (col scrollHeight 676 vs 556 client, stage scrollHeight == clientHeight so it cannot be scrolled) and the h1 'Confirm' is clipped off the top while the 'Capture' tab is clipped off the right - content becomes unreachable; at ?scale=2 it recovers by shedding the caption and tab row but 'left'/'right' fuse into 'leftright' and 'Ahead of you' lies across 'behind'; (c) the shared OS gaze cursor parks at stage centre 300,300 and lands on top of the headline in every notice state ('Sound [dot]is holding', 'Sound has n[dot]owhere to go', 'Shown,[dot]not felt')."
+  },
+  "blind": {
+    "A": "visionOS Control Center volume slider + Environments dial",
+    "B": "Horizon OS Quest Universal Menu quick-settings audio panel",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "A vertical dark-glass pill floating to the right of the current window, pulled down from the small status affordance above the app. The fill is a soft white column with a speaker glyph at the foot; looking at it swells the whole pill and lifts a specular edge, and a real soft shadow falls onto the wall behind it so it reads as a physical slab of glass in the room. Beside it a row of round icon buttons (Control Center, Environments, Mac display, Guest User) with no text labels, and behind Environments a horizontal strip of environment thumbnails plus an immersion slider. Nothing here is designed for failure: with no audio route there is simply silence and an unchanged slider.",
+    "B": "A flat, near-opaque dark grey rounded rectangle docked under a horizontal menu bar with clock, battery and Wi-Fi at the top. Inside, a single horizontal volume track with a white fill and round knob, a small headphone/speaker route row beneath it, and a 'Spatial audio' toggle in white Meta-sans. It floats in space with a uniform drop shadow but no transmission of the room behind it, and interaction is a laser pointer with a small dot, so the focused control is only weakly distinguished by a slight lightening.",
+    "C": "A 600x600 monocular surface that makes an inaudible cue visible. One bold headline names the cue ('Confirm', 'Arrive', 'Boundary') with a one-line meaning under it, then a compass rose - concentric rings, a small head glyph at the centre facing front, and a single glowing blue orb sitting at the cue's azimuth with a thin spoke back to the listener. Under the rose a low-contrast pill draws the haptic pattern as literal on/off blocks with a duration in tabular figures, then one primary blue 'Play cue' button and a row of six cue names. Failure states replace the whole surface with a single glyph, a plain-English headline, and one recovery button ('Switch to touch only', 'Keep sound only', 'Turn on sound'). Text collides with text in several states: the bearing readout sits on top of the 'behind' rose label, and at 1.6x text the title clips off the top of the stage with no way to scroll to it."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS 2 Control Center, volume slider + Environments dial, opened from the green status affordance above the active window. The volume control is a tall dark-glass pill with a white column fill and a speaker glyph at the bottom that swells and picks up a bright specular rim when gazed at, casting a genuine soft shadow onto the real wall behind; to its left sits an unlabelled round-icon row and, under Environments, a horizontal strip of environment thumbnails with an immersion slider that dissolves the room as you drag it.",
+    "horizonOS": "Horizon OS (Quest v60-era) Universal Menu quick-settings audio panel, reached by pressing the Oculus button and clicking the clock/battery cluster. It is a flat dark-grey rounded card with a horizontal volume track and round knob, a route row for speakers vs headphones, a 'Spatial audio' toggle, and brightness beneath, all in white Meta-sans on an almost fully opaque fill with a uniform drop shadow, driven by a laser pointer whose hover state barely lightens the row."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 8, "focusDiscipline": 8, "materialHonesty": 9, "motion": 9, "typography": 8, "edgeStates": 4, "dependability": 7, "accessibility": 7, "delight": 7 },
+    "horizonOS": { "glanceability": 7, "focusDiscipline": 6, "materialHonesty": 4, "motion": 5, "typography": 6, "edgeStates": 5, "dependability": 6, "accessibility": 4, "delight": 3 },
+    "ours": { "glanceability": 7, "focusDiscipline": 7, "materialHonesty": 8, "motion": 9, "typography": 6, "edgeStates": 9, "dependability": 9, "accessibility": 5, "delight": 8 }
+  },
+  "totals": { "visionOS": 67, "horizonOS": 46, "ours": 68 },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "ours",
+    "accessibility": "visionOS",
+    "delight": "ours"
+  },
+  "overallRanking": ["ours", "visionOS", "horizonOS"],
+  "biggestGap": "Bearing readout collides with the compass-rose 'behind' label and with the source orb in every cue state - components/17-audio-haptics/index.html:66 (.rose .s { bottom: calc(6px * var(--s)) }) and :125 (.bearing { position:absolute; left:50%; bottom: calc(16px * var(--s)) }) place both elements at left:50% inside the same .field box, so a 13px bearing line starting 16px from the bottom overlaps the 11px 'behind' label sitting 6px from the bottom. Expected: the primary bearing readout is the only text in its band, fully legible, with the rose cardinal labels and the orb never touching it (move .bearing outside .field, into its own row between the field and the haptic pill, and inset the four rose labels to a radius the orb cannot reach). Got: 'Ahead of you' printed across 'behind' in the default Confirm state (stage.png), '168 deg right' printed across both 'behind' and the glowing source orb in the notification-from-behind state (s-Notification-from-behind.png), and the orb covering the 'right' label down to a stray 't' in the boundary state (s-Hit-the-end-of-a-list.png).",
+  "reason": "The audio is real, not depicted: HRTF PannerNode with ramped positionX/Y/Z, oscillator- and noise-synthesised cues, an explicit single-channel mono bus behind the Mono-audio setting, and navigator.vibrate for the motor. The screen earns its keep by making that invisible modality legible: one orb at one azimuth, one spoke, one plain-English bearing, one drawn haptic waveform with a tabular duration, one primary action. Its edge states are the best of the three by a wide margin - loading ('Tuning to your head'), permission-blocked ('Sound is holding' with 'Touch is unaffected'), no-output, no-motor and offline are each a bespoke glyph, a plain headline and exactly one safe recovery button, where the visionOS volume control simply goes silent and the Quest panel defaults. That wins edge states, dependability and delight by enough to take the total, 68 to 67 to 46. It loses glanceability, focus, material, motion, typography and accessibility to visionOS on polish: text lies on top of text in the rose in every cue state, the shared gaze cursor parks on the headline of every notice, the 11px ink-40 rose labels are below usable contrast on a transparent lens over a bright street, and at 1.6x text the title and the 'Capture' tab clip off a stage that cannot scroll. Ours ranks first, so this passes - but by one point, on the strength of failure handling alone, and the collision defect is embarrassing on a surface whose entire job is spatial legibility.",
+  "passCondition": "Ours ranked first overall (68 vs visionOS 67 vs Horizon OS 46). One named gap remains."
+}

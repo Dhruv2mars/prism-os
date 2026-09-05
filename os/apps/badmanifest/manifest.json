@@ -1,0 +1,11 @@
+{
+  "manifestVersion": 1,
+  "id": "badmanifest",
+  "name": "A Deliberately Overlong Application Name",
+  "version": "1.0",
+  "entry": "https://example.com/app.html",
+  "category": "gaming",
+  "developer": "Test Fixture",
+  "permissions": ["location", "telepathy"],
+  "permissionReasons": {}
+}

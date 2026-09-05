@@ -1,0 +1,105 @@
+{
+  "piece": "17-audio-haptics",
+  "round": 3,
+  "critic": "fresh-context critic, round 3",
+  "judgedAt": "2026-09-05T08:23:57Z",
+  "verdict": "pass",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/17-audio-haptics/index.html reviews/17-audio-haptics/judge-r3",
+    "outDir": "reviews/17-audio-haptics/judge-r3",
+    "screenshotsRead": [
+      "stage.png",
+      "full.png",
+      "stage-reduced-motion.png",
+      "stage-state-loading.png",
+      "stage-state-blocked.png",
+      "stage-state-nooutput.png",
+      "stage-state-nomotor.png",
+      "stage-state-offline.png",
+      "stage-scale-130.png",
+      "stage-scale-175.png",
+      "stage-scale-300.png",
+      "stage-mono.png",
+      "stage-tactile.png",
+      "stage-arrive.png",
+      "stage-outdoor.png",
+      "stage-dragged.png",
+      "stage-playing.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 8,
+    "notes": "Verified live: drag on the compass moved the real panner and bearing read '67 deg right', ArrowRight stepped to 82 deg, Space fired the Capture cue, tab order is field > Play > six tabs > wrap. All six lab states render designed screens with recovery actions. Text scale reflows the whole surface at 1.3/1.75/3.0 with progressive shedding and zero clipping. Outdoor world keeps every line legible via per-text shadows. DEFECT FOUND: after a pointer drag, browser text selection paints a blue highlight over the 'front' rose word (visible in stage-playing.png) - the field lacks user-select:none and pointerdown does not preventDefault. Zero console errors across 12 loads."
+  },
+  "blind": {
+    "A": "visionOS Settings > Sounds pane + AirPods spatial-audio personalization head diagram",
+    "B": "Horizon OS (Quest 3) Settings > System Sounds flat panel",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "A floating frosted-glass window over the room. Large white SF Pro heading, rows of settings with blue-accented sliders and toggles, a subtle gaze highlight that follows the eye. The spatial-audio personalization surface shows a centred animated head-with-earbuds illustration on glass with one blue pill action. Strengths: material is true glass, gaze focus is unmistakable, type is flawless. Weaknesses: the sounds pane is a long scroll with weak glanceability at arm's length, loading is a bare spinner, error dialogs are verbose.",
+    "B": "A flat, near-opaque dark grey panel docked in the void. Left section rail, dense toggle rows, small type, no spatial or sound visualization whatsoever - haptics have no system surface at all. Strengths: utilitarian glanceability per row, one column, never ambiguous. Weaknesses: panels read as opaque screens floating nowhere, motion is linear fades and teleports, edge states are generic spinners and toasts, zero delight.",
+    "C": "A head-centred compass disc over a street scrim: one glowing orb orbiting at the cue's bearing, cardinal words outside the rim, a live bearing sentence below, a haptic waveform strip whose bar widths are real milliseconds and heights real intensities, one Play action, six-cue tab strip. Six designed states (loading, autoplay-blocked, no output, no motor, offline) each with a recovery action. Mono and tactile-only modes restructure meaning instead of degrading it. Dragging the orb moves a real HRTF panner live."
+  },
+  "referenceScreens": {
+    "visionOS": "Settings > Sounds, plus the AirPods 'spatialize stereo / personalize spatial audio' surface: a single frosted window floating over the wearer's room, SF Pro white text on glass, blue-filled pill controls, a centred head illustration that animates sound placement around the ears, back chevron top-left, and a subtle gaze highlight that brightens the row under the eye. Loading inside these panes is a bare spinner in glass; errors are multi-sentence modal dialogs.",
+    "horizonOS": "Quest 3 Settings > System Sounds: a flat near-black rectangle docked in the headset void - no transparency, no world bleed through the panel - with a left rail of sections, small grey labels and toggle switches, and at most one accent color. There is no spatial-audio visualization and no system haptics surface; controller haptics are configured per-app. Motion between panes is a hard swap with a linear fade."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 7,
+      "focusDiscipline": 8,
+      "materialHonesty": 9,
+      "motion": 8,
+      "typography": 9,
+      "edgeStates": 6,
+      "dependability": 8,
+      "accessibility": 8,
+      "delight": 7
+    },
+    "horizonOS": {
+      "glanceability": 6,
+      "focusDiscipline": 7,
+      "materialHonesty": 4,
+      "motion": 5,
+      "typography": 7,
+      "edgeStates": 4,
+      "dependability": 6,
+      "accessibility": 6,
+      "delight": 3
+    },
+    "ours": {
+      "glanceability": 8,
+      "focusDiscipline": 7,
+      "materialHonesty": 8,
+      "motion": 8,
+      "typography": 9,
+      "edgeStates": 9,
+      "dependability": 8,
+      "accessibility": 9,
+      "delight": 9
+    }
+  },
+  "totals": {
+    "visionOS": 70,
+    "horizonOS": 48,
+    "ours": 75
+  },
+  "winnersPerCriterion": {
+    "glanceability": "ours",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "ours",
+    "typography": "ours",
+    "edgeStates": "ours",
+    "dependability": "ours",
+    "accessibility": "ours",
+    "delight": "ours"
+  },
+  "overallRanking": ["ours", "visionOS", "horizonOS"],
+  "biggestGap": "Drag selection glitch · components/17-audio-haptics/index.html:628 (.field pointerdown) · expected: dragging the compass (the signature interaction) paints nothing but the spoke; got: browser text selection highlights the 'front' rose word in blue, visible in reviews/17-audio-haptics/judge-r3/stage-playing.png. Fix: add user-select:none (-webkit-user-select:none) to .field and e.preventDefault() in the pointerdown handler. Secondary: focus discipline is 7 vs visionOS 8 because two bright blue elements glow at rest (the orb and the Play pill); demote the resting Play pill or the bearing dot so exactly one accent leads.",
+  "reason": "Blind scoring ranked System C first at 75/90 against visionOS 70 and Horizon OS 48. C wins glanceability (orb position plus a plain-language bearing sentence is readable in under a second; visionOS's sounds pane is a scroll of rows), edge states (six designed states each naming what still works and offering recovery - beats visionOS's bare spinner and verbose dialogs), accessibility (mono bus with explicit channel count, spoken direction, tactile-only mode, whole-surface reflow at 300% with nothing clipped, reduced motion verified with zero infinite animations), and delight (the drag-the-sound-around-your-head HRTF demo is a signature moment that serves function). visionOS keeps material honesty (true glass, 9 vs 8) and focus discipline (one gaze-highlighted target; 8 vs 7 where two blue elements glow at rest). Horizon OS's opaque panels, linear motion and generic errors leave it far behind. One concrete defect found and named; the pass condition - ours ranked first overall - is met.",
+  "passCondition": "Ours ranked first overall (75 vs 70 vs 48). One named gap (drag text-selection glitch) plus two criteria lost to visionOS (focus discipline, material honesty); pass holds because first overall is achieved."
+}

@@ -1,0 +1,79 @@
+{
+  "url": "http://localhost:4310/components/04-gestures/index.html",
+  "probedAt": "2026-09-05T07:34:57.948Z",
+  "gate": {
+    "pass": true,
+    "violations": [],
+    "warnings": [
+      "no lab rail mounted — critics cannot reach edge states; import mountLab from /os/shared/lab.js"
+    ]
+  },
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "reducedMotion": {
+    "ok": true,
+    "infiniteAnimations": 0,
+    "contentPresent": true
+  },
+  "screenshots": [
+    "full.png",
+    "stage.png",
+    "stage-reduced-motion.png"
+  ],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "inStageFocusables": 10,
+  "labFocusables": 0,
+  "totalFocusables": 15,
+  "labInsideStage": 0,
+  "devTokenLeaks": [],
+  "loudElementCount": 1,
+  "loudElements": [
+    "button.nav-btn"
+  ],
+  "surfaces": [
+    {
+      "el": "div.trainer",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.step-view",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.practice",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(28, 38, 54, 0.88), rgba(14, 21, 32, 0.92)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    },
+    {
+      "el": "div.targets",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    }
+  ],
+  "unlabeledIconButtons": [],
+  "subTenPxTextCount": 0,
+  "reducedMotionSupport": true,
+  "hasLab": false,
+  "labControls": [],
+  "overflow": {
+    "stageScrollH": 600,
+    "stageClientH": 600,
+    "innerScrollH": null,
+    "innerClientH": null
+  },
+  "title": "Prism OS — Gesture Trainer"
+}

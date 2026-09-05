@@ -1,0 +1,125 @@
+{
+  "url": "http://localhost:4310/components/03-wm/index.html",
+  "probedAt": "2026-09-05T06:44:19.202Z",
+  "gate": {
+    "pass": false,
+    "violations": [
+      "gaze reticle collides with 4 text run(s) — e.g. \"Build 26A ready — window chrome now respects scr\" in div (at rest, painted reticle). Keep the stage centre clear of glyphs, composite the reticle as a ring rather than a filled disc, and hide it until the first gaze or pointer event."
+    ],
+    "warnings": [
+      "no lab rail mounted — critics cannot reach edge states; import mountLab from /os/shared/lab.js",
+      "14 in-stage focusables at rest — dense for a 600x600 glasses display"
+    ]
+  },
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "reducedMotion": {
+    "ok": true,
+    "infiniteAnimations": 0,
+    "contentPresent": true
+  },
+  "screenshots": [
+    "full.png",
+    "stage.png",
+    "stage-reduced-motion.png"
+  ],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "inStageFocusables": 14,
+  "labFocusables": 0,
+  "totalFocusables": 27,
+  "labInsideStage": 0,
+  "devTokenLeaks": [],
+  "loudElementCount": 2,
+  "loudElements": [
+    "div.",
+    "div.hintbar"
+  ],
+  "surfaces": [
+    {
+      "el": "section.wm-layer",
+      "bg": "rgba(4, 7, 11, 0.16)",
+      "bgImage": "none",
+      "backdrop": "blur(6px)"
+    },
+    {
+      "el": "div.win-sheet",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(34px)"
+    },
+    {
+      "el": "div.win-body",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "section.wm-layer",
+      "bg": "rgba(4, 7, 11, 0.16)",
+      "bgImage": "none",
+      "backdrop": "blur(6px)"
+    },
+    {
+      "el": "div.win-sheet",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(34px)"
+    },
+    {
+      "el": "div.win-body",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "radial-gradient(130% 120% at 30% 18%, rgb(200, 236, 255) 0%, rgb(126, ",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "radial-gradient(60% 50% at 70% 78%, rgba(255, 255, 255, 0.22), rgba(0,",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "section.wm-layer",
+      "bg": "rgba(4, 7, 11, 0.26)",
+      "bgImage": "none",
+      "backdrop": "blur(6px)"
+    },
+    {
+      "el": "div.win-sheet",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(34px)"
+    },
+    {
+      "el": "div.win-body",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    }
+  ],
+  "unlabeledIconButtons": [],
+  "subTenPxTextCount": 0,
+  "reducedMotionSupport": true,
+  "hasLab": false,
+  "labControls": [],
+  "overflow": {
+    "stageScrollH": 600,
+    "stageClientH": 600,
+    "innerScrollH": null,
+    "innerClientH": null
+  },
+  "title": "Prism OS — Window Manager"
+}

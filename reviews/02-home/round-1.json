@@ -1,0 +1,99 @@
+{
+  "piece": "02-home",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T00:00:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/02-home/index.html reviews/02-home/judge-r1",
+    "outDir": "reviews/02-home/judge-r1",
+    "screenshotsRead": [
+      "stage.png",
+      "full.png",
+      "judge-r1-state-loading.png",
+      "judge-r1-state-empty.png",
+      "judge-r1-state-error.png",
+      "judge-r1-state-offline.png",
+      "judge-r1-state-permission.png",
+      "judge-r1-reduced.png",
+      "judge-r1-scale2x.png",
+      "judge-r1-hover.png",
+      "judge-r1-kbd.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 15,
+    "notes": "At-rest home: 48px clock hero with date/city/Lens%, weather+next-event card, 2x4 launcher grid with colored tiles and sublabels, recents rail with badges. All five edge states reachable via on-stage chips and each is genuinely designed (skeleton loading, empty with CTAs, error with PR-HOME-503 code and Retry/Dismiss, offline with retrying status and 'use offline' escape, permission with allow/decline and Settings path). Gaze/hover ring on Maps unmistakable. Tab+Enter opened demo surface, Esc returned. BUT: stage content overflows — innerScrollH 653 vs 556 visible — so the recents rail is clipped mid-tile at rest, sub-labels sliced through; no text-scale reflow (all sizing in px, root font change does nothing); probe counts 18 loud elements at rest; colon of the clock pulses infinitely (ambient decorative motion); '12S' badge duplicates 'Video · 12s' on the same tile; the dev-chips toolbar overlaps recents and its own 'No access' chip is itself clipped."
+  },
+  "blind": {
+    "A": "visionOS Home View app grid (2024, Vision Pro): 1x1 rounded-square icons in a loose grid floating over the dimmed room, white labels beneath, Dock of recent apps at bottom, control center pills top — glass panels over real environment",
+    "B": "Horizon OS universal menu + dock (Quest 3, 2024): dark rounded bottom dock with 5 app pills (Apps, Camera, People, Browser, Store), App Library as a flat dark window, glass time/battery pill top-left, controller laser pointer with highlight reticle",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "Sparse icon grid over the wearer's real room. Meaning lands in under a second: icons are large, few, labeled. One focal surface at a time; gaze dims/hover-lifts a single icon. Materials are genuine glass — the room stays visible through every panel. Motion is springy but restrained and interruptible. Weaknesses: labels get small at room distance, loading is a bare spinner, permission dialogs are wordy, no designed error surface on Home itself.",
+    "B": "A dock-first layout: five pills at the bottom carry 90% of daily navigation; everything else lives in a flat dark library window. Glanceable at the dock, weaker beyond it. Focus is controller-bound with a laser reticle and highlight. Materials read as opaque dark panels floating in space, not glass. Motion is snappy but utilitarian. Edge states are defaulted (spinner dialogs, terse errors). Typography in menus is small and inconsistent. Delight is minimal — it is a menu, not a place.",
+    "C": "A four-zone lens home: oversized clock hero with date/city/lens-battery line, weather plus next-event card, a 2x4 launcher of colored icon tiles with status sublabels, and a recents rail with NEW/LIVE/12S/TEXT badges. All five edge states are designed with recovery paths; keyboard and Esc work end to end; zero console errors. Scrims at 78-84% opacity with 22px blur read as glass. But the content stack exceeds the 600px stage — the recents rail is clipped mid-tile at rest — everything is px-sized so text scale cannot reflow, and at rest the clock, weather card, eight colored tiles, and rail all compete; no single focal element owns the moment."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS Home View (Vision Pro, 2024): a grid of rounded-square app icons with white SF labels floating over the user's dimmed real room, shared-space glass panels, a Dock of recent apps at bottom, and control center pills at top. Gaze subtle-lifts exactly one icon at a time; icons sit on nearly invisible hit-targets so the room remains the background. Two-sentence detail: icons are roughly 1x1 with generous gaps, backgrounds are the wearer's environment blurred behind glass, and there is almost never more than one bright focal cluster.",
+    "horizonOS": "Meta Horizon OS universal menu (Quest 3, 2024): a persistent dark rounded dock of five app pills at the bottom of view, an App Library rendered as a flat dark rectangular window, and a small glass pill with time and battery at top-left. Navigation is a controller laser with a highlight reticle; panels are opaque dark surfaces that read as floating flatscreens rather than glass. Two-sentence detail: the dock is the glanceable layer, the library window is dense small-type grid, and edge states across the menu are spinner dialogs with terse copy."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 8,
+      "focusDiscipline": 8,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 6,
+      "dependability": 8,
+      "accessibility": 9,
+      "delight": 8
+    },
+    "horizonOS": {
+      "glanceability": 7,
+      "focusDiscipline": 6,
+      "materialHonesty": 5,
+      "motion": 7,
+      "typography": 6,
+      "edgeStates": 5,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 5
+    },
+    "ours": {
+      "glanceability": 7,
+      "focusDiscipline": 6,
+      "materialHonesty": 8,
+      "motion": 7,
+      "typography": 7,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 6,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 74,
+    "horizonOS": 54,
+    "ours": 65
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "ours",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": ["visionOS", "ours", "horizonOS"],
+  "biggestGap": "At-rest vertical overflow — viewHome content stack (components/02-home/index.html:739, .recents at :357) · expected the four zones (hero ~160px + launcher rows ~2x210px + recents rail) to fit the fixed 600x600 stage or clip with an intentional peek-plus-scroll affordance · got innerScrollH 653 vs 556 visible, so the recents rail is cut mid-tile with the 'Photo · Today' / 'Capture · Yesterday' sub-labels sliced through at the bottom edge of the stage in the default at-rest screenshot (reviews/02-home/judge-r1/stage.png)",
+  "reason": "Ours loses to visionOS 65-74. The artifact genuinely wins edge states and dependability — all five failure surfaces are designed with recovery paths, which neither reference ships on Home — but visionOS wins glanceability, focus discipline, material honesty, motion, typography, accessibility, and delight. The decisive defects visible in pixels: the home does not fit its own 600px stage (recents clipped mid-tile at rest), text scale cannot reflow anything because every size is a hardcoded px value (root font change produced an identical frame), and 18 elements read as loud at rest so nothing owns the moment. Harsh-but-fair: fix the overflow, add rem-based scale reflow, and quiet the at-rest hierarchy before re-judging.",
+  "passCondition": "Ours ranked second overall (65 vs visionOS 74, horizonOS 54). One gap named. Fail."
+}

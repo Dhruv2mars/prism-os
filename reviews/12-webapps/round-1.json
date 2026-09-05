@@ -1,0 +1,53 @@
+{
+  "piece": "12-webapps",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T08:12:40Z",
+  "verdict": "pass",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/12-webapps/index.html reviews/12-webapps/judge-r1  (+ ?state=loading|empty|error|offline|denied probes; playwright drive scripts reviews/12-webapps/judge-r1/drive2.mjs / drive3.mjs / drive4.mjs for open-app, allow/deny prompt, pause/resume, permissions manager, stalled app, broken package, scale=2.0, scale=3.1, rm=1)",
+    "outDir": "reviews/12-webapps/judge-r1",
+    "screenshotsRead": [
+      "stage.png", "full.png", "stage-reduced-motion.png",
+      "state-loading/stage.png", "state-empty/stage.png", "state-error/stage.png", "state-offline/stage.png", "state-denied/stage.png",
+      "flow-prompt.png", "flow-after-deny.png", "flow-transit-data.png", "flow-transit-live.png", "flow-paused.png",
+      "flow-launcher-running.png", "flow-permissions.png", "flow-perm-cycled.png", "flow-stalled.png", "flow-broken-pkg.png",
+      "flow-scale-200.png", "flow-scale200-page2.png", "flow-scale200-prompt.png", "flow-scale200-app.png", "flow-scale-310.png", "flow-rm-prompt.png"
+    ],
+    "consoleErrors": 0, "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 3,
+    "notes": "Launcher shows exactly one loud row (lead) and one quiet row; warm street glow visibly bleeds through every scrim, and the lower half stays world under the gaze-guard. All five lab edge states are bespoke compositions, not defaults. Real runtime: launching Transit raises an actual permission alertdialog from a capability call; Don't allow lands inside the app with a 'Network is off / Ask again' recovery card; Allow shows live N Judah data; Pause blurs the canvas with a Paused overlay; stalled app yields 'did not start' with close/wait/back; broken package refusal lists the exact validator reasons in prose. Text scale 310% reflows the whole surface to one lead row plus a '1 more' pagination pill — nothing clipped, nothing unreachable. Reduced motion zeroes every animation including the window scale-in. Zero engineering tokens in any rendered copy."
+  },
+  "blind": { "A": "visionOS Home View app grid + app permission alert", "B": "Horizon OS (Quest) App Library panel + Android-style permission dialog", "C": "artifact under review", "oursIs": "C" },
+  "blindDescriptions": {
+    "A": "System A solves app management as a spatial grid: rounded-square 1x1 icons with small labels on dark glass over the shared environment, one focused window at a time with an unmistakable hover ring, permissions as a centered near-opaque alert ('Allow X to access Y?') with Allow / Don't Allow, per-app toggles buried in Settings > Apps. Loading is a bare spinner in the void; a permission-denied app usually just fails with no system-side explanation; offline is a transient system banner. Materials are the best glass in the industry; edge-state design is the weakest pillar.",
+    "B": "System B solves it as a flat, largely opaque dark panel (App Library) floating in passthrough — grid or list of apps, Android-derived permission dialogs, running apps surfaced through the universal menu rather than the library. Text scale exists but reflows unevenly; loading is spinners; errors are generic OK-alerts. It reads as a screen in space, not glass over the world.",
+    "C": "System C is a 600px monocular lens: a header with live count, one loud lead row (resume target) above quiet index rows, and the entire lower half committed to the world behind the lens with a bottom action bar. Opening an app slides up a window whose frame carries no fill of its own — a chrome bar (blur 20) over a lighter transient canvas (blur 12), escalating to a heavy decision sheet (blur 34) only when the system asks a question. The sheet quotes the app's stated reason and then adds the OS's own risk explanation, defaults focus to the safe affordance, and makes Escape mean Don't allow. Denial never strands: the app stays open with a recovery card. Every failure (stall, bad package, offline, revoked grant) has a composed state with a named next action. Text scale reflows the entire surface and paginates rather than clipping."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS Home View (2024): the app grid of rounded-square 1x1 icons floating on a dark glass ellipse with the Environments dial at right; icons brighten and gain a rounded-rect focus outline under eye gaze; apps open as glass windows with a bottom window bar (drag handle + close X). Permissions appear as centered dark alerts with the app icon, a capability sentence, and Allow / Don't Allow buttons.",
+    "horizonOS": "Meta Horizon OS App Library (Quest 3, 2024): a large flat dark panel in passthrough holding a grid of square icons with labels, a filter/search row on top, and Android-style permission dialogs ('Allow App to access this device's location?' with While using / Only this time / Don't allow). Running apps live in the universal menu's recent-apps strip, not in the library; loading is a spinner on an opaque dimmed panel."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 8, "focusDiscipline": 8, "materialHonesty": 9, "motion": 9, "typography": 9, "edgeStates": 5, "dependability": 8, "accessibility": 10, "delight": 8 },
+    "horizonOS": { "glanceability": 7, "focusDiscipline": 7, "materialHonesty": 6, "motion": 7, "typography": 7, "edgeStates": 5, "dependability": 7, "accessibility": 7, "delight": 6 },
+    "ours": { "glanceability": 9, "focusDiscipline": 9, "materialHonesty": 9, "motion": 8, "typography": 9, "edgeStates": 10, "dependability": 9, "accessibility": 8, "delight": 8 }
+  },
+  "totals": { "visionOS": 74, "horizonOS": 59, "ours": 79 },
+  "winnersPerCriterion": {
+    "glanceability": "ours",
+    "focusDiscipline": "ours",
+    "materialHonesty": "ours",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "ours",
+    "accessibility": "visionOS",
+    "delight": "ours"
+  },
+  "overallRanking": ["ours", "visionOS", "horizonOS"],
+  "biggestGap": "mono-audio cues · components/12-webapps/index.html (rt.on('notification') handler ~line 782 and renderSheet ~line 602) · expected: state transitions that demand attention — permission sheet rising, install refused, app stalled, notification banner — carry a distinct earcon per the platform rubric's mono-audio accessibility line · got: every state change is silent; accessibility otherwise wins on reflow, semantics, and reduced motion, so audio is the one unaddressed axis",
+  "reason": "Judged blind, System C wins six of nine criteria against visionOS Home View + permission alerts. The decisive evidence is edge states and dependability: every failure I could inject (stalled launch, malformed manifest, network off, revoked grant, denied permission) landed in a composed, named, recoverable state, while visionOS's own loading is a bare spinner and permission denial is typically silent. Material honesty is genuine, not claimed: the world's warm street light visibly bleeds through the launcher rows and app canvas, the material ladder escalates fill with commitment, and the lower half of the lens stays world. It loses motion and accessibility to visionOS — visionOS's spring timing and VoiceOver/Dynamic-Type/sound stack remain the reference — and it concedes one real gap: no mono-audio cues on attention-demanding transitions. Ours is ranked first overall.",
+  "passCondition": "Ours ranked FIRST overall (79 vs visionOS 74 vs horizonOS 59). One gap named (missing mono-audio cues); pass condition met on first-place ranking."
+}

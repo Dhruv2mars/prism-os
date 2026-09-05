@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Developer</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+/* The developer portal is the one Prism surface that is NOT a 600x600 lens.
+   An SDK reference is read on a desktop with a keyboard and a clipboard, and
+   pretending otherwise would make the reference worse to use in order to make
+   a screenshot look consistent. It still speaks the system's language — same
+   tokens, same type ramp, same motion curve — so it reads as the same OS. */
+:root { color-scheme: dark; }
+html, body { height: auto; min-height: 100%; }
+body {
+  margin: 0;
+  background:
+    radial-gradient(90% 60% at 50% -8%, rgba(46,62,96,0.55), transparent 62%),
+    #06090f;
+  color: var(--ink-100);
+  font: 400 15px/1.6 var(--font-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px 96px; }
+
+header.top {
+  position: sticky; top: 0; z-index: 20;
+  backdrop-filter: blur(20px) saturate(1.3); -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  background: rgba(8,12,19,0.72);
+  border-bottom: 1px solid var(--stroke-glass);
+}
+header.top .wrap { display: flex; align-items: center; gap: 14px; padding-top: 14px; padding-bottom: 14px; }
+.logo { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(180deg,#56b8ff,#0b5ed7); flex: none; }
+.brand { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+.brand span { color: var(--ink-60); font-weight: 500; }
+.pill {
+  margin-left: auto; font-size: 12px; font-weight: 600; color: var(--ink-80);
+  padding: 5px 11px; border-radius: var(--r-pill);
+  background: rgba(255,255,255,0.05); outline: 1px solid var(--stroke-glass);
+}
+
+.hero { padding: 64px 0 40px; max-width: 660px; }
+.hero h1 { font-size: 44px; line-height: 1.08; letter-spacing: -0.035em; margin: 0 0 16px; font-weight: 700; }
+.hero p { font-size: 18px; color: var(--ink-80); margin: 0 0 12px; }
+
+.cols { display: grid; grid-template-columns: 190px 1fr; gap: 40px; align-items: start; }
+nav.side { position: sticky; top: 78px; display: flex; flex-direction: column; gap: 2px; }
+nav.side a {
+  font-size: 13px; font-weight: 600; color: var(--ink-60); padding: 7px 10px;
+  border-radius: 8px; border-left: 2px solid transparent;
+  transition: color var(--dur-fast) var(--ease-prism), background var(--dur-fast) var(--ease-prism);
+}
+nav.side a:hover { color: var(--ink-100); background: rgba(255,255,255,0.05); text-decoration: none; }
+nav.side a[aria-current="true"] { color: var(--accent); border-left-color: var(--accent); background: rgba(86,184,255,0.08); }
+
+section { padding: 44px 0; border-top: 1px solid rgba(255,255,255,0.07); }
+section:first-of-type { border-top: none; padding-top: 8px; }
+h2 { font-size: 30px; letter-spacing: -0.03em; margin: 0 0 8px; font-weight: 700; }
+h3 { font-size: 17px; margin: 30px 0 8px; font-weight: 700; }
+.lede { color: var(--ink-80); margin: 0 0 22px; max-width: 62ch; }
+p { max-width: 68ch; }
+.muted { color: var(--ink-60); }
+
+pre {
+  background: rgba(255,255,255,0.035); outline: 1px solid var(--stroke-glass);
+  border-radius: var(--r-md); padding: 16px 18px; overflow-x: auto;
+  font-size: 13px; line-height: 1.62; margin: 0;
+}
+pre .k { color: #ff9ec4; } pre .s { color: #9ee8b0; } pre .c { color: var(--ink-40); } pre .n { color: #ffc247; }
+.codeblock { position: relative; }
+.copy {
+  position: absolute; top: 10px; right: 10px; font: 600 11px/1 inherit; color: var(--ink-80);
+  background: rgba(12,18,28,0.9); outline: 1px solid var(--stroke-glass); border: none;
+  border-radius: 7px; padding: 7px 10px; cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
+}
+.copy:hover { color: var(--ink-100); outline-color: var(--stroke-focus); }
+.copy[data-done] { color: var(--ok); }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 4px 0 8px; }
+th { text-align: left; font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-60); padding: 0 12px 9px 0; border-bottom: 1px solid rgba(255,255,255,0.09); }
+td { padding: 11px 12px 11px 0; border-bottom: 1px solid rgba(255,255,255,0.05); vertical-align: top; color: var(--ink-80); }
+td:first-child, th:first-child { padding-left: 2px; }
+td code { color: var(--ink-100); font-size: 13px; }
+.risk { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: var(--r-pill); white-space: nowrap; }
+.risk.high { color: #ffb3b3; background: rgba(255,93,93,0.14); }
+.risk.medium { color: var(--warn); background: rgba(255,194,71,0.13); }
+.risk.low { color: #9ee8b0; background: rgba(76,212,124,0.12); }
+
+.method { border-top: 1px solid rgba(255,255,255,0.06); padding: 20px 0; display: grid; grid-template-columns: 1fr; gap: 8px; }
+.method:first-of-type { border-top: none; }
+.sig { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; color: var(--ink-100); font-weight: 600; }
+.sig em { color: var(--ink-60); font-style: normal; font-weight: 400; }
+.method p { margin: 0; font-size: 14px; color: var(--ink-80); }
+.throws { font-size: 13px; color: var(--ink-60); }
+.throws code { color: #ffb3b3; }
+
+.callout {
+  background: rgba(86,184,255,0.07); outline: 1px solid rgba(86,184,255,0.22);
+  border-radius: var(--r-md); padding: 15px 18px; margin: 18px 0; font-size: 14px; color: var(--ink-80);
+}
+.callout strong { color: var(--ink-100); }
+
+/* ---- live validator ---- */
+.validator { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+@media (max-width: 900px) { .validator, .cols { grid-template-columns: 1fr; } nav.side { position: static; flex-direction: row; flex-wrap: wrap; } }
+textarea#manifestInput {
+  width: 100%; box-sizing: border-box; height: 380px; resize: vertical;
+  background: rgba(255,255,255,0.035); color: var(--ink-100);
+  outline: 1px solid var(--stroke-glass); border: none; border-radius: var(--r-md);
+  padding: 15px 16px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px; line-height: 1.6; tab-size: 2;
+}
+textarea#manifestInput:focus { outline: 2px solid var(--stroke-focus); }
+.vresult { background: rgba(255,255,255,0.035); outline: 1px solid var(--stroke-glass); border-radius: var(--r-md); padding: 16px 18px; min-height: 380px; box-sizing: border-box; }
+.verdict { display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.verdict .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.verdict.ok { color: var(--ok); } .verdict.ok .dot { background: var(--ok); }
+.verdict.bad { color: var(--danger); } .verdict.bad .dot { background: var(--danger); }
+.vcount { font-size: 13px; color: var(--ink-60); font-weight: 500; margin-bottom: 14px; }
+.issue { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.06); }
+.issue .field { font-family: ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 700; grid-column: 1 / -1; }
+.issue.err .field { color: #ffb3b3; } .issue.warn .field { color: var(--warn); }
+.issue .msg { grid-column: 1 / -1; font-size: 13px; color: var(--ink-80); line-height: 1.5; }
+.vrow { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.vbtn {
+  font: 600 12px/1 inherit; color: var(--ink-80); background: rgba(255,255,255,0.05);
+  outline: 1px solid var(--stroke-glass); border: none; border-radius: var(--r-pill);
+  padding: 8px 13px; cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-prism), background var(--dur-fast) var(--ease-prism);
+}
+.vbtn:hover { color: var(--ink-100); background: rgba(255,255,255,0.09); }
+.vbtn:focus-visible { outline: 2px solid var(--stroke-focus); outline-offset: 2px; }
+.normalized { margin-top: 16px; font-size: 12px; }
+.normalized summary { cursor: pointer; color: var(--ink-60); font-weight: 600; }
+.normalized pre { margin-top: 10px; font-size: 12px; }
+
+.steps { counter-reset: step; padding: 0; margin: 22px 0 0; list-style: none; }
+.steps li { counter-increment: step; position: relative; padding: 0 0 26px 46px; border-left: 1px solid rgba(255,255,255,0.1); margin-left: 13px; }
+.steps li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.steps li::before {
+  content: counter(step); position: absolute; left: -13px; top: -3px;
+  width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 12px; font-weight: 700; color: #051423;
+  background: linear-gradient(180deg,#7cc9ff,#3f9be0);
+}
+.steps h3 { margin: 0 0 5px; font-size: 15px; }
+.steps p { margin: 0; font-size: 14px; color: var(--ink-80); }
+
+.checks { list-style: none; padding: 0; margin: 14px 0 0; }
+.checks li { padding: 9px 0 9px 26px; position: relative; font-size: 14px; color: var(--ink-80); border-bottom: 1px solid rgba(255,255,255,0.05); }
+.checks li::before { content: ""; position: absolute; left: 4px; top: 16px; width: 10px; height: 6px; border-left: 2px solid var(--ok); border-bottom: 2px solid var(--ok); transform: rotate(-45deg); }
+
+footer { padding: 40px 0 0; border-top: 1px solid rgba(255,255,255,0.07); color: var(--ink-60); font-size: 13px; }
+
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="logo" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3.5l6.2 10.8H5.8L12 3.5z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/><path d="M6 11h8" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+    <div class="brand">Prism <span>Developer</span></div>
+    <div class="pill" id="versionPill">manifest v1</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>Build for a display you look through.</h1>
+    <p>A Prism app is a web app that runs in a sandbox with no origin, no host DOM and no capability it did not declare. Everything it needs from the glasses it asks for, and the wearer can always say no.</p>
+    <p class="muted">Two files: <code>manifest.json</code> and your entry HTML. No build step, no bundler, no account to write your first one.</p>
+  </div>
+
+  <div class="cols">
+    <nav class="side" aria-label="Sections">
+      <a href="#start">Start here</a>
+      <a href="#sandbox">The sandbox</a>
+      <a href="#manifest">Manifest</a>
+      <a href="#validator">Validator</a>
+      <a href="#sdk">SDK reference</a>
+      <a href="#errors">Error codes</a>
+      <a href="#design">Design rules</a>
+      <a href="#submit">Submit for review</a>
+    </nav>
+
+    <main>
+      <section id="start">
+        <h2>Start here</h2>
+        <p class="lede">Copy these two files into <code>/os/apps/&lt;your-id&gt;/</code>, open the simulator, and your app is running against the real OS — same broker, same permission sheets, same suspend and kill.</p>
+
+        <h3>manifest.json</h3>
+        <div class="codeblock"><pre id="starterManifest"></pre></div>
+
+        <h3>index.html</h3>
+        <div class="codeblock"><pre id="starterApp"></pre></div>
+
+        <div class="callout">
+          <strong>Then open <a href="/components/25-devsim/index.html">Developer Mode</a>.</strong>
+          It runs your build inside a real sandbox and shows every brokered call, its verdict, and how long it took — including how much of that time the wearer spent reading a grant sheet.
+        </div>
+      </section>
+
+      <section id="sandbox">
+        <h2>The sandbox</h2>
+        <p class="lede">Your app is embedded with <code>sandbox="allow-scripts"</code> and deliberately without <code>allow-same-origin</code>. That gives it an opaque origin. It is worth knowing exactly what that costs you, because the failures are quiet ones.</p>
+
+        <table>
+          <thead><tr><th style="width:38%">You do not have</th><th>Use instead</th></tr></thead>
+          <tbody>
+            <tr><td><code>localStorage</code>, <code>sessionStorage</code>, cookies, IndexedDB</td><td><code>prism.storage</code> — a per-app store held by the host. One app can never read another's.</td></tr>
+            <tr><td><code>fetch()</code> to the network</td><td><code>prism.fetch(url)</code> — brokered, and refused unless the wearer granted <code>network</code>.</td></tr>
+            <tr><td>Access to <code>window.parent</code> or the host DOM</td><td>Nothing. The host is reachable only through the SDK's message channel.</td></tr>
+            <tr><td><code>&lt;script type="module"&gt;</code> from the origin</td><td>Classic scripts. An opaque origin turns every module fetch into a CORS request, and it will fail silently. This is the single most common first-hour mistake.</td></tr>
+            <tr><td>Control of your own window size</td><td>Nothing to do — the OS measures your <code>&lt;body&gt;</code> and sizes the window to your content, clamped so the world stays visible behind you.</td></tr>
+            <tr><td>An opinion about text size or motion</td><td>The system pushes the wearer's settings in. Style against <code>var(--a11y-scale)</code> and <code>[data-reduced-motion]</code> on <code>&lt;html&gt;</code> and you inherit accessibility for free.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="manifest">
+        <h2>Manifest</h2>
+        <p class="lede">Validated at install, never at launch. The wearer should never install something that fails in their face later, so every rule below is enforced before an app is ever on the device.</p>
+
+        <table>
+          <thead><tr><th style="width:22%">Field</th><th style="width:14%">Type</th><th>Rule</th></tr></thead>
+          <tbody id="fieldRows"></tbody>
+        </table>
+
+        <h3>Permissions</h3>
+        <p>Declare only what you use. A capability missing from the manifest is refused before the wearer is ever asked — the OS will not widen your contract at runtime. High-risk permissions require a reason in your own words; the wearer sees it next to the system's explanation and is never asked to trust your copy alone.</p>
+        <table>
+          <thead><tr><th style="width:20%">Name</th><th style="width:14%">Risk</th><th>What the wearer is told</th></tr></thead>
+          <tbody id="permRows"></tbody>
+        </table>
+      </section>
+
+      <section id="validator">
+        <h2>Validator</h2>
+        <p class="lede">This runs the same <code>validateManifest()</code> the installer runs. Not a copy of it, not a rough approximation of it — the module itself, in your browser.</p>
+        <div class="vrow">
+          <button class="vbtn" data-sample="transit">Load a good manifest</button>
+          <button class="vbtn" data-sample="bad">Load a broken one</button>
+          <button class="vbtn" data-sample="minimal">Minimum viable</button>
+        </div>
+        <div class="validator">
+          <div>
+            <label for="manifestInput" style="display:block;font-size:11px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-60);margin-bottom:8px">Your manifest.json</label>
+            <textarea id="manifestInput" spellcheck="false" aria-describedby="vresult"></textarea>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink-60);margin-bottom:8px">Result</div>
+            <div class="vresult" id="vresult" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="sdk">
+        <h2>SDK reference</h2>
+        <p class="lede">One classic script, one global. <code>&lt;script src="/os/shared/prism-sdk.js"&gt;&lt;/script&gt;</code> gives you <code>window.prism</code> and <code>window.PrismError</code>.</p>
+        <div id="sdkMethods"></div>
+        <h3>Events</h3>
+        <p class="muted" style="font-size:14px;margin-bottom:10px">Subscribe with <code>prism.on(event, fn)</code>. Returns an unsubscribe function.</p>
+        <table>
+          <thead><tr><th style="width:26%">Event</th><th>Fires when</th></tr></thead>
+          <tbody id="eventRows"></tbody>
+        </table>
+      </section>
+
+      <section id="errors">
+        <h2>Error codes</h2>
+        <p class="lede">Every rejection from the SDK is a <code>PrismError</code> with a <code>code</code>. Branch on the code, never on the message — messages are wearer-facing copy and will be rewritten.</p>
+        <table>
+          <thead><tr><th style="width:22%">Code</th><th style="width:34%">Means</th><th>What your app should do</th></tr></thead>
+          <tbody id="errorRows"></tbody>
+        </table>
+      </section>
+
+      <section id="design">
+        <h2>Design rules</h2>
+        <p class="lede">These are not style advice. An app that breaks them is rejected at review, because on a see-through display they are safety and legibility problems, not taste.</p>
+        <ul class="checks" id="ruleList"></ul>
+      </section>
+
+      <section id="submit">
+        <h2>Submit for review</h2>
+        <p class="lede">Review is a person plus the same automated checks you can run yourself. Nothing in the list below is a surprise at submission time — run the validator and Developer Mode first and you will already know the answer.</p>
+
+        <ol class="steps">
+          <li>
+            <h3>Validate</h3>
+            <p>Your manifest must pass with zero errors. Warnings do not block submission, but every warning is a line a reviewer will ask you about.</p>
+          </li>
+          <li>
+            <h3>Run it in Developer Mode</h3>
+            <p>Launch, suspend, resume, kill, go offline, and deny every permission you request. A reviewer will do all six. An app that dead-ends on a denial is the most common rejection.</p>
+          </li>
+          <li>
+            <h3>Submit the folder</h3>
+            <p>Your app folder is the package: <code>manifest.json</code>, your entry HTML, and any assets, all relative. No remote entry point is installable.</p>
+          </li>
+          <li>
+            <h3>Automated review</h3>
+            <p>Manifest validation, a sandbox launch, a permission-denial sweep, an offline pass, and a render at 310% text. Results come back in minutes with the failing screenshot attached.</p>
+          </li>
+          <li>
+            <h3>Human review</h3>
+            <p>One reviewer wearing the hardware. They judge glanceability and whether the permissions you ask for match what the app actually does. A reason that does not survive being read out loud is a rejection.</p>
+          </li>
+        </ol>
+
+        <div class="callout" style="margin-top:26px">
+          <strong>The catalog is at <a href="/components/23-appstore/index.html">Apps</a>.</strong>
+          That is the wearer's view of the same package — what they see before installing, what they are asked to grant, and how they take it back.
+        </div>
+      </section>
+
+      <footer>
+        Prism OS developer platform · manifest v<span id="footVer">1</span> · protocol v1 · this page reads the shipping modules directly, so it cannot describe an SDK that is not there.
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script type="module">
+import { PERMISSIONS, CATEGORIES, MANIFEST_VERSION, validateManifest } from '/os/shared/app-manifest.js';
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+document.getElementById('versionPill').textContent = `manifest v${MANIFEST_VERSION}`;
+document.getElementById('footVer').textContent = MANIFEST_VERSION;
+
+/* ------------------------------------------------------------ manifest ---- */
+
+const FIELDS = [
+  ['manifestVersion', 'number', `Exactly ${MANIFEST_VERSION}. There is no forward compatibility promise; a new version means a new field list.`],
+  ['id', 'string', '3–32 characters, lowercase letters, digits and hyphens, starting with a letter. Must match your folder name — the folder is the address.'],
+  ['name', 'string', 'What the wearer sees. 24 characters or fewer, because past that it truncates on a 600px display and truncation is a shipped bug.'],
+  ['version', 'string', 'Semantic version, such as "1.2.0".'],
+  ['entry', 'string', 'Relative path to your HTML inside the app folder. Absolute and remote entry points are not installable.'],
+  ['category', 'string', `Optional. One of: ${CATEGORIES.join(', ')}. Defaults to utility.`],
+  ['developer', 'string', 'Optional. Shown on the install sheet next to the permissions you ask for.'],
+  ['permissions', 'string[]', 'Optional. Names from the table below. An unknown name is a hard error, not an ignored one.'],
+  ['permissionReasons', 'object', 'Optional, but required for every high-risk permission: at least 8 characters, at most 90, in your own words.'],
+  ['badge', 'string', 'Optional. 28 characters or fewer. The one line shown on the home surface before your app has run.'],
+  ['offline', 'boolean', 'Optional. True if the app is usable with no connection. If you neither request network nor declare this, you get a warning.'],
+  ['accent', 'string', 'Optional. A hex colour for your app icon.'],
+  ['glyph', 'string', 'Optional. A single character for your icon. Defaults to the first letter of your name.'],
+];
+$('#fieldRows').innerHTML = FIELDS.map(([f, t, r]) =>
+  `<tr><td><code>${f}</code></td><td class="muted">${t}</td><td>${esc(r)}</td></tr>`).join('');
+
+$('#permRows').innerHTML = Object.entries(PERMISSIONS).map(([name, p]) =>
+  `<tr><td><code>${name}</code></td><td><span class="risk ${p.risk}">${p.risk}</span></td><td>${esc(p.why)}</td></tr>`).join('');
+
+/* ------------------------------------------------------------------ sdk ---- */
+/* Each entry carries data-sdk-method. The portal's own gate walks these paths
+   against a real prism object inside a real sandboxed frame, so a method that
+   is documented here and missing from the shipped SDK fails the build. */
+
+const METHODS = [
+  ['prism.ready()', 'ready', 'Promise&lt;context&gt;',
+    'Announce your app is alive and receive the launch context: display size, eye, text scale, motion preference, and which permissions you already hold. Call it first. The host runs a watchdog — an app that never calls ready() is shown to the wearer as not responding, with a way out.', null],
+  ['prism.on(event, fn)', 'on', '() =&gt; void',
+    'Subscribe to a lifecycle or system event. Returns an unsubscribe function.', null],
+  ['prism.permissions.query(name)', 'permissions.query', "Promise&lt;'granted'|'denied'|'prompt'&gt;",
+    'Read the current state without showing anything. Use it to decide what to render, never to decide whether to ask.', null],
+  ['prism.permissions.request(name)', 'permissions.request', "Promise&lt;'granted'|'denied'&gt;",
+    'Show the wearer a grant sheet. It resolves rather than rejects on a denial, because a denial is a normal outcome your app must render, not an exception it may crash on.', 'not-declared'],
+  ['prism.location.get()', 'location.get', 'Promise&lt;{lat, lon, accuracy, label}&gt;',
+    'One position fix. Prompts on first use. Accuracy is in metres and you are expected to decide whether to trust it.', 'permission-denied, not-declared'],
+  ['prism.storage.get(key)', 'storage.get', 'Promise&lt;value|null&gt;',
+    'Read from your app’s private store. Returns null for a key you never set.', 'permission-denied, not-declared'],
+  ['prism.storage.set(key, value)', 'storage.set', 'Promise&lt;true&gt;',
+    'Write a JSON-serialisable value. Survives suspend and resume; removed when the wearer uninstalls you.', 'permission-denied, not-declared'],
+  ['prism.storage.remove(key)', 'storage.remove', 'Promise&lt;true&gt;', 'Delete one key.', 'permission-denied, not-declared'],
+  ['prism.storage.keys()', 'storage.keys', 'Promise&lt;string[]&gt;', 'List your keys.', 'permission-denied, not-declared'],
+  ['prism.fetch(url, opts?)', 'fetch', 'Promise&lt;{status, body}&gt;',
+    'The only network you get. Brokered by the host, and refused for any endpoint the broker does not allow — which is what a deny-by-default policy does on hardware too.', 'offline, blocked, permission-denied, not-declared'],
+  ['prism.notify({title, body})', 'notify', 'Promise&lt;true&gt;',
+    'Interrupt the wearer. Title is cut at 40 characters and body at 90, so write to that, not to what fits on your laptop.', 'permission-denied, not-declared'],
+  ['prism.setBadge(text)', 'setBadge', 'Promise&lt;true&gt;',
+    'Your one glanceable line on the home surface while you are not focused. 28 characters. This is the single most valuable pixel you will ever be given; do not spend it on your own name.', null],
+  ['prism.close()', 'close', 'Promise&lt;true&gt;',
+    'Ask to be torn down. The wearer can also do this at any time and you do not get a veto.', null],
+];
+$('#sdkMethods').innerHTML = METHODS.map(([sig, path, ret, desc, throws]) => `
+  <div class="method" data-sdk-method="${path}">
+    <div class="sig">${sig} <em>→ ${ret}</em></div>
+    <p>${desc}</p>
+    ${throws ? `<div class="throws">Rejects with <code>${throws.split(', ').join('</code>, <code>')}</code></div>` : ''}
+  </div>`).join('');
+
+const EVENTS = [
+  ['suspend', 'The wearer looked away or launched something else. Stop timers and animation now — you keep running, and a background app burning frames is a battery bug the wearer will feel as heat.'],
+  ['resume', 'You are visible again. Re-read anything that could have gone stale.'],
+  ['offline', 'The link dropped. Every prism.fetch() will reject with offline until online fires.'],
+  ['online', 'The link came back.'],
+  ['permissionchange', 'A grant was changed outside your app — the wearer revoked it in Settings. Re-render; do not re-prompt.'],
+  ['displaychange', 'Text scale or motion preference changed. The SDK has already applied it to your document; this is your chance to reflow.'],
+];
+$('#eventRows').innerHTML = EVENTS.map(([e, d]) => `<tr><td><code>${e}</code></td><td>${esc(d)}</td></tr>`).join('');
+
+const ERRORS = [
+  ['permission-denied', 'The wearer said no, or revoked it later.', 'Render the state without the capability. Never re-prompt in a loop — one ask, then a way to change it later.'],
+  ['not-declared', 'You called a method for a permission your manifest never listed.', 'Fix the manifest. This is refused before the wearer is ever asked, so it is a build error, not a runtime condition.'],
+  ['offline', 'No connection.', 'Show what you have cached and say when it was from. An empty screen that says "offline" is a dead end.'],
+  ['blocked', 'The network broker refuses that endpoint.', 'Only declared endpoints resolve. Check the URL; the detail field names what was refused.'],
+  ['timeout', 'The host did not answer within 8 seconds.', 'Treat as a transient failure and offer a retry.'],
+  ['unknown-method', 'No such SDK method at this protocol version.', 'You are calling something newer than the host. Feature-detect before calling.'],
+  ['no-ready', 'Your app never called ready() within 4 seconds of launch.', 'Call prism.ready() at the top of your script, not after your data loads.'],
+];
+$('#errorRows').innerHTML = ERRORS.map(([c, m, d]) =>
+  `<tr><td><code>${c}</code></td><td>${esc(m)}</td><td>${esc(d)}</td></tr>`).join('');
+
+const RULES = [
+  'One obvious focal element per screen. If a wearer has to choose what to read first, the app has already failed at a walking pace.',
+  'Nothing at the centre of the display. That is where the gaze reticle rests, and a glyph under it is unreadable and un-clickable at once.',
+  'Three type sizes at most in one view. Numbers use tabular figures so they do not jitter as they update.',
+  'Design the empty, loading, error, offline and permission-denied states. A reviewer will visit all five, and four of them are where apps actually spend their time.',
+  'Never dead-end. Every state has a way forward or a way out that is visible without scrolling.',
+  'Motion between 200 and 320 milliseconds, interruptible, and gone entirely when the wearer has asked for reduced motion.',
+  'Legible at 310% text. The system scales your type; scale your spacing sub-linearly or you will spend the whole lens on padding.',
+  'Never say a permission is required to continue when it is not. If the app works without it, show that path first.',
+];
+$('#ruleList').innerHTML = RULES.map((r) => `<li>${esc(r)}</li>`).join('');
+
+/* -------------------------------------------------------------- starter ---- */
+
+const STARTER_MANIFEST = `{
+  "manifestVersion": ${MANIFEST_VERSION},
+  "id": "hello-prism",
+  "name": "Hello Prism",
+  "version": "1.0.0",
+  "entry": "index.html",
+  "category": "utility",
+  "developer": "Your name",
+  "glyph": "H",
+  "badge": "Not checked yet",
+  "offline": false,
+  "permissions": ["network"],
+  "permissionReasons": {
+    "network": "Reads the current conditions once when you open it."
+  }
+}`;
+
+const STARTER_APP = `<!doctype html>
+<meta charset="utf-8">
+<style>
+  /* The host measures your body and sizes the window to it.
+     Do not set height: 100% — you would be measuring the host's frame. */
+  body { margin: 0; padding: 14px; font: 400 15px system-ui; color: #fff;
+         font-size: calc(15px * var(--a11y-scale, 1)); }
+  .t { font-size: calc(30px * var(--a11y-scale, 1)); font-weight: 700;
+       font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
+  .s { opacity: 0.6; font-size: calc(12px * var(--a11y-scale, 1)); }
+  [data-reduced-motion] .t { transition: none; }
+</style>
+<div class="t" id="t">—</div>
+<div class="s" id="s">Starting</div>
+
+<script src="/os/shared/prism-sdk.js"><\/script>
+<script>
+  var t = document.getElementById('t');
+  var s = document.getElementById('s');
+
+  prism.ready().then(function () {
+    return prism.fetch('https://api.prism.dev/weather/now');
+  }).then(function (res) {
+    t.textContent = res.body.tempC + '\\u00b0';
+    s.textContent = res.body.condition;
+    prism.setBadge(res.body.tempC + '\\u00b0 ' + res.body.condition);
+  }).catch(function (err) {
+    /* Branch on the code. Every one of these is a state you must design. */
+    if (err.code === 'permission-denied') { s.textContent = 'Network is off for this app'; }
+    else if (err.code === 'offline') { s.textContent = 'No connection'; }
+    else { s.textContent = 'Could not load'; }
+    t.textContent = '—';
+  });
+
+  prism.on('suspend', function () { /* stop timers here */ });
+  prism.on('resume', function () { /* re-read anything stale */ });
+<\/script>`;
+
+/* One pass, not a chain: a second pass would happily colour the class names
+   inside the spans the first pass just inserted. */
+function highlight(code) {
+  const TOKEN = /(\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*")|\b(function|return|var|const|let|if|else|new|true|false)\b|\b(\d+(?:\.\d+)*)\b/g;
+  return esc(code).replace(TOKEN, (m, comment, str, kw, num) => {
+    if (comment) return `<span class="c">${comment}</span>`;
+    if (str) return `<span class="s">${str}</span>`;
+    if (kw) return `<span class="k">${kw}</span>`;
+    return `<span class="n">${num}</span>`;
+  });
+}
+$('#starterManifest').innerHTML = highlight(STARTER_MANIFEST);
+$('#starterApp').innerHTML = highlight(STARTER_APP);
+
+document.querySelectorAll('.codeblock').forEach((block, i) => {
+  const raw = [STARTER_MANIFEST, STARTER_APP][i];
+  const b = document.createElement('button');
+  b.className = 'copy';
+  b.type = 'button';
+  b.textContent = 'Copy';
+  b.setAttribute('aria-label', 'Copy this file to the clipboard');
+  b.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(raw.replace(/<\\\//g, '</')); }
+    catch { /* clipboard blocked; the code is selectable either way */ }
+    b.textContent = 'Copied';
+    b.setAttribute('data-done', '');
+    setTimeout(() => { b.textContent = 'Copy'; b.removeAttribute('data-done'); }, 1600);
+  });
+  block.appendChild(b);
+});
+
+/* ------------------------------------------------------------ validator ---- */
+
+const SAMPLES = {
+  transit: {
+    manifestVersion: MANIFEST_VERSION, id: 'transit', name: 'Transit', version: '1.2.0',
+    entry: 'index.html', category: 'travel', developer: 'Halfmoon Labs',
+    glyph: 'T', accent: '#7ee0b8', badge: 'No departures yet', offline: false,
+    permissions: ['network', 'notifications', 'storage'],
+    permissionReasons: {
+      network: 'Fetches live departure times for your saved stop.',
+      notifications: 'Tells you when it is time to leave.',
+      storage: 'Remembers the stop you ride from.',
+    },
+  },
+  bad: {
+    manifestVersion: 1, id: 'Bad_App', name: 'A Deliberately Overlong Application Name',
+    version: '1.0', entry: 'https://example.com/app.html', category: 'gaming',
+    developer: 'Test Fixture', permissions: ['location', 'telepathy'], permissionReasons: {},
+  },
+  minimal: {
+    manifestVersion: MANIFEST_VERSION, id: 'hello-prism', name: 'Hello Prism',
+    version: '1.0.0', entry: 'index.html', offline: true,
+  },
+};
+
+const input = $('#manifestInput');
+const out = $('#vresult');
+
+function run() {
+  let raw;
+  try {
+    raw = JSON.parse(input.value);
+  } catch (err) {
+    out.innerHTML = `
+      <div class="verdict bad"><span class="dot"></span>Not valid JSON</div>
+      <div class="vcount">The installer never gets as far as the schema.</div>
+      <div class="issue err"><div class="field">(parse)</div><div class="msg">${esc(err.message)}</div></div>`;
+    return;
+  }
+  const r = validateManifest(raw);
+  const issues = [
+    ...r.errors.map((e) => ({ ...e, kind: 'err' })),
+    ...r.warnings.map((w) => ({ ...w, kind: 'warn' })),
+  ];
+  const counts = [];
+  if (r.errors.length) counts.push(`${r.errors.length} error${r.errors.length === 1 ? '' : 's'}`);
+  if (r.warnings.length) counts.push(`${r.warnings.length} warning${r.warnings.length === 1 ? '' : 's'}`);
+
+  out.innerHTML = `
+    <div class="verdict ${r.valid ? 'ok' : 'bad'}"><span class="dot"></span>${r.valid ? 'Installable' : 'Rejected at install'}</div>
+    <div class="vcount">${counts.length ? counts.join(' · ') : 'Nothing to fix.'}${r.valid && r.warnings.length ? ' — warnings do not block, but a reviewer will ask.' : ''}</div>
+    ${issues.map((i) => `<div class="issue ${i.kind}"><div class="field">${esc(i.field)}</div><div class="msg">${esc(i.message)}</div></div>`).join('')}
+    ${r.manifest ? `<details class="normalized"><summary>What the OS stores after normalising</summary><pre>${esc(JSON.stringify(r.manifest, null, 2))}</pre></details>` : ''}`;
+}
+
+document.querySelectorAll('[data-sample]').forEach((b) => {
+  b.addEventListener('click', () => {
+    input.value = JSON.stringify(SAMPLES[b.dataset.sample], null, 2);
+    run();
+    input.focus();
+  });
+});
+
+input.addEventListener('input', run);
+input.value = JSON.stringify(SAMPLES.transit, null, 2);
+run();
+
+/* ------------------------------------------------------------------ nav ---- */
+
+const links = [...document.querySelectorAll('nav.side a')];
+const sections = links.map((a) => document.querySelector(a.getAttribute('href')));
+const io = new IntersectionObserver((entries) => {
+  for (const e of entries) {
+    if (!e.isIntersecting) continue;
+    const i = sections.indexOf(e.target);
+    links.forEach((a, j) => a.setAttribute('aria-current', String(j === i)));
+  }
+}, { rootMargin: '-70px 0px -70% 0px' });
+sections.forEach((s) => s && io.observe(s));
+
+console.log('[devportal] ready — manifest v' + MANIFEST_VERSION + ', ' + METHODS.length + ' documented methods');
+</script>
+</body>
+</html>

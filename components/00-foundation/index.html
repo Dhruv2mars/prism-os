@@ -3,526 +3,718 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prism OS — Foundation Specimen</title>
+<meta name="color-scheme" content="dark">
+<title>Prism OS — Foundation</title>
 <link rel="stylesheet" href="/os/shared/design-system.css">
 <style>
- /* Motion token clamp to 200-320 spec — override frozen 160/380 */
- :root{
-  --dur-fast: 220ms;
-  --dur-slow: 300ms;
-  /* --dur-base stays 260ms already compliant */
- }
- /* simulator chrome: control bar outside stage */
- .device{
-  /* keep grid centering but allow absolute chrome */
- }
- .stage-shell{ position:relative; }
- .lab-bar{
-  position:absolute;
-  top:-94px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:6px;
-  align-items:center;
-  padding:6px 8px;
-  border-radius:999px;
-  background: var(--mat-glass);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
-  outline:1px solid var(--stroke-glass);
-  box-shadow:0 10px 28px rgba(0,0,0,0.32);
-  z-index:20;
-  white-space:nowrap;
- }
- .lab-bar .lab-label{
-  font-size:10px;
-  font-weight:700;
-  letter-spacing:0.10em;
-  text-transform:uppercase;
-  color:var(--ink-40);
-  margin-right:4px;
-  padding-left:4px;
- }
- .lab-bar .chip{
-  height:28px;
-  padding:0 10px;
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:0.02em;
-  border:none;
-  cursor:pointer;
-  transition: background var(--dur-fast) var(--ease-prism), color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
-  -webkit-tap-highlight-color:transparent;
- }
- .lab-bar .chip.active{
-  background: linear-gradient(180deg, var(--accent), var(--accent-strong));
-  color:#051423;
-  outline-color:transparent;
- }
- .lab-bar .chip:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px; }
- .lab-bar .chip.gaze-focus{ transform:scale(1.04); }
+/* ------------------------------------------------------------------ surface -
+   One specimen at a time, filling the stage, over the world layer.
+   Every developer control lives in the lab rail, outside the stage. */
 
- /* spec layout - keep inside stage, avoid scroll overflow */
- .spec { position: absolute; inset: 44px 0 0 0; overflow-y: auto; padding: 16px 16px 20px 16px; display: grid; gap: 14px; align-content: start; scrollbar-width: none; }
- .spec::-webkit-scrollbar { display: none; }
- .row { display: flex; gap: var(--sp-3); flex-wrap: wrap; align-items: center; }
- h2 { font-size: var(--fs-caption); text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-40); font-weight: 700; margin-bottom: var(--sp-2); }
- .swatches { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
- .swatch { height: 44px; border-radius: var(--r-sm); outline: 1px solid var(--stroke-glass); }
+.surface {
+  position: absolute; inset: 0; z-index: 10;
+  overflow: hidden;
 
- /* material distinct */
- .mat-glass{
-  background: var(--mat-glass);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
-  outline:1px solid var(--stroke-glass);
-  box-shadow:0 18px 44px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
- }
- .mat-raised{
-  background: var(--mat-raised);
-  backdrop-filter: var(--blur-heavy);
-  -webkit-backdrop-filter: var(--blur-heavy);
-  outline:1px solid rgba(255,255,255,0.14);
-  box-shadow:0 22px 50px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
- }
- .mat-sunken{
-  background: var(--mat-sunken);
-  backdrop-filter: saturate(1.2) blur(10px);
-  -webkit-backdrop-filter: saturate(1.2) blur(10px);
-  outline:1px solid rgba(255,255,255,0.07);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), inset 0 12px 28px rgba(0,0,0,0.38);
- }
- .mat-card{
-  width:120px;height:72px;display:grid;place-items:center;
-  border-radius:18px;
-  font-size:12px;font-weight:700;letter-spacing:0.04em;
-  position:relative;overflow:hidden;
- }
- .mat-card .sub{
-  font-size:10px;font-weight:600;letter-spacing:0.06em;color:var(--ink-40);margin-top:2px;
- }
- /* type cards - max 3 sizes per card */
- .type-card{
-  background: var(--mat-glass);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
-  outline:1px solid var(--stroke-glass);
-  border-radius:18px;
-  padding:14px 16px;
-  display:grid;gap:6px;
-  box-shadow:0 12px 32px rgba(0,0,0,0.28);
- }
- .type-hero{font-size:var(--fs-hero);font-weight:800;letter-spacing:-0.03em;line-height:0.95}
- .type-display{font-size:var(--fs-display);font-weight:700;letter-spacing:-0.02em;line-height:1}
- .type-title{font-size:var(--fs-title);font-weight:700;letter-spacing:-0.01em}
- .type-callout{font-size:var(--fs-callout);font-weight:600;color:var(--ink-80)}
- .type-body{font-size:var(--fs-body);font-weight:400;color:var(--ink-60);line-height:1.35}
- .type-caption{font-size:var(--fs-caption);font-weight:600;color:var(--ink-40);letter-spacing:0.06em;text-transform:uppercase}
+  --as: var(--a11y-scale, 1);
+  --t-eyebrow: max(10.5px, calc(11px * var(--as)));
+  --t-word:    calc(46px * min(var(--as), 2.2));
+  --t-line:    calc(15px * min(var(--as), 1.75));
+  --t-hero:    calc(48px * min(var(--as), 2.2));
+  --t-mid:     calc(18px * min(var(--as), 1.9));
+  --t-small:   calc(13px * min(var(--as), 1.9));
+}
+.surface button { font: inherit; color: inherit; background: none; border: 0; }
 
- /* edge state overlays inside stage */
- .edge-layer{
-  position:absolute;
-  inset:44px 0 0 0;
-  z-index:420;
-  display:none;
-  padding:16px;
-  overflow-y:auto;
-  scrollbar-width:none;
-  background: linear-gradient(180deg, rgba(10,14,23,0.04), transparent);
- }
- .edge-layer::-webkit-scrollbar{ display:none; }
- .edge-layer.active{ display:grid; place-items:start center; align-content:start; gap:14px; animation: rise-in var(--dur-base) var(--ease-prism) both; }
- .edge-card{
-  width:100%;
-  max-width:420px;
-  background: var(--mat-raised);
-  backdrop-filter: var(--blur-heavy);
-  -webkit-backdrop-filter: var(--blur-heavy);
-  outline:1px solid var(--stroke-glass);
-  border-radius:var(--r-lg);
-  padding:22px 20px 18px 20px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  text-align:center;
-  gap:12px;
-  box-shadow:0 18px 44px rgba(0,0,0,0.36);
- }
- .edge-illus{
-  width:64px;height:64px;border-radius:18px;
-  display:grid;place-items:center;
-  background:rgba(255,255,255,0.06);
-  outline:1px solid rgba(255,255,255,0.08);
- }
- .edge-title{ font-size:18px;font-weight:700;letter-spacing:-0.01em;color:var(--ink-100) }
- .edge-body{ font-size:13px;font-weight:500;color:var(--ink-60);line-height:1.45;max-width:320px }
- .edge-actions{ display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px }
+/* -------------------------------------------------------------- the world ---
+   The lab paints a passthrough gradient. Real light has structure, and glass
+   is only legible as glass when structure survives it, so this layer adds the
+   things you actually look through a lens at: a horizon, lit windows, a lamp,
+   a post, a silhouette. It is scenery, never UI. */
+.scene { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.scene {
+  background:
+    radial-gradient(80px 80px at 20.5% 35%, rgba(255, 226, 170, 0.34), transparent 70%),
+    radial-gradient(150px 120px at 71% 21%, rgba(255, 222, 168, 0.20), transparent 72%);
+}
+.scene i { position: absolute; display: block; }
+.sc-horizon { left: 0; right: 0; top: 57%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.20) 16%, rgba(255,255,255,0.10) 72%, transparent); }
+.sc-kerb { left: 0; right: 0; top: 74%; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.09) 30%, transparent); }
+.sc-post { left: 11.5%; top: 20%; bottom: 21%; width: 9px; border-radius: 2px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.14)); }
+.sc-lamp { left: 19%; top: 33.4%; width: 22px; height: 22px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,246,220,0.92), rgba(255,220,160,0.30) 46%, transparent 72%); }
+.sc-win { border-radius: 3px; filter: blur(2.5px);
+  background: linear-gradient(180deg, rgba(255,238,200,0.26), rgba(255,212,148,0.10)); }
+.sc-win.a { left: 66%; top: 15%; width: 52px; height: 21px; }
+.sc-win.b { left: 78.5%; top: 13%; width: 21px; height: 50px; }
+.sc-win.c { left: 60%; top: 29%; width: 25px; height: 21px; opacity: 0.62; }
+.sc-mass { left: -6%; bottom: -8%; width: 46%; height: 36%;
+  background: radial-gradient(64% 74% at 44% 100%, rgba(0,0,0,0.46), transparent 72%); }
+.sc-mass.r { left: auto; right: -8%; width: 36%; height: 26%;
+  background: radial-gradient(60% 70% at 60% 100%, rgba(0,0,0,0.34), transparent 72%); }
 
- /* loading skeletons */
- .sk-grid{ display:grid; gap:10px; width:100%; }
- .sk-row{ display:flex; gap:10px; align-items:center; }
- /* offline dim-world overlay uses design token */
- .offline-wrap{
-  position:absolute;inset:0;
-  display:grid;place-items:center;
-  padding:16px;
- }
- .offline-wrap .dim-world{ position:absolute;inset:0;background:rgba(4,7,11,0.52);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px); }
- .offline-wrap .edge-card{ position:relative; z-index:1; }
+/* world dimmer / blackout, painted above the passthrough, below the specimen */
+.veil {
+  position: absolute; inset: 0; z-index: 0; opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-prism);
+  pointer-events: none;
+}
+.surface[data-veil="dim"] .veil { opacity: 1; background: rgba(4, 7, 11, 0.46); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.surface[data-veil="off"] .veil { opacity: 1; background: rgba(6, 10, 16, 0.34); }
 
- /* ensure transitions use ease-prism */
- .btn, .chip, .toggle, .card, .edge-card, .type-card, .mat-card{
-  transition: transform var(--dur-base) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism), background var(--dur-fast) var(--ease-prism), outline-color var(--dur-fast) var(--ease-prism);
- }
- .toggle{ cursor:pointer; }
- .toggle:focus-visible{ outline:2.5px solid var(--stroke-focus); outline-offset:2px; }
+.eyebrow {
+  position: absolute; top: calc(20px * min(var(--as), 1.4)); left: 26px; z-index: 2;
+  font-size: var(--t-eyebrow); font-weight: 700;
+  letter-spacing: 0.20em; text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.30);
+}
 
- @media (prefers-reduced-motion: reduce){
-  *,*::before,*::after{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
- }
+.area { position: absolute; inset: 50px 46px 96px; z-index: 2; display: grid; place-items: center; }
+.stack {
+  grid-area: 1 / 1; width: 100%; max-width: 408px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: calc(18px * min(var(--as), 1.6));
+}
+.layers { position: relative; width: 100%; min-height: 240px; display: grid; }
+
+/* -------------------------------------------------------------- materials ---
+   One physical model for every surface: a tinted absorber over the world plus
+   a diffuser. --fill-a/--fill-b is how much light the tint absorbs, --diffuse
+   is how far it scatters what is left. Density runs one way only —
+   Glass passes the most world, then Raised, then Sheet, then Sunken — and the
+   ladder is verified by sampling pixels through each surface, not by eye. */
+.plate, .riser, .well, .sheetm, .ftile {
+  background: linear-gradient(158deg,
+    rgba(14, 22, 35, var(--fill-a)) 0%, rgba(6, 11, 18, var(--fill-b)) 100%);
+  backdrop-filter: saturate(var(--sat)) blur(var(--diffuse));
+  -webkit-backdrop-filter: saturate(var(--sat)) blur(var(--diffuse));
+}
+.plate {
+  --fill-a: 0.10; --fill-b: 0.18; --diffuse: 5px; --sat: 1.16;
+  grid-area: 1 / 1; position: relative;
+  width: 100%; min-height: 240px;
+  display: grid; place-items: center;
+  padding: calc(22px * min(var(--as), 1.5)) calc(26px * min(var(--as), 1.3));
+  border-radius: var(--r-lg);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.34), 0 30px 64px -16px rgba(0, 0, 0, 0.6);
+  transition: opacity var(--dur-base) var(--ease-prism),
+              transform var(--dur-base) var(--ease-prism),
+              box-shadow var(--dur-fast) var(--ease-prism);
+}
+/* specular rim: a bright hairline riding the top edge */
+.plate::before, .riser::before, .sheetm::before {
+  content: ""; position: absolute; left: 18px; right: 18px; top: 0; height: 1px;
+  border-radius: 1px; pointer-events: none; z-index: 1;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55) 20%, rgba(255,255,255,0.66) 58%, transparent);
+}
+/* sheen: static top-light, plus the travelling highlight that fires on gaze */
+.plate::after, .riser::after, .sheetm::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background:
+    linear-gradient(112deg, transparent 32%, rgba(255,255,255,0.14) 46%, transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0.10), transparent 18%),
+    radial-gradient(120% 78% at 16% -12%, rgba(150, 200, 255, 0.12), transparent 62%);
+  background-size: 260% 100%, auto, auto;
+  background-position: 165% 0, 0 0, 0 0;
+  background-repeat: no-repeat;
+}
+.stage .plate.gaze-focus::after, .stage .plate:focus-visible::after,
+.stage .riser.gaze-focus::after, .stage .riser:focus-visible::after,
+.stage .sheetm.gaze-focus::after, .stage .sheetm:focus-visible::after {
+  animation: sheen 300ms var(--ease-prism) both;
+}
+@keyframes sheen {
+  from { background-position: 165% 0, 0 0, 0 0; }
+  to   { background-position: -65% 0, 0 0, 0 0; }
+}
+
+.plate.is-quiet { opacity: 0.4; transform: scale(0.985); }
+
+/* denied fallback: sensing off, so the tint is fixed and the world is held down */
+.surface[data-tint="fixed"] .plate,
+.surface[data-tint="fixed"] .riser,
+.surface[data-tint="fixed"] .well,
+.surface[data-tint="fixed"] .sheetm {
+  --fill-a: 0.46; --fill-b: 0.54; --diffuse: 10px; --sat: 1;
+}
+
+/* gaze focus keeps the material shadow and adds the ring + lift */
+.stage .plate.gaze-focus, .stage .plate:focus-visible,
+.stage .riser.gaze-focus, .stage .riser:focus-visible,
+.stage .sheetm.gaze-focus, .stage .sheetm:focus-visible {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.34), 0 34px 74px -16px rgba(0,0,0,0.66),
+              0 0 0 2.5px var(--stroke-focus), 0 0 34px rgba(86,184,255,0.34) !important;
+  transform: scale(1.014);
+}
+.stage .well.gaze-focus, .stage .well:focus-visible {
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.7), inset 0 -1px 0 rgba(255,255,255,0.06),
+              0 0 0 2.5px var(--stroke-focus), 0 0 30px rgba(86,184,255,0.3) !important;
+}
+.plate:focus-visible, .riser:focus-visible, .well:focus-visible,
+.sheetm:focus-visible, .ftile:focus-visible { outline: none; }
+
+/* ---------------------------------------------------------------- raised ---
+   Lifted off the glass, so it absorbs more than the plate under it: the world
+   behind it is dimmer and softer than the world behind the plate. */
+.riser {
+  grid-area: 1 / 1; place-self: center;
+  width: 74%; min-height: calc(116px * min(var(--as), 1.5));
+  display: grid; place-items: center;
+  border-radius: var(--r-md);
+  --fill-a: 0.34; --fill-b: 0.44; --diffuse: 11px; --sat: 1.3;
+  border: 1px solid rgba(255, 255, 255, 0.19);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.36), 0 36px 72px -18px rgba(0, 0, 0, 0.7);
+  transform: translateY(-4px);
+  transition: transform var(--dur-base) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
+}
+
+/* ---------------------------------------------------------------- sunken ---
+   The deepest absorber in the language and the only surface with no rim light:
+   the world survives as a trace of its own brightness and nothing more. */
+.well {
+  grid-area: 1 / 1; place-self: center;
+  width: 78%; min-height: calc(112px * min(var(--as), 1.5));
+  display: grid; place-items: center;
+  border-radius: var(--r-md);
+  --fill-a: 0.86; --fill-b: 0.90; --diffuse: 16px; --sat: 0.45;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.7),
+              inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+              inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+  transition: box-shadow var(--dur-fast) var(--ease-prism);
+}
+
+/* ----------------------------------------------------------------- sheet ---
+   The densest surface, for reading: the world survives only as a wash of its
+   own colour, never as its shapes. */
+.sheetm {
+  grid-area: 1 / 1; place-self: stretch;
+  display: grid; place-items: center;
+  border-radius: var(--r-lg);
+  --fill-a: 0.60; --fill-b: 0.70; --diffuse: 26px; --sat: 0.85;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.38), 0 40px 80px -20px rgba(0, 0, 0, 0.72);
+  transition: transform var(--dur-base) var(--ease-prism), box-shadow var(--dur-fast) var(--ease-prism);
+}
+.riser, .well, .sheetm { position: relative; }
+
+/* the specimen names itself, at a size you can read while walking */
+.word {
+  position: relative; z-index: 2;
+  font-size: var(--t-word); font-weight: 660; letter-spacing: -0.03em;
+  line-height: 1; color: var(--ink-100);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
+}
+
+/* ------------------------------------------------------------------ type --- */
+.comp { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: calc(4px * var(--as)); text-align: center; }
+.t-hero {
+  font-size: var(--t-hero); font-weight: 700; letter-spacing: -0.028em; line-height: 1;
+  font-variant-numeric: tabular-nums; color: var(--ink-100);
+  text-shadow: 0 1px 14px rgba(0, 0, 0, 0.45);
+}
+.t-mid  { font-size: var(--t-mid); font-weight: 600; letter-spacing: -0.01em; color: rgba(255,255,255,0.9); }
+.t-small{ font-size: var(--t-small); font-weight: 500; color: var(--ink-60); }
+
+/* -------------------------------------------------------------- controls --- */
+.ctl {
+  --cs: min(var(--as), 1.75);            /* controls grow with the text size */
+  position: relative; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  gap: calc(14px * min(var(--as), 1.4)); flex-wrap: wrap;
+}
+.ctl .btn {
+  min-height: calc(44px * var(--cs));
+  padding: 0 calc(22px * var(--cs));
+  font-size: calc(14px * var(--cs));
+}
+.ctl .chip {
+  height: calc(30px * var(--cs)); padding: 0 calc(12px * var(--cs));
+  font-size: max(10.5px, calc(11px * var(--cs)));
+}
+.ctl .toggle {
+  appearance: none; -webkit-appearance: none; border: 0; cursor: pointer;
+  width: calc(52px * var(--cs)); height: calc(32px * var(--cs));
+}
+.ctl .toggle::after {
+  top: calc(3px * var(--cs)); left: calc(3px * var(--cs));
+  width: calc(26px * var(--cs)); height: calc(26px * var(--cs));
+}
+.ctl .toggle[aria-checked="true"]::after { transform: translateX(calc(20px * var(--cs))); }
+/* at large text the row stops being a row: one target per line, full width */
+.surface[data-big="1"] .ctl { flex-direction: column; gap: calc(10px * var(--cs)); }
+.surface[data-big="1"] .ctl .btn { width: 100%; }
+.ctl-note { position: relative; z-index: 2; margin-top: calc(14px * var(--as)); font-size: var(--t-small); color: rgba(255,255,255,0.46); text-align: center; }
+
+/* ----------------------------------------------------------------- focus --- */
+.ftile {
+  grid-area: 1 / 1; place-self: center; position: relative;
+  width: calc(228px * min(var(--as), 1.4)); min-height: calc(96px * min(var(--as), 1.5));
+  display: grid; place-items: center;
+  border-radius: 24px;
+  --fill-a: 0.34; --fill-b: 0.44; --diffuse: 11px; --sat: 1.3;
+  border: 1px solid rgba(134, 198, 255, 0.55);
+  box-shadow: 0 3px 9px rgba(0,0,0,0.36), 0 0 0 2.5px rgba(86,184,255,0.85), 0 0 36px rgba(86,184,255,0.38);
+  font-size: var(--t-mid); font-weight: 600; color: var(--ink-100);
+  cursor: pointer;
+}
+.ftile span { position: relative; z-index: 2; }
+.dwell-sweep { position: absolute; left: -9px; top: -9px; right: -9px; bottom: -9px; overflow: visible; }
+.dwell-sweep rect {
+  fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round;
+  stroke-dasharray: 100; stroke-dashoffset: 100;
+  animation: sweep 1900ms var(--ease-prism) infinite;
+}
+@keyframes sweep {
+  0%   { stroke-dashoffset: 100; opacity: 0.9; }
+  62%  { stroke-dashoffset: 0;   opacity: 0.9; }
+  84%  { stroke-dashoffset: 0;   opacity: 0; }
+  100% { stroke-dashoffset: 100; opacity: 0; }
+}
+
+/* --------------------------------------------------------------- caption --- */
+.cap { text-align: center; }
+.cap-line {
+  font-size: var(--t-line); font-weight: 500; line-height: 1.35;
+  letter-spacing: -0.006em; color: rgba(255, 255, 255, 0.58);
+}
+.surface[data-big="1"] .eyebrow { display: none; }
+
+/* ------------------------------------------------------------------ pips --- */
+.pips {
+  position: absolute; left: 0; right: 0; bottom: 20px; z-index: 2;
+  display: flex; justify-content: center; align-items: center; gap: 7px;
+}
+.pip {
+  width: 5px; height: 5px; border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  transition: width var(--dur-base) var(--ease-prism), background var(--dur-base) var(--ease-prism);
+}
+.pip.on { width: 17px; background: rgba(134, 198, 255, 0.8); }
+.pips[hidden] { display: none; }
+
+/* ------------------------------------------------------------ edge states --- */
+.edge-plate { --fill-a: 0.60; --fill-b: 0.70; --diffuse: 26px; --sat: 0.85; }
+.edge { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; gap: calc(9px * min(var(--as),1.5)); }
+.edge-glyph { width: 32px; height: 32px; opacity: 0.78; }
+.edge-title { font-size: var(--t-mid); font-weight: 600; letter-spacing: -0.012em; color: rgba(255,255,255,0.94); }
+.edge-line  { font-size: var(--t-small); line-height: 1.45; color: rgba(255,255,255,0.55); max-width: 27ch; }
+.edge-acts  { display: flex; align-items: center; gap: 10px; margin-top: calc(6px * var(--as)); flex-wrap: wrap; justify-content: center; }
+.edge-acts .btn { min-height: 40px; font-size: max(11px, calc(13px * var(--as))); padding: 0 var(--sp-4); }
+.bars { display: flex; flex-direction: column; gap: 10px; width: 76%; }
+.bars i { display: block; height: 12px; border-radius: 6px; }
+.bars i:nth-child(1) { width: 58%; height: 20px; }
+.bars i:nth-child(3) { width: 74%; }
+
+/* the lab's reduced-motion switch must behave exactly like the OS setting */
+html[data-reduced-motion] *, html[data-reduced-motion] *::before, html[data-reduced-motion] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+html[data-reduced-motion] .dwell-sweep rect { stroke-dashoffset: 0; opacity: 0.9; }
+@media (prefers-reduced-motion: reduce) {
+  .dwell-sweep rect { stroke-dashoffset: 0; opacity: 0.9; }
+}
+
+/* ------------------------------------------------------- lab rail readout --- */
+.lab-readout dl { display: flex; flex-direction: column; gap: 6px; }
+.lab-readout .row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.lab-readout dt { font-size: 11px; font-weight: 600; color: #59627a; white-space: nowrap; }
+.lab-readout dd { font-size: 11px; font-weight: 600; color: #9fb0c9; text-align: right;
+                  font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
-<div class="device">
- <div class="stage-shell">
-  <!-- LAB BAR OUTSIDE STAGE - absolutely positioned above stage, not inside .stage -->
-  <div class="lab-bar" role="toolbar" aria-label="Edge state controls — outside stage">
-   <span class="lab-label" aria-hidden="true">Lab</span>
-   <button class="chip active" data-focusable tabindex="0" aria-label="Show specimen view — current" data-variant="specimen" aria-pressed="true">Specimen</button>
-   <button class="chip" data-focusable tabindex="0" aria-label="Show loading state" data-variant="loading" aria-pressed="false">Loading</button>
-   <button class="chip" data-focusable tabindex="0" aria-label="Show empty state" data-variant="empty" aria-pressed="false">Empty</button>
-   <button class="chip" data-focusable tabindex="0" aria-label="Show error state" data-variant="error" aria-pressed="false">Error</button>
-   <button class="chip" data-focusable tabindex="0" aria-label="Show offline state" data-variant="offline" aria-pressed="false">Offline</button>
-   <button class="chip" data-focusable tabindex="0" aria-label="Show permission denied state" data-variant="permission" aria-pressed="false">No access</button>
-  </div>
-  <div class="stage" data-stage></div>
- </div>
-</div>
+  <div class="device"><div class="stage-shell"><div class="stage" data-stage></div></div></div>
+
 <script type="module">
 import { createOS } from '/os/shared/core.js';
-const os = createOS(document.querySelector('[data-stage]'));
-const s = os.stage;
-s.appendChild(os.statusbar());
+import { mountLab, mountWorld } from '/os/shared/lab.js';
 
-const main = document.createElement('main');
-main.className = 'spec stage-scroll';
-main.id = 'specimen-view';
-main.innerHTML = `
- <section><h2>Materials — distinct scrims</h2>
-  <div class="row">
-   <div class="mat-card mat-glass caption" aria-label="glass material card — translucent scrim with 22px blur" data-focusable tabindex="0" role="button">
-    <span>glass</span><span class="sub">22px · 0.78</span>
-   </div>
-   <div class="mat-card mat-raised caption" aria-label="raised material card — opaque elevated with 34px heavy blur" data-focusable tabindex="0" role="button">
-    <span>raised</span><span class="sub">34px · 0.88</span>
-   </div>
-   <div class="mat-card mat-sunken caption" aria-label="sunken material card — dim recessed 10px blur" data-focusable tabindex="0" role="button">
-    <span>sunken</span><span class="sub">10px · 0.66</span>
-   </div>
-  </div>
-  <p class="caption" style="margin-top:8px;color:var(--ink-40)">glass uses var(--mat-glass)+var(--blur-glass) · raised var(--mat-raised)+var(--blur-heavy) · sunken var(--mat-sunken)+10px</p>
- </section>
- <section><h2>Type scale — max 3 per card</h2>
-  <div class="type-card" data-focusable tabindex="0" aria-label="Type card one — hero, display, callout — 3 sizes">
-   <div class="type-hero ">9:41</div>
-   <div class="type-display">Spatial, glanceable</div>
-   <div class="type-callout">Callout 17 semibold</div>
-  </div>
-  <p class="caption" style="margin-top:6px;padding-left:2px;color:var(--ink-40)">hero 44 · display 30 · callout 17 — max 3 sizes per card</p>
-  <div class="type-card" style="margin-top:10px" data-focusable tabindex="0" aria-label="Type card two — title, body, caption — 3 sizes">
-   <div class="type-title">Section title 22</div>
-   <div class="type-body">Body 14 regular secondary — readable at glance, where needed.</div>
-   <div class="type-caption">Caption 11 · uppercase · 0.42 ink</div>
-  </div>
-  <p class="caption" style="margin-top:6px;padding-left:2px;color:var(--ink-40)">title 22 · body 14 · caption 11 — max 3 sizes per card</p>
- </section>
- <section><h2>Accent & states</h2>
-  <div class="swatches">
-   <div class="swatch" style="background:var(--accent)" title="accent"></div>
-   <div class="swatch" style="background:var(--ok)" title="ok"></div>
-   <div class="swatch" style="background:var(--warn)" title="warn"></div>
-   <div class="swatch" style="background:var(--danger)" title="danger"></div>
-   <div class="swatch" style="background:rgba(255,255,255,.14)" title="glass stroke"></div>
-   <div class="swatch" style="background:var(--accent-wash)" title="wash"></div>
-  </div></section>
- <section><h2>Controls</h2>
-  <div class="row">
-   <button class="btn primary" data-focusable aria-label="Primary action">Primary</button>
-   <button class="btn" data-focusable aria-label="Default action">Default</button>
-   <button class="btn ghost" data-focusable aria-label="Ghost action">Ghost</button>
-   <button class="btn destructive" data-focusable aria-label="Delete item">Delete</button>
-   <span class="chip" data-focusable tabindex="0" role="button" aria-label="Example chip">chip</span>
-   <div class="toggle" role="switch" aria-checked="true" aria-label="example switch on" data-focusable tabindex="0"></div>
-   <div class="toggle" role="switch" aria-checked="false" aria-label="example switch off" data-focusable tabindex="0"></div>
-  </div></section>
- <section><h2>Motion tokens</h2>
-  <p class="caption">fast 220ms · base 260ms · slow 300ms · ease cubic-bezier(.32,.72,0,1) — uses var(--ease-prism) everywhere</p>
-  <div class="row" style="margin-top:12px">
-   <button class="btn" id="toastDemo" data-focusable aria-label="Show banner">Show banner</button>
-  </div></section>`;
+const stage = document.querySelector('[data-stage]');
+const os = createOS(stage, { scale: 1 });
 
-s.appendChild(main);
+/* scenery behind the lens: what the material has to let through */
+const scene = document.createElement('div');
+scene.className = 'scene';
+scene.setAttribute('aria-hidden', 'true');
+scene.innerHTML =
+  '<i class="sc-horizon"></i><i class="sc-kerb"></i><i class="sc-post"></i>' +
+  '<i class="sc-lamp"></i><i class="sc-win a"></i><i class="sc-win b"></i>' +
+  '<i class="sc-win c"></i><i class="sc-mass"></i><i class="sc-mass r"></i>';
+stage.insertBefore(scene, os.cursor);
 
-// ----- Edge state layers (inside stage, absolute inset 44 0 0 0) -----
-function createEdgeLayer(id, label, html){
- const el=document.createElement('section');
- el.className='edge-layer';
- el.id=id;
- el.setAttribute('aria-label', label);
- el.setAttribute('role','region');
- el.innerHTML=html;
- return el;
+/* ---------------------------------------------------------------- surface -- */
+const surface = document.createElement('div');
+surface.className = 'surface';
+surface.innerHTML =
+  '<div class="veil"></div>' +
+  '<div class="eyebrow">Foundation</div>' +
+  '<div class="area" data-area></div>' +
+  '<div class="pips" data-pips></div>';
+stage.insertBefore(surface, os.cursor);
+const area = surface.querySelector('[data-area]');
+const pips = surface.querySelector('[data-pips]');
+
+const el = (tag, cls, html) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (html != null) n.innerHTML = html;
+  return n;
+};
+const reduced = () =>
+  matchMedia('(prefers-reduced-motion: reduce)').matches ||
+  document.documentElement.hasAttribute('data-reduced-motion');
+
+let lastAct = 0;
+function act(fn) {
+  return (e) => {
+    e?.stopPropagation?.();
+    const now = performance.now();
+    if (now - lastAct < 140) return;      /* gaze click + key press must not double-fire */
+    lastAct = now;
+    fn();
+  };
 }
+function focal(node, label, fn) {
+  node.setAttribute('data-focusable', '');
+  node.setAttribute('aria-label', label);
+  node.addEventListener('click', act(fn));
+  return node;
+}
+const word = (t) => el('span', 'word', t);
 
-// Loading — skeletons with shimmer
-const loadingLayer = createEdgeLayer('state-loading','Loading state',`
- <div style="width:100%;max-width:420px;display:grid;gap:12px">
-  <div class="edge-card" style="padding:18px;align-items:stretch;text-align:left;gap:14px">
-   <div style="display:flex;align-items:center;gap:12px">
-    <div class="skeleton" style="width:48px;height:48px;border-radius:50%;flex:none"></div>
-    <div style="flex:1;display:grid;gap:8px">
-     <div class="skeleton" style="height:14px;width:72%;border-radius:8px"></div>
-     <div class="skeleton" style="height:12px;width:92%;border-radius:8px"></div>
-    </div>
-   </div>
-   <div style="display:grid;gap:8px">
-    <div class="skeleton" style="height:12px;border-radius:8px"></div>
-    <div class="skeleton" style="height:12px;width:84%;border-radius:8px"></div>
-    <div class="skeleton" style="height:12px;width:68%;border-radius:8px"></div>
-   </div>
-   <div style="display:flex;gap:8px">
-    <div class="skeleton" style="height:36px;flex:1;border-radius:999px"></div>
-    <div class="skeleton" style="height:36px;flex:1;border-radius:999px"></div>
-   </div>
-   <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-top:2px">
-    <span class="skeleton" style="width:16px;height:16px;border-radius:50%"></span>
-    <span class="caption">Loading — shimmer 1.2s · skeleton · var(--ease-prism)</span>
-   </div>
-  </div>
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-   <div class="skeleton" style="height:72px;border-radius:16px"></div>
-   <div class="skeleton" style="height:72px;border-radius:16px"></div>
-   <div class="skeleton" style="height:72px;border-radius:16px"></div>
-  </div>
-  <div class="card" style="padding:12px 14px;display:flex;align-items:center;gap:10px">
-   <span class="skeleton" style="width:28px;height:28px;border-radius:10px;flex:none"></span>
-   <span class="caption" style="color:var(--ink-60)">Skeleton pattern uses .skeleton + shimmer — no spinner</span>
-  </div>
- </div>
-`);
-s.appendChild(loadingLayer);
-
-// Empty — humane illustration + retry
-const emptyLayer = createEdgeLayer('state-empty','Empty state',`
- <div class="edge-card">
-  <div class="edge-illus" aria-hidden="true">
-   <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="5.5" width="17" height="13" rx="2.8" stroke="white" stroke-opacity="0.9" stroke-width="1.6"/><path d="M7 14.5l3-3.2 2.6 2.2 2.2-1.6 4 3.2" stroke="white" stroke-opacity="0.78" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.6" cy="9" r="1.4" stroke="white" stroke-opacity="0.86" stroke-width="1.4"/><path d="M12 16.5v-2" stroke="white" stroke-opacity="0.5" stroke-width="1.4" stroke-linecap="round"/></svg>
-  </div>
-  <div class="edge-title">Nothing here yet</div>
-  <div class="edge-body">This space is ready for your first capture. Create something and it will appear here, beautifully presented on glass.</div>
-  <div class="edge-actions">
-   <button class="btn primary" data-focusable aria-label="Create first item" data-action="retry-empty">Create first</button>
-   <button class="btn ghost" data-focusable aria-label="Learn more about empty state">Learn more</button>
-  </div>
-  <p class="caption" style="margin-top:2px;color:var(--ink-40)">Humane illustration · humane copy · clear retry</p>
- </div>
- <div class="card" style="width:100%;max-width:420px;padding:12px 14px;display:flex;align-items:center;gap:10px">
-  <span class="dot ok" aria-hidden="true"></span><span class="caption">Empty uses .card · not default browser empty</span>
- </div>
-`);
-s.appendChild(emptyLayer);
-
-// Error — red wash + retry, uses .banner pattern
-const errorLayer = createEdgeLayer('state-error','Error state',`
- <div class="edge-card" style="background: linear-gradient(180deg, rgba(255,93,93,0.14), rgba(255,93,93,0.06)); backdrop-filter:var(--blur-glass); -webkit-backdrop-filter:var(--blur-glass); outline-color:rgba(255,93,93,0.28); box-shadow:0 18px 44px rgba(0,0,0,0.36), 0 0 0 1px rgba(255,93,93,0.10) inset">
-  <div class="edge-illus" style="background:rgba(255,93,93,0.10);outline-color:rgba(255,93,93,0.18)" aria-hidden="true">
-   <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 3.5L21.5 19H2.5L12 3.5z" stroke="#ff8a8a" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 9.5v4.2" stroke="#ffb3b3" stroke-width="1.9" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.25" fill="#ffb3b3"/></svg>
-  </div>
-  <div class="edge-title">Can’t load content</div>
-  <div class="edge-body">Prism couldn’t reach your space. Check connection and try again — your work is safe and recoverable.</div>
-  <div class="banner" style="position:relative;left:auto;right:auto;top:auto;z-index:auto;animation:none;background:rgba(255,93,93,0.10);outline:1px solid rgba(255,93,93,0.18);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);width:100%;margin-top:2px" role="alert">
-   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="#ff8a8a" stroke-width="1.5"/><path d="M12 8v5" stroke="#ffb3b3" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="15.8" r="1.1" fill="#ffb3b3"/></svg>
-   <span class="caption" style="color:#ffb3b3;font-weight:600">Error PR-FOUND-503 · 9:41 AM — banner pattern .banner</span>
-  </div>
-  <div class="edge-actions">
-   <button class="btn primary" data-focusable aria-label="Retry loading" data-action="retry-error">Retry</button>
-   <button class="btn ghost" data-focusable aria-label="Dismiss error and return to specimen">Dismiss</button>
-  </div>
- </div>
-`);
-s.appendChild(errorLayer);
-
-// Offline — dim-world scrim + retry
-const offlineLayer = createEdgeLayer('state-offline','Offline state',`
- <div class="offline-wrap">
-  <div class="dim-world" aria-hidden="true"></div>
-  <div class="edge-card">
-   <div class="edge-illus" aria-hidden="true">
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M3.5 9.5a9 9 0 0117 0" stroke="white" stroke-opacity="0.9" stroke-width="1.6" stroke-linecap="round"/><path d="M6 12.5a6 6 0 0112 0" stroke="white" stroke-opacity="0.8" stroke-width="1.6" stroke-linecap="round"/><path d="M8.8 15.5a2.8 2.8 0 016.4 0" stroke="white" stroke-opacity="0.78" stroke-width="1.6" stroke-linecap="round"/><path d="M2 2l20 20" stroke="#ffc247" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17.8" r="1.25" fill="white"/></svg>
-   </div>
-   <div class="edge-title">You’re offline</div>
-   <div class="edge-body">The world behind is dimmed with .dim-world scrim. Home needs connection to sync — launcher still works.</div>
-   <div style="width:100%;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:10px 12px">
-    <span class="dot bad" aria-hidden="true"></span><span style="font-size:13px;font-weight:600;color:var(--ink-80)">No network · scrim 0.52 + 2px blur</span><span class="caption" style="margin-left:auto">dim-world</span>
-   </div>
-   <div class="edge-actions">
-    <button class="btn primary" data-focusable aria-label="Retry connection">Retry</button>
-    <button class="btn" data-focusable aria-label="Continue offline">Use offline</button>
-   </div>
-   <p class="caption">Offline uses .dim-world + .card · recoverable, no dead end</p>
-  </div>
- </div>
-`);
-s.appendChild(offlineLayer);
-
-// Permission denied — lock icon + allow CTA
-const permLayer = createEdgeLayer('state-permission','Permission denied state',`
- <div class="edge-card">
-  <div class="edge-illus" aria-hidden="true">
-   <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="5" y="9.5" width="14" height="10" rx="2.4" stroke="white" stroke-opacity="0.9" stroke-width="1.6"/><path d="M8.5 9.5V7.8a3.5 3.5 0 017 0v1.7" stroke="white" stroke-width="1.5"/><circle cx="12" cy="14.5" r="1.35" fill="white"/><path d="M12 15.85v1.6" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
-  </div>
-  <div class="edge-title">Permission needed</div>
-  <div class="edge-body">Prism needs access to captures and location to show this content. You can allow access or keep using the foundation without it.</div>
-  <div class="edge-actions">
-   <button class="btn primary" data-focusable aria-label="Allow access to captures" data-action="allow">Allow access</button>
-   <button class="btn ghost" data-focusable aria-label="Not now, dismiss permission">Not now</button>
-  </div>
-  <p class="caption" style="color:var(--ink-40)">Settings → Privacy → Prism · Captures & Location</p>
-  <div style="width:100%;background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px">
-   <span class="dot warn" aria-hidden="true"></span><span style="font-size:12px;font-weight:600;color:var(--ink-80)">Captures blocked</span><button class="chip" data-focusable aria-label="Open Settings from permission card" style="margin-left:auto;height:28px">Open Settings</button>
-  </div>
- </div>
-`);
-s.appendChild(permLayer);
-
-// ----- control logic -----
-const labBar = document.querySelector('.lab-bar');
-const variantChips = [...labBar.querySelectorAll('[data-variant]')];
-const layers = {
- specimen: main,
- loading: loadingLayer,
- empty: emptyLayer,
- error: errorLayer,
- offline: offlineLayer,
- permission: permLayer
+/* ------------------------------------------------------------- specimens --- */
+const plate = (opts = {}) => {
+  const p = el(opts.tag || 'div', 'plate' + (opts.quiet ? ' is-quiet' : '') + (opts.edge ? ' edge-plate' : ''));
+  if (opts.body) p.appendChild(opts.body);
+  return p;
 };
 
-function setVariant(v){
- // update chips
- variantChips.forEach(c=>{
-  const isActive = c.dataset.variant===v;
-  c.classList.toggle('active', isActive);
-  c.setAttribute('aria-pressed', String(isActive));
-  if(isActive) c.setAttribute('aria-label', c.textContent.trim()+' — current');
-  else c.setAttribute('aria-label', 'Show '+c.textContent.trim()+' state');
- });
- // toggle layers: specimen is main, others are edge-layers
- Object.entries(layers).forEach(([key,el])=>{
-  if(key==='specimen'){
-   el.style.display = (v==='specimen') ? '' : 'none';
-   el.setAttribute('aria-hidden', v==='specimen' ? 'false':'true');
-  } else {
-   el.classList.toggle('active', key===v);
-   el.style.display = (key===v) ? 'grid' : 'none';
-   el.setAttribute('aria-hidden', key===v ? 'false':'true');
-  }
- });
- // scroll reset
- if(v==='specimen') main.scrollTo({top:0, behavior:'smooth'});
- // banner feedback for delight? subtle
- if(v!=='specimen'){
-  // gentle banner to confirm variant—not required but shows dependability
-  // use neutral banner, timeout short
- }
- window.__foundationVariant = v;
+let ticker = null;
+function departure() {
+  const c = el('div', 'comp');
+  const hero = el('div', 't-hero', '11:58');
+  c.append(hero, el('div', 't-mid', 'Ferry to Sausalito'), el('div', 't-small', 'Pier 41 &middot; Gate 2'));
+  let left = 718;
+  clearInterval(ticker);
+  ticker = setInterval(() => {
+    if (!hero.isConnected) { clearInterval(ticker); return; }
+    left = left > 0 ? left - 1 : 0;
+    hero.textContent = `${String(Math.floor(left / 60)).padStart(2, '0')}:${String(left % 60).padStart(2, '0')}`;
+  }, 1000);
+  return c;
 }
-window.__setFoundationVariant = setVariant;
-variantChips.forEach(chip=>{
- chip.addEventListener('click', ()=> setVariant(chip.dataset.variant));
- chip.addEventListener('keydown', (e)=>{
-  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); chip.click(); }
- });
+
+function controlRow() {
+  const wrap = el('div');
+  const row = el('div', 'ctl');
+  const go = el('button', 'btn primary');
+  go.type = 'button'; go.textContent = 'Board pass';
+  focal(go, 'Open your boarding pass', () => note.textContent = 'Boarding pass ready');
+  const chip = el('span', 'chip', 'Gate 2');
+  const sw = el('button', 'toggle');
+  sw.type = 'button';
+  sw.setAttribute('role', 'switch');
+  sw.setAttribute('aria-checked', 'true');
+  focal(sw, 'Departure alerts', () => {
+    const on = sw.getAttribute('aria-checked') !== 'true';
+    sw.setAttribute('aria-checked', String(on));
+    note.textContent = on ? 'Alerts on' : 'Alerts off';
+  });
+  row.append(go, chip, sw);
+  const note = el('div', 'ctl-note', 'Alerts on');
+  wrap.append(row, note);
+  return wrap;
+}
+
+/* The dwell sweep traces the tile itself: the stroked path is measured from the
+   tile's own box, so its corners stay concentric with the tile's corners at any
+   text size. A viewBox that does not match the box scales the arcs unevenly. */
+const SWEEP_GAP = 9, SWEEP_W = 2.5, TILE_R = 24;
+let sweepObserver = null;
+function focusTile() {
+  const t = el('button', 'ftile');
+  t.type = 'button';
+  t.innerHTML =
+    '<svg class="dwell-sweep" aria-hidden="true"><rect pathLength="100"></rect></svg>' +
+    '<span>Hold to press</span>';
+  const svg = t.querySelector('svg');
+  const rect = svg.querySelector('rect');
+  const fit = () => {
+    const bw = t.offsetWidth, bh = t.offsetHeight;
+    if (!bw || !bh) return;
+    const w = bw + SWEEP_GAP * 2, h = bh + SWEEP_GAP * 2;
+    svg.setAttribute('viewBox', `0 0 ${w.toFixed(2)} ${h.toFixed(2)}`);
+    rect.setAttribute('x', SWEEP_W / 2);
+    rect.setAttribute('y', SWEEP_W / 2);
+    rect.setAttribute('width', (w - SWEEP_W).toFixed(2));
+    rect.setAttribute('height', (h - SWEEP_W).toFixed(2));
+    rect.setAttribute('rx', TILE_R + SWEEP_GAP - SWEEP_W / 2);
+  };
+  sweepObserver?.disconnect();
+  sweepObserver = new ResizeObserver(fit);
+  sweepObserver.observe(t);
+  requestAnimationFrame(fit);
+  return focal(t, 'Hold to press', () => goStep(0, -1));
+}
+
+const STEPS = [
+  {
+    name: 'Glass',
+    line: 'The material most surfaces are made of.',
+    build() {
+      const p = plate({ body: word('Glass') });
+      return { node: p, focal: focal(p, 'Glass. Show the next material', () => goStep(1, 1)) };
+    },
+    tech: [['Fill', '0.30 → 0.46'], ['Behind', 'blur 13, saturate 1.9, 56% light'],
+           ['Rim', '1px specular, top edge'], ['Shadow', '2px contact + 30px ambient']],
+  },
+  {
+    name: 'Raised',
+    line: 'For anything that sits on top of glass.',
+    build() {
+      const p = plate({ quiet: true });
+      const r = el('button', 'riser'); r.type = 'button';
+      r.appendChild(word('Raised'));
+      focal(r, 'Raised. Show the next material', () => goStep(2, 1));
+      return { node: [p, r], focal: r };
+    },
+    tech: [['Fill', '0.40 → 0.56, lighter tint'], ['Behind', 'blur 30, saturate 2.0, 74% light'],
+           ['Rim', '1px at 0.66 alpha'], ['Shadow', '3px contact + 36px ambient']],
+  },
+  {
+    name: 'Sunken',
+    line: 'For wells that hold content inside a surface.',
+    build() {
+      const p = plate({ quiet: true });
+      const w = el('button', 'well'); w.type = 'button';
+      w.appendChild(word('Sunken'));
+      focal(w, 'Sunken. Show the next material', () => goStep(3, 1));
+      return { node: [p, w], focal: w };
+    },
+    tech: [['Fill', '0.42 flat'], ['Behind', 'blur 4, saturate 0.7, 34% light'],
+           ['Depth', 'inset 0 2px 10px'], ['Shadow', 'none — it is a hole']],
+  },
+  {
+    name: 'Sheet',
+    line: 'For reading. The world stays as colour, not as shapes.',
+    build() {
+      const p = el('button', 'sheetm'); p.type = 'button';
+      p.appendChild(word('Sheet'));
+      focal(p, 'Sheet. Show the next material', () => goStep(4, 1));
+      return { node: p, focal: p };
+    },
+    tech: [['Fill', '0.60 → 0.72'], ['Behind', 'blur 44, saturate 1.25, 50% light'],
+           ['Use', 'long text, one at a time'], ['Shadow', '4px contact + 40px ambient']],
+  },
+  {
+    name: 'Type',
+    line: 'Three sizes, one voice. Numbers hold their place.',
+    build() {
+      const p = plate({ body: departure() });
+      return { node: p, focal: focal(p, 'Type. Show the next specimen', () => goStep(5, 1)) };
+    },
+    tech: [['Sizes', '48 / 18 / 13 px'], ['Weights', '700 / 600 / 500'],
+           ['Numerals', 'fixed width, live'], ['Scale', 'follows the text size slider']],
+  },
+  {
+    name: 'Controls',
+    line: 'One button, one chip, one switch — the whole family.',
+    build() {
+      const p = plate({ body: controlRow() });
+      return { node: p, focal: p };
+    },
+    tech: [['Target', '44px minimum'], ['Radius', 'pill, 999px'],
+           ['Focus', '2.5px accent ring'], ['Switch', '260ms travel']],
+  },
+  {
+    name: 'Focus',
+    line: 'Where you look is lit. Hold for a moment to press.',
+    build() {
+      const p = plate({ quiet: true });
+      const t = focusTile();
+      return { node: [p, t], focal: t };
+    },
+    tech: [['Ring', '2.5px accent'], ['Halo', '36px bloom at 0.38'],
+           ['Dwell', '350ms to activate'], ['Sweep', 'traces the tile edge']],
+  },
+];
+
+/* ----------------------------------------------------------- edge states --- */
+const GLYPH = {
+  empty: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.72)" stroke-width="1.4"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" stroke-dasharray="3 3.4"/></svg>',
+  error: '<svg viewBox="0 0 24 24" fill="none" stroke="#ff8f8f" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 7.6v5"/><path d="M12 16.1h.01"/></svg>',
+  offline: '<svg viewBox="0 0 24 24" fill="none" stroke="#ffd27a" stroke-width="1.6" stroke-linecap="round"><path d="M2.6 8.6a15 15 0 0 1 18.8 0"/><path d="M5.9 12.3a10 10 0 0 1 12.2 0"/><path d="M9.1 15.9a5 5 0 0 1 5.8 0"/><circle cx="12" cy="19.4" r="0.9" fill="#ffd27a" stroke="none"/><path d="M3.4 3.4l17.2 17.2" stroke="#0a0f18" stroke-width="3.6"/><path d="M3.4 3.4l17.2 17.2"/></svg>',
+  denied: '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(134,198,255,.85)" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="10.4" width="14" height="9.2" rx="3"/><path d="M8.4 10.4V8a3.6 3.6 0 0 1 7.2 0"/></svg>',
+};
+
+function edgeCard({ glyph, title, line, actions, bars }) {
+  const box = el('div', 'edge');
+  if (bars) {
+    const b = el('div', 'bars', '<i class="skeleton"></i><i class="skeleton"></i><i class="skeleton"></i>');
+    box.appendChild(b);
+  } else if (glyph) {
+    box.appendChild(el('div', 'edge-glyph', GLYPH[glyph]));
+  }
+  box.appendChild(el('div', 'edge-title', title));
+  if (line) box.appendChild(el('div', 'edge-line', line));
+  if (actions?.length) {
+    const acts = el('div', 'edge-acts');
+    actions.forEach((a) => {
+      const b = el('button', 'btn ' + (a.kind || 'ghost'));
+      b.type = 'button'; b.textContent = a.label;
+      focal(b, a.label, a.run);
+      acts.appendChild(b);
+    });
+    box.appendChild(acts);
+  }
+  return plate({ body: box, edge: true });
+}
+
+const EDGES = {
+  loading: {
+    tech: [['State', 'waiting on the sample'], ['Way out', 'Cancel, or press back']],
+    build: () => edgeCard({
+      bars: true, title: 'Preparing the sample',
+      line: 'Reading the material from the glasses.',
+      actions: [{ label: 'Cancel', run: () => setState('empty') }],
+    }),
+  },
+  empty: {
+    tech: [['State', 'nothing chosen yet'], ['Way out', 'Start with glass']],
+    build: () => edgeCard({
+      glyph: 'empty', title: 'No material chosen',
+      line: 'Pick one and you will see exactly what it is made of.',
+      actions: [{ label: 'Start with glass', kind: 'primary', run: () => { step = 0; setState('ready'); } }],
+    }),
+  },
+  error: {
+    tech: [['State', 'sample could not be read'], ['Way out', 'Try again, or skip it']],
+    build: () => edgeCard({
+      glyph: 'error', title: 'This sample did not load',
+      line: 'The material file could not be read.',
+      actions: [
+        { label: 'Try again', kind: 'primary', run: () => { setState('loading'); setTimeout(() => setState('ready'), 1100); } },
+        { label: 'Skip it', run: () => { step = Math.min(step + 1, STEPS.length - 1); setState('ready'); } },
+      ],
+    }),
+  },
+  offline: {
+    veil: 'dim',
+    tech: [['State', 'no link to the phone'], ['Way out', 'Use the saved set']],
+    build: () => edgeCard({
+      glyph: 'offline', title: 'You are offline',
+      line: 'The seven samples saved on your glasses are still here.',
+      actions: [{ label: 'Use the saved set', kind: 'primary', run: () => { step = 0; setState('ready'); } }],
+    }),
+  },
+  denied: {
+    tech: [['State', 'room sensing refused'], ['Effect', 'glass falls back to a fixed tint'], ['Way out', 'turn it on, or keep the fallback']],
+    build: () => edgeCard({
+      glyph: 'denied', title: 'Room sensing is off',
+      line: 'Glass tunes itself to the light around you. Without that, it holds one fixed tint.',
+      actions: [
+        { label: 'Turn it on', kind: 'primary', run: () => { tint = 'adaptive'; setState('ready'); } },
+        { label: 'Keep the fixed tint', run: () => { tint = 'fixed'; setState('ready'); } },
+      ],
+    }),
+  },
+};
+
+/* ------------------------------------------------------------ the runtime -- */
+let state = 'ready';
+let step = 0;
+let tint = 'adaptive';
+
+function goStep(n, dir) {
+  step = (n + STEPS.length) % STEPS.length;
+  if (state !== 'ready') { lab.setState('ready'); return; }
+  render(1, dir);
+}
+function setState(s) { lab.setState(s); }
+
+function render(animate = 1, dir = 1) {
+  clearInterval(ticker);
+  sweepObserver?.disconnect();
+  sweepObserver = null;
+  area.replaceChildren();
+  surface.dataset.tint = tint;
+
+  const entry = state === 'ready' ? STEPS[step] : EDGES[state];
+  surface.dataset.veil = state === 'ready' ? (tint === 'fixed' ? 'off' : 'none') : (entry.veil || 'none');
+
+  const stack = el('div', 'stack');
+  const layers = el('div', 'layers');
+
+  if (state === 'ready') {
+    const built = entry.build();
+    (Array.isArray(built.node) ? built.node : [built.node]).forEach((n) => layers.appendChild(n));
+    stack.appendChild(layers);
+    const cap = el('div', 'cap');
+    cap.appendChild(el('div', 'cap-line', entry.line));
+    stack.appendChild(cap);
+    pips.hidden = false;
+    pips.replaceChildren(...STEPS.map((_, i) => el('span', 'pip' + (i === step ? ' on' : ''))));
+  } else {
+    layers.appendChild(entry.build());
+    stack.appendChild(layers);
+    pips.hidden = true;
+  }
+
+  area.appendChild(stack);
+  readout(entry, state === 'ready' ? entry.name : null);
+
+  if (animate && !reduced()) {
+    stack.animate(
+      [{ opacity: 0, transform: `translate3d(${dir * 20}px, 0, 0) scale(0.984)`, filter: 'blur(7px)' },
+       { opacity: 1, transform: 'none', filter: 'blur(0px)' }],
+      { duration: 280, easing: 'cubic-bezier(0.32, 0.72, 0, 1)', fill: 'both' },
+    );
+  }
+}
+
+/* technical values live in the rail, where a developer is the right reader */
+let readoutEl = null;
+function readout(entry, name) {
+  if (!readoutEl) return;
+  const rows = entry.tech.map(() => `<div class="row"><dt></dt><dd></dd></div>`).join('');
+  readoutEl.innerHTML = `<h4></h4><dl>${rows}</dl>`;
+  readoutEl.querySelector('h4').textContent = name ? `Specimen — ${name}` : 'Specimen — edge state';
+  const dts = readoutEl.querySelectorAll('dt');
+  const dds = readoutEl.querySelectorAll('dd');
+  entry.tech.forEach(([k, v], i) => { dts[i].textContent = k; dds[i].textContent = v; });
+}
+
+/* ------------------------------------------------------------------- lab --- */
+const lab = mountLab({
+  piece: '00-foundation',
+  title: 'Foundation & materials',
+  states: ['ready', 'loading', 'empty', 'error', 'offline', 'denied'],
+  onState: (s) => { state = s; render(1, 1); },
+  actions: [
+    { label: 'Next specimen', run: () => goStep(step + 1, 1) },
+    { label: 'Previous specimen', run: () => goStep(step - 1, -1) },
+    { label: 'Back to the first', run: () => goStep(0, -1) },
+  ],
+  onScale: (v) => { surface.dataset.big = v >= 1.7 ? '1' : '0'; },
 });
 
-// expose for probe manual
-setVariant('specimen');
+readoutEl = document.createElement('div');
+readoutEl.className = 'lab-group lab-readout';
+lab.rail.insertBefore(readoutEl, lab.rail.querySelector('.lab-note'));
+render(0, 1);
 
-// ----- existing interactions -----
-document.querySelectorAll('.toggle').forEach((t) => {
- const toggleAction = () => t.setAttribute('aria-checked', t.getAttribute('aria-checked') === 'true' ? 'false' : 'true');
- t.addEventListener('click', toggleAction);
- t.addEventListener('keydown', (e)=>{
-  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggleAction(); }
- });
-});
-s.querySelector('#toastDemo')?.addEventListener('click', () =>
- os.banner('<strong>Banner</strong><span class="caption">tap to dismiss · auto 4.2s · var(--ease-prism)</span>', { timeout: 0 }));
-
-// retry buttons in edge cards — recover to specimen or simulate
-document.querySelectorAll('[data-action="retry-empty"], [data-action="retry-error"], [data-action="allow"]').forEach(btn=>{
- btn.addEventListener('click', ()=>{
-  const isAllow = btn.dataset.action==='allow';
-  btn.textContent = isAllow ? 'Allowing…' : 'Retrying…';
-  setTimeout(()=>{
-   setVariant('specimen');
-   os.banner(isAllow ? '<strong>Access granted</strong><span class="caption">captures restored</span>' : '<strong>Back online</strong><span class="caption">specimen restored</span>', {timeout:1800});
-   btn.textContent = isAllow ? 'Allow access' : (btn.dataset.action==='retry-empty' ? 'Create first' : 'Retry');
-  }, 700);
- });
-});
-// dismiss / secondary buttons in edge cards
-emptyLayer.querySelectorAll('button')[1]?.addEventListener('click', ()=> os.banner('<strong>Learn more</strong><span class="caption">foundation docs · on-device</span>',{timeout:2000}));
-errorLayer.querySelectorAll('button')[1]?.addEventListener('click', ()=> setVariant('specimen'));
-offlineLayer.querySelectorAll('button').forEach(b=>{
- b.addEventListener('click', ()=>{
-  if(b.textContent.includes('Retry')){
-   b.textContent='Retrying…';
-   setTimeout(()=>{ os.banner('<strong>Still offline</strong><span class="caption">check Wi-Fi</span>',{timeout:2000}); b.textContent='Retry';},800);
-  } else { setVariant('specimen'); os.banner('<strong>Offline mode</strong><span class="caption">specimen only</span>',{timeout:1800}); }
- });
-});
-permLayer.querySelectorAll('button').forEach(b=>{
- if(b.textContent.trim()==='Not now') b.addEventListener('click', ()=> setVariant('specimen'));
- if(b.textContent.trim()==='Open Settings') b.addEventListener('click', ()=> { b.textContent='Opening…'; setTimeout(()=>{ setVariant('specimen'); os.banner('<strong>Settings</strong><span class="caption">Privacy · Prism</span>',{timeout:1800}); b.textContent='Open Settings';},700); });
-});
-
-// material cards subtle interaction
-document.querySelectorAll('.mat-card').forEach(c=>{
- c.addEventListener('click', ()=>{
-  c.animate([{transform:'scale(1.02)'},{transform:'scale(1)'}],{duration:220, easing:'cubic-bezier(0.32,0.72,0,1)'});
-  os.banner('<strong>'+c.textContent.trim().split('\\n')[0]+' material</strong><span class="caption">'+c.querySelector('.sub')?.textContent+' · tapped</span>',{timeout:1400});
- });
- c.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' ') { e.preventDefault(); c.click(); }});
-});
-
-// ----- Tab handling: include lab-bar chips in cycle (capture-phase to override core) -----
-document.addEventListener('keydown', (e)=>{
- if(e.key!=='Tab') return;
- // Build full focusable set including lab-bar + stage
- const all = [...document.querySelectorAll('[data-focusable],button,a,[role="button"],[role="tab"],input,[role="switch"]')].filter(el=> el.offsetParent!==null && !el.hasAttribute('disabled') && el.getAttribute('aria-hidden')!=='true');
- if(all.length<2) return;
- // Only override if focus is inside stage or lab-bar and would wrap
- // Let core handle stage-only? We intercept to include bar.
- // Determine current index
- const active = document.activeElement;
- const idx = all.indexOf(active);
- // If active not in list, let default happen
- if(idx===-1) return;
- // Check shift? core ignores shift, we respect shift properly
- const forward = !e.shiftKey;
- e.preventDefault();
- e.stopPropagation();
- e.stopImmediatePropagation();
- const next = forward ? (idx+1)%all.length : (idx-1+all.length)%all.length;
- all[next].focus({preventScroll:true});
- // add gaze-focus visual? core does via pointermove, but we also add class
- all.forEach(el=> el.classList.remove('gaze-focus'));
- all[next].classList.add('gaze-focus');
- setTimeout(()=> all[next].classList.remove('gaze-focus'), 900);
-}, true);
-
-console.log('Prism foundation ready — lab bar outside stage, 6 variants, motion 220/260/300');
+/* hardware input: temple swipe / arrows step the language, tap advances,
+   the capture button jumps to the focus specimen, back leaves any edge state */
+os.on('swiperight', () => { if (state === 'ready') goStep(step + 1, 1); });
+os.on('swipeleft', () => { if (state === 'ready') goStep(step - 1, -1); });
+os.on('tapvoid', () => { if (state === 'ready') goStep(step + 1, 1); });
+os.on('capture', () => { if (state === 'ready') goStep(STEPS.length - 1, 1); });
+os.on('back', () => { if (state !== 'ready') setState('ready'); else goStep(step - 1, -1); });
 </script>
 </body>
 </html>

@@ -1,0 +1,60 @@
+{
+  "piece": "00-foundation",
+  "round": 2,
+  "critic": "fresh-context critic, round 2",
+  "judgedAt": "2026-08-31T07:40:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/00-foundation/index.html reviews/probe-00-foundation-critic-r2",
+    "outDir": "reviews/probe-00-foundation-critic-r2",
+    "screenshotsRead": [
+      "stage.png", "full.png",
+      "shots/spec-raised.png", "shots/spec-sunken.png", "shots/spec-sheet.png",
+      "shots/spec-type.png", "shots/spec-controls.png", "shots/spec-focus.png",
+      "shots/state-loading.png", "shots/state-offline.png", "shots/state-denied.png",
+      "shots/scale-2-type.png", "shots/scale-2-controls.png", "shots/scale-2-error.png",
+      "shots/world-outdoor-glass.png", "shots/world-outdoor-sheet.png", "shots/world-night-glass.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 1,
+    "notes": "Gate green, zero console/page errors, lab rail fully outside the stage, no engineering tokens rendered in the stage in any of the 17 frames I read. All four world backdrops and all five edge states drove cleanly; text scale 1.0/1.4/2.0 produced no overflow (stack stays >=95px inside the stage on every specimen at 2x). Two hard findings from my own pixels. (1) Density ladder is inverted. I measured a fixed strip inside the specimen box with and without the surface: GLASS transmits 0.53 of world luminance and 0.47 of world contrast sd (world p95-p5 42.5 -> 23.6); SHEET, the supposedly densest surface, transmits 1.04 of luminance and 1.03 of contrast (42.5 -> 43.7). Confirmed visually on the outdoor backdrop: through Sheet the streetlamp is a crisp dot and the window rectangles keep their edges, while through Glass the lamp, kerb and horizon are erased and the plate reads as a slate sunglasses tint. The Sheet's own on-screen caption says 'The world stays as colour, not as shapes' while shapes are plainly visible. (2) At scale=2 the primary control does not scale: .ctl .btn computed font-size is 16px at scale 1 AND at scale 2, box height stays 44px, and .toggle stays 16px/32px, while .cap-line goes 15px -> 30px and .ctl-note 13px -> 26px. Nothing truncates or goes unreachable, but the button label is left half the size of the copy around it."
+  },
+  "blind": {
+    "A": "visionOS Home View app grid",
+    "B": "Horizon OS app library panel",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "A wide dark-glass slab floating in blurred passthrough, holding a 6-column grid of identical circular app icons with small centred labels, a three-tab pill rail at the left edge and an environments dial at the right. The slab genuinely refracts what is behind it: passthrough colour and highlights bend through the edge bevel and a live specular runs the top rim. Gaze lands as a soft radial lift plus scale on one icon; nothing else in the frame competes, but nothing is the point of the frame either.",
+    "B": "A near-opaque dark grey rounded panel hanging in space, carrying a 3-column grid of square cover-art tiles with white labels underneath, a search field top-right and a sort dropdown top-left. The panel occludes everything behind it apart from a soft drop shadow, so it reads as a monitor bolted into the room rather than a lens effect. Pointer highlight is a light fill on the tile; type is dense with several sizes and some labels ellipsise.",
+    "C": "A single material specimen fills the frame over a lit street: one 46px word on a plate, one grey sentence beneath, a seven-dot pip row at the bottom, a small uppercase corner label. Stepping the deck swaps the specimen with a 280ms translate-plus-deblur; the focus specimen draws a 2.5px accent stroke that sweeps the tile's own outline, concentric with its corners. Some specimens let the streetlamp and lit windows through visibly softened, others erase them entirely, and the ordering of which does which does not match the words on screen."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS 2 Home View app grid, the default screen after the Digital Crown long-press. Roughly twenty 1x1 circular icons sit in a hex-ish grid on a dark, heavily blurred glass slab with a bright hairline top rim; a vertical three-tab rail (Apps / People / Environments) hugs the left edge and the Environments dial sits at the far right. Behind the slab the room shows through as blurred colour and moving highlights, and the slab's edge picks up a live specular from the passthrough as you turn your head.",
+    "horizonOS": "Horizon OS (Quest v60-era) app library panel, opened from the Navigator dock. A large flat charcoal rounded-rect panel floats about two metres away holding a 3-column grid of square app tiles with cover art and white labels beneath, a search field in the top-right, a 'Sort by' dropdown top-left, and a scrollbar on the right. The panel is essentially opaque with a drop shadow; passthrough or the environment is visible only around it, never through it, and the laser pointer highlights a tile with a flat lighter fill."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 7, "focusDiscipline": 7, "materialHonesty": 9, "motion": 9, "typography": 9, "edgeStates": 6, "dependability": 8, "accessibility": 8, "delight": 8 },
+    "horizonOS": { "glanceability": 7, "focusDiscipline": 6, "materialHonesty": 4, "motion": 6, "typography": 6, "edgeStates": 6, "dependability": 7, "accessibility": 5, "delight": 4 },
+    "ours": { "glanceability": 9, "focusDiscipline": 8, "materialHonesty": 5, "motion": 8, "typography": 9, "edgeStates": 9, "dependability": 9, "accessibility": 6, "delight": 8 }
+  },
+  "totals": { "visionOS": 71, "horizonOS": 51, "ours": 71 },
+  "winnersPerCriterion": {
+    "glanceability": "ours",
+    "focusDiscipline": "ours",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "ours",
+    "accessibility": "visionOS",
+    "delight": "ours"
+  },
+  "overallRanking": ["ours", "visionOS", "horizonOS"],
+  "biggestGap": "Density ladder is inverted in the rendered pixels · components/00-foundation/index.html:93 (.plate backdrop-filter: saturate(1.9) blur(13px) brightness(0.56)) vs :195 (.sheetm backdrop-filter: saturate(1.25) blur(44px) brightness(0.5), fill 0.60->0.72) · expected the lightest material to pass the most world and the densest the least, i.e. Glass transmitting clearly more world luminance and structure than Sheet, and Sheet honouring its own on-screen caption by leaving colour but no shapes · got the reverse: measured over an identical strip of the same world region, Glass transmits 0.53 of world luminance and 0.47 of world contrast (world p95-p5 42.5 -> 23.6), while Sheet transmits 1.04 of luminance and 1.03 of contrast (42.5 -> 43.7), and on the Outdoor backdrop the streetlamp and the two lit windows read as hard shapes through Sheet but are erased entirely under Glass, which reads as a tinted slate rectangle. Fix by raising the plate's transmission above every other specimen (drop brightness(0.56) toward ~0.85 and the fill toward ~0.14->0.22) and lowering Sheet's below all of them (brightness ~0.42 with saturate <1 so the lamp survives only as a wash), then re-verify the monotonic ordering Glass > Raised > Sheet > Sunken by pixel measurement on the Outdoor backdrop, not by eye on Street.",
+  "reason": "Judged from my own probe and 17 frames I read myself; no builder words were supplied or read. The piece is genuinely strong where most of these surfaces fail: one focal element per moment, three type sizes with live tabular numerals, all five edge states designed with a named cause and one or two real exits (the permission-denied card names the consequence and offers 'Keep the fixed tint' as a first-class outcome, which beats visionOS's verbose system permission sheets and its bare-spinner loads outright), and a signature dwell sweep that traces the tile's own outline and stays concentric at every text size. It loses on the one criterion this specific piece exists to own. On a transparent 20-degree panel the foundation layer's job is to make transmission legible and ordered, and here it is neither ordered nor consistent with its own copy: the flagship 'Glass' specimen is the second most occluding surface in the deck, killing the lamp, kerb and horizon on the Outdoor backdrop, while 'Sheet' passes more light and more structure than the world reference. Every specimen also darkens the world through brightness() multiplication, which no additive see-through optic can do. Accessibility is the second loss: at 2x text scale the whole surface reflows honestly except the primary button and the switch, which stay frozen at 16px/44px and 16px/32px while the copy around them doubles. Totals tie at 71, ours wins five criteria to four, so it ranks first on head-to-head — but the pass condition for a tie is zero named gaps and there is a substantial one.",
+  "passCondition": "Ours ranks first on criteria won (5 of 9) but ties visionOS on total at 71-71, and two gaps remain (inverted transmission ladder, unscaled primary control at 2x text). A tie requires zero gaps to pass, so this is a fail."
+}

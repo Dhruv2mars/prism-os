@@ -1,0 +1,53 @@
+{
+  "piece": "07-camera",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T08:15:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/07-camera/index.html reviews/07-camera/judge-r1",
+    "outDir": "reviews/07-camera/judge-r1",
+    "screenshotsRead": [
+      "stage.png", "full.png", "stage-reduced-motion.png",
+      "state-empty.png", "state-loading.png", "state-error.png", "state-offline.png",
+      "state-permission.png", "state-after-capture.png", "state-recording.png",
+      "state-after-video-stop.png", "state-grid-on.png", "state-countdown.png",
+      "state-ctx-sheet.png", "stage-textscale2x.png", "verify-countdown-aftermath.png"
+    ],
+    "consoleErrors": 0, "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 17,
+    "notes": "Drove all five edge states via window.__setCameraEdge (no lab rail mounted), plus capture, video record/stop, grid, countdown, long-press sheet, and a 2x text-scale pass. Zero console/page errors everywhere. Confirmed by geometry probe: .strip-wrap bottom = 812.5px vs stage bottom = 755px => 57.5px clipped (overflow:hidden on .cam-viewport), visible as a hard-cut thumbnail row in every rest frame. Confirmed phantom state: photo-mode 3s countdown capture leaves '00:01 REC · 12 MP' timer pill painted at top of viewfinder indefinitely after the capture (startCountdownThenCapture adds vfTimer.on at index.html:940 and nothing clears it on the photo path). Reduced-motion pass: 0 infinite animations, content present. No lab rail: critic had to use dev globals."
+  },
+  "blind": { "A": "visionOS design language: iOS 17 Camera rest state (the camera surface Apple actually ships on this design language)", "B": "Horizon OS: Quest 3 system camera-permission dialog + passthrough safety pill", "C": "artifact under review", "oursIs": "C" },
+  "blindDescriptions": {
+    "A": "Full-bleed live viewfinder IS the surface; chrome is four floating elements: white shutter ring bottom-center, mode strip (PHOTO/VIDEO/PORTRAIT, yellow-highlighted), last-shot thumbnail bottom-left, and a top chevron that expands one row of icon controls on demand only. Nothing else is ever painted over the world. Capture feedback is a shutter blip plus the thumbnail swapping. Permission-denied is a single centered card over the frozen last frame with one Settings deep-link.",
+    "B": "A near-opaque dark rounded panel floating in room space: large title, body copy, two buttons (Deny / Allow) with the controller-laser focus ring unambiguous on one at a time. Camera state surfaces as a small passthrough pill, not a full surface. Loading is a bare centered spinner in a panel; errors are a generic 'Something went wrong' panel with Try Again. Honest but heavy, and text-dense for arm's-length reading.",
+    "C": "A 600x600 simulated viewfinder card (gradient world, glass chips top-left countdown/aspect, top-right grid/flash, EXIF pills bottom) over a dark scrim, mode tab strip below, 72px white shutter with label, last-capture thumb + meta, and a recents strip that is clipped mid-thumbnail by the stage's bottom edge. Five edge states are designed (empty/loading/error/offline/permission) with distinct icons, actions, and recovery flows. Capture chain: 220ms flash, shutter ring pulse, thumbnail pop, confirmation banner. Recording turns the shutter red and shows a REC timer. Countdown pops large tabular numerals."
+  },
+  "referenceScreens": {
+    "visionOS": "iOS 17 Camera app rest state (Apple's camera surface in the visionOS design language): edge-to-edge live viewfinder, one white ring shutter bottom center, horizontally scrollable mode strip with the active mode in yellow caps, last-shot thumbnail bottom-left, all other controls collapsed behind a top chevron. At arm's length you extract 'camera, photo mode, press here' in well under a second because the world is the content and chrome is four items.",
+    "horizonOS": "Quest 3 Horizon OS system permission dialog for camera access: a floating near-opaque dark panel with a bold white title ('Allow ... to access your camera?'), grey body text, and Deny/Allow buttons where the laser-pointer hover paints an unmistakable highlight on exactly one button; the OS additionally shows a small passthrough status pill. Loading in these panels is a bare spinner; errors are a generic panel with Try Again. Text is larger than Apple's but panels read as slabs, not glass."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 9, "focusDiscipline": 10, "materialHonesty": 9, "motion": 9, "typography": 9, "edgeStates": 6, "dependability": 8, "accessibility": 9, "delight": 7 },
+    "horizonOS": { "glanceability": 6, "focusDiscipline": 9, "materialHonesty": 5, "motion": 6, "typography": 7, "edgeStates": 6, "dependability": 7, "accessibility": 7, "delight": 4 },
+    "ours": { "glanceability": 8, "focusDiscipline": 6, "materialHonesty": 8, "motion": 8, "typography": 5, "edgeStates": 7, "dependability": 5, "accessibility": 6, "delight": 7 }
+  },
+  "totals": { "visionOS": 76, "horizonOS": 57, "ours": 60 },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": ["visionOS", "ours", "horizonOS"],
+  "biggestGap": "Recents strip clipped at stage bottom · components/07-camera/index.html:58-66 (.cam-viewport inset + overflow:hidden) and :69-72 (.vf-card fixed 338px) · expected the Recents strip fully inside the 600px stage (or an intentional scroll affordance), got 57.5px of overflow with thumbnails sliced mid-body by overflow:hidden in every rest frame (strip-wrap bottom 812.5px vs stage bottom 755px) — the resting surface reads as broken rendering. Runner-up defect, same fix pass: photo-mode countdown leaves a phantom '00:01 REC · 12 MP' pill painted forever (vfTimer.classList.add('on') at index.html:940 never cleared on the photo path).",
+  "reason": "Ours loses to the visionOS-design-language camera on 8 of 9 criteria. The core loop (viewfinder, shutter, capture chain, five designed edge states, zero console errors, reduced-motion honored) is genuinely strong and beats Horizon OS's slab panels overall — edge states is a fair outright win. But the resting frame of a camera surface ships with a clipped thumbnail row (57.5px overflow, confirmed by geometry), a photo-mode countdown leaves a false REC timer on screen indefinitely, the context sheet renders a literal 'stub' pill and 'clipboard stub'/'demo · stub' banner copy to the wearer, the offline card claims 'shutter still works' while viewport pointer-events:none disables the shutter button, and all type is px-locked so 2x text scale changes nothing. Not first overall, multiple named gaps: fail.",
+  "passCondition": "Ours ranked second of three (60 vs visionOS 76). Gaps remain: clipped Recents strip, phantom REC timer after countdown, 'stub' engineering copy on screen, offline copy/behavior contradiction, no text-scale reflow."
+}

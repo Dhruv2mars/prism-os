@@ -1,0 +1,53 @@
+{
+  "piece": "00-foundation",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-08-31T02:10:00Z",
+  "verdict": "pass",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/00-foundation/index.html reviews/probe-00-foundation-critic-r1 (plus ?state=loading|empty|error|offline|denied, ?scale=2, and a Playwright script stepping all six specimens and hovering for gaze focus)",
+    "outDir": "reviews/probe-00-foundation-critic-r1",
+    "screenshotsRead": ["stage.png", "full.png", "loading/stage.png", "empty/stage.png", "error/stage.png", "offline/stage.png", "denied/stage.png", "scale2/stage.png", "step3.png", "step4.png", "step5.png", "gaze.png"],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 1,
+    "notes": "Six-specimen material walkthrough: one plate centred in the stage, a two-line caption under it, six pips at the bottom, FOUNDATION eyebrow top-left. All dev controls are in the rail outside the stage (labInsideStage 0, 15 lab focusables). Exactly one in-stage focusable per moment; gaze hover paints an unmistakable 2.5px accent ring plus a 34px bloom on the plate (gaze.png). Five edge states are individually art-directed: shaped skeleton bars for loading (not a spinner), distinct dashed-square / red-circle / amber-cloud / blue-padlock glyphs, one-line plain-English cause, and 1-2 exits each including a fallback ('Keep the fixed tint'). ?scale=2 reflows the whole surface - caption sub-line and eyebrow drop out, plate and name scale - it is not a preview swatch. Reduced motion honoured by both media query and the rail switch; the dwell sweep freezes at full stroke. Zero rendered engineering tokens inside the stage; technical values (blur 20px, saturate 1.5) live only in the rail readout. Defects seen in pixels: (1) the gaze cursor rests at stage 300,300 and an opaque 13px white disc with a halo lands directly on top of body copy in the Type specimen ('Pier 41 [dot] Gate 2') and the Controls specimen ('Ale[dot]s on'), and on top of the offline and permission glyphs; (2) the dwell sweep rect is not concentric with the tile it traces - its top-left arc crosses the tile border (step5.png); (3) the Glass plate at 0.70-0.79 fill fully occludes the world bloom behind it, so the opening frame reads closer to a dark slab than to glass."
+  },
+  "blind": {
+    "A": "visionOS 2 Home View, Apps tab",
+    "B": "Horizon OS (Quest v70+) Universal Menu dock in Home",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "A vignetted dark ellipse of circular app icons, roughly six across, floating in the room with the room clearly visible around and through the substrate. A slim vertical tab rail sits at the left; each icon carries a small white label; looking at an icon lifts it a hair and rolls a specular sheen across it. Twenty-odd equally weighted targets means no single focal element until gaze lands, and at distance the uniform circular silhouettes blur together.",
+    "B": "A horizontal charcoal slab pinned to the bottom of the room, holding a row of thin white glyphs, a pill search field at the left and a clock/battery/wifi cluster at the right. Hover paints a light grey rounded pill behind a glyph and pops a text tooltip above it. The slab is close to opaque, the glyphs are small and low-contrast, and three separate clusters compete for the eye.",
+    "C": "A single rounded plate centred over a blurred world, with a two-line caption underneath and six progress pips at the bottom edge. A 1px specular hairline rides the plate's top edge and a two-layer shadow puts it on a real surface; stepping forward cross-dissolves the plate with a short blur-and-slide. Gaze lands on the plate and it gains an accent ring plus a bloom, which is unmistakable. A stray white dot sits over the body copy in two of the six frames."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS 2 Home View, Apps tab. Circular 1x1 app icons laid out about six per row on a near-transparent smoked substrate that lets the room read through it, each with a white label beneath; the vertical Apps/People/Environments tab rail sits at the left edge. Gaze on an icon scales it slightly and sweeps a soft specular highlight over the glass dome of the icon.",
+    "horizonOS": "Horizon OS (Quest v70+) Universal Menu dock in the Home environment. A wide charcoal translucent slab at the bottom of view carrying Explore / Store / Library / Camera / Settings glyphs in thin white line art, a rounded search field on the left and a clock, battery and wifi cluster on the right. Pointer or gaze hover fills a light grey rounded-rect behind the glyph and raises a small text tooltip above it."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 7, "focusDiscipline": 5, "materialHonesty": 9, "motion": 9, "typography": 8, "edgeStates": 6, "dependability": 9, "accessibility": 9, "delight": 9 },
+    "horizonOS": { "glanceability": 5, "focusDiscipline": 5, "materialHonesty": 5, "motion": 6, "typography": 6, "edgeStates": 4, "dependability": 8, "accessibility": 5, "delight": 4 },
+    "ours": { "glanceability": 7, "focusDiscipline": 9, "materialHonesty": 7, "motion": 8, "typography": 9, "edgeStates": 9, "dependability": 9, "accessibility": 8, "delight": 8 }
+  },
+  "totals": { "visionOS": 71, "horizonOS": 48, "ours": 74 },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "ours",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "ours",
+    "edgeStates": "ours",
+    "dependability": "ours",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": ["ours", "visionOS", "horizonOS"],
+  "biggestGap": "Body copy collides with the resting gaze cursor - components/00-foundation/index.html:291 ('Pier 41 &middot; Gate 2') and :319 ('Alerts on'), both centred at stage 300,300 where os/shared/core.js:23 parks the cursor and index.html:208-210 enlarges it to a 13px opaque white disc with a 4px halo and a 20px bloom. Expected: no user-visible glyph is ever punched through by the cursor - either park the cursor at rest outside the content column (e.g. 300,540) / hide it until the first pointer or gaze event, or shift the specimen stack so no text baseline crosses 290-310y. Got: the default rendered frame of the Type specimen reads 'Pier 41 [white disc] Gate 2' and the Controls specimen reads 'Ale[white disc]s on', and the same disc sits on the padlock shackle in permission-denied and on the cloud in offline.",
+  "reason": "Probed and screenshotted every state myself; no builder words were supplied or read. Ours ranks first on totals (74 vs 71 vs 48) and wins four of nine criteria outright. It beats both references decisively on focus discipline (exactly one in-stage focusable, one plate, one caption, an unmistakable ring-plus-bloom gaze state, against a grid of twenty equal icons in Home View and three competing clusters in the Quest dock), on edge states (five individually art-directed states with shaped skeletons and named fallbacks, against visionOS's bare-spinner loading and absent Home View offline/empty), on typography (three sizes, live tabular numerals, zero engineering tokens in the stage) and on dependability (every failure path carries a labelled exit and the back gesture leaves any edge state). It loses material honesty and delight to visionOS honestly: the 0.70-0.79 plate fill swallows the world bloom behind it so the opening Glass frame reads as a dark slab rather than glass, where Home View's substrate genuinely carries room colour, and visionOS's gaze specular is a better-executed signature than a dwell sweep whose stroked rect is not concentric with the tile it traces. Glanceability is a wash rather than a win: the first frame is a blank rectangle whose meaning lives entirely in the caption below it. Pass condition is ours ranked first overall, which it is - but the cursor-over-copy defect is a shipping-quality failure that must be closed.",
+  "passCondition": "Ours ranked FIRST overall (74/90 vs visionOS 71, Horizon OS 48). Pass granted on rank. One named gap remains: body copy centred under the resting gaze cursor."
+}

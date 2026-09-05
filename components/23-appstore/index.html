@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prism OS — Apps</title>
+<link rel="stylesheet" href="/os/shared/design-system.css">
+<style>
+/* ---------------------------------------------------------------------------
+   Apps — the catalog. The wearer's half of the developer platform.
+
+   Everything here runs against the real runtime. Install fetches and validates
+   a real manifest, a rejected package shows the validator's real reasons, an
+   update check re-reads the real file on disk, and Open launches a real
+   sandboxed frame. Nothing on this surface is a rendering of a decision that
+   was made somewhere else.
+
+   Material ladder — a surface earns occlusion in proportion to its commitment:
+     rows      0.52 fill · blur 20 · brightness 0.76   persistent while browsing
+     sheet     0.78 fill · blur 34 · brightness 0.54   a decision, demands you
+
+   Geometry — the two regions are pinned to percentages of the lens, never to
+   their own content. The band between them is where the gaze reticle rests and
+   where the wearer sees the street; content that grows at 310% text scrolls
+   inside its region instead of closing that band.
+--------------------------------------------------------------------------- */
+
+:root {
+  --s: var(--a11y-scale, 1);
+  /* Type scales all the way; space and icons do not. At 310% a linearly scaled
+     layout spends the whole lens on padding and there is nowhere left to read. */
+  --sp: min(var(--s), 1.5);
+  --glyph: calc(26px * var(--sp));
+}
+
+.stage { background: transparent; }
+
+.region {
+  position: absolute;
+  left: 0; right: 0;
+  padding: 0 calc(16px * var(--sp));
+  box-sizing: border-box;
+  display: grid;
+  min-height: 0;
+}
+/* 0-282 and 318-600. The 36px band between them is where the gaze reticle
+   rests, so it is kept clear of text at every text scale. The status bar owns
+   the first 44px, so the top region starts under it. */
+.region.top { top: 0; height: 47%; padding-top: 50px; align-content: start; gap: calc(9px * var(--sp)); overflow: auto; }
+.region.bottom { top: 53%; bottom: 0; align-content: start; gap: calc(9px * var(--sp)); padding-top: calc(4px * var(--sp)); overflow: auto; }
+
+.scroll, .region { scrollbar-width: thin; scrollbar-color: var(--ink-20) transparent; }
+.scroll { min-height: 0; overflow: auto; }
+.scroll::-webkit-scrollbar, .region::-webkit-scrollbar { width: 4px; }
+.scroll::-webkit-scrollbar-thumb, .region::-webkit-scrollbar-thumb { background: var(--ink-20); border-radius: 999px; }
+
+/* ---------- header ---------- */
+.head { display: flex; align-items: baseline; justify-content: space-between; gap: calc(10px * var(--sp)); min-width: 0; }
+.head h1 { margin: 0; font-size: calc(var(--fs-callout) * var(--s)); font-weight: 640; letter-spacing: -0.01em; white-space: nowrap; }
+.head .count { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-60); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ---------- rows ---------- */
+.list { display: grid; gap: calc(7px * var(--sp)); align-content: start; }
+.row {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center; gap: calc(11px * var(--sp));
+  padding: calc(9px * var(--sp)) calc(11px * var(--sp));
+  border-radius: var(--r-md);
+  background: rgba(10, 15, 23, 0.52);
+  backdrop-filter: saturate(1.3) blur(20px) brightness(0.76);
+  -webkit-backdrop-filter: saturate(1.3) blur(20px) brightness(0.76);
+  outline: 1px solid var(--stroke-glass);
+  text-align: left; border: 0; color: inherit; font: inherit; width: 100%;
+  box-sizing: border-box; cursor: pointer;
+  transition: outline-color var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism);
+}
+.row:focus-visible { outline: 2.5px solid var(--stroke-focus); outline-offset: 2px; }
+.row.gaze-focus { outline-color: var(--stroke-focus); transform: translateY(-1px); }
+.row[data-unavailable] { opacity: 0.62; }
+
+.glyph {
+  width: var(--glyph); height: var(--glyph); min-width: var(--glyph);
+  border-radius: calc(8px * var(--sp)); display: grid; place-items: center;
+  font-size: calc(13px * var(--s)); font-weight: 680; color: #08101a;
+  background: var(--app-accent, var(--accent));
+}
+.name { font-size: calc(var(--fs-body) * var(--s)); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.by { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-60); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tag {
+  font-size: calc(var(--fs-caption) * var(--s)); font-weight: 620;
+  padding: calc(3px * var(--sp)) calc(8px * var(--sp)); border-radius: var(--r-pill);
+  white-space: nowrap; color: var(--ink-80); background: rgba(255,255,255,0.07);
+}
+.tag[data-kind="installed"] { color: var(--ok); background: rgba(76,212,124,0.14); }
+.tag[data-kind="update"] { color: var(--accent); background: rgba(86,184,255,0.16); }
+.tag[data-kind="refused"] { color: #ffb3b3; background: rgba(255,93,93,0.15); }
+
+/* ---------- detail ---------- */
+.hero { display: grid; grid-template-columns: auto minmax(0,1fr); gap: calc(12px * var(--sp)); align-items: center; }
+.hero .glyph { width: calc(38px * var(--sp)); height: calc(38px * var(--sp)); min-width: calc(38px * var(--sp)); font-size: calc(17px * var(--s)); border-radius: calc(11px * var(--sp)); }
+.hero h2 { margin: 0; font-size: calc(var(--fs-title) * var(--s)); font-weight: 680; letter-spacing: -0.02em; line-height: 1.1; }
+.hero .by { font-variant-numeric: tabular-nums; }
+.tagline { font-size: calc(var(--fs-body) * var(--s)); color: var(--ink-80); line-height: 1.4; }
+.review { display: flex; align-items: center; gap: calc(7px * var(--sp)); font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-60); }
+.review .dot { width: calc(6px * var(--sp)); height: calc(6px * var(--sp)); border-radius: 50%; background: var(--ok); flex: none; }
+.review[data-state="pending"] .dot { background: var(--warn); }
+.review[data-state="refused"] .dot { background: var(--danger); }
+
+/* ---------- sheet ---------- */
+.sheet {
+  background: rgba(8, 12, 19, 0.78);
+  backdrop-filter: saturate(1.2) blur(34px) brightness(0.54);
+  -webkit-backdrop-filter: saturate(1.2) blur(34px) brightness(0.54);
+  outline: 1px solid var(--stroke-glass);
+  border-radius: var(--r-lg);
+  padding: calc(13px * var(--sp)) calc(14px * var(--sp));
+  display: grid; gap: calc(9px * var(--sp)); min-height: 0;
+  animation: rise var(--dur-base) var(--ease-prism) both;
+}
+@keyframes rise { from { transform: translateY(10px); opacity: 0; } }
+:root[data-reduced-motion] .sheet { animation: none; }
+
+.sheet h3 { margin: 0; font-size: calc(var(--fs-body) * var(--s)); font-weight: 640; }
+.ask { display: grid; grid-template-columns: auto minmax(0,1fr); gap: calc(4px * var(--sp)) calc(9px * var(--sp)); padding: calc(7px * var(--sp)) 0; border-top: 1px solid rgba(255,255,255,0.07); }
+.ask:first-of-type { border-top: 0; }
+.ask .pip { width: calc(6px * var(--sp)); height: calc(6px * var(--sp)); border-radius: 50%; margin-top: calc(6px * var(--s)); background: var(--ink-40); }
+.ask[data-risk="high"] .pip { background: var(--danger); }
+.ask[data-risk="medium"] .pip { background: var(--warn); }
+.ask[data-risk="low"] .pip { background: var(--ok); }
+.ask .what { font-size: calc(var(--fs-body) * var(--s)); font-weight: 600; }
+.ask .why { grid-column: 2; font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-60); line-height: 1.42; }
+.ask .said { grid-column: 2; font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-80); line-height: 1.42; }
+
+.problem { display: grid; gap: calc(2px * var(--sp)); padding: calc(6px * var(--sp)) 0; border-top: 1px solid rgba(255,255,255,0.07); }
+.problem:first-of-type { border-top: 0; }
+.problem .field { font-size: calc(var(--fs-caption) * var(--s)); font-weight: 700; color: #ffb3b3; }
+.problem .msg { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-80); line-height: 1.42; }
+
+/* ---------- buttons ---------- */
+.buttons { display: flex; gap: calc(8px * var(--sp)); flex-wrap: wrap; }
+.act {
+  flex: 1 1 auto; min-width: 0;
+  font: inherit; font-size: calc(var(--fs-body) * var(--s)); font-weight: 620;
+  color: var(--ink-100); background: rgba(255,255,255,0.08);
+  outline: 1px solid var(--stroke-glass); border: 0;
+  border-radius: var(--r-md); padding: calc(9px * var(--sp)) calc(13px * var(--sp));
+  cursor: pointer; white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease-prism), transform var(--dur-fast) var(--ease-prism);
+}
+.act[data-primary] { background: linear-gradient(180deg, #7cc9ff, #3f9be0); color: #051423; outline-color: transparent; }
+.act[data-danger] { color: #ffb3b3; }
+.act:focus-visible { outline: 2.5px solid var(--stroke-focus); outline-offset: 2px; }
+.act.gaze-focus { transform: translateY(-1px); background: rgba(255,255,255,0.14); }
+.act[data-primary].gaze-focus { background: linear-gradient(180deg, #96d5ff, #52a9ec); }
+
+/* ---------- message states ---------- */
+.msg { display: grid; gap: calc(6px * var(--sp)); }
+.msg .title { font-size: calc(var(--fs-callout) * var(--s)); font-weight: 640; }
+.msg .body { font-size: calc(var(--fs-body) * var(--s)); color: var(--ink-80); line-height: 1.42; }
+
+/* ---------- install progress ---------- */
+.steps { display: grid; gap: calc(6px * var(--sp)); }
+.step { display: grid; grid-template-columns: auto minmax(0,1fr); gap: calc(9px * var(--sp)); align-items: center; font-size: calc(var(--fs-body) * var(--s)); color: var(--ink-40); }
+.step[data-done] { color: var(--ink-100); }
+.step[data-now] { color: var(--ink-100); }
+.step .mark { width: calc(14px * var(--sp)); height: calc(14px * var(--sp)); border-radius: 50%; outline: 1.5px solid var(--ink-20); display: grid; place-items: center; font-size: calc(9px * var(--s)); }
+.step[data-done] .mark { background: var(--ok); outline-color: transparent; color: #05230f; }
+
+/* ---------- live app window ---------- */
+.window {
+  border-radius: var(--r-lg); overflow: hidden;
+  outline: 1px solid var(--stroke-glass);
+  background: rgba(10, 15, 23, 0.34);
+  backdrop-filter: saturate(1.25) blur(12px) brightness(0.90);
+  -webkit-backdrop-filter: saturate(1.25) blur(12px) brightness(0.90);
+  min-height: 0; display: grid; grid-template-rows: auto auto; align-self: start;
+}
+.window[hidden] { display: none; }
+.window .bar { display: flex; align-items: center; gap: calc(8px * var(--sp)); padding: calc(6px * var(--sp)) calc(10px * var(--sp)); border-bottom: 1px solid rgba(255,255,255,0.07); }
+.window .bar .t { font-size: calc(var(--fs-caption) * var(--s)); font-weight: 620; }
+.window .bar .n { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-60); margin-left: auto; font-variant-numeric: tabular-nums; }
+.window iframe { border: 0; width: 100%; display: block; background: transparent; }
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="stage-shell"><div class="stage" data-stage></div></div>
+</div>
+
+<script type="module">
+import { createOS } from '/os/shared/core.js';
+import { mountLab } from '/os/shared/lab.js';
+import { AppRuntime } from '/os/shared/app-runtime.js';
+import { PERMISSIONS } from '/os/shared/app-manifest.js';
+
+const stage = document.querySelector('[data-stage]');
+const os = createOS(stage, { scale: 1 });
+stage.appendChild(os.statusbar());
+
+const rt = new AppRuntime({ container: null });
+
+/* The catalog is the store's own record, not the developer's. Review status in
+   particular must never come from the package being reviewed. */
+const CATALOG = [
+  { id: 'transit',  tagline: 'Live departures for the stop you actually ride from.',
+    review: { state: 'reviewed', on: '12 Aug 2026' } },
+  { id: 'waypoint', tagline: 'Drop a pin on where you parked, walk back to it later.',
+    review: { state: 'reviewed', on: '28 Jul 2026' } },
+  { id: 'stalled',  tagline: 'A build that passed the manifest checks and never starts.',
+    review: { state: 'pending', on: 'submitted 2 days ago' } },
+  { id: 'badmanifest', tagline: 'A submission the checks refused before anyone wore it.',
+    review: { state: 'refused', on: 'automated review' } },
+];
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+let view = 'catalog';      /* catalog | detail | installing | refused | running */
+let selected = null;       /* app id */
+let edge = null;           /* lab-driven edge state */
+let steps = [];            /* live install progress */
+let problems = [];         /* real validator output for a refused package */
+let updates = new Map();   /* id -> version available on disk */
+let notice = '';
+
+/* Manifests for packages that are not installed still have to be readable —
+   the wearer decides from the manifest, and deciding after installing is not
+   a decision. */
+const previews = new Map();
+
+async function preview(id) {
+  if (previews.has(id)) return previews.get(id);
+  const r = await rt.inspect(id);
+  previews.set(id, r);
+  return r;
+}
+
+/* ------------------------------------------------------------------ render */
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+
+function action(label, run, kind) {
+  const b = el('button', 'act', label);
+  b.type = 'button';
+  b.setAttribute('data-focusable', '');
+  if (kind) b.setAttribute(`data-${kind}`, '');
+  b.addEventListener('click', run);
+  return b;
+}
+
+/* The two regions and the live app window persist across renders. Detaching an
+   iframe from the document reloads it, which would restart the app every time
+   the wearer was asked a question about it — so the window is emptied of
+   nothing, only hidden. */
+const topRegion = el('div', 'region top');
+const bottomRegion = el('div', 'region bottom');
+stage.append(topRegion, bottomRegion);
+
+let winEl = null;
+let winHolder = null;
+let winTitle = null;
+
+function ensureWindow() {
+  if (winEl) return winEl;
+  winEl = el('div', 'window');
+  const bar = el('div', 'bar');
+  winTitle = el('span', 't', '');
+  bar.append(winTitle, el('span', 'n', 'sandboxed'));
+  winHolder = el('div');
+  winHolder.style.minHeight = '0';
+  winEl.append(bar, winHolder);
+  topRegion.append(winEl);
+  return winEl;
+}
+
+function regions() {
+  for (const n of [...topRegion.children]) if (n !== winEl) n.remove();
+  bottomRegion.replaceChildren();
+  if (winEl) winEl.hidden = true;
+  topRegion.style.gridTemplateRows = '';
+  bottomRegion.style.gridTemplateRows = '';
+  return [topRegion, bottomRegion];
+}
+
+function catalogRow(entry, result) {
+  const m = result.manifest;
+  const row = el('button', 'row');
+  row.type = 'button';
+  row.setAttribute('data-focusable', '');
+
+  const installed = rt.installed.has(entry.id);
+  const hasUpdate = updates.has(entry.id);
+  const refused = !result.valid;
+
+  let tagText = 'Get';
+  let kind = '';
+  if (refused) { tagText = 'Not available'; kind = 'refused'; }
+  else if (hasUpdate) { tagText = 'Update'; kind = 'update'; }
+  else if (installed) { tagText = 'Installed'; kind = 'installed'; }
+  else if (entry.review.state === 'pending') { tagText = 'In review'; }
+
+  const glyph = el('span', 'glyph', m ? m.glyph : '!');
+  if (m?.accent) glyph.style.setProperty('--app-accent', m.accent);
+  if (refused) glyph.style.setProperty('--app-accent', 'var(--ink-40)');
+
+  const mid = el('span');
+  mid.style.minWidth = '0';
+  mid.append(
+    el('span', 'name', m ? m.name : entry.id),
+    el('span', 'by', m ? `${m.developer} · ${m.category}` : 'Package refused'),
+  );
+  mid.firstChild.style.display = 'block';
+  mid.lastChild.style.display = 'block';
+
+  const tag = el('span', 'tag', tagText);
+  if (kind) tag.setAttribute('data-kind', kind);
+  if (refused) row.setAttribute('data-unavailable', '');
+
+  row.setAttribute('aria-label',
+    `${m ? m.name : entry.id}. ${m ? m.developer : 'Package refused'}. ${tagText}.`);
+  row.append(glyph, mid, tag);
+  row.addEventListener('click', () => { selected = entry.id; view = 'detail'; render(); });
+  return row;
+}
+
+async function renderCatalog(top, bottom) {
+  const results = await Promise.all(CATALOG.map((c) => preview(c.id)));
+
+  const head = el('div', 'head');
+  head.append(el('h1', null, 'Apps'));
+  const installedCount = rt.installed.size;
+  head.append(el('span', 'count',
+    updates.size ? `${updates.size} update ready` : `${installedCount} of ${CATALOG.length} installed`));
+  top.append(head);
+
+  const list = el('div', 'list scroll');
+  CATALOG.forEach((c, i) => list.append(catalogRow(c, results[i])));
+  top.append(list);
+  top.style.gridTemplateRows = 'auto minmax(0,1fr)';
+
+  const msg = el('div', 'msg');
+  msg.append(el('div', 'body', notice ||
+    'Every app here was read and checked before it was offered. What each one asks for is on its own page, in the words it used to ask.'));
+  bottom.append(msg);
+  bottom.append(buttons([
+    action('Check for updates', checkUpdates, 'primary'),
+  ]));
+}
+
+function buttons(list) {
+  const b = el('div', 'buttons');
+  for (const n of list) b.append(n);
+  return b;
+}
+
+async function renderDetail(top, bottom) {
+  const entry = CATALOG.find((c) => c.id === selected);
+  const result = await preview(selected);
+  const m = result.manifest;
+
+  if (!result.valid) {
+    problems = result.errors;
+    view = 'refused';
+    return renderRefused(top, bottom);
+  }
+
+  const hero = el('div', 'hero');
+  const glyph = el('span', 'glyph', m.glyph);
+  if (m.accent) glyph.style.setProperty('--app-accent', m.accent);
+  const who = el('div');
+  who.style.minWidth = '0';
+  who.append(el('div', null, m.name), el('div', 'by', `${m.developer} · version ${m.version}`));
+  who.firstChild.className = '';
+  const h2 = el('h2', null, m.name);
+  who.replaceChild(h2, who.firstChild);
+  hero.append(glyph, who);
+  top.append(hero);
+
+  top.append(el('div', 'tagline', entry.tagline));
+
+  const rv = el('div', 'review');
+  rv.setAttribute('data-state', entry.review.state);
+  rv.append(el('span', 'dot'));
+  rv.append(el('span', null,
+    entry.review.state === 'reviewed' ? `Reviewed by Prism · ${entry.review.on}`
+    : entry.review.state === 'pending' ? `Still in review · ${entry.review.on}`
+    : 'Refused in review'));
+  rv.querySelector('span:last-child').setAttribute('aria-live', 'polite');
+  top.append(rv);
+
+  top.append(el('div', 'tagline',
+    m.offline ? 'Works with no connection.' : 'Needs a connection to be useful.'));
+
+  /* The ask list. System risk wording first, then the app's own reason, so the
+     wearer is never asked to trust the app's framing on its own. */
+  const sheet = el('div', 'sheet');
+  sheet.style.gridTemplateRows = 'auto minmax(0,1fr) auto';
+  sheet.append(el('h3', null, m.permissions.length ? 'What it asks for' : 'Asks for nothing'));
+
+  const asks = el('div', 'scroll');
+  if (!m.permissions.length) {
+    asks.append(el('div', 'ask',).appendChild
+      ? (() => { const d = el('div', 'ask'); d.append(el('span', 'pip'), el('span', 'what', 'No capabilities')); const w = el('span', 'why', 'It runs entirely on what it ships with.'); d.append(w); return d; })()
+      : null);
+  }
+  for (const p of m.permissions) {
+    const meta = PERMISSIONS[p];
+    const d = el('div', 'ask');
+    d.setAttribute('data-risk', meta.risk);
+    d.append(el('span', 'pip'), el('span', 'what', meta.label), el('span', 'why', meta.why));
+    const said = m.permissionReasons[p];
+    if (said) d.append(el('span', 'said', `${m.name} says: ${said}`));
+    asks.append(d);
+  }
+  sheet.append(asks);
+
+  const installed = rt.installed.has(selected);
+  const hasUpdate = updates.has(selected);
+  const acts = [];
+  if (hasUpdate) acts.push(action(`Update to ${updates.get(selected)}`, () => install(selected), 'primary'));
+  else if (!installed) acts.push(action('Install', () => install(selected), 'primary'));
+  else acts.push(action('Open', () => open(selected), 'primary'));
+  if (installed) acts.push(action('Remove', () => remove(selected), 'danger'));
+  acts.push(action('Back', () => { view = 'catalog'; selected = null; render(); }));
+  sheet.append(buttons(acts));
+
+  bottom.append(sheet);
+  bottom.style.gridTemplateRows = 'minmax(0,1fr)';
+}
+
+function renderRefused(top, bottom) {
+  const entry = CATALOG.find((c) => c.id === selected);
+  const msg = el('div', 'msg');
+  msg.append(el('div', 'title', 'Refused in review'));
+  msg.append(el('div', 'body',
+    `${selected} was not offered because the checks below failed. Nobody wore it and nothing was installed.`));
+  top.append(msg);
+
+  const sheet = el('div', 'sheet');
+  sheet.style.gridTemplateRows = 'auto minmax(0,1fr) auto';
+  sheet.append(el('h3', null, `${problems.length} problem${problems.length === 1 ? '' : 's'}`));
+  const list = el('div', 'scroll');
+  for (const p of problems) {
+    const d = el('div', 'problem');
+    d.append(el('div', 'field', p.field), el('div', 'msg', p.message));
+    d.lastChild.className = 'msg';
+    list.append(d);
+  }
+  sheet.append(list);
+  sheet.append(buttons([action('Back', () => { view = 'catalog'; selected = null; render(); }, 'primary')]));
+  bottom.append(sheet);
+  bottom.style.gridTemplateRows = 'minmax(0,1fr)';
+}
+
+function renderInstalling(top, bottom) {
+  const msg = el('div', 'msg');
+  msg.append(el('div', 'title', `Installing ${selected}`));
+  top.append(msg);
+
+  const sheet = el('div', 'sheet');
+  const s = el('div', 'steps');
+  for (const st of steps) {
+    const d = el('div', 'step');
+    if (st.done) d.setAttribute('data-done', '');
+    else if (st.now) d.setAttribute('data-now', '');
+    const mark = el('span', 'mark', st.done ? '✓' : '');
+    d.append(mark, el('span', null, st.label));
+    s.append(d);
+  }
+  sheet.append(s);
+  bottom.append(sheet);
+  bottom.style.gridTemplateRows = 'minmax(0,1fr)';
+}
+
+function renderRunning(top, bottom) {
+  const inst = rt.instances.get(selected);
+  ensureWindow();
+  winEl.hidden = false;
+  winTitle.textContent = inst ? inst.manifest.name : selected;
+  /* The window is as tall as the app says it is. A frame stretched to fill the
+     region would put a slab of empty chrome under every short app. */
+  if (inst?.frame && inst.frame.parentNode !== winHolder) winHolder.replaceChildren(inst.frame);
+
+  const prompt = rt.pendingPrompt;
+  if (prompt) {
+    bottom.append(promptSheet(prompt));
+    return;
+  }
+
+  const msg = el('div', 'msg');
+  msg.append(el('div', 'body', inst?.status === 'unresponsive'
+    ? `${selected} did not start. Nothing it asked for was granted.`
+    : `Running in its own sandbox. It reaches nothing it did not ask you for.`));
+  bottom.append(msg);
+  bottom.append(buttons([
+    action('Close', () => { rt.kill(selected); view = 'detail'; render(); }, 'primary'),
+    action('Back to apps', () => { rt.kill(selected); view = 'catalog'; selected = null; render(); }),
+  ]));
+}
+
+function promptSheet(p) {
+  const sheet = el('div', 'sheet');
+  sheet.setAttribute('role', 'dialog');
+  sheet.setAttribute('aria-label', `${p.appName} wants ${p.meta.label}`);
+  sheet.append(el('h3', null, `${p.appName} wants ${p.meta.label.toLowerCase()}`));
+  if (p.reason) sheet.append(el('div', 'tagline', `${p.appName} says: ${p.reason}`));
+  sheet.append(el('div', 'tagline', p.meta.why));
+  sheet.append(buttons([
+    action('Allow', () => rt.answerPrompt('granted'), 'primary'),
+    action('Don’t allow', () => rt.answerPrompt('denied')),
+  ]));
+  return sheet;
+}
+
+const EDGE = {
+  loading: {
+    title: 'Reading the catalog',
+    body: 'Each package is fetched and checked before it appears, so nothing here can turn out to be unreadable after you tap it.',
+    acts: () => [action('Show what loaded', () => { lab.setState('ready'); }, 'primary')],
+  },
+  empty: {
+    title: 'No apps yet',
+    body: 'Nothing has been published for this pair of glasses. Anything you build yourself installs from the same place.',
+    acts: () => [action('Open the developer portal', () => { location.href = '/components/24-devsdk/index.html'; }, 'primary')],
+  },
+  error: {
+    title: 'The catalog would not load',
+    body: 'The list is served over the network and the request failed. Anything already installed still works.',
+    acts: () => [action('Try again', () => { lab.setState('ready'); }, 'primary'), action('Show installed apps', () => { lab.setState('ready'); }, null)],
+  },
+  offline: {
+    title: 'No connection',
+    body: 'You cannot install or update without one. Everything already on the glasses is untouched and still opens.',
+    acts: () => [action('Show installed apps', () => { lab.setState('ready'); }, 'primary')],
+  },
+  denied: {
+    title: 'Installing is switched off',
+    body: 'This pair is managed, and whoever manages it turned off installing apps. Nothing you already have was removed.',
+    acts: () => [action('See what is installed', () => { lab.setState('ready'); }, 'primary'), action('Who manages this?', () => { notice = 'Managed by Halfmoon Labs IT. Ask them to allow installs.'; lab.setState('ready'); }, null)],
+  },
+};
+
+function renderEdge(top, bottom) {
+  const e = EDGE[edge];
+  const msg = el('div', 'msg');
+  msg.append(el('div', 'title', e.title), el('div', 'body', e.body));
+  top.append(msg);
+  bottom.append(buttons(e.acts()));
+}
+
+/* Renders await a manifest read, so a second render can be asked for while the
+   first is still in flight. Dropping it would leave the surface showing a view
+   the wearer has already moved on from, so the later one is queued instead. */
+let rendering = false;
+let dirty = false;
+async function render() {
+  if (rendering) { dirty = true; return; }
+  rendering = true;
+  const [top, bottom] = regions();
+  try {
+    if (edge) renderEdge(top, bottom);
+    else if (view === 'catalog') await renderCatalog(top, bottom);
+    else if (view === 'detail') await renderDetail(top, bottom);
+    else if (view === 'installing') renderInstalling(top, bottom);
+    else if (view === 'refused') renderRefused(top, bottom);
+    else if (view === 'running') renderRunning(top, bottom);
+  } finally {
+    rendering = false;
+    if (dirty) { dirty = false; render(); }
+  }
+}
+
+/* ------------------------------------------------------------------ verbs */
+
+/* Install is shown as it happens because each step can genuinely fail, and a
+   spinner that hides which one failed is how a wearer ends up with no idea
+   whether the package or the connection was the problem. */
+async function install(id) {
+  view = 'installing';
+  selected = id;
+  steps = [
+    { label: 'Reading the package', now: true },
+    { label: 'Checking the manifest' },
+    { label: 'Setting up its own storage' },
+  ];
+  render();
+
+  const settle = (i) => {
+    steps[i].done = true;
+    steps[i].now = false;
+    if (steps[i + 1]) steps[i + 1].now = true;
+    render();
+  };
+
+  await new Promise((r) => setTimeout(r, 260));
+  settle(0);
+  const result = await rt.inspect(id);
+  await new Promise((r) => setTimeout(r, 220));
+  if (!result.valid) {
+    problems = result.errors;
+    view = 'refused';
+    render();
+    return;
+  }
+  settle(1);
+  await rt.install(id);
+  updates.delete(id);
+  await new Promise((r) => setTimeout(r, 200));
+  settle(2);
+  await new Promise((r) => setTimeout(r, 240));
+  view = 'detail';
+  notice = '';
+  render();
+}
+
+function remove(id) {
+  rt.uninstall(id);
+  updates.delete(id);
+  notice = `${id} and everything it stored are gone. Any permission you gave it went with them.`;
+  view = 'catalog';
+  selected = null;
+  render();
+}
+
+function open(id) {
+  selected = id;
+  view = 'running';
+  rt.launch(id);
+  render();
+}
+
+/* A real check: the manifest on disk is re-read and its version compared with
+   what is installed. Nothing here consults a list of pretend updates. */
+async function checkUpdates() {
+  notice = 'Checking…';
+  render();
+  if (!rt.online) {
+    notice = 'No connection, so nothing could be checked. What is installed still works.';
+    render();
+    return;
+  }
+  updates = new Map();
+  for (const [id, entry] of rt.installed) {
+    previews.delete(id);
+    const fresh = await rt.inspect(id);
+    if (fresh.valid && fresh.manifest.version !== entry.manifest.version) {
+      updates.set(id, fresh.manifest.version);
+    }
+  }
+  notice = updates.size
+    ? `${updates.size} app can be updated.`
+    : 'Everything installed is up to date.';
+  render();
+}
+
+/* ------------------------------------------------------------------ wiring */
+
+rt.on('change', () => render());
+rt.on('permission-request', () => render());
+rt.on('prompt-closed', () => render());
+rt.on('unresponsive', () => render());
+rt.on('notification', (n) => {
+  os.banner(`<b>${esc(n.appName)}</b> ${esc(n.title)}<br><span style="opacity:.7">${esc(n.body)}</span>`);
+});
+
+const lab = mountLab({
+  piece: '23-appstore',
+  title: 'Apps',
+  states: ['ready', 'loading', 'empty', 'error', 'offline', 'denied'],
+  onState: (s) => {
+    edge = s === 'ready' ? null : s;
+    if (s === 'ready' && view === 'running') { view = 'catalog'; }
+    render();
+  },
+  actions: [
+    { label: 'Install Transit', run: () => { edge = null; lab.setState('ready'); install('transit'); } },
+    { label: 'Open a refused package', run: () => { edge = null; lab.setState('ready'); selected = 'badmanifest'; view = 'detail'; render(); } },
+    { label: 'Pretend an older build is installed', run: async () => {
+        edge = null; lab.setState('ready');
+        /* Rolls the INSTALLED copy back so the update check finds a genuinely
+           newer manifest on disk. The check itself is never faked. */
+        if (!rt.installed.has('transit')) await rt.install('transit');
+        const e = rt.installed.get('transit');
+        e.manifest = { ...e.manifest, version: '1.0.0' };
+        notice = 'Transit is now recorded as version 1.0.0.';
+        view = 'catalog';
+        render();
+      } },
+    { label: 'Run Transit here', run: () => { edge = null; lab.setState('ready'); if (rt.installed.has('transit')) open('transit'); } },
+    { label: 'Remove everything', run: () => { for (const id of [...rt.installed.keys()]) rt.uninstall(id); updates = new Map(); view = 'catalog'; render(); } },
+  ],
+  toggles: [
+    { label: 'Network', initial: true, run: (on) => rt.setOnline(on) },
+  ],
+  onScale: (v) => rt.setDisplay({ textScale: v }),
+  onReducedMotion: (on) => rt.setDisplay({ reducedMotion: on }),
+});
+
+rt.setDisplay({ textScale: lab.scale, reducedMotion: lab.reducedMotion });
+await rt.install('waypoint');
+render();
+</script>
+</body>
+</html>

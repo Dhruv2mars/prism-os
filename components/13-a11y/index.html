@@ -85,7 +85,7 @@
   justify-content:space-between;
   gap:12px;
   animation: rise-in var(--dur-base) var(--ease-prism) both;
-  padding:2px 2px 0 2px;
+  padding:0 2px;
  }
  .a11y-title{font-size:22px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:var(--ink-100)}
  .a11y-subtitle{font-size:11px;font-weight:600;letter-spacing:0.04em;color:var(--ink-60);line-height:1;margin-top:4px;display:flex;align-items:center;gap:6px}
@@ -105,7 +105,7 @@
 
  /* groups */
  .group{
-  display:flex;flex-direction:column;gap:6px;
+  display:flex;flex-direction:column;gap:5px;
   animation: rise-in var(--dur-base) var(--ease-prism) both;
  }
  .group:nth-of-type(1){animation-delay:40ms}
@@ -150,7 +150,7 @@
  .row-icon.ok{background:linear-gradient(180deg,#4cd47c 0%, #1a8a4a 100%);color:#fff}
  .row-icon.warn{background:linear-gradient(180deg,#ffc247 0%, #ff7a1a 100%);color:#1a0f00}
  .row-icon.purple{background:linear-gradient(180deg,#a58bff 0%, #6a4bff 100%);color:#fff}
- .row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+ .row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;justify-content:center}
  .row-title{font-size:14px;font-weight:700;color:var(--ink-100);letter-spacing:-0.01em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  .row-sub{font-size:11px;font-weight:500;color:var(--ink-60);letter-spacing:0.01em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  .row-ctrl{flex:none;display:flex;align-items:center;gap:8px}
@@ -159,7 +159,7 @@
  .row-chevron{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;flex:none;color:var(--ink-40);background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06)}
 
  /* slider row */
- .slider-row{flex-direction:column;align-items:stretch;gap:10px;padding:12px 12px 14px 12px;cursor:default}
+ .slider-row{flex-direction:column;align-items:stretch;gap:8px;padding:11px 12px 12px 12px;cursor:default}
  .slider-row:hover{background:transparent}
  .slider-head{display:flex;align-items:center;gap:12px;width:100%}
  .slider-head .row-main{flex:1}
@@ -343,6 +343,7 @@
 </div>
 <script type="module">
 import { createOS } from '/os/shared/core.js';
+import { hardenGaze } from '/os/shared/lab.js';
 const stage = document.querySelector('[data-stage]');
 const device = document.querySelector('.device');
 const os = createOS(stage, { dwell:true, dwellMs:350 });
@@ -443,7 +444,7 @@ function updateStageScale(v){
   c.classList.toggle('active', parseInt(c.dataset.scale,10)===v);
  });
  // update metric pills?
- os.banner(`<strong>Text scale ${v}%</strong><span class="caption">· --a11y-scale ${ (v/100).toFixed(2) }</span>`,{timeout:1400});
+ os.banner(`<strong>Text scale ${v}%</strong><span class="caption">applied across the whole system</span>`,{timeout:1400});
 }
 function setContrast(on){
  highContrast=on;
@@ -464,7 +465,7 @@ function setReduced(on){
  // update wave state
  const wave=document.getElementById('previewWave');
  if(wave) wave.className= on ? 'wave paused' : (mono? 'wave muted' : 'wave');
- os.banner(on ? '<strong>Reduced motion on</strong><span class="caption">animations paused · 0.01ms · prism-ease held</span>' : '<strong>Animations live</strong><span class="caption">260 ms · cubic-bezier(.32,.72,0,1)</span>',{timeout:1800});
+ os.banner(on ? '<strong>Reduced motion on</strong><span class="caption">animations paused across the system</span>' : '<strong>Animations live</strong><span class="caption">motion restored across the system</span>',{timeout:1800});
 }
 function setMono(on){
  mono=on;
@@ -520,7 +521,7 @@ function render(){
  // scale slider row
  const scaleRow = h('div', {class:'a11y-row slider-row', 'data-focusable':'', tabindex:'0', 'aria-label':'Text scale, 100 to 150 percent'});
  const scaleHead = h('div', {class:'slider-head'});
- scaleHead.innerHTML=`<div class="row-icon accent">${iconSvg('type')}</div><div class="row-main"><div class="row-title">Text scale</div><div class="row-sub">Stage scales via --a11y-scale · glanceable at arm’s length</div></div>`;
+ scaleHead.innerHTML=`<div class="row-icon accent">${iconSvg('type')}</div><div class="row-main"><div class="row-title">Text scale</div><div class="row-sub">Every surface reflows · glanceable at arm’s length</div></div>`;
  const chipWrap = h('div', {class:'scale-chips'});
  [100,125,150].forEach(v=>{
   const chip=h('button', {class:'scale-chip' + (v===scalePct?' active':''), 'data-scale':String(v), 'data-focusable':'', tabindex:'0', 'aria-label':`Set text scale to ${v} percent`}, `${v}%`);
@@ -538,7 +539,7 @@ function render(){
    // live refresh subtitle
    const subEl=document.querySelector('.a11y-subtitle');
       if(subEl) subEl.innerHTML=`<span class="dot ok" aria-hidden="true"></span> Prism OS · scale <span class="tabular">${v}%</span> · ${highContrast?'high contrast':'standard'} · ${reducedMotion?'reduced':'motion'}`;
-   os.banner(`<strong>Text scale ${v}%</strong><span class="caption">--a11y-scale ${ (v/100).toFixed(2) } · live</span>`,{timeout:1400});
+   os.banner(`<strong>Text scale ${v}%</strong><span class="caption">live across the system</span>`,{timeout:1400});
    // animate preview
    if(!os.state.reducedMotion && !reducedMotion){
     const ps=document.getElementById('previewStage'); if(ps) ps.animate([{transform:'scale(0.99)'},{transform:'scale(1)'}],{duration:220,easing:'cubic-bezier(0.32,0.72,0,1)'});
@@ -570,7 +571,7 @@ function render(){
  visionCard.append(scaleRow);
  // contrast row
  const contrastRow=h('div', {class:'a11y-row', 'data-focusable':'', tabindex:'0', role:'button', 'aria-label':`High contrast ${highContrast?'on':'off'}, toggle`});
- contrastRow.innerHTML=`<div class="row-icon">${iconSvg('contrast')}</div><div class="row-main"><div class="row-title">High contrast</div><div class="row-sub">Increases outline opacity 0.12 → 0.26 · glass stays translucent</div></div><span class="row-value " id="contrastVal">${highContrast?'High':'Standard'}</span>`;
+ contrastRow.innerHTML=`<div class="row-icon">${iconSvg('contrast')}</div><div class="row-main"><div class="row-title">High contrast</div><div class="row-sub">Stronger outlines · glass stays translucent</div></div><span class="row-value " id="contrastVal">${highContrast?'High':'Standard'}</span>`;
  const contrastToggle=makeToggle(highContrast,'High contrast');
  contrastToggle.id='contrastToggle';
  contrastToggle.addEventListener('togglechange', e=> setContrast(e.detail.on));
@@ -648,7 +649,7 @@ function render(){
  const colorWrap=h('div', {style:'display:flex;flex-direction:column;gap:0'});
  const colorTitleRow=h('div', {class:'a11y-row', style:'cursor:default', 'data-focusable':'', tabindex:'0', 'aria-label':'Colorblind-safe palette, accent distinguishable from ok warn danger by shape and icon'});
  colorTitleRow.innerHTML=`<div class="row-icon accent">${iconSvg('eye')}</div><div class="row-main"><div class="row-title">Colorblind-safe accents</div><div class="row-sub">Accent always blue · never only color · shape + icon</div></div><span class="row-chevron">${iconSvg('chevron')}</span>`;
- colorTitleRow.addEventListener('click', ()=> os.banner('<strong>Accents · safe</strong><span class="caption">accent #56b8ff vs ok #4cd47c · icon + pattern</span>',{timeout:1600}));
+ colorTitleRow.addEventListener('click', ()=> os.banner('<strong>Accents · safe</strong><span class="caption">always paired with icon + pattern</span>',{timeout:1600}));
  const colorRow=h('div', {class:'color-row'});
  const chips=[
   {label:'Accent', sub:'circle · blue', bg:'linear-gradient(180deg, var(--accent), var(--accent-strong))', icon:iconSvg('focus'), pattern:'linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%)'},
@@ -716,7 +717,7 @@ function render(){
  });
  focusDemo.append(gazeBtn, keyBtn, focusTrigger);
  const legend=h('div', {class:'focus-legend'});
-  legend.innerHTML=`<span class="legend-dot" aria-hidden="true">${iconSvg('focus')}</span><span><strong style="color:var(--ink-80)">Ring:</strong> 2.5 px <span style="color:var(--accent)">#56b8ff</span> · <span class="tabular">0.9</span> opacity · offset 2 px · seen on Tab and gaze hover</span>`;
+  legend.innerHTML=`<span class="legend-dot" aria-hidden="true">${iconSvg('focus')}</span><span><strong style="color:var(--ink-80)">Ring:</strong> bright focus ring · seen on Tab and gaze hover</span>`;
  focusTitleRow.append(focusDemo, legend);
  fiCard.appendChild(focusTitleRow);
  // equivalence grid
@@ -825,7 +826,7 @@ function setEdge(id){
    b.addEventListener('click', ()=>{
     const t=b.textContent.trim();
     if(t.includes('high contrast')){ highContrast=true; stage.classList.add('high-contrast'); setEdge('normal'); os.banner('<strong>High contrast on</strong><span class="caption">outline 0.26 · saved</span>',{timeout:1800}); }
-    else { scalePct=125; stage.style.setProperty('--a11y-scale','1.25'); setEdge('normal'); os.banner('<strong>Scale 125%</strong><span class="caption">--a11y-scale 1.25 · live preview scaled</span>',{timeout:1800}); }
+    else { scalePct=125; stage.style.setProperty('--a11y-scale','1.25'); setEdge('normal'); os.banner('<strong>Scale 125%</strong><span class="caption">applied across the whole system</span>',{timeout:1800}); }
    });
   });
   stage.appendChild(os.cursor);
@@ -941,6 +942,8 @@ render();
 os.on('back', ()=>{
  if(edgeState!=='normal'){ setEdge('normal'); }
 });
+
+hardenGaze();
 
 console.log('Prism a11y ready — scale var --a11y-scale, contrast, reduced-motion, mono, colorblind-safe, focus ring, gaze equivalence');
 </script>

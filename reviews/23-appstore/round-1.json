@@ -1,0 +1,93 @@
+{
+  "piece": "23-appstore",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T11:05:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/23-appstore/index.html reviews/23-appstore/judge-r1",
+    "outDir": "reviews/23-appstore/judge-r1",
+    "screenshotsRead": [
+      "stage.png", "full.png", "stage-reduced-motion.png",
+      "s-catalog.png", "s-detail.png", "s-installed.png", "s-installing.png",
+      "s-running.png", "s-running2.png", "s-refused.png (via view-refused.png)",
+      "s-error.png", "s-denied.png", "state-loading.png", "state-empty.png",
+      "s-scale310.png", "s-detail310.png", "s-updatebadge.png",
+      "s-offline-check.png", "zombie-window.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 5,
+    "notes": "Catalog, detail, refused (real validator output, 6 fielded problems), installing (3 live steps), running (content-sized sandboxed frame + permission prompt with the app's own words), all five lab states, 310% text scale, and offline update check all probed by hand. Zero console/page errors. Then verified a real defect mechanically: after leaving the running view, .window carries hidden=true but computed display is 'grid' and it still has a box — the dead app window paints over the catalog header and first row forever. Root cause: .window { display: grid } (index.html:170) beats the UA [hidden] rule that regions() at index.html:282 relies on."
+  },
+  "blind": {
+    "A": "visionOS App Store / App Library sheet (visionOS 1.x, dark environment)",
+    "B": "Horizon OS Meta Horizon Store on Quest 3 (v69+ storefront and library mixed view)",
+    "C": "artifact under review"
+  },
+  "blindDescriptions": {
+    "A": "visionOS App Store lands as a floating glass sheet over your room, search field at top, large product cards with big art, a Today-style editorial stack. Product page shows a Get pill, tabular version/size line, and a verbose but genuinely informative permission list rendered as plain rows in the same glass material. Failure states are nearly invisible: the store is almost always network-fed, and when it fails you get a small centered alert with OK — a dead-end alert, not a recovery surface. App Library is a dense grid of rounded icons with labels; glanceable but identical chrome everywhere makes state (updating, paused) hard to read at arm's length.",
+    "B": "Horizon OS's store is a flat panel pinned in VR space with a dark slab background, left nav rail, big promotional hero tile, horizontal app rows, and a blue-accented Buy/Get button per card. Detail pages lean on screenshots and a star rating; permission text is short and sometimes thin — 'storage access' with no reason given. Loading is a centered blue spinner over the panel; failures are toast-like banners that vanish, leaving a blank row region. Install progress is a determinate bar on the card. It is glanceable at distance but the panel reads as opaque TV UI, not glass, and the empty/offline stories are weak.",
+    "C": "A two-region lens: top region is the catalog list (icon glyph, name, developer·category, state pill on the right), bottom region is a supporting sheet or message. Rows are real buttons with visible gaze focus ring. Detail view pairs a hero with a risk-pipped permission list that prints the system's wording AND the developer's own claimed reason side by side. A refused package shows the actual validator failures field-by-field. Installing walks three real steps live. Running apps open in a content-sized sandboxed window with a per-permission prompt. Every lab state (loading/empty/error/offline/denied) is written copy with a recovery action, not a spinner. One defect: a dead app window persists over the catalog after leaving the running view."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS App Store product page (visionOS 1.0-2.x): a glass sheet floating in the shared space, hero art at top, blue Get capsule bottom-right, a 'What it asks for'-style permission section rendered as plain rows in the same material, tabular version and size caption. Failure surfaces are system alerts with a single OK button, not recovery flows. App Library (Home View app grid, 2024): 1x1 icons on the dark glass ellipse, Environments dial at right — glanceable but state-blind at distance.",
+    "horizonOS": "Meta Horizon Store on Quest 3 (Horizon OS v69 storefront): opaque dark panel with left nav rail, promotional hero carousel, horizontal app rows with blue Buy/Get buttons, determinate progress bar on installing cards, centered spinner while the store content loads. Permission copy is terse ('storage access') with no developer-side justification shown, and offline/empty regions collapse to blank space or vanished toasts."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 8,
+      "focusDiscipline": 7,
+      "materialHonesty": 9,
+      "motion": 8,
+      "typography": 8,
+      "edgeStates": 6,
+      "dependability": 7,
+      "accessibility": 8,
+      "delight": 7
+    },
+    "horizonOS": {
+      "glanceability": 7,
+      "focusDiscipline": 6,
+      "materialHonesty": 4,
+      "motion": 6,
+      "typography": 6,
+      "edgeStates": 4,
+      "dependability": 5,
+      "accessibility": 5,
+      "delight": 5
+    },
+    "ours": {
+      "glanceability": 8,
+      "focusDiscipline": 7,
+      "materialHonesty": 8,
+      "motion": 7,
+      "typography": 8,
+      "edgeStates": 9,
+      "dependability": 5,
+      "accessibility": 9,
+      "delight": 8
+    }
+  },
+  "totals": {
+    "visionOS": 68,
+    "horizonOS": 48,
+    "ours": 69
+  },
+  "winnersPerCriterion": {
+    "glanceability": "ours (tied visionOS)",
+    "focusDiscipline": "ours (tied visionOS)",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "ours (tied visionOS)",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "ours",
+    "delight": "ours"
+  },
+  "overallRanking": ["ours", "visionOS", "horizonOS"],
+  "biggestGap": "Zombie app window · components/23-appstore/index.html:170 (.window { display: grid }) vs line 282 (regions(): winEl.hidden = true) · expected the sandboxed app window to disappear when the wearer leaves the running view (hidden attribute must actually remove it) · got the dead window painting over the catalog permanently — 'transit / sandboxed' bar and the app's frame occlude the 'Apps' header and first row, verified in zombie-window.png and computed style {hiddenAttr:true, display:'grid', box:true}. Fix: add `.window[hidden] { display: none; }` (or toggle a class) so hidden actually hides.",
+  "reason": "Probed every surface by hand: catalog, detail with the dual-voice permission list (system wording + the app's own words, which visionOS does not even do), refused package with real validator field errors, live three-step install, content-sized sandboxed window with per-permission prompts, all five lab states with real recovery actions, 310% text scale (regions hold, band preserved), offline update check (honest message, no fake data). Zero console errors. Blind scoring put ours tied with visionOS on glanceability/focus/typography and ahead on edge states, accessibility, and delight; visionOS wins material honesty (its sheets sit in a rendered environment so occlusion is never in doubt) and motion, and it should win dependability — except this artifact found a failure visionOS never ships: leaving a running app leaves the dead window painting over the store forever because .window's display:grid defeats the hidden attribute regions() relies on (index.html:170 vs 282, proven with computed style and screenshot). That is a standing occlusion of primary content with no recovery gesture, so dependability drops to 5 and a gap is named. Ours still ranks first overall at 69 vs visionOS 68, but the pass condition requires tied-first with ZERO named gaps, and this gap is real and verified, so: fail.",
+  "passCondition": "Ours ranked first overall (69/90 vs visionOS 68, horizonOS 48) but not tied-first with zero gaps — one verified gap (zombie window over the catalog) remains, so the verdict is fail."
+}

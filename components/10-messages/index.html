@@ -59,8 +59,8 @@
   inset:44px 0 0 0;
   display:flex;
   flex-direction:column;
-  gap:10px;
-  padding:10px 14px 14px 14px;
+  gap:8px;
+  padding:8px 14px 14px 14px;
   overflow-y:auto;
   overscroll-behavior:contain;
   scrollbar-width:none;
@@ -590,6 +590,7 @@
 </div>
 <script type="module">
 import { createOS } from '/os/shared/core.js';
+import { hardenGaze } from '/os/shared/lab.js';
 const stage = document.querySelector('[data-stage]');
 const device = document.querySelector('.device');
 const os = createOS(stage, { dwell:true, dwellMs:350 });
@@ -639,7 +640,7 @@ stage.append(viewport, stateLayer, hintbar, convSheet, callOverlay);
 
 // data
 let threads = [
- { id:'mara', name:'Mara', avatar:'M', avatarClass:'mara circle', unread:2, time:'9:41', preview:'Lens test at 4pm? I’ll bring the mount — need 20° FOV check.', status:'Active now', live:true },
+ { id:'mara', name:'Mara', avatar:'M', avatarClass:'mara circle', unread:2, time:'9:41', preview:'Lens test at 4pm?', status:'Active now', live:true },
  { id:'prism', name:'Prism Team', avatar:'P', avatarClass:'prism', unread:1, time:'9:12', preview:'Build 26A ready — window chrome now respects scrim depth.', status:'3 members · updated 18m ago', live:false },
  { id:'alex', name:'Alex Rivera', avatar:'A', avatarClass:'alex circle', unread:0, time:'Yesterday', preview:'Nice shot · 12 MP · Golden Gate is fire.', status:'Delivered · Yesterday', live:false },
  { id:'jordan', name:'Jordan · Group', avatar:'J', avatarClass:'jordan', unread:0, time:'Mon', preview:'Voice · 00:14 — Running 5 late, start without me.', status:'4 members', live:false },
@@ -1430,6 +1431,8 @@ os.on('capture', ()=>{
 const keepCursorTop = ()=> stage.appendChild(os.cursor);
 stage.addEventListener('pointermove', keepCursorTop);
 os.on('focuschange', keepCursorTop);
+
+hardenGaze();
 </script>
 </body>
 </html>

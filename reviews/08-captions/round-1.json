@@ -1,0 +1,57 @@
+{
+  "piece": "08-captions",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T08:05:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/08-captions/index.html reviews/08-captions/judge-r1",
+    "outDir": "reviews/08-captions/judge-r1",
+    "screenshotsRead": [
+      "stage.png", "full.png", "stage-reduced-motion.png",
+      "state-loading.png", "state-empty.png", "state-error.png", "state-error-retrying.png",
+      "state-offline.png", "state-permission.png", "state-paused.png", "state-muted.png",
+      "lang-es.png", "gaze-focus-pause.png", "devspeak-rendered.png"
+    ],
+    "consoleErrors": 0, "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 6,
+    "notes": "Drove all six edge states via the piece's own window.__setCaptionsEdge plus pause/mute/language clicks; read every screenshot. Normal state: word-by-word blur-wipe reveal with current-line accent bar, glass transcript over radial scrim, waveform + pause/mute/copy/clear card. Loading = skeleton mirror of final layout but its content overflows the 600px stage (controls skeleton clipped at bottom edge). Empty/error/offline/permission cards are designed with real recovery actions; retry verified working (restored banner). Reduced motion: 0 infinite animations, content present. No token-leak gate trips because probe ran too early — the leak streams in later: SCRIPT line 5 'Prism's blur wipe makes each new word glide in. No bounce — just prism ease.' renders verbatim as a caption (devspeak-rendered.png), loading state paints 'Loading · shimmer 1.2s · on-device engine', empty paints 'Humane empty', persistent hint row paints 'Gaze + dwell 350 ms'. Worse: after ~30s the transcript degenerates — lang-es.png and gaze-focus-pause.png show five/six IDENTICAL cards all reading 'Exactly — one focal element, timer, and glass that reads over the world'; startNextLine pushes an extra line then the next tick re-reads the same pushed index, so every synthesized line renders twice consecutively. Muted state semantics are odd (muting the mic does not stop caption streaming). Error card grammar: 'Past transcript still readable · 1 lines'."
+  },
+  "blind": {
+    "A": "visionOS FaceTime Live Captions (spatial call), visionOS 2.x",
+    "B": "Meta Quest system Live Captions overlay, Horizon OS v50+",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "A single wide glass capsule pinned near the bottom of the shared space during a FaceTime call with Live Captions on: deep-black blurred glass, speaker name in small grey caps, the active sentence in ~30px white SF Pro across one or two lines, old lines fade out entirely rather than stacking. Nothing else is in frame; no waveform, no timer, no pills. Swap-in is a short fade. Failure handling is a terse system alert, not an in-surface state; loading is a bare system spinner; mic permission is a verbose modal sheet.",
+    "B": "A Quest headset with system Live Captions enabled: a dark translucent rounded strip floating at the bottom of the VR view, one to two lines of white sans text at a fixed modest size, no speaker labels, no history — text just replaces itself. It pops in and out with plain fades and can overlap whatever app content sits low in the view. Size is a three-step system setting; there is no offline concept, no queue, no in-surface retry; errors surface as Android-style toasts.",
+    "C": "A 600x600 glass stage: status bar, then a header row (pulsing LIVE·ENGLISH·ON-DEVICE pill, green-dot timer pill, language chip), a scrolling transcript of rounded cards where the current line carries an accent bar, glow, and LIVE badge while words reveal one-by-one with a blur wipe and a highlighted latest word; below, a controls card with an animated blue waveform, mute and pause buttons, confidence/word stats, copy/clear chips, and a persistent hint row. Six edge states are one click away: skeleton loading, empty card with Start captions, error card with Retry and PR-CAP-503 code, offline card with queued-segment list over a dimmed transcript, mic-blocked card with Allow path. All states recover; none dead-end. But the caption CONTENT is builder self-narration ('just prism ease', '600 by 600', 'one focal element'), the synthesized lines eventually repeat identically, and five elements glow at once."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS FaceTime Live Captions during a spatial Persona call (visionOS 2.x): a single bottom-pinned capsule of heavily blurred dark glass over the passthrough room, speaker attribution in small grey caps, active sentence in ~30px white SF Pro with generous optical sizing, completed lines gone rather than stacked, no chrome in frame. Weaknesses: no transcript history without leaving the surface, loading is a bare spinner, permission is a verbose system modal, and the capsule occludes lower content.",
+    "horizonOS": "Meta Quest system-wide Live Captions (Horizon OS v50+): a translucent black rounded strip anchored low in the headset view, 1-2 lines of white text that replace themselves, no speaker diarization, no history, plain pop in/out, three-step text size in Quick Settings. Weaknesses: strip collides with app UI, no current-line emphasis, no offline/error design, purely utilitarian with zero signature moment."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 9, "focusDiscipline": 9, "materialHonesty": 9, "motion": 7, "typography": 9, "edgeStates": 5, "dependability": 7, "accessibility": 9, "delight": 6 },
+    "horizonOS": { "glanceability": 7, "focusDiscipline": 7, "materialHonesty": 7, "motion": 6, "typography": 7, "edgeStates": 4, "dependability": 6, "accessibility": 7, "delight": 4 },
+    "ours": { "glanceability": 6, "focusDiscipline": 5, "materialHonesty": 7, "motion": 7, "typography": 2, "edgeStates": 8, "dependability": 5, "accessibility": 6, "delight": 7 }
+  },
+  "totals": { "visionOS": 70, "horizonOS": 55, "ours": 51 },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "ours",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "ours"
+  },
+  "overallRanking": ["visionOS", "horizonOS", "ours"],
+  "biggestGap": "Caption content stream (the transcript itself, the one thing this surface produces) · components/08-captions/index.html:588-594 (SCRIPT) and :761-767 (extra-line reuse in startNextLine) · expected: captions render plausible speaker dialog in clean user language, each line unique · got: every scripted line is builder meta-narration addressed at the critic — line 5 renders the engineering token 'prism ease' verbatim ('No bounce — just prism ease.', automatic typography 1-3), line 3 narrates 'We're at 600 by 600', the extras narrate 'one focal element, timer, and glass that reads over the world', and the extra-line logic pushes a line then re-reads the same index next tick so each synthesized line paints twice consecutively until five/six identical 'Exactly —' cards fill the viewport (captured in lang-es.png and gaze-focus-pause.png). Fix the SCRIPT copy to neutral dialog, remove token vocabulary, and advance past the pushed index instead of re-reading it.",
+  "reason": "Ours ranks last (51 vs visionOS 70, Horizon 55). The edge-state craft is real and beats both references (8 vs 5/4) — loading skeletons mirror the final layout, offline keeps a queued-segment list with times, permission offers allow/deny plus a settings path, and every state recovers without dead ends; the blur-wipe word reveal is an earned signature and reduced motion is fully honored. But the surface's single product — the caption stream — is broken twice over in pixels: it renders the engineering token 'prism ease' and builder self-narration as user-visible caption text (automatic typography 2), and the synthesis bug repeats identical lines until the transcript is six copies of one sentence, which is a dependability failure of the core loop, not a cosmetic flaw. Focus discipline is diluted (five loud glowing elements at once where visionOS ships one capsule), the current line is only 13px in a 20-degree FOV, and aria-live polite on a log mutating every ~70ms would flood a screen reader. Strong bones, disqualified by what it actually says.",
+  "passCondition": "Ours ranked LAST overall (51/90, behind Horizon OS 55 and visionOS 70); one gap named — the caption content stream's dev-speak script plus the duplicate-line synthesis bug."
+}

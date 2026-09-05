@@ -1,0 +1,63 @@
+{
+  "piece": "25-devsim",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T08:55:00Z",
+  "verdict": "pass",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/25-devsim/index.html reviews/25-devsim/judge-r1  (plus my own playwright drives: reviews/25-devsim/judge-r1/drive.mjs, drive2.mjs covering ready/loading/empty/error/offline/denied, log+permissions+prompt sheets, hung build 9s to Not responding, refused build, Why? at 310%, scale 1.6/2.3/3.1, rm=1, world night/outdoor, lab=0)",
+    "outDir": "reviews/25-devsim/judge-r1",
+    "screenshotsRead": [
+      "stage.png", "full.png", "stage-reduced-motion.png",
+      "states/ready.png", "states/loading.png", "states/empty.png", "states/error.png",
+      "states/offline.png", "states/denied.png", "states/sheet-log.png", "states/sheet-perms.png",
+      "states/sheet-prompt.png", "states/hang.png", "states/refused.png", "states/log-filled.png",
+      "states/scale-160.png", "states/scale-230.png", "states/scale-310.png",
+      "states/scale-230-sheet-log.png", "states/scale-310-empty.png", "states/rm-sheet.png",
+      "states/world-night.png", "states/world-outdoor.png", "states/nolab.png",
+      "states/sheet-log2.png", "states/sheet-perms2.png", "states/sheet-perms-toggled.png",
+      "states/hang-notresponding.png", "states/scale-310-why.png", "states/nolab-empty.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 6,
+    "notes": "Gate green: no token leaks, no reticle/glyph collisions, reduced-motion honored (0 infinite animations), lab chrome fully outside the stage, all focusables labeled. Pixels: header + status dot, app preview (real iframe, id/version bar) top, world deliberately open mid-lens, three quiet figures + actions bottom; bottom sheets over a scrim for prompt/log/permissions. All six edge states are designed with icon, title, explanation and a recovery action; hang resolves to 'Not responding' with Stop available; refused build lists per-field validation reasons; offline state leaves the app running and shows the brokered refusal inside the app itself ('Network is off / Ask again'). 310% reflows the whole surface and the fitBand logic lifts optional prompt lines into a 'Why?' sheet so the ask never sits under the reticle rest point."
+  },
+  "blind": {
+    "A": "visionOS system permission alert + Settings > Privacy & Security rows (visionOS 2, Quest-class equivalent described below)",
+    "B": "Horizon OS system dialog + OVR Metrics Tool overlay (Quest 3)",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "System A puts a single glass card dead-center in the shared space: dark translucent material with strong background blur, app icon top, semibold one-line question, small secondary text, two bezel buttons where the confirmation is typographically heavier. The world and windows behind dim slightly but stay visible — the material always reads as glass over something. Its developer-facing numbers (frame stats) live outside the headset or in a sparse overlay; in-headset states beyond the alert (loading, denied) are bare spinners or static icons with terse text, and dialogs at large Dynamic Type sizes clip rather than reflow.",
+    "B": "System B renders the same decision on a near-opaque dark rounded rectangle that suppresses the world almost entirely: white title, grey body, two equal-weight pill buttons side by side. Loading and error states default to a spinner or toast; permission-denied leaves the app on a dead screen with a terse system line. Its performance readout is a corner overlay of small white-on-black numbers with no hierarchy. Text scaling works inside panels but dialogs truncate; reduced motion is honored inconsistently.",
+    "C": "System C is a 600x600 monocular surface: title + live status word/dot top-right; the app under test in a bordered preview (its own id/version, 'sandboxed') at top with the real running app inside; the middle of the lens left open for world and reticle; three quiet tabular figures and four actions at the bottom. Every decision or inspection rises as a bottom sheet over a scrim while the surface's own content dims leaf-by-leaf, so exactly one thing is loud. All six edge states replace the preview with icon + sentence + recovery button; a hung build resolves to 'Not responding'; a refused build prints the exact failing manifest fields; Escape on a grant means deny. At 310% text the whole surface reflows and the least-essential prompt lines move behind a 'Why?' sheet."
+  },
+  "referenceScreens": {
+    "visionOS": "The visionOS system permission alert (e.g. 'Allow Transit to access your location'), visionOS 1/2: a centered glass card on the room's passthrough, strong blur, app icon top, semibold question sentence, caption body, and a horizontal pair of bezeled buttons with the default heavier; windows behind recede while remaining visible. Secondarily Settings > Developer / Privacy rows: grouped glass list, label left, grey trailing value ('Allow', 'Denied'), one accent for selection.",
+    "horizonOS": "The Quest 3 Horizon OS runtime permission dialog: near-opaque #1C1C1E-class rounded panel centered on a vignetted background, white title, grey explanation naming the capability, two equal-weight white pill buttons ('Allow' / 'Don't Allow'); plus the OVR Metrics Tool overlay used as Horizon's de-facto developer readout: a compact pinned block of small white-on-black stats (FPS, GPU time) with no hierarchy, and Developer settings as a two-column 2D panel list."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 9, "focusDiscipline": 9, "materialHonesty": 9, "motion": 9, "typography": 9, "edgeStates": 5, "dependability": 8, "accessibility": 8, "delight": 6 },
+    "horizonOS": { "glanceability": 8, "focusDiscipline": 8, "materialHonesty": 6, "motion": 7, "typography": 7, "edgeStates": 5, "dependability": 7, "accessibility": 6, "delight": 4 },
+    "ours": { "glanceability": 7, "focusDiscipline": 8, "materialHonesty": 9, "motion": 8, "typography": 7, "edgeStates": 9, "dependability": 9, "accessibility": 9, "delight": 9 }
+  },
+  "totals": { "visionOS": 72, "horizonOS": 58, "ours": 75 },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "ours",
+    "accessibility": "ours",
+    "delight": "ours"
+  },
+  "overallRanking": ["ours", "visionOS", "horizonOS"],
+  "biggestGap": "Glanceability of the developer HUD's own numbers · components/25-devsim/index.html:115-124 (.fig-n/.fig-k) · expected the three figures that justify this surface (slowest frame / calls / refused) to be the most glanceable thing after the app itself — large type (fs-body/fs-callout scale), ink-100, tabular, sitting mid-lens like a HUD complication — got fs-caption at ink-80 over ink-40 keys, the smallest and dimmest type on the entire lens, parked at the extreme bottom edge; a developer glancing at their frame budget reads it last, not first. (Runner-up, worth a follow-up: mountSheet at index.html:599-600 focuses the [data-primary] button, which on a permission prompt is 'Allow' — the safe default focus would be the deny action, since Enter grants without the wearer looking at it.)",
+  "reason": "Judged from rendered pixels across 30 screenshots I drove myself: six lab states, all three sheets, hung-build watchdog, refused build, 160/230/310% text, reduced motion, three worlds, rail-less embed. Ours loses glanceability and typography to the visionOS alert because the surface's payload numbers are caption-sized and dim, and it loses focus discipline marginally (the hung build's preview is a large empty box). But it beats both references where this surface actually lives: edge states (all six designed with explanations and recovery actions vs bare spinners/static icons), dependability (hang lands on 'Not responding' + Stop, refusal lists exact failing manifest fields, offline keeps the build running and shows the brokered refusal inside the app, Escape on a grant means deny, log capped, iframe never re-parented, zero errors across every load), accessibility (the whole surface reflows at 310% and the fitBand 'Why?' mechanism keeps the decision above the reticle rest point instead of truncating like the references do), and delight (the call-log annotation 'includes the time you spent deciding' — a system that notices the human's decision time was inside the latency and says so, so the developer optimizes the right thing; earned, functional, and neither reference has anything like it). Material honesty ties visionOS: the 0.34/0.52/0.78 ladder reads as glass over the street in every world, world visible through the sheet. Totals: ours 75, visionOS 72, horizonOS 58 — ours first overall, so it passes, with the .fig-n glance gap named for the builder to fix.",
+  "passCondition": "ours ranked FIRST overall (75/90 vs visionOS 72, horizonOS 58); 1 gap named (the glanceability/typography of the .fig-n figures), so not tied-first-with-zero-gaps — pass rides on the outright ranking, and the gap is the next builder task."
+}

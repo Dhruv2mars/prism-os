@@ -1,0 +1,95 @@
+{
+  "piece": "01-boot",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T08:55:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/01-boot/index.html reviews/01-boot/judge-r1",
+    "outDir": "reviews/01-boot/judge-r1",
+    "screenshotsRead": [
+      "stage.png", "full.png",
+      "drive-0-boot-mid.png", "drive-1-handoff.png", "drive-2-handoff-street.png",
+      "drive-3-handoff-outdoor.png", "drive-4-home.png", "drive-5-fail-boot.png",
+      "drive-6-recovery.png", "drive-7-recovery-focus.png", "drive-8-hold-mid.png",
+      "drive-9-hold-cancel.png", "drive-10-rm-handoff.png", "drive-11-recovery-150.png",
+      "drive-12-handoff-150.png", "drive-13-handoff-200.png",
+      "el-handoff-200.png", "el-rm-after-replay.png", "el-boot-mid.png", "el-boot-late.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 0,
+    "notes": "inStageFocusables=0 because probe samples during boot phase; handoff layer itself is one focus target (role=button tabindex=0) and recovery exposes Restart + Reinstall with visible focus ring via Tab (drive-7). Cold boot: prism draw + arc sweep + caption, tap-to-skip present. Fail mode: arc stalls at 62%, amber inset glow, warn chip, lands in recovery with diagnostics and hold-to-confirm destructive. Home-ready shows world through glass correctly. CRITICAL: handoff state is an opaque #020407 field — switching world Street->Outdoor changes nothing (drive-2 vs drive-3 pixel-identical); world visible only after swipe at home-ready. CRITICAL: Text size slider (lab.js:277 sets --a11y-scale) has zero consumers in boot.css/boot.js/design-system.css — 100%, 150%, 200% screenshots pixel-identical (el-handoff-200.png). Lab Reduced-motion toggle does not affect live piece (RM cached at boot.js:6, no [data-reduced-motion] CSS anywhere), though real prefers-reduced-motion at load IS honored (timers clamped to 40ms, draws finished instantly, probe RM check passed)."
+  },
+  "blind": {
+    "A": "visionOS",
+    "B": "Horizon OS",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "System A boots to an Apple logo with a thin indeterminate progress bar on true black (sensors calibrating, passthrough deliberately absent), then lands on 'Welcome to Apple Vision Pro' rendered over LIVE color passthrough with a single large rounded Continue button; eye-dot focus ring is unmistakable; one idea per screen; failure paths are a designed reboot/support screen. The post-boot moment is the best-in-class glass material: the world is visible through the UI with correct dimming.",
+    "B": "System B boots to a Meta logo with thin progress on black, then runs a multi-card setup flow (guardian boundary, guardian tutorial) over grayscale passthrough with strong dark vignettes; controller laser plus highlighted cards; wordier copy, occasionally two competing focal elements; tracking-lost is handled constantly and gracefully, but a true boot failure funnels to a cable-reimaging screen that is a near dead end.",
+    "C": "System C boots to a wireframe prism that draws itself with a chromatic beam, a circular arc that sweeps as progress, and a single uppercase caption; failure stalls the arc at 62%, tints the field amber, pins a warn chip, then hands off to a recovery sheet with four diagnostics and two actions (Restart; hold-to-confirm Reinstall with a 3-segment progress ring that cancels on release). The wake state is a chevron + 'Swipe up to begin' on an opaque near-black field with a faint bottom glow cue. Terminal state is a small card over visible world saying 'Prism ready / Home placeholder'."
+  },
+  "referenceScreens": {
+    "visionOS": "Apple Vision Pro boot + Welcome screen (visionOS 1, 2024): black boot screen with Apple logo and thin progress bar, then 'Welcome to Apple Vision Pro' headline over bright live passthrough with one large Continue button and the gaze reticle; Solo Keyboard-style typography hierarchy, exactly two text sizes on the welcome screen.",
+    "horizonOS": "Quest 3 boot + guardian setup (Horizon OS v60+, 2024): Meta logo with thin progress bar on black, then boundary-setup cards over grayscale passthrough, each card with title, body, and one primary button; persistent vignette frame around passthrough; controller-pointed laser with hover-highlight as focus state."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 8,
+      "typography": 9,
+      "edgeStates": 7,
+      "dependability": 8,
+      "accessibility": 8,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 7,
+      "focusDiscipline": 6,
+      "materialHonesty": 7,
+      "motion": 7,
+      "typography": 7,
+      "edgeStates": 6,
+      "dependability": 6,
+      "accessibility": 7,
+      "delight": 8
+    },
+    "ours": {
+      "glanceability": 9,
+      "focusDiscipline": 8,
+      "materialHonesty": 5,
+      "motion": 10,
+      "typography": 7,
+      "edgeStates": 9,
+      "dependability": 9,
+      "accessibility": 4,
+      "delight": 9
+    }
+  },
+  "totals": {
+    "visionOS": 76,
+    "horizonOS": 61,
+    "ours": 70
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "ours",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "ours",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": ["visionOS", "ours", "horizonOS"],
+  "biggestGap": "Text scale is a dead control on this piece · components/01-boot/boot.css (all font-sizes hardcoded, e.g. :128 caption 13px, :181-182 .b-diag dt 13px/dd 15px) + os/shared/lab.js:277 · expected every stage font-size to multiply by var(--a11y-scale, 1) like components/13-a11y and os/apps/transit already do, so the Recovery sheet reflows at 200% · got pixel-identical output at 100/150/200% (el-handoff-200.png vs drive-11/12/13) — a wearer needing 200% text gets an unreadable recovery card and a Text size slider that lies to them",
+  "reason": "Motion, edge states, and dependability genuinely beat both references: every animation is 200-320ms on cubic-bezier(0.32,0.72,0,1), tap-to-skip interrupts anything, the failure path lands in a designed recovery sheet with diagnostics and a cancellable hold-to-confirm, and there are zero dead ends. But the piece loses overall to visionOS's boot/welcome flow on the two axes that define a transparent-lens platform: (1) material honesty — the handoff state, the piece's indefinite resting surface, is an opaque #020407 panel; the lab's own world toggle proves it (Street vs Outdoor identical pixels), while visionOS's post-boot welcome shows live passthrough; only the terminal home-ready card demonstrates glass-over-world; (2) accessibility — the Text size slider is a verified no-op (--a11y-scale set by lab.js:277, consumed by nothing in this piece), so the 13px recovery diagnostics cannot be scaled at all, which for a 20deg-FOV monocular display where 13px is already at the edge of legibility is a hard violation of the platform's own a11y contract. Simulator chrome also leaks into the stage copy ('ArrowUp key', 'Home placeholder') where both references speak only in device gestures. Fail: ours ranks second of three with two named-class gaps; the text-scale no-op is the single biggest because it makes the recovery surface unusable for the wearers who need it most.",
+  "passCondition": "ours did NOT rank first (visionOS 76, ours 70, horizonOS 61); one gap named (text scale no-op), plus material-honesty failure on the handoff scrim and stage-copy sim-speak documented in reason."
+}

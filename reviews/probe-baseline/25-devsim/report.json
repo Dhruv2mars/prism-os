@@ -1,0 +1,108 @@
+{
+  "url": "http://localhost:4310/components/25-devsim/index.html",
+  "probedAt": "2026-09-05T06:43:56.695Z",
+  "gate": {
+    "pass": true,
+    "violations": [],
+    "warnings": []
+  },
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "reducedMotion": {
+    "ok": true,
+    "infiniteAnimations": 0,
+    "contentPresent": true
+  },
+  "screenshots": [
+    "full.png",
+    "stage.png",
+    "stage-reduced-motion.png"
+  ],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "inStageFocusables": 6,
+  "labFocusables": 19,
+  "totalFocusables": 25,
+  "labInsideStage": 0,
+  "devTokenLeaks": [],
+  "loudElementCount": 1,
+  "loudElements": [
+    "div.sheet"
+  ],
+  "surfaces": [
+    {
+      "el": "div.surface",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.main",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.preview",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.pv-canvas",
+      "bg": "rgba(10, 15, 23, 0.34)",
+      "bgImage": "none",
+      "backdrop": "saturate(1.15) blur(12px) brightness(0.9)"
+    },
+    {
+      "el": "iframe.app-frame",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.scrim",
+      "bg": "rgba(3, 6, 11, 0.3)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.sheet",
+      "bg": "rgba(10, 15, 23, 0.78)",
+      "bgImage": "none",
+      "backdrop": "saturate(1.5) blur(34px) brightness(0.54)"
+    }
+  ],
+  "unlabeledIconButtons": [],
+  "subTenPxTextCount": 0,
+  "reducedMotionSupport": true,
+  "hasLab": true,
+  "labControls": [
+    "Ready",
+    "Loading",
+    "Empty",
+    "Error",
+    "Offline",
+    "Permission denied",
+    "Open the call log",
+    "Open permissions",
+    "Run a build that hangs",
+    "Run the sample build",
+    "Run a refused build",
+    "Stop the build",
+    "Network",
+    "Reduced motion",
+    "Street",
+    "Room",
+    "Outdoor",
+    "Night"
+  ],
+  "overflow": {
+    "stageScrollH": 600,
+    "stageClientH": 600,
+    "innerScrollH": null,
+    "innerClientH": null
+  },
+  "title": "Prism OS — Developer Mode"
+}
