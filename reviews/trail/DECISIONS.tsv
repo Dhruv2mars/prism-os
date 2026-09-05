@@ -1,0 +1,4 @@
+what	why	evidence	result
+2026-09-05 resume gauntlet-2	Run loop until user stops; keep web live; verify usability	PR https://github.com/Dhruv2mars/prism-os/pull/1	server :4310 up, draft PR open
+baseline gate audit	Know which pieces are green before fanning out	tools/probe.mjs on 20 lens pieces	12 PASS, 8 FAIL: 01-boot(2), 03-wm(1), 06-assistant(1), 07-camera(2), 10-messages(1), 13-a11y(1), 14-onboarding(1), 15-hud(1)
+verdict audit	Read all prior verdicts before dispatching builders	reviews/*/round-*.json	00-foundation r2 FAIL (density ladder), 16-motion r1 FAIL (interruptibility), 17-audio-haptics r1 PASS 1/2
