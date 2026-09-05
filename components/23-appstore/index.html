@@ -175,6 +175,7 @@
   -webkit-backdrop-filter: saturate(1.25) blur(12px) brightness(0.90);
   min-height: 0; display: grid; grid-template-rows: auto auto; align-self: start;
 }
+.window[hidden] { display: none; }
 .window .bar { display: flex; align-items: center; gap: calc(8px * var(--sp)); padding: calc(6px * var(--sp)) calc(10px * var(--sp)); border-bottom: 1px solid rgba(255,255,255,0.07); }
 .window .bar .t { font-size: calc(var(--fs-caption) * var(--s)); font-weight: 620; }
 .window .bar .n { font-size: calc(var(--fs-caption) * var(--s)); color: var(--ink-60); margin-left: auto; font-variant-numeric: tabular-nums; }

@@ -1,0 +1,135 @@
+{
+  "url": "http://localhost:4310/components/13-a11y/index.html",
+  "probedAt": "2026-09-05T11:36:32.529Z",
+  "gate": {
+    "pass": true,
+    "violations": [],
+    "warnings": [
+      "no lab rail mounted — critics cannot reach edge states; import mountLab from /os/shared/lab.js",
+      "31 in-stage focusables at rest — dense for a 600x600 glasses display",
+      "focus discipline: 13 elements read as loud at rest, target is 1 — div.a11y-title, button.hdr-chip, div.group-card, div.row-icon, button.scale-chip, div.preview-card, div.preview-title, div.group-card"
+    ]
+  },
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "reducedMotion": {
+    "ok": true,
+    "infiniteAnimations": 0,
+    "contentPresent": true
+  },
+  "screenshots": [
+    "full.png",
+    "stage.png",
+    "stage-reduced-motion.png"
+  ],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "inStageFocusables": 31,
+  "labFocusables": 0,
+  "totalFocusables": 37,
+  "labInsideStage": 0,
+  "devTokenLeaks": [],
+  "loudElementCount": 13,
+  "loudElements": [
+    "div.a11y-title",
+    "button.hdr-chip",
+    "div.group-card",
+    "div.row-icon",
+    "button.scale-chip",
+    "div.preview-card",
+    "div.preview-title",
+    "div.group-card",
+    "div.group-card",
+    "div.row-icon",
+    "div.group-card",
+    "button.focus-btn",
+    "div.hintbar"
+  ],
+  "surfaces": [
+    {
+      "el": "div.a11y-viewport",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.group",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.group-card",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    },
+    {
+      "el": "div.a11y-row",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.group",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.preview-card",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    },
+    {
+      "el": "div.preview-stage",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "radial-gradient(120% 90% at 50% 16%, rgba(42, 53, 80, 0.66) 0%, rgba(2",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.preview-content",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.group",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.group-card",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    },
+    {
+      "el": "div.group",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.group-card",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    }
+  ],
+  "unlabeledIconButtons": [],
+  "subTenPxTextCount": 0,
+  "reducedMotionSupport": true,
+  "hasLab": false,
+  "labControls": [],
+  "overflow": {
+    "stageScrollH": 600,
+    "stageClientH": 600,
+    "innerScrollH": null,
+    "innerClientH": null
+  },
+  "title": "Prism OS — Accessibility"
+}

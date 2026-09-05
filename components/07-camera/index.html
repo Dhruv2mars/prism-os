@@ -585,6 +585,7 @@
 </div>
 <script type="module">
 import { createOS } from '/os/shared/core.js';
+import { hardenGaze } from '/os/shared/lab.js';
 const stage = document.querySelector('[data-stage]');
 const device = document.querySelector('.device');
 const os = createOS(stage, { dwell:true, dwellMs:350 });
@@ -1344,6 +1345,8 @@ window.__setCameraMode = setMode;
 
 // hint for reducedMotion: keep cursor above
 stage.appendChild(os.cursor);
+
+hardenGaze();
 
 console.log('Prism Camera ready — 600x600');
 </script>

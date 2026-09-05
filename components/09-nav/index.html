@@ -569,6 +569,7 @@
 </div>
 <script type="module">
 import { createOS } from '/os/shared/core.js';
+import { hardenGaze } from '/os/shared/lab.js';
 const stage = document.querySelector('[data-stage]');
 const device = document.querySelector('.device');
 const os = createOS(stage, { dwell:true, dwellMs:350 });
@@ -1317,6 +1318,8 @@ function setEdge(id){
  }
 }
 window.__setNavState = setEdge;
+
+hardenGaze();
 
 console.log('Prism Nav ready — 600x600 · gaze primary · progress glide');
 </script>

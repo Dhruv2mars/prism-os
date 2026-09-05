@@ -196,12 +196,13 @@
   .notif-card.is-top:hover{ transform: scale(1.01) translateY(-1px) !important; }
   /* primary focal at rest — single focal discipline (visionOS: one banner raised, others recessive) */
   .notif-card.is-top{
-   transform: scale(1.01) !important;
-   box-shadow:0 16px 36px rgba(0,0,0,0.34), 0 0 0 1px rgba(255,255,255,0.04) inset !important;
+   transform: scale(1.02) !important;
+   box-shadow:0 18px 42px rgba(0,0,0,0.40), 0 0 0 1px rgba(86,184,255,0.14) inset !important;
    opacity:1 !important;
   }
   .notif-card:not(.is-top){
-   opacity:0.92 !important;
+   opacity:0.72 !important;
+   filter: saturate(0.9) brightness(0.94);
   }
   /* parallax dim: when any card has gaze-focus, dim non-focused to 0.65 */
   .notif-viewport:has(.notif-card.gaze-focus) .notif-card:not(.gaze-focus){
@@ -509,6 +510,7 @@
 </div>
 <script type="module">
 import { createOS } from '/os/shared/core.js';
+import { hardenGaze } from '/os/shared/lab.js';
 const stage = document.querySelector('[data-stage]');
 const device = document.querySelector('.device');
 const os = createOS(stage, { dwell: true, dwellMs: 350 });
@@ -1138,6 +1140,8 @@ window.__notif = { setEdge, dismiss: (id)=> dismiss(id,'left'), getState: ()=>({
 
 // initial render
 render();
+hardenGaze();
+
 console.log('Prism Notifications ready — 600x600');
 </script>
 </body>

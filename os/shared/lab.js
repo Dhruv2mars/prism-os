@@ -133,7 +133,8 @@ export function hardenGaze(stage = document.querySelector('.stage')) {
      so the stage transform shifts what it thinks the wearer is looking at. It is
      frozen, so the correction lives here: hit-test in viewport space and settle
      .gaze-focus on the element actually under the gaze. Registered after core's
-     own listener, so it always has the last word. */
+     own listener, so it always has the last word. core's dwell then arms on the
+     corrected focus, so a 350ms hold on a real target activates it. */
   const HIT = '[data-focusable],button,a,[role="button"],[role="tab"],input,select';
   let hot = null;
   const settle = (el) => {

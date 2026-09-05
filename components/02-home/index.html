@@ -654,6 +654,7 @@
 </div>
 <script type="module">
 import { createOS } from '/os/shared/core.js';
+import { hardenGaze } from '/os/shared/lab.js';
 const stage = document.querySelector('[data-stage]');
 const device = document.querySelector('.device');
 const stageShell = document.querySelector('.stage-shell');
@@ -1133,6 +1134,8 @@ requestAnimationFrame(()=> {
 
 // expose for probe: ensure at least 6 focusables visible in home
 // share subtle drill for gaze cursor dwell test
+hardenGaze();
+
 console.log('Prism Home ready — 600x600');
 </script>
 </body>

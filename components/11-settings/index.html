@@ -398,6 +398,7 @@
 </div>
 <script type="module">
 import { createOS } from '/os/shared/core.js';
+import { hardenGaze } from '/os/shared/lab.js';
 const stage = document.querySelector('[data-stage]');
 const device = document.querySelector('.device');
 const os = createOS(stage, { dwell:true, dwellMs:350 });
@@ -735,17 +736,8 @@ function renderSettings(){
  viewport.appendChild(searchWrap);
  search.addEventListener('input', ()=>{
   searchQuery=search.value.trim().toLowerCase();
-  if(searchQuery.length>0){
-   // filter logic: if query yields no results, trigger empty visual inline? For now just re-render groups filtered
-   // For probe's empty chip, we will handle via edgeState, not search. Search filter just banners.
-   if(['zx','qqq','xyz'].some(x=> searchQuery.includes(x))){
-    // show inline empty? just banner
-    os.banner(`<strong>No results for “${search.value}”</strong><span class="caption">try Optics, Privacy</span>`,{timeout:1800});
-   }
-   filterActive=true;
-  } else {
-   filterActive=false;
-  }
+  filterActive=searchQuery.length>0;
+  renderSettings();
  });
  search.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ search.value=''; searchQuery=''; filterActive=false; search.blur(); }});
 
@@ -1162,6 +1154,8 @@ os.on('capture', ()=>{
   os.banner('<strong>Shutter</strong><span class="caption">settings snapshot</span>',{timeout:1400});
  }
 });
+
+hardenGaze();
 
 console.log('Prism Settings ready — 600x600');
 </script>

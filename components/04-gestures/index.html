@@ -541,6 +541,7 @@
 </div>
 <script type="module">
 import { createOS } from '/os/shared/core.js';
+import { hardenGaze } from '/os/shared/lab.js';
 const device = document.querySelector('.device');
 const stage = document.querySelector('[data-stage]');
 const os = createOS(stage, { dwell: true, dwellMs: 350 });
@@ -1327,6 +1328,8 @@ window.__setGestureState = setEdge;
 /* init */
 updateStepper();
 syncPracticeStatus();
+hardenGaze();
+
 console.log('Prism Gestures ready — 600x600');
 
 </script>
