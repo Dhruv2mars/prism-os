@@ -1,0 +1,54 @@
+{
+  "piece": "16-motion",
+  "round": 3,
+  "critic": "fresh-context critic, round 3",
+  "judgedAt": "2026-09-05T08:31:00Z",
+  "verdict": "pass",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/16-motion/index.html reviews/16-motion/judge-r3",
+    "outDir": "reviews/16-motion/judge-r3",
+    "screenshotsRead": [
+      "stage.png", "full.png", "stage-reduced-motion.png",
+      "s-loading.png", "s-empty.png", "s-error.png", "s-offline.png", "s-denied.png",
+      "m2-grow-mid.png", "m3-grow-done.png", "m7-thread-done.png", "m9-interrupt-grow-b.png",
+      "m11-exit-mid.png", "m13-undo.png", "m15-fail-inline.png", "m17-two-dismiss-done.png",
+      "w-outdoor-card.png", "w-outdoor-lit.png", "w-outdoor-denied.png",
+      "w-keyboard-expand.png", "x1-scale170.png", "x2-reduced-motion-dismiss.png"
+    ],
+    "consoleErrors": 0, "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 1,
+    "notes": "Drove all 6 states plus 10 lab actions with a custom Playwright script (reviews/16-motion/drive-r3.mjs, drive2-r3.mjs). Measured live animation timing: enter 300ms, change 260ms, leave 220ms, easing cubic-bezier(0.32,0.72,0,1) confirmed on running animations; loading bar 1500ms determinate fill. Sampled the interrupt path at 40ms intervals: grow 139->161->169 retargeted mid-flight down to 129->125, re-grown to 149, settles 119 with zero snap and animations reassigned cleanly. Reduced-motion: dismissal still advances the queue (Dad card + Undo trail present), zero infinite animations, opacity-only fallback verified in code path. Text scale 170%: card reflows to top-anchored, surface scrolls internally (690 vs 556). Keyboard: Tab reaches the card, Enter expands, aria-expanded=true, visible focus ring. Outdoor world: scrim holds contrast over bright sky, statusbar flips net dot red in offline. Gate PASS with zero violations."
+  },
+  "blind": { "A": "visionOS notification stack / expanded notification (visionOS 2, 2024)", "B": "Horizon OS notification panel (Meta Quest, v69 2024)", "C": "artifact under review", "oursIs": "C" },
+  "blindDescriptions": {
+    "A": "One rounded-rect Regular-glass card floats at the top of the Shared Space: SF Pro with a gray-caps MESSAGES caption, semibold sender, two-line preview, right-aligned relative time. Gaze dims the surroundings and a click expands the card in place with quick actions; swipe-up dismisses with no undo. There is no designed empty, error or offline state at the notification layer, and system loading is a bare spinner.",
+    "B": "Small near-opaque dark panels anchor upper-left with a thin outline, Optimistic-family white text and an app icon; gaze plus trigger opens a larger flat dark panel with actions at the bottom. Empty is a generic centered 'No new notifications' glyph, loading is the system spinner, motion is quick fade/scale without continuous height, and dismissal is unrecoverable.",
+    "C": "A single thin-scrim message card sits anchored low with the world continuing through it - cool sky above, warm street light bleeding through the card base and rim. Beneath it a demoted dot-trail reads '2 more waiting'. Gaze on the card grows it around its action tray; every edge state is a designed screen with a recovery verb; dismissal carries a 5.2s Undo on the trail; reply failure inlines 'saved as a draft' with Try again."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS 2 notification stack over the Home View, 2024: a single frosted-glass rounded rectangle in Regular material hanging at the top of the Shared Space, brightening with ambient light, SF Pro text with gray-caps app caption, semibold sender line, two-line preview, right-aligned relative time. Gaze lifts it and click expands in place to a taller glass panel with action buttons; no inline error/offline/empty exists at this layer and dismiss (swipe up) has no undo.",
+    "horizonOS": "Meta Quest Horizon OS v69 notification panel, 2024: small near-opaque near-black rounded cards anchored upper-left with thin white outline, Optimistic-typeface white text, app icon at left; gaze-plus-trigger opens a flat dark detail panel with bottom action buttons; empty state is a generic centered gray icon with 'No new notifications'; loading is the system spinner; no continuous height animation and no undo."
+  },
+  "scores": {
+    "visionOS":  { "glanceability": 8, "focusDiscipline": 8, "materialHonesty": 9, "motion": 8, "typography": 9, "edgeStates": 4, "dependability": 7, "accessibility": 9, "delight": 7 },
+    "horizonOS": { "glanceability": 7, "focusDiscipline": 7, "materialHonesty": 6, "motion": 6, "typography": 7, "edgeStates": 5, "dependability": 6, "accessibility": 7, "delight": 5 },
+    "ours":      { "glanceability": 9, "focusDiscipline": 9, "materialHonesty": 9, "motion": 9, "typography": 8, "edgeStates": 9, "dependability": 9, "accessibility": 8, "delight": 9 }
+  },
+  "totals": { "visionOS": 69, "horizonOS": 55, "ours": 79 },
+  "winnersPerCriterion": {
+    "glanceability": "ours",
+    "focusDiscipline": "ours",
+    "materialHonesty": "ours",
+    "motion": "ours",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "ours",
+    "accessibility": "visionOS",
+    "delight": "ours"
+  },
+  "overallRanking": ["ours", "visionOS", "horizonOS"],
+  "biggestGap": "mono-audio cues · components/16-motion/index.html (sendReply L538-560, step L564-619) · expected: a distinct short earcon on message arrival, reply-sent and reply-failure, per VISION.md accessibility bar ('mono-audio cues') · got: zero audio wiring anywhere in the piece or os/shared/core.js (grep for audio/earcon/tone/haptic returns nothing), so arrival and failure are silently visual-only",
+  "reason": "Blind-scored against the visionOS 2 notification stack and the Horizon OS v69 notification panel. The artifact wins outright at 79/90 vs 69 (visionOS) and 55 (Horizon). The wins are evidenced, not vibed: motion was measured live (300/260/220ms on the prism curve) and the interrupt trace proves mid-flight retargeting with no snap - something neither reference notification surface does; all six edge states are designed screens with recovery verbs where visionOS has none at this layer and Horizon only a generic empty; material honesty held in the outdoor world test with the scrim reading as glass over visible street light. It loses typography to visionOS SF Pro optical sizing (8 vs 9) and accessibility to system audio/VoiceOver integration (8 vs 9). The single biggest gap is the absence of mono-audio cues - arrival and reply failure are silent. Pass condition met: ranked first overall.",
+  "passCondition": "ours ranked FIRST overall outright (79 vs 69 vs 55); one named gap remains (no mono-audio cues) which does not block the pass condition"
+}

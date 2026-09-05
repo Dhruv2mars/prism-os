@@ -1,0 +1,47 @@
+{
+  "piece": "03-wm",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T09:55:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/03-wm/index.html reviews/03-wm/judge-r1  (plus ?state=empty|loading|error|offline|denied probes and Playwright drives: overview, tiled, 5-window limit, minimize, close-all-organic, ?scale=2, ?world=night, 3x ArrowLeft swipe)",
+    "outDir": "reviews/03-wm/judge-r1",
+    "screenshotsRead": ["stage.png", "full.png", "stage-reduced-motion.png", "state-empty/stage.png", "state-loading/stage.png", "state-error/stage.png", "state-offline/stage.png", "state-denied/stage.png", "drive-overview.png", "drive-tiled.png", "drive-limit.png", "drive-minimized.png", "drive-scale14.png", "drive-night.png", "drive-closeall.png", "drive-scale20.png"],
+    "consoleErrors": 0, "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 7,
+    "notes": "Default stacked view: focused Live Captions sheet straddles stage centre, Messages/Maps collapsed to translucent spines above with depth blur, statusbar count top-centre. All five lab states render designed, distinct layouts that split content around the gaze rest line. Loading is skeleton sheet + ghost spines; error is an error sheet with surviving windows as spines, retry runs an interim skeleton then restores Maps with a banner; offline/permission dim the workspace and park actions below the rest line. Overview is a 2-col card grid with kind-tinted previews. 5-window limit raises a banner. BUT: organically closing every window via the sheets' real close buttons (and via 3 swipe-lefts) leaves a BLANK stage - only the statusbar 'WM · 0 windows', zero focusables, no empty-state card, no open affordance; the designed empty state is reachable only through the lab rail. ?scale=2 changed nothing visually (computed .win-title stays 14px; piece never consumes --a11y-scale). Reduced-motion shot identical to default with animations disabled - honored."
+  },
+  "blind": { "A": "visionOS 2 Shared Space focused-window bezel + Home View app grid", "B": "Meta Horizon OS (Quest 3) multitasking panels + universal menu bar", "C": "artifact under review", "oursIs": "C" },
+  "blindDescriptions": {
+    "A": "System A opens apps as free-floating glass windows in a shared space. The focused window gains a brightened bezel and an under-window drag bar with close/resize pills; background windows stay full-size where placed and differentiate only by dimming - three dimmed windows still compete for attention. Home View is a grid of 1x1 rounded icons over a dimmable environment backdrop with a recents dock. Loading is a bare spinner; permission dialogs are wordy; Dynamic Type reflows everything system-wide.",
+    "B": "System B presents windows as flat dark 2D panels anchored in space, each carrying a thin universal menu bar along its bottom edge; the input-targeted panel brightens slightly while others stay near-equal weight. A system dock holds pinned and recent apps. Panels are opaque dark rectangles - the passthrough world stops hard at their edges. Loading and empty states are default spinners or blank; text-size settings exist but apps routinely ignore them.",
+    "C": "System C stacks windows along a fixed vertical spine: exactly one focused glass sheet whose titlebar straddles the stage centre, background windows collapsed to translucent spine rows above it that recede by opacity, scale and blur with depth. Edge states split content above and below the centre rest band so no glyph enters the gaze zone. Materials are translucent gradients with saturate/blur over the visible world. Overview is a 2-col card grid; minimized windows dock as chips at the bottom. All five edge states are designed with icons, actions and status pills - but closing the last window through the real UI leaves a blank stage with nothing focusable."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS 2 Shared Space with Safari focused: the active window shows a brightened glass bezel and an under-window bar with drag handle and close pill; background windows (e.g. Messages, Photos) remain at full size and only dim, so two dimmed windows are hard to rank. Home View itself: 1x1 rounded-square icons with labels on a dark glass plane, Environments dial for backdrop, recents dock at bottom - glanceable at distance but window-layer state is not.",
+    "horizonOS": "Horizon OS on Quest 3 multitasking: flat near-opaque dark panels floating in the room, each with a universal menu bar (thin strip of app icons) at its bottom edge; the targeted window brightens marginally, others stay equal weight; a left-edge dock holds pinned apps. Loading a panel shows a default spinner on black; text-size is an experimental display setting that most panels ignore."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 8, "focusDiscipline": 8, "materialHonesty": 9, "motion": 9, "typography": 9, "edgeStates": 6, "dependability": 9, "accessibility": 9, "delight": 8 },
+    "horizonOS": { "glanceability": 7, "focusDiscipline": 7, "materialHonesty": 6, "motion": 7, "typography": 7, "edgeStates": 5, "dependability": 8, "accessibility": 6, "delight": 6 },
+    "ours": { "glanceability": 9, "focusDiscipline": 9, "materialHonesty": 9, "motion": 8, "typography": 8, "edgeStates": 8, "dependability": 6, "accessibility": 6, "delight": 9 }
+  },
+  "totals": { "visionOS": 75, "horizonOS": 59, "ours": 72 },
+  "winnersPerCriterion": {
+    "glanceability": "ours",
+    "focusDiscipline": "ours",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "ours"
+  },
+  "overallRanking": ["visionOS", "ours", "horizonOS"],
+  "biggestGap": "Close-all dead end · components/03-wm/index.html:385-388 (closeWindow -> refresh) and :614 (refresh) · expected: closing the LAST window through the real UI (sheet × button or wrist-flick swipe, verified by driving both) routes to the already-designed empty state - setEdgeState('empty') at :667 with the 'No windows open' icon card and Open Messages/Gallery actions; got: a blank 600x600 stage showing only the statusbar 'WM · 0 windows' with ZERO focusable elements, no dock, no hint, and the 'back' gesture (:793-797) a no-op at edgeState 'normal' - the wearer has no on-device recovery path, violating the no-dead-ends non-negotiable. The designed empty state exists but is wired only to the simulator lab rail.",
+  "reason": "The spine-deck composition is genuinely strong - it beats visionOS on glanceability, focus discipline, edge-state design and delight, and its materials are honest glass. But the artifact ranked second overall (72 vs visionOS 75). Two real failures found in pixels: (1) the organic close-all dead end described in biggestGap - a dependability failure against an explicit non-negotiable; (2) the piece never consumes --a11y-scale, so the Text size setting does nothing to it (computed title stays 14px at ?scale=2), an accessibility failure against the text-scale-reflow bar that the platform's own SDK documentation tells apps to meet. Either one alone is disqualifying under the rubric; together they sink an otherwise winning surface. Fix: route last-close to setEdgeState('empty') and multiply type/padding by var(--a11y-scale, 1).",
+  "passCondition": "Ours ranked second (72/90 vs visionOS 75/90); one gap named (close-all dead end); verdict fail."
+}

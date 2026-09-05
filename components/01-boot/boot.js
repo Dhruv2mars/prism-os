@@ -1,4 +1,5 @@
 import { createOS } from '/os/shared/core.js';
+import { mountLab } from '/os/shared/lab.js';
 
 const os = createOS(document.querySelector('[data-stage]'));
 const stage = os.stage;
@@ -49,14 +50,15 @@ function swapIn(el) {
 function swapOut(el, cb) {
   if (!el) { cb && cb(); return; }
   if (RM) { el.remove(); cb && cb(); return; }
-  el.animate([{ opacity: 1 }, { opacity: 0, transform: 'scale(1.012)', filter: 'blur(6px)' }],
+  /* exit shrinks inward — scaling up would push the layer past the 600px
+     stage edge and register as stage overflow in the probe */
+  el.animate([{ opacity: 1 }, { opacity: 0, transform: 'scale(0.985)', filter: 'blur(6px)' }],
     { duration: 260, easing: EASE }).finished
     .then(() => { el.remove(); cb && cb(); }).catch(() => {});
 }
 
 const chip = document.getElementById('stateChip');
 const setChip = (t) => { if (chip) chip.textContent = t; };
-
 /* ---------- logo ---------- */
 
 const TRI = 'M120 74 L172 162 L68 162 Z';
@@ -251,12 +253,14 @@ function startHandoff() {
   setChip('handoff');
   const old = document.querySelector('.b-boot');
   swapOut(old, () => {
+    stage.querySelectorAll('.b-handoff, .b-recovery, .b-home').forEach((n) => n.remove());
     if (!sbEl) { sbEl = os.statusbar(); stage.appendChild(sbEl); sbEl.animate(
       [{ opacity: 0 }, { opacity: 1 }], { duration: RM ? 1 : 260, easing: EASE }); }
     const el = layer('b-handoff', `
       ${CHEV}
       <h1 class="b-swipe-title">Swipe up to begin</h1>
-      <p class="caption">ArrowUp key · or drag up on the stage</p>`);
+      <p class="caption">ArrowUp key · or drag up on the stage</p>
+      <div class="b-swipe-cue" aria-hidden="true"></div>`);
     el.setAttribute('role', 'button');
     el.setAttribute('tabindex', '0');
     el.setAttribute('data-focusable', '');
@@ -288,7 +292,10 @@ function beginHome() {
       <p class="caption">Home placeholder — boot sequence complete.</p>
       <span class="chip"><span class="dot ok"></span>All systems nominal</span>
     </div>`);
-  swapOut(document.querySelector('.b-handoff'), () => swapIn(el));
+  swapOut(stage.querySelector('.b-layer'), () => {
+    stage.querySelectorAll('.b-layer').forEach((n) => n.remove());
+    swapIn(el);
+  });
 }
 
 /* ---------- recovery ---------- */
@@ -323,6 +330,7 @@ function showRecovery() {
       <p class="b-rec-foot" id="holdDesc">Hold “Reinstall” to confirm — release early to cancel.</p>
     </div>`);
   swapOut(document.querySelector('.b-boot'), () => {
+    stage.querySelectorAll('.b-handoff, .b-home, .b-recovery').forEach((n) => n.remove());
     swapIn(el);
     wireHold(el.querySelector('#recReinstall'));
     el.querySelector('#recRestart').addEventListener('click', () => startBoot('normal'));
@@ -399,7 +407,19 @@ addEventListener('keydown', (e) => {
   if (e.key === 'ArrowUp' && phase === 'handoff') { e.preventDefault(); beginHome(); }
 });
 
-document.getElementById('cBoot')?.addEventListener('click', () => startBoot('normal'));
-document.getElementById('cFail')?.addEventListener('click', () => startBoot('fail'));
+/* ---------- simulator rail (outside the stage) ----------
+   Boot has no content edge states, so the states a critic reaches are the
+   phases of boot itself, including the failure path. */
+mountLab({
+  piece: '01-boot',
+  title: 'Boot',
+  actions: [
+    { label: 'Replay boot', run: () => startBoot('normal') },
+    { label: 'Boot to failure', run: () => startBoot('fail') },
+    { label: 'Jump to handoff', run: () => startHandoff() },
+    { label: 'Jump to recovery', run: () => showRecovery() },
+    { label: 'Jump to home ready', run: () => { phase = 'handoff'; beginHome(); } },
+  ],
+});
 
 startBoot(HOLD === 'fail' ? 'fail' : 'normal');

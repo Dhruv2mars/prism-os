@@ -1,0 +1,102 @@
+{
+  "piece": "14-onboarding",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T08:52:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/14-onboarding/index.html reviews/14-onboarding/judge-r1",
+    "outDir": "reviews/14-onboarding/judge-r1",
+    "screenshotsRead": [
+      "stage.png",
+      "full.png",
+      "stage-reduced-motion.png",
+      "states/step1-perms.png",
+      "states/step2-pair.png",
+      "states/step3-calib.png",
+      "states/step4-done.png",
+      "states/state-loading.png",
+      "states/state-empty.png",
+      "states/state-error.png",
+      "states/state-offline.png",
+      "states/state-denied.png",
+      "states/scale-200-perms.png",
+      "states/scale-200-welcome.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 2,
+    "notes": "Gate pass, zero console/page errors across 13 loads. Default render is welcome step: kicker STEP 1 OF 5, hairline progress, glasses line-art hero, one primary pill. Probed all 5 steps via ?step= and all 5 edge states via ?state= (loading/empty/error/offline/denied) plus ?scale=2. At 2x scale fonts reflow genuinely but the primary CTA falls below the fold on welcome and perms rows clip mid-row (stage-scroll does scroll). Reduced motion kills spinner/pulse correctly. Found in pixels+source: step-to-step navigation is a hard innerHTML cut with no transition; pairing digits bind to digitsEl which is never assigned (index.html:364) so code rotation and .hit tint are silent no-ops while the status line claims 'code refreshes in Xs'."
+  },
+  "blind": {
+    "A": "visionOS first-run Setup steps + standard permission alert",
+    "B": "Horizon OS (Quest) first-run controller pairing screen",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "Small centered blurred-glass sheets; bold title, one body line, plain-text buttons; steps slide horizontally on glass; materials are the see-through gold standard; loading is a bare spinner; denied states are terse dialogs with weak recovery affordances.",
+    "B": "Dark full-screen setup panels; large illustration left, title/body right, full-width filled primary button, segmented progress; pairing failure recovery is guided and explicit; panels are opaque in VR space rather than glass over a world.",
+    "C": "600x600 three-band layout: uppercase kicker + title + hairline progress on top, exactly one hero object at reticle center, centered copy + one primary pill + one quiet link below. Five edge states each get a medallion, status chip, specific copy, and two recovery actions. Two visible defects: hard cuts between steps, and pairing digits that promise rotation/verification feedback but never change."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS first-run Setup (2024): floating glass panels holding account/permission steps against the passthrough room, sliding horizontally between steps; the standard permission alert is a small centered dark-glass sheet with a bold title, one body line, and two plain-text buttons ('Don't Allow' / 'Allow'), no filled primary. Loading during setup is a bare system spinner.",
+    "horizonOS": "Meta Horizon OS (Quest 2/3) first-run controller pairing screen: near-black full-screen panel, large left illustration of the controller with blinking LED, right column with 'Pairing left controller' title, body copy, a full-width white primary 'Pair' button, and segmented step dots at top; failure paths name the fix (hold buttons until LED blinks) and offer Try Again."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 9,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 7,
+      "dependability": 8,
+      "accessibility": 9,
+      "delight": 9
+    },
+    "horizonOS": {
+      "glanceability": 8,
+      "focusDiscipline": 8,
+      "materialHonesty": 7,
+      "motion": 8,
+      "typography": 8,
+      "edgeStates": 8,
+      "dependability": 8,
+      "accessibility": 8,
+      "delight": 7
+    },
+    "ours": {
+      "glanceability": 9,
+      "focusDiscipline": 8,
+      "materialHonesty": 9,
+      "motion": 7,
+      "typography": 8,
+      "edgeStates": 9,
+      "dependability": 7,
+      "accessibility": 8,
+      "delight": 8
+    }
+  },
+  "totals": {
+    "visionOS": 77,
+    "horizonOS": 70,
+    "ours": 73
+  },
+  "winnersPerCriterion": {
+    "glanceability": "ours",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": ["visionOS", "ours", "horizonOS"],
+  "biggestGap": "Pairing digits feedback is dead code · components/14-onboarding/index.html:364,424,435,439 · expected: 'Rotate pairing code' (and the 45s countdown) visibly rotates digits, and on pairing found the six digits tint accent (.hit) to confirm the code matched · got: digitsEl is declared null and optional-chained but never assigned from a querySelector, so digits stay frozen at 482917 with no tint while the status line asserts 'Connected · code refreshes in Xs' — the UI claims a security-relevant change it never shows",
+  "reason": "Ran the probe and 13 loads myself: zero errors, gate pass, all five steps and all five edge states captured and read. Ours wins glanceability and edge states outright — the five edge states are more designed than either reference's (visionOS setup loading is a bare spinner; our loading has copy, chip, cancel, and auto-resolve). But ours loses focus discipline, material honesty, motion, typography, dependability, accessibility and delight to visionOS, mostly on execution truth rather than concept: (1) step navigation is a hard innerHTML cut with zero transition while both references move between wizard steps (motion 7 vs 9); (2) the pairing digits bug makes the UI lie about the most sensitive step (dependability 7 vs 8); (3) 'PR-PAIR-503' error code and a fourth font size on the pair card (typography 8 vs 9); (4) a dead .settle signature animation never applied (delight). Ranked second of three, so verdict is fail. Fix the digitsEl wiring and add a 240-300ms prism-eased crossfade/slide in renderStep() and this piece competes for first — the three-band skeleton, progress hairline and edge-state craft are already at or above the reference bar.",
+  "passCondition": "Not met: ours ranked second overall (73 vs visionOS 77). One named gap remains."
+}

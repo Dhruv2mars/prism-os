@@ -244,8 +244,10 @@
  .word{
   display:inline-block;
   margin-right:0.22em;
-  animation: blurWipe 320ms var(--ease-prism) both;
   will-change: filter, opacity, transform;
+ }
+ .word.reveal{
+  animation: blurWipe 260ms var(--ease-prism) both;
  }
  @keyframes blurWipe{
   from{filter:blur(8px);opacity:0;transform:translateY(4px)}
@@ -631,20 +633,14 @@ function buildLineEl(entry, idx, isCurrent){
  head.append(pill, meta);
 
  const textWrap = h('div', {class:'line-text', id:`line-text-${idx}`});
- // words will be filled progressively
  entry.words.forEach((w, wi)=>{
-  const span = h('span', {class:'word' + (wi >= entry.revealed ? ' pending' : '')});
+  // already-revealed words render plainly (no animation); future words stay pending
+  const span = h('span', {class:'word' + (wi < entry.revealed ? '' : ' pending')});
   span.textContent = w;
-  if(wi < entry.revealed){
-   // already revealed — show with highlight if isCurrent and last word? highlight current word?
-   if(isCurrent && wi === entry.revealed-1){
-    span.classList.add('highlight');
-   }
-  }
+  if(isCurrent && wi === entry.revealed-1) span.classList.add('highlight');
   textWrap.appendChild(span);
-  // add space via margin; no extra text node needed because .word margin handles spacing, but we need to preserve spaces - handled via margin-right
  });
- if(isCurrent && entry.revealed < entry.words.length){
+ if(isCurrent){
   const caret = h('span', {class:'line-caret', 'aria-hidden':'true'});
   textWrap.appendChild(caret);
  }
@@ -652,13 +648,54 @@ function buildLineEl(entry, idx, isCurrent){
  const foot = h('div', {class:'line-foot'});
  const confWrap = h('div', {class:'line-confidence', 'aria-hidden':'true'});
  const confFill = h('i', {style:`--w:${entry.confidence}%`});
- // confidence shown only for current? but show for all subtle
  confWrap.appendChild(confFill);
  const footCap = h('span', {class:'caption'}, entry.speaker==='MARA' ? 'Mara · on-device' : 'You · mic');
  foot.append(confWrap, footCap);
 
  line.append(head, textWrap, foot);
  return line;
+}
+
+// in-place reveal: flip classes on existing spans, never rebuild the line
+function updateLineEl(entry, idx){
+ const el = lineEls[idx];
+ if(!el) return;
+ const spans = el.querySelectorAll('.word');
+ const wasCurrent = el.classList.contains('current');
+ const isCurrent = idx===currentLineIdx;
+ el.classList.toggle('current', isCurrent);
+ spans.forEach((span, wi)=>{
+  const revealed = wi < entry.revealed;
+  if(revealed){
+   if(span.classList.contains('pending')){
+    span.classList.remove('pending');
+    span.classList.add('reveal');
+   }
+   span.classList.toggle('highlight', isCurrent && wi === entry.revealed-1);
+  } else if(!span.classList.contains('pending')){
+   span.classList.add('pending');
+   span.classList.remove('reveal','highlight');
+  }
+ });
+ // move the caret to the streaming line
+ const textWrap = el.querySelector('.line-text');
+ let caret = textWrap.querySelector('.line-caret');
+ if(isCurrent && entry.revealed < entry.words.length){
+  if(!caret){ caret = h('span', {class:'line-caret', 'aria-hidden':'true'}); textWrap.appendChild(caret); }
+ } else if(caret){
+  caret.remove();
+ }
+ // live badge only on the streaming line
+ const badge = el.querySelector('.line-current-badge');
+ if(isCurrent && !badge){
+  const meta = el.querySelector('.line-meta');
+  const b = h('span', {class:'line-current-badge'});
+  b.innerHTML = `<span class="cb-dot" aria-hidden="true"></span>Live`;
+  meta.appendChild(b);
+ } else if(!isCurrent && badge){
+  badge.remove();
+ }
+ if(wasCurrent !== isCurrent) el.setAttribute('aria-label', `${entry.speaker} at ${entry.timeStr}: ${entry.words.join(' ')}`);
 }
 
 function renderAll(){
@@ -685,6 +722,23 @@ function renderAll(){
  // confidence overall average of current line or last?
  const cur = streamedLines[currentLineIdx];
  if(cur) document.getElementById('confidenceVal').textContent = `${cur.confidence}%`;
+}
+
+// word reveal without DOM rebuild — words animate in once, then stay put
+function renderStats(){
+ totalWords = streamedLines.reduce((n,e)=> n + e.words.length, 0);
+ document.getElementById('wordsStat').textContent = `${totalWords} words`;
+ const cur = streamedLines[currentLineIdx];
+ if(cur) document.getElementById('confidenceVal').textContent = `${cur.confidence}%`;
+}
+
+function revealInPlace(){
+ streamedLines.forEach((entry, idx)=> updateLineEl(entry, idx));
+ renderStats();
+ requestAnimationFrame(()=>{
+  const cur = lineEls[currentLineIdx];
+  if(cur) cur.scrollIntoView({block:'nearest', behavior:'smooth'});
+ });
 }
 
 function initTranscript(){
@@ -743,7 +797,7 @@ function revealWordsStep(){
  if(!entry) return;
  if(entry.revealed < entry.words.length){
   entry.revealed++;
-  renderAll();
+  revealInPlace();
   // haptic-like wave jitter
   jitterWaveform(entry.revealed);
   const delay = entry.revealed===1 ? 180 : 72 + Math.random()*34;
@@ -877,7 +931,7 @@ pauseBtn.addEventListener('click', ()=>{
  updatePauseBtn();
  if(isPaused){
   stopStreaming();
-  os.banner('<strong>Paused · 00:'+fmtTimer(elapsedSec).split(':')[1]+'</strong><span class="caption">captions frozen · tap resume</span>',{timeout:1800});
+  os.banner(`<strong>Paused · ${fmtTimer(elapsedSec)}</strong><span class="caption">captions frozen · tap resume</span>`,{timeout:1800});
   stopWaveIdle();
  } else {
   os.banner('<strong>Resumed · Live</strong><span class="caption">streaming word by word</span>',{timeout:1800});

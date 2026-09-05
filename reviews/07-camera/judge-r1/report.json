@@ -1,0 +1,138 @@
+{
+  "url": "http://localhost:4310/components/07-camera/index.html",
+  "probedAt": "2026-09-05T07:58:50.800Z",
+  "gate": {
+    "pass": true,
+    "violations": [],
+    "warnings": [
+      "no lab rail mounted — critics cannot reach edge states; import mountLab from /os/shared/lab.js",
+      "17 in-stage focusables at rest — dense for a 600x600 glasses display",
+      "focus discipline: 16 elements read as loud at rest, target is 1 — div.vf-world, div.vf-reticle, button.vf-chip, button.vf-chip, button.vf-chip, button.vf-chip, div.vf-meta-pill, div.vf-meta-pill"
+    ]
+  },
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "reducedMotion": {
+    "ok": true,
+    "infiniteAnimations": 0,
+    "contentPresent": true
+  },
+  "screenshots": [
+    "full.png",
+    "stage.png",
+    "stage-reduced-motion.png"
+  ],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "inStageFocusables": 17,
+  "labFocusables": 0,
+  "totalFocusables": 23,
+  "labInsideStage": 0,
+  "devTokenLeaks": [],
+  "loudElementCount": 16,
+  "loudElements": [
+    "div.vf-world",
+    "div.vf-reticle",
+    "button.vf-chip",
+    "button.vf-chip",
+    "button.vf-chip",
+    "button.vf-chip",
+    "div.vf-meta-pill",
+    "div.vf-meta-pill",
+    "button.mode-btn",
+    "button.thumb-preview",
+    "button.shutter-btn",
+    "button.thumb-preview",
+    "button.recent-thumb",
+    "button.recent-thumb",
+    "button.recent-thumb",
+    "button.recent-thumb"
+  ],
+  "surfaces": [
+    {
+      "el": "div.cam-viewport",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.vf-card",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(18, 26, 38, 0.78), rgba(10, 15, 23, 0.84)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    },
+    {
+      "el": "div.vf-world",
+      "bg": "rgb(10, 16, 32)",
+      "bgImage": "radial-gradient(120% 70% at 30% 18%, rgb(106, 140, 194) 0%, rgb(61, 90",
+      "backdrop": "none"
+    },
+    {
+      "el": "span.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "span.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "span.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "span.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "span.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "span.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "span.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "span.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "span.",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    }
+  ],
+  "unlabeledIconButtons": [],
+  "subTenPxTextCount": 0,
+  "reducedMotionSupport": true,
+  "hasLab": false,
+  "labControls": [],
+  "overflow": {
+    "stageScrollH": 600,
+    "stageClientH": 600,
+    "innerScrollH": null,
+    "innerClientH": null
+  },
+  "title": "Prism OS — Camera"
+}

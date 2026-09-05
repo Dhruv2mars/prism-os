@@ -1,0 +1,106 @@
+{
+  "url": "http://localhost:4310/components/03-wm/index.html?state=offline",
+  "probedAt": "2026-09-05T09:33:01.226Z",
+  "gate": {
+    "pass": true,
+    "violations": [],
+    "warnings": []
+  },
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "reducedMotion": {
+    "ok": true,
+    "infiniteAnimations": 0,
+    "contentPresent": true
+  },
+  "screenshots": [
+    "full.png",
+    "stage.png",
+    "stage-reduced-motion.png"
+  ],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "inStageFocusables": 9,
+  "labFocusables": 19,
+  "totalFocusables": 28,
+  "labInsideStage": 0,
+  "devTokenLeaks": [],
+  "loudElementCount": 0,
+  "loudElements": [],
+  "surfaces": [
+    {
+      "el": "div.deck",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.state-layer",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.edge-above",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.edge-below",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "section.wm-layer",
+      "bg": "rgba(4, 7, 11, 0.05)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "section.wm-layer",
+      "bg": "rgba(4, 7, 11, 0.05)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "section.wm-layer",
+      "bg": "rgba(4, 7, 11, 0.2)",
+      "bgImage": "none",
+      "backdrop": "blur(4px)"
+    }
+  ],
+  "unlabeledIconButtons": [],
+  "subTenPxTextCount": 0,
+  "reducedMotionSupport": true,
+  "hasLab": true,
+  "labControls": [
+    "Ready",
+    "Loading",
+    "Empty",
+    "Error",
+    "Offline",
+    "Permission denied",
+    "Open window",
+    "Cycle focus",
+    "Minimize top",
+    "Close top",
+    "Toggle overview",
+    "Stacked layout",
+    "Tiled layout",
+    "Reduced motion",
+    "Street",
+    "Room",
+    "Outdoor",
+    "Night"
+  ],
+  "overflow": {
+    "stageScrollH": 600,
+    "stageClientH": 600,
+    "innerScrollH": null,
+    "innerClientH": null
+  },
+  "title": "Prism OS — Window Manager"
+}

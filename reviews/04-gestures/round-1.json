@@ -1,0 +1,60 @@
+{
+  "piece": "04-gestures",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T08:05:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/04-gestures/index.html reviews/04-gestures/judge-r1",
+    "outDir": "reviews/04-gestures/judge-r1",
+    "screenshotsRead": [
+      "stage.png", "full.png", "stage-reduced-motion.png",
+      "stage-gaze-hover.png", "stage-gaze-dwell.png", "step1-done.png",
+      "step2-swipe.png", "step4-voice.png",
+      "s2-swipe-arrows.png", "s3-capture-space.png", "s4-voice-sheet.png",
+      "edge-loading.png", "edge-error.png", "edge-offline.png", "edge-permission.png",
+      "edge-error-recovered.png", "edge-perm-settings.png", "edge-perm-allowed.png", "s4-complete.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 10,
+    "notes": "Gate PASS (no lab rail mounted; edge states driven via window.__setGestureState instead). Static frames are clean: 1 loud element, no token leaks, reduced motion honored, 600x600 exact. But instrumented interaction shows the piece's headline interaction is dead on real pointer input: pointer held on a gaze target for 900ms produced no .gaze-focus, no dwell ring, status stayed '0 / 3', readout said 'idle'. Root cause verified in os/shared/core.js:50-52 (stage-local coords fed to elementFromPoint, which needs client coords; at scale 1.15/offset 215,65 the focus hit-test lands ~260px up-left of the pointer). Consequences captured on screen: every physical pointerdown fires a false 'Tap outside · move halo to a target' banner (index.html os.on('tapvoid')), and the banner strip (top:52px) overlaps the step dots (~y60-84) so pointerup re-targets clicks to DIV.stage — capture-phase listener recorded the click target as DIV.stage and the step dots never navigated (30s playwright timeout waiting for #orbBtn to become visible). Keyboard paths all verified working: ArrowRight/Left complete the swipe step (status 'complete · swipe mastered'), Space captures ('captured · 1'), orb click opens assistant sheet and Dismiss closes it, error Retry recovers to trainer, offline 'Use offline' returns, permission → Open Settings → toggle recovers to step 5. Loading state is a static skeleton that never resolves (still on after 4s) but shows a progress bar and caption."
+  },
+  "blind": {
+    "A": "visionOS 'Get to know gestures' Setup coach + Home View gaze focus pod (visionOS 2, 2024)",
+    "B": "Horizon OS (Meta Quest) hand-tracking tutorial 'touch the orbs' panel (v69)",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "A darkened passthrough room. One ghost-hand line diagram at center, a single instruction line above it, one Continue pill below. The eye-gaze focus pod — a subtle rounded-rect highlight — snaps as a unit onto whatever the eyes rest on; a pinch confirms with a haptic/audio tick and the coach advances. Nothing else competes for attention; there is no step chrome, no counters, no secondary panels. Failure is silent (gaze misses = nothing happens); loading elsewhere in the system is a bare spinner.",
+    "B": "A dimmed passthrough room with glowing blue target orbs floating in an arc. Your own rendered hand meshes are the pointer: you physically reach out and touch an orb, then index-pinch to select. Big high-contrast text, a row of progress dots at top, quite game-like. Missing an orb fades it and respawns it. Flow is long (60s+), modal, and the loading states around it are bare spinners; tracking-loss handling is a minimal toast.",
+    "C": "A 600x600 glass trainer: status bar, 5-step stepper with dots, two-line instruction, a small SVG diagram strip, and one raised practice card holding three 56px dwell targets (or a chip, a swipe track, a shutter, an orb, depending on step). A halo cursor is supposed to move with gaze and dwell-select at 350ms; banners confirm each register ('Gaze mastered', 'Capture 1'); a coordinate readout sits bottom-right. Dedicated loading/error/offline/permission cards swap in from a dev chip row below the stage. On real pointer input the halo focus/dwell never engages and every click raises a false 'Tap outside' banner that also swallows clicks on the step dots."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS Setup 'Get to know gestures' coach (2024) and Home View app grid: the Home View is a shelf of 1x1 rounded-square app icons floating on a dark translucent ellipse over your room, name labels beneath, Control Center/environment dial at right; exactly one icon carries the rounded-rect gaze pod at a time and a finger-pinch activates it. The gesture coach is the same material language: darkened world, one line diagram, one Continue target, pod snaps with ~200ms ease. Weaknesses I am scoring: the coach has no error/loading/offline design at all, system loading is a bare spinner, and the pod's low contrast is genuinely hard to see at arm's length in bright rooms.",
+    "horizonOS": "Horizon OS (Quest) hand-tracking tutorial (v69): passthrough dimmed by a scrim, a horizontal arc of glowing blue orbs, your hand meshes rendered in real time as the selection pointer, index-pinch to confirm, progress dots top-center, large SF-style text with generous spacing. Weaknesses I am scoring: the flow is long and modal, orb glow is decorative more than informative, loading states are bare spinners, and tracking-loss feedback is a thin toast."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 9, "focusDiscipline": 9, "materialHonesty": 9, "motion": 9, "typography": 9, "edgeStates": 5, "dependability": 8, "accessibility": 9, "delight": 9 },
+    "horizonOS": { "glanceability": 8, "focusDiscipline": 8, "materialHonesty": 8, "motion": 8, "typography": 8, "edgeStates": 5, "dependability": 8, "accessibility": 8, "delight": 8 },
+    "ours": { "glanceability": 7, "focusDiscipline": 5, "materialHonesty": 8, "motion": 8, "typography": 6, "edgeStates": 9, "dependability": 4, "accessibility": 6, "delight": 6 }
+  },
+  "totals": { "visionOS": 76, "horizonOS": 69, "ours": 59 },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "visionOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": ["visionOS", "horizonOS", "ours"],
+  "biggestGap": "Gaze focus + dwell — the interaction this trainer exists to teach — never engages on real pointer input. os/shared/core.js:50-52 computes stage-local coords ((clientX-rect.left)/scale) and passes them to document.elementFromPoint, which expects client coords; with the stage at scale 1.15 and offset (215,65) the focus hit-test lands ~260px up-left of the pointer, so hovering a target shows no .gaze-focus ring, the dwell timer never arms (armDwell returns on null focus), the dwell ring never draws, and the readout says 'idle' while the pointer sits on a target (verified: 900ms hover, status stuck at '0 / 3 · hold to select'). Compound failure: because focus is always null, every physical pointerdown emits os 'tapvoid' → false 'Tap outside' banner (index.html:1184), and that banner strip (top:52px, full width) overlaps the step dots (~y60-84), re-targeting pointerup/click to DIV.stage — step dots are click-dead in real use (capture-phase listener recorded click target DIV.stage; navigation never happened). Expected: pointer over a target → gaze-focus ring + dwell ring → target checks at 350ms, dots clickable. Got: nothing on hover, false error banner on every click, dead navigation. Fix in the piece (core is frozen): index.html already does correct inverse mapping for the readout (index.html:1176-1183) — apply the same hit-testing to drive its own gaze-focus/dwell on the targets, suppress the tapvoid banner when the pointer is over a focusable, and move the banner anchor below the stepper so it can never occlude the dots.",
+  "reason": "The static surface is the best-crafted I have judged — designed edge states beat both references, motion is in-spec, materials are honest. But a gesture trainer whose gaze/dwell mechanic does not function under the canonical probe is a failed product: the one thing a wearer must learn cannot be demonstrated, the interface lies ('Tap outside' while pointing at a target), and the step navigation is click-dead under the banner. visionOS wins 8 of 9 criteria from named screens (its real weaknesses — no edge-state design, bare spinner loading — are exactly where ours earns its one win). Ours ranks last at 59/90. Fail.",
+  "passCondition": "Ours ranked THIRD overall (59 vs visionOS 76, horizonOS 69). One gap named. Fail."
+}

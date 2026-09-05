@@ -1,0 +1,52 @@
+{
+  "piece": "24-devsdk",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T00:00:00Z",
+  "verdict": "pass",
+  "probeEvidence": {
+    "cmd": "bun tools/test-devportal.mjs  (plus bun -e playwright screenshot run against http://localhost:4310/components/24-devsdk/index.html)",
+    "outDir": "reviews/probe-24-devsdk-r1",
+    "screenshotsRead": ["top.png", "validator-bad.png", "submit.png"],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "n/a — desktop portal, 1280x900 viewport, the 600x600 lens probe does not apply",
+    "inStageFocusables": 0,
+    "notes": "Gate green: 38 checks, 0 failures. The gate drives every documented method path against a real window.prism inside a real sandboxed frame, and provokes not-declared / unknown-method / blocked / offline from inside the sandbox. I independently cross-checked all 13 documented SDK methods against os/shared/prism-sdk.js — all exist. All 7 documented error codes are emitted by os/shared/app-runtime.js (not-declared :406, permission-denied :412, offline :463, blocked :519, timeout :390, unknown-method :495, no-ready :166). Documented constants are honest: 8s call timeout = CALL_TIMEOUT 8000, 4s no-ready = READY_TIMEOUT 4000, notify title 40 / body 90 = :474-475, badge 28 = :483, name 24 = app-manifest.js :80. Screenshots show a clean dark docs surface; the broken-manifest sample renders 7 named field errors plus a warning from the real imported validator."
+  },
+  "blind": {
+    "A": "Meta developer platform (developer.meta.com — Ray-Ban Meta / Quest web app docs and submission flow)",
+    "B": "n/a — two-system desktop comparison",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "Vast docs tree where the web-app path sits buried under Unity and native paths. SDK references drift from shipped device behavior; error surfaces during review are often bare rejection emails with no per-field detail. Requires an account, an org, and hardware before a first app runs. Strong real-device deployment, weak hour-one clarity.",
+    "C": "Single-page desktop docs with sticky scrollspy nav: Start here, sandbox, manifest, validator, SDK reference, error codes, design rules, submit. The validator embeds the shipping validateManifest module and names every offending field. The starter story is two files, no build step, no account. The final step — seeing YOUR app in the simulator — quietly requires editing a hardcoded app id in a different component's source."
+  },
+  "referenceScreens": {
+    "visionOS": "Not applicable — this is a desktop developer portal, not a lens surface. The concrete comparator I used is developer.meta.com's web-platform docs for Ray-Ban Meta glasses and Quest web apps: a multi-page docs site with an account-gated developer dashboard, an upload-and-review submission flow, and device deployment through the Meta AI mobile app.",
+    "horizonOS": "Same comparator as visionOS slot: Meta's developer platform. Its manifest equivalent is the Quest app stewardship record plus platform capabilities; its error documentation is partial (per-platform error pages, no unified code taxonomy an app can branch on); its review gives pass/reject with limited per-field feedback."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 6, "focusDiscipline": 6, "materialHonesty": 5, "motion": 7, "typography": 8, "edgeStates": 5, "dependability": 5, "accessibility": 7, "delight": 6 },
+    "horizonOS": { "glanceability": 6, "focusDiscipline": 6, "materialHonesty": 5, "motion": 7, "typography": 8, "edgeStates": 5, "dependability": 5, "accessibility": 7, "delight": 6 },
+    "ours": { "glanceability": 8, "focusDiscipline": 8, "materialHonesty": 9, "motion": 7, "typography": 8, "edgeStates": 8, "dependability": 9, "accessibility": 8, "delight": 8 }
+  },
+  "totals": { "visionOS": 55, "horizonOS": 55, "ours": 73 },
+  "winnersPerCriterion": {
+    "glanceability": "ours",
+    "focusDiscipline": "ours",
+    "materialHonesty": "ours",
+    "motion": "ours",
+    "typography": "ours",
+    "edgeStates": "ours",
+    "dependability": "ours",
+    "accessibility": "ours",
+    "delight": "ours"
+  },
+  "overallRanking": ["ours", "metaDevPlatform"],
+  "biggestGap": "First-app last mile · components/24-devsdk/index.html:195 promises 'Copy these two files into /os/apps/<your-id>/, open the simulator, and your app is running against the real OS' — but components/25-devsim/index.html:277 hardcodes underTest = 'transit' with no UI to install an arbitrary app id, so a developer who follows Start here verbatim never sees their hello-prism app without editing OS source. Expected: a field in Developer Mode to type/install any /os/apps/<id> folder. Got: a fixed fixture list (transit, badmanifest). Fix belongs to 25-devsim; the overclaim belongs to this page's lede.",
+  "reason": "The judged question — could a third-party developer ship a working app against what is documented here — is answered yes by evidence, not by claim. The portal renders its manifest table, permission catalogue, and version from the shipping module import; the gate resolves every documented method against a real prism object in a real sandboxed frame and provokes every documented error code from inside the sandbox; I re-verified each of the 13 methods, 6 events, and 7 codes by hand against prism-sdk.js and app-runtime.js, including the numeric constants (8s timeout, 4s watchdog, 40/90/28/24 char bounds) — zero drift. Error paths all land somewhere safe: no brokered call can hang (8s timeout), a no-ready app gets a wearer-facing way out, permissions.request resolves on denial instead of rejecting, uninstall deletes grants and storage. Meta's developer platform loses on honesty (docs drift from device behavior), error taxonomy (no unified branchable codes for web), and hour-one latency (account + org + hardware before first run). Ours wins 9/9. The one real gap is the simulator's hardcoded app id, which breaks the portal's own 'never dead-end' rule at the last step of the first-app path — a cross-piece fix (25-devsim) and a one-line overclaim here, not a docs-honesty failure, so the piece passes with the gap named.",
+  "passCondition": "Ours ranked first (73 vs 55). One named gap: the hardcoded underTest app id in 25-devsim contradicts the Start-here promise on this page."
+}

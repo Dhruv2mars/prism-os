@@ -1,0 +1,111 @@
+{
+  "url": "http://localhost:4310/components/00-foundation/index.html?world=night",
+  "probedAt": "2026-09-05T07:25:14.430Z",
+  "gate": {
+    "pass": true,
+    "violations": [],
+    "warnings": []
+  },
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "reducedMotion": {
+    "ok": true,
+    "infiniteAnimations": 0,
+    "contentPresent": true
+  },
+  "screenshots": [
+    "full.png",
+    "stage.png",
+    "stage-reduced-motion.png"
+  ],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "inStageFocusables": 1,
+  "labFocusables": 15,
+  "totalFocusables": 16,
+  "labInsideStage": 0,
+  "devTokenLeaks": [],
+  "loudElementCount": 2,
+  "loudElements": [
+    "div.plate",
+    "span.word"
+  ],
+  "surfaces": [
+    {
+      "el": "div.scene",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "radial-gradient(80px 80px at 20.5% 35%, rgba(255, 226, 170, 0.34), rgb",
+      "backdrop": "none"
+    },
+    {
+      "el": "i.sc-mass",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "radial-gradient(64% 74% at 44% 100%, rgba(0, 0, 0, 0.46), rgba(0, 0, 0",
+      "backdrop": "none"
+    },
+    {
+      "el": "i.sc-mass",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "radial-gradient(60% 70% at 60% 100%, rgba(0, 0, 0, 0.34), rgba(0, 0, 0",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.surface",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.area",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.stack",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.layers",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.plate",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(158deg, rgba(14, 22, 35, 0.1) 0%, rgba(6, 11, 18, 0.18",
+      "backdrop": "saturate(1.16) blur(5px)"
+    }
+  ],
+  "unlabeledIconButtons": [],
+  "subTenPxTextCount": 0,
+  "reducedMotionSupport": true,
+  "hasLab": true,
+  "labControls": [
+    "Ready",
+    "Loading",
+    "Empty",
+    "Error",
+    "Offline",
+    "Permission denied",
+    "Next specimen",
+    "Previous specimen",
+    "Back to the first",
+    "Reduced motion",
+    "Street",
+    "Room",
+    "Outdoor",
+    "Night"
+  ],
+  "overflow": {
+    "stageScrollH": 600,
+    "stageClientH": 600,
+    "innerScrollH": null,
+    "innerClientH": null
+  },
+  "title": "Prism OS — Foundation"
+}

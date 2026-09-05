@@ -104,10 +104,15 @@
 
 /* ---------- handoff ---------- */
 
+/* Composition sits in the upper quarter. The stage centre is the gaze reticle's
+   rest point — it stays clear of every glyph, so the space below the title is
+   genuinely empty gesture canvas. */
 .b-handoff {
   background: #020407;
   cursor: grab;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  display: flex; flex-direction: column; align-items: center;
+  padding-top: 76px;
+  gap: 12px;
   outline-offset: -6px;
 }
 .b-chev { color: var(--ink-80); margin-bottom: 2px; }
@@ -121,11 +126,20 @@
   color: var(--ink-100);
 }
 .b-handoff .caption { font-size: 13px; color: var(--ink-60); }
+/* non-text glow marking where the upward gesture begins */
+.b-swipe-cue {
+  position: absolute; left: 50%; bottom: 54px; transform: translateX(-50%);
+  width: 200px; height: 62px;
+  background: radial-gradient(58% 92% at 50% 90%, rgba(86, 184, 255, 0.18), transparent 72%);
+  pointer-events: none;
+}
 
 /* ---------- home ready ---------- */
 
-.b-home { background: rgba(5, 8, 12, 0.45); }
+.b-home { place-items: start center; }
+/* mark sits at the gaze rest point; all text reads below it */
 .b-home-card {
+  margin-top: 228px;
   width: 320px;
   padding: var(--sp-6) var(--sp-5);
   display: flex; flex-direction: column; align-items: center; gap: 12px;
@@ -136,7 +150,7 @@
 
 /* ---------- recovery ---------- */
 
-.b-recovery { background: rgba(4, 7, 11, 0.58); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.b-recovery { place-items: start center; padding-top: 128px; }
 .b-rec-card {
   width: 380px;
   padding: var(--sp-5);
@@ -191,36 +205,4 @@
 .sheet-in { animation: sheet-in 260ms var(--ease-prism); }
 .rise-in { animation: rise-in 260ms var(--ease-prism) both; }
 
-/* ---------- scenario control row (simulator chrome, outside stage) ---------- */
-
-.console-row {
-  position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
-  z-index: 1000;
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 12px;
-  border-radius: var(--r-pill);
-  background: rgba(10, 15, 23, 0.72);
-  outline: 1px solid var(--stroke-glass);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-}
-.cbtn {
-  height: 36px; padding: 0 16px;
-  border: 1px solid var(--stroke-glass);
-  border-radius: var(--r-pill);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--ink-100);
-  font-family: var(--font);
-  font-size: 13px; font-weight: 600;
-  cursor: pointer;
-  transition: background 260ms var(--ease-prism);
-}
-.cbtn:hover { background: rgba(255, 255, 255, 0.14); }
-.cbtn.cwarn { border-color: rgba(255, 194, 71, 0.4); background: rgba(255, 194, 71, 0.1); color: #ffd98a; }
-.state-chip {
-  font-size: 13px; font-weight: 600; color: var(--accent);
-  padding: 6px 12px; border-radius: var(--r-pill);
-  background: var(--accent-wash);
-  outline: 1px solid rgba(86, 184, 255, 0.3);
-  min-width: 96px; text-align: center;
-}
-.chint { font-size: 13px; color: var(--ink-40); font-weight: 500; }
+/* ---------- simulator rail is rendered by /os/shared/lab.js ---------- */

@@ -1,0 +1,88 @@
+{
+  "url": "http://localhost:4310/components/03-wm/index.html?state=error",
+  "probedAt": "2026-09-05T09:32:55.482Z",
+  "gate": {
+    "pass": true,
+    "violations": [],
+    "warnings": []
+  },
+  "consoleMsgs": [],
+  "pageErrors": [],
+  "failedReqs": [],
+  "reducedMotion": {
+    "ok": true,
+    "infiniteAnimations": 0,
+    "contentPresent": true
+  },
+  "screenshots": [
+    "full.png",
+    "stage.png",
+    "stage-reduced-motion.png"
+  ],
+  "stagePresent": true,
+  "stageSize": "600x600",
+  "inStageFocusables": 5,
+  "labFocusables": 19,
+  "totalFocusables": 24,
+  "labInsideStage": 0,
+  "devTokenLeaks": [],
+  "loudElementCount": 0,
+  "loudElements": [],
+  "surfaces": [
+    {
+      "el": "div.deck",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.state-layer",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.win-sheet",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(165deg, rgba(24, 34, 50, 0.62), rgba(10, 16, 26, 0.72)",
+      "backdrop": "saturate(1.5) blur(26px)"
+    },
+    {
+      "el": "div.win-body",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "none",
+      "backdrop": "none"
+    }
+  ],
+  "unlabeledIconButtons": [],
+  "subTenPxTextCount": 0,
+  "reducedMotionSupport": true,
+  "hasLab": true,
+  "labControls": [
+    "Ready",
+    "Loading",
+    "Empty",
+    "Error",
+    "Offline",
+    "Permission denied",
+    "Open window",
+    "Cycle focus",
+    "Minimize top",
+    "Close top",
+    "Toggle overview",
+    "Stacked layout",
+    "Tiled layout",
+    "Reduced motion",
+    "Street",
+    "Room",
+    "Outdoor",
+    "Night"
+  ],
+  "overflow": {
+    "stageScrollH": 600,
+    "stageClientH": 600,
+    "innerScrollH": null,
+    "innerClientH": null
+  },
+  "title": "Prism OS — Window Manager"
+}

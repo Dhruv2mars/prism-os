@@ -506,7 +506,7 @@
   padding:16px 14px 14px 14px;
   display:flex;flex-direction:column;gap:12px;
   box-shadow:0 18px 44px rgba(0,0,0,0.42);
-  transform:translateY(18px) scale(0.98);
+  transform:translateY(8px) scale(0.98);
   opacity:0;
   transition: transform 280ms var(--ease-prism), opacity 260ms var(--ease-prism);
   pointer-events:none;
@@ -632,7 +632,7 @@ ctxSheet.innerHTML = `
  <div class="sheet-drag" aria-hidden="true"></div>
  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
   <div class="sheet-title">Quick actions</div>
-  <span class="caption " style="color:var(--ink-40);font-size:10px;letter-spacing:0.04em">long-press · prism-ease</span>
+  <span class="caption " style="color:var(--ink-40);font-size:10px;letter-spacing:0.04em">Long-press for options</span>
  </div>
  <div style="background:rgba(255,255,255,0.06);outline:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px">
   <div style="width:36px;height:36px;border-radius:8px;flex:none;background:linear-gradient(135deg,#ff8a6b 0%, #d4232a 100%);display:grid;place-items:center;color:white">
@@ -717,7 +717,7 @@ gridBtn.addEventListener('click', (e)=>{
  vfGrid.classList.toggle('on', gridOn);
  gridBtn.classList.toggle('active', gridOn);
  gridBtn.setAttribute('aria-label', gridOn ? 'Grid on, tap to hide' : 'Grid off, tap to show 3 by 3');
- if(gridOn) os.banner('<strong>Grid on</strong><span class="caption">3×3 · prism-ease</span>',{timeout:1400});
+ if(gridOn) os.banner('<strong>Grid on</strong><span class="caption">3×3 composition guide</span>',{timeout:1400});
 });
 const flashBtn = h('button', {class:'vf-chip', 'data-focusable':'', tabindex:'0', 'aria-label':'Flash auto'}, 'Auto');
 flashBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg> Auto`;
@@ -1213,7 +1213,7 @@ function setEdge(id){
       ${Array(4).fill(0).map(()=>`<span class="skeleton" style="flex:0 0 76px;height:56px;border-radius:10px"></span>`).join('')}
      </div>
     </div>
-    <div class="caption" style="text-align:center;color:var(--ink-40);display:flex;align-items:center;justify-content:center;gap:6px"><span class="dot ok" style="width:6px;height:6px;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5)"></span>Loading · shimmer 1.2s · prism-ease</div>
+    <div class="caption" style="text-align:center;color:var(--ink-40);display:flex;align-items:center;justify-content:center;gap:6px"><span class="dot ok" style="width:6px;height:6px;background:var(--accent);box-shadow:0 0 8px rgba(86,184,255,0.5)"></span>Warming up the lens</div>
    </div>
   `;
   return;
