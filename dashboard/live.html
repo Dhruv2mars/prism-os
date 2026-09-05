@@ -62,12 +62,12 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
 <body><div class="wrap">
 <h1>Prism OS <span>the gauntlet</span></h1>
 <p class="sub">Prism OS — the operating system for smart glasses.</p>
-<p class="meta">Updated 2026-09-01T20:42:52 UTC · run gauntlet-2 · <a href="https://github.com/Dhruv2mars/prism-os">https://github.com/Dhruv2mars/prism-os</a></p>
+<p class="meta">Updated 2026-09-05T17:08:00 UTC · run gauntlet-2 · <a href="https://github.com/Dhruv2mars/prism-os">https://github.com/Dhruv2mars/prism-os</a></p>
 
 <div class="stats">
   <div class="stat"><b>0<span style="color:var(--faint);font-size:15px">/26</span></b><span>passed</span></div>
-  <div class="stat"><b>2</b><span>agents live</span></div>
-  <div class="stat"><b>10</b><span>rounds run</span></div>
+  <div class="stat"><b>0</b><span>agents live</span></div>
+  <div class="stat"><b>22</b><span>rounds run</span></div>
   <div class="stat"><b>5</b><span>waves</span></div>
 </div>
 <div class="bar"><i style="width:0.0%"></i></div>
@@ -84,39 +84,39 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
       <tbody>
     <tr>
       <td class="pid"><b>00-foundation</b><span>foundation &amp; materials</span></td>
-      <td><span class="badge" style="color:#ffc247;background:rgba(255,194,71,.13)">building</span></td>
-      <td class="num">R3</td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
+      <td class="num">R2</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="spark"><svg width="108" height="30" viewBox="0 0 108 30" aria-hidden="true">
     <line x1="0" y1="8.1" x2="108" y2="8.1" stroke="rgba(255,255,255,.2)" stroke-dasharray="2 3" stroke-width="1"/>
     <path d="M2.0,7.3 L106.0,8.1" fill="none" stroke="#56b8ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="2.0" cy="7.3" r="1.6" fill="#4cd47c"/><circle cx="106.0" cy="8.1" r="2.6" fill="#56b8ff"/>
   </svg><b>71<span>/90</span></b><em class="down">-3</em></span></td>
-      <td class="gap"><span>Density ladder inverted in rendered pixels: Glass transmits 0.53 of world luminance, Sheet transmits 1.04 — backwards. On Outdoor the streetlamp reads as a hard shape through Sheet, whose own caption says the world stays as colour not shapes, while Glass erases it and reads as a sunglasses tint. Also: .ctl .btn and .toggle are hardcoded px and do not scale with --a11y-scale, ending up half the size of the copy at scale 2.</span></td>
+      <td class="gap"><span>Density ladder is inverted in the rendered pixels · components/00-foundation/index.html:93 (.plate backdrop-filter: saturate(1.9) blur(13px) brightness(0.56)) vs :195 (.sheetm backdrop-filter: saturat</span></td>
     </tr>
     <tr>
       <td class="pid"><b>16-motion</b><span>motion &amp; transition language</span></td>
-      <td><span class="badge" style="color:#ffc247;background:rgba(255,194,71,.13)">building</span></td>
+      <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
       <td class="num">R2</td>
-      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="spark"><svg width="108" height="30" viewBox="0 0 108 30" aria-hidden="true">
     <line x1="0" y1="7.5" x2="108" y2="7.5" stroke="rgba(255,255,255,.2)" stroke-dasharray="2 3" stroke-width="1"/>
     <path d="M54.0,7.5" fill="none" stroke="#56b8ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="54.0" cy="7.5" r="2.6" fill="#56b8ff"/>
   </svg><b>73<span>/90</span></b></span></td>
-      <td class="gap"><span>resize() measures the post-mutation height before cancelling the in-flight height animation, so h1-h0 &lt; 1px, the guard returns early, and interruption is ignored — then a 61px single-frame snap. Plus: card hover feedback is dead because the enter animation holds fill:'both'; and advance() matches the leaving card, so two fast dismisses silently eat a message.</span></td>
+      <td class="gap"><span class="dash">—</span></td>
     </tr>
     <tr>
       <td class="pid"><b>17-audio-haptics</b><span>spatial audio &amp; haptics</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
       <td class="num">R2</td>
-      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:#4cd47c"></i></span></td>
       <td class="sp"><span class="spark"><svg width="108" height="30" viewBox="0 0 108 30" aria-hidden="true">
     <line x1="0" y1="9.1" x2="108" y2="9.1" stroke="rgba(255,255,255,.2)" stroke-dasharray="2 3" stroke-width="1"/>
     <path d="M54.0,8.9" fill="none" stroke="#56b8ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
     <circle cx="54.0" cy="8.9" r="2.6" fill="#4cd47c"/>
   </svg><b>68<span>/90</span></b></span></td>
-      <td class="gap"><span>Bearing readout collides with the compass-rose &quot;behind&quot; label and the source orb in every cue state. Also: at text scale 1.6 the column overflows 676 vs 556 and clips &quot;Confirm&quot; and &quot;Capture&quot; out of reach.</span></td>
+      <td class="gap"><span class="dash">—</span></td>
     </tr></tbody>
     </table></div>
   </section><section class="wave">
@@ -131,34 +131,34 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
     <tr>
       <td class="pid"><b>01-boot</b><span>boot &amp; recovery</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Text scale is a dead control on this piece · components/01-boot/boot.css (all font-sizes hardcoded, e.g. :128 caption 13px, :181-182 .b-diag dt 13px/dd 15px) + os/shared/lab.js:277 · expected every st</span></td>
     </tr>
     <tr>
       <td class="pid"><b>02-home</b><span>home environment</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>At-rest vertical overflow — viewHome content stack (components/02-home/index.html:739, .recents at :357) · expected the four zones (hero ~160px + launcher rows ~2x210px + recents rail) to fit the fixe</span></td>
     </tr>
     <tr>
       <td class="pid"><b>03-wm</b><span>window manager</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Close-all dead end · components/03-wm/index.html:385-388 (closeWindow -&gt; refresh) and :614 (refresh) · expected: closing the LAST window through the real UI (sheet × button or wrist-flick swipe, verif</span></td>
     </tr>
     <tr>
       <td class="pid"><b>04-gestures</b><span>gesture &amp; input model</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Gaze focus + dwell — the interaction this trainer exists to teach — never engages on real pointer input. os/shared/core.js:50-52 computes stage-local coords ((clientX-rect.left)/scale) and passes them</span></td>
     </tr>
     <tr>
       <td class="pid"><b>18-textinput</b><span>text input &amp; dictation</span></td>
@@ -181,10 +181,10 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
     <tr>
       <td class="pid"><b>05-notifications</b><span>notifications</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Focus discipline at rest · components/05-notifications/index.html:197-205 (.notif-card.is-top) · expected: one unmistakable focal card at rest on a 600x600 lens — non-top cards recessive (dimmed ~0.7,</span></td>
     </tr>
     <tr>
       <td class="pid"><b>06-assistant</b><span>AI assistant</span></td>
@@ -213,18 +213,18 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
     <tr>
       <td class="pid"><b>11-settings</b><span>settings</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Search field · components/11-settings/index.html:736-749 (dead filter), renderSettings() gating at :949 · expected: typing filters groups live and shows the inline 'No results' card (already built at </span></td>
     </tr>
     <tr>
       <td class="pid"><b>13-a11y</b><span>accessibility</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Text scale control scales only the demo card, not the surface · components/13-a11y/index.html:432-447 (updateStageScale sets --a11y-scale, consumed solely by .preview-kicker/.preview-title/.preview-bo</span></td>
     </tr></tbody>
     </table></div>
   </section><section class="wave">
@@ -239,26 +239,26 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
     <tr>
       <td class="pid"><b>07-camera</b><span>camera &amp; capture</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Recents strip clipped at stage bottom · components/07-camera/index.html:58-66 (.cam-viewport inset + overflow:hidden) and :69-72 (.vf-card fixed 338px) · expected the Recents strip fully inside the 60</span></td>
     </tr>
     <tr>
       <td class="pid"><b>08-captions</b><span>live captions</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Caption content stream (the transcript itself, the one thing this surface produces) · components/08-captions/index.html:588-594 (SCRIPT) and :761-767 (extra-line reuse in startNextLine) · expected: ca</span></td>
     </tr>
     <tr>
       <td class="pid"><b>09-nav</b><span>navigation</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Gaze hover-focus and dwell activation (the platform's primary input per VISION.md) never engage on this surface - os/shared/core.js:41-53 (targetFromPoint) - expected: moving head-gaze over the turn c</span></td>
     </tr>
     <tr>
       <td class="pid"><b>10-messages</b><span>messages &amp; calls</span></td>
@@ -279,10 +279,10 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
     <tr>
       <td class="pid"><b>15-hud</b><span>performance HUD</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Engineering tokens and builder self-narration rendered as user-visible copy · components/15-hud/index.html:495 ('TARGET 90 FPS · PRISM-EASE 260MS' on the hero axis), :578 ('prism-ease · 260ms' in the </span></td>
     </tr></tbody>
     </table></div>
   </section><section class="wave">
@@ -298,7 +298,7 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
       <td class="pid"><b>12-webapps</b><span>web apps runtime</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
       <td class="num">R1</td>
-      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
       <td class="gap"><span class="dash">—</span></td>
     </tr>
@@ -316,31 +316,31 @@ a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(86,184,255,
       <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Zombie app window · components/23-appstore/index.html:170 (.window { display: grid }) vs line 282 (regions(): winEl.hidden = true) · expected the sandboxed app window to disappear when the wearer leav</span></td>
     </tr>
     <tr>
       <td class="pid"><b>24-devsdk</b><span>developer SDK &amp; manifest spec</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
       <td class="num">R1</td>
-      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
       <td class="gap"><span class="dash">—</span></td>
     </tr>
     <tr>
       <td class="pid"><b>25-devsim</b><span>developer simulator &amp; devtools</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
-      <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
+      <td class="num">R1</td>
+      <td><span class="pips" title="two consecutive passes required"><i style="background:#4cd47c"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
       <td class="gap"><span class="dash">—</span></td>
     </tr>
     <tr>
       <td class="pid"><b>14-onboarding</b><span>onboarding &amp; pairing</span></td>
       <td><span class="badge" style="color:#7c869e;background:rgba(124,134,158,.13)">queued</span></td>
-      <td class="num">R0</td>
+      <td class="num">R1</td>
       <td><span class="pips" title="two consecutive passes required"><i style="background:rgba(255,255,255,.12)"></i><i style="background:rgba(255,255,255,.12)"></i></span></td>
       <td class="sp"><span class="dash">—</span></td>
-      <td class="gap"><span class="dash">—</span></td>
+      <td class="gap"><span>Pairing digits feedback is dead code · components/14-onboarding/index.html:364,424,435,439 · expected: 'Rotate pairing code' (and the 45s countdown) visibly rotates digits, and on pairing found the si</span></td>
     </tr></tbody>
     </table></div>
   </section>
