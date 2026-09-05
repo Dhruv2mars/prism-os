@@ -1,6 +1,6 @@
 {
   "url": "http://localhost:4310/components/00-foundation/index.html?state=error",
-  "probedAt": "2026-09-05T07:24:45.901Z",
+  "probedAt": "2026-09-05T10:59:01.336Z",
   "gate": {
     "pass": false,
     "violations": [

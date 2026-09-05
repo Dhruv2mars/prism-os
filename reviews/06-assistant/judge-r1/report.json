@@ -1,6 +1,6 @@
 {
-  "url": "http://localhost:4310/components/00-foundation/index.html",
-  "probedAt": "2026-09-05T10:58:06.019Z",
+  "url": "http://localhost:4310/components/06-assistant/index.html",
+  "probedAt": "2026-09-05T10:53:22.727Z",
   "gate": {
     "pass": true,
     "violations": [],
@@ -21,64 +21,65 @@
   ],
   "stagePresent": true,
   "stageSize": "600x600",
-  "inStageFocusables": 1,
-  "labFocusables": 15,
-  "totalFocusables": 16,
+  "inStageFocusables": 6,
+  "labFocusables": 14,
+  "totalFocusables": 20,
   "labInsideStage": 0,
   "devTokenLeaks": [],
-  "loudElementCount": 2,
+  "loudElementCount": 3,
   "loudElements": [
-    "div.plate",
-    "span.word"
+    "div.sheet",
+    "div.msg",
+    "div.msg"
   ],
   "surfaces": [
     {
-      "el": "div.scene",
-      "bg": "rgba(0, 0, 0, 0)",
-      "bgImage": "radial-gradient(80px 80px at 20.5% 35%, rgba(255, 226, 170, 0.34), rgb",
-      "backdrop": "none"
-    },
-    {
-      "el": "i.sc-mass",
-      "bg": "rgba(0, 0, 0, 0)",
-      "bgImage": "radial-gradient(64% 74% at 44% 100%, rgba(0, 0, 0, 0.46), rgba(0, 0, 0",
-      "backdrop": "none"
-    },
-    {
-      "el": "i.sc-mass",
-      "bg": "rgba(0, 0, 0, 0)",
-      "bgImage": "radial-gradient(60% 70% at 60% 100%, rgba(0, 0, 0, 0.34), rgba(0, 0, 0",
-      "backdrop": "none"
-    },
-    {
-      "el": "div.surface",
+      "el": "div.assistant-viewport",
       "bg": "rgba(0, 0, 0, 0)",
       "bgImage": "none",
       "backdrop": "none"
     },
     {
-      "el": "div.area",
+      "el": "div.view",
       "bg": "rgba(0, 0, 0, 0)",
       "bgImage": "none",
       "backdrop": "none"
     },
     {
-      "el": "div.stack",
+      "el": "div.view-primary",
       "bg": "rgba(0, 0, 0, 0)",
       "bgImage": "none",
       "backdrop": "none"
     },
     {
-      "el": "div.layers",
+      "el": "div.sheet",
+      "bg": "rgba(0, 0, 0, 0)",
+      "bgImage": "linear-gradient(160deg, rgba(28, 38, 54, 0.88), rgba(14, 21, 32, 0.92)",
+      "backdrop": "saturate(1.4) blur(22px)"
+    },
+    {
+      "el": "div.transcript",
       "bg": "rgba(0, 0, 0, 0)",
       "bgImage": "none",
       "backdrop": "none"
     },
     {
-      "el": "div.plate",
+      "el": "div.msg",
+      "bg": "rgba(255, 255, 255, 0.08)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.msg",
+      "bg": "rgba(255, 255, 255, 0.08)",
+      "bgImage": "none",
+      "backdrop": "none"
+    },
+    {
+      "el": "div.view-dock",
       "bg": "rgba(0, 0, 0, 0)",
-      "bgImage": "linear-gradient(158deg, rgba(14, 22, 35, 0.1) 0%, rgba(6, 11, 18, 0.18",
-      "backdrop": "saturate(1.16) blur(5px)"
+      "bgImage": "none",
+      "backdrop": "none"
     }
   ],
   "unlabeledIconButtons": [],
@@ -92,9 +93,8 @@
     "Error",
     "Offline",
     "Permission denied",
-    "Next specimen",
-    "Previous specimen",
-    "Back to the first",
+    "Run a reply",
+    "Queue offline prompt",
     "Reduced motion",
     "Street",
     "Room",
@@ -107,5 +107,5 @@
     "innerScrollH": null,
     "innerClientH": null
   },
-  "title": "Prism OS — Foundation"
+  "title": "Prism OS — Assistant"
 }

@@ -1,0 +1,104 @@
+{
+  "piece": "13-a11y",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T10:58:52Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/13-a11y/index.html reviews/13-a11y/judge-r1",
+    "outDir": "reviews/13-a11y/judge-r1",
+    "screenshotsRead": [
+      "stage.png",
+      "full.png",
+      "stage-reduced-motion.png",
+      "banner-scale.png",
+      "banner-motion.png",
+      "state-loading.png",
+      "state-empty.png",
+      "state-error.png",
+      "state-error-retrying.png",
+      "state-offline.png",
+      "state-blocked.png",
+      "state-hc-150.png",
+      "kbd-tab5.png",
+      "state-bottom.png",
+      "toggle-off.png",
+      "toggle-on.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 31,
+    "notes": "Zero console/page errors; all six edge states reachable via fixed dev chips below the stage and every one renders a real designed layout. Toggle mechanics verified working. But the probe gate FAILS: gaze reticle painted at rest over the High-contrast row subtitle; 31 focusables in a 600x600 stage; 13 loud elements. Pixels confirm engineering tokens in user-visible copy (banner 'Text scale 100% --a11y-scale 1.00 · live', row-sub 'Stage scales via --a11y-scale', motion banner 'animations paused · 0.01ms · prism-ease held', legend '#56b8ff · 0.9 opacity'), a state contradiction (Reduced motion ON while preview body reads 'motion live' in banner-motion.png), and the text-scale control scales ONLY the demo card — the entire control surface itself never reflows at 150%."
+  },
+  "blind": {
+    "A": "visionOS Settings > Accessibility page (visionOS 2, 2024, pointer-target list rows on frosted glass)",
+    "B": "Horizon OS accessibility settings in Meta Quest system settings (v69+, 2024, flat panel list with toggle switches)",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "System A shows a single full-bleed scrollable list on dark frosted glass: large 34pt page title that shrinks into the nav bar on scroll, then uniform rows (icon left, two-line label, value/toggle right). Grouped sections separated by hairlines only, no card chrome. Selecting a row slides in a detail pane; toggles animate 200ms with the standard Apple spring. The screen reads as one continuous surface — no nested cards, no badges-in-headlines, and the focal element is always the row nearest the pointer, shown by a soft capsule hover state. Text scale is not a demo inside the page: changing 'Larger Text' reflows the entire settings UI on return.",
+    "B": "System B presents accessibility settings as a flat near-black panel with a left-anchored column of plain rows — small gray icon, white label, right-aligned switch. Almost no decoration: no gradients, no pill badges, no rounded card stacks. Focus is a hard high-contrast rectangle outline driven by the controller laser pointer, unmistakable and singular. Preview of accessibility effects (e.g. colorblind filters) applies to the WHOLE panel instantly. Typography is three sizes total. It looks utilitarian to the point of dullness, but nothing competes and nothing lies about state.",
+    "C": "System C is a dense card stack: big 'Accessibility' title with a live subtitle line, then a VISION card (text-scale row with slider + 100/125/150 chips, high-contrast row with value pill and switch), a LIVE PREVIEW card with kicker/title/body/caption and metric pills, a MOTION & SOUND card (reduced-motion, mono audio), a COLOR & SHORTCUTS card (four colorblind chips with icons+patterns, voice row, captions row), and a FOCUS & INPUT card (three demo buttons, a legend line quoting hex values, a six-cell input-equivalence grid). A hintbar sits at the bottom; a gaze dot floats mid-stage; edge states replace the whole viewport with a centered glass state-card. Visually polished, glassy, everything animates with the same eased curve, and every state has clearly been designed. But at rest there is no single focal element — a dozen loud things shout at once — the copy leaks CSS variable names and easing function names to the user, and the 'text scale' control only rescales the demo card inside the page, not the page itself."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS Settings > Accessibility (visionOS 2, 2024): a single resizable frosted-glass window over the room, 34pt bold title in the header that collapses into the title bar on scroll, then a uniform list of 2-line rows on glass with hairline separators — SF icon in a rounded square, black-on-white label, right-aligned toggle or chevron. Hover (pointer proximity) draws one soft capsule around exactly one row. No nested cards, no decorative badges; toggles animate ~200ms; changing Larger Text reflows the whole window's type on dismiss.",
+    "horizonOS": "Meta Horizon OS system Settings > Accessibility (v69+, 2024): a flat near-opaque dark panel in VR with a single column of plain rows — small desaturated icon, white 2-line label, right-aligned switch — driven by the controller's laser pointer with a hard rectangular focus outline on exactly one row at a time. Almost zero ornamentation (no gradients, no pill badges), three type sizes total, and filter/preview effects apply to the entire panel content instantly rather than to a sandboxed demo widget."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 8,
+      "focusDiscipline": 8,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 6,
+      "dependability": 8,
+      "accessibility": 8,
+      "delight": 6
+    },
+    "horizonOS": {
+      "glanceability": 7,
+      "focusDiscipline": 9,
+      "materialHonesty": 6,
+      "motion": 6,
+      "typography": 8,
+      "edgeStates": 5,
+      "dependability": 7,
+      "accessibility": 7,
+      "delight": 4
+    },
+    "ours": {
+      "glanceability": 4,
+      "focusDiscipline": 3,
+      "materialHonesty": 7,
+      "motion": 7,
+      "typography": 3,
+      "edgeStates": 8,
+      "dependability": 7,
+      "accessibility": 4,
+      "delight": 6
+    }
+  },
+  "totals": {
+    "visionOS": 70,
+    "horizonOS": 59,
+    "ours": 49
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "horizonOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "visionOS"
+  },
+  "overallRanking": ["visionOS", "horizonOS", "ours"],
+  "biggestGap": "Text scale control scales only the demo card, not the surface · components/13-a11y/index.html:432-447 (updateStageScale sets --a11y-scale, consumed solely by .preview-kicker/.preview-title/.preview-body/.preview-caption at :231-234) · expected: setting 150% reflows the WHOLE stage — row titles, subtitles, chips, header — exactly the way visionOS 'Larger Text' reflows Settings on return, on a 600px glasses stage where 11px row-subs are already at the floor of arm's-length legibility · got: after clicking 150% (state-hc-150.png) every row title stays 14px, every row-sub stays 11px, group labels stay 10-11px; the accessibility settings page itself is inaccessible to the low-vision user it exists to serve, and its own demo mocks the lie by showing 'Notifications — glanceable' at 27px next to a control surface stuck at 11px.",
+  "reason": "Blind scoring ranked ours third (49/90 vs visionOS 70, Horizon 59). The piece's genuine strength is edge states — all six designed, reachable, and safe (loading skeleton, humane empty with actions, error with retry/cached + PR-A11Y-503 error code, offline with dimmed-but-alive content, permission-denied with partial function noted), the only criterion it wins outright. But it loses the accessibility piece to visionOS on its own subject matter: the scale control is a preview widget, not a surface behavior (accessibility 4 vs 8). Typography auto-fails per rubric: 'prism-ease held', 'cubic-bezier', '--a11y-scale 1.00', '0.26', '#56b8ff', '0.9 opacity' are all rendered verbatim in user-visible copy (banner-scale.png, banner-motion.png, state-bottom.png), so typography scores 3 and would be 1-3 regardless of craft. Focus discipline scores 3: probe counts 31 focusables and 13 loud elements at rest, and the at-rest stage (stage.png) shows the gaze reticle parked over the High-contrast row subtitle — the probe gate hard-fails on it. A state lie compounds it: with Reduced motion ON the preview body still reads 'motion live' until a re-render (banner-motion.png), which on a piece ABOUT dependability of state is self-disqualifying. Material honesty is decent (real backdrop blur, consistent scrim language), motion is on-spec (260ms prism-ease everywhere, verified in reduced-motion capture). The path to pass is concrete: make --a11y-scale (or a real rem-based scale) drive the entire stage, strip every engineering token from copy, hide the reticle until first pointer/gaze event, and demote at-rest chrome so one card wins the glance.",
+  "passCondition": "Ours ranked third overall (49 vs 70 vs 59) — not first, not tied-first. Multiple named gaps remain: preview-only text scale, engineering tokens in copy, reticle-over-text at rest, motion-state contradiction."
+}

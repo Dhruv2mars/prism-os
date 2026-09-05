@@ -1,0 +1,69 @@
+{
+  "piece": "09-nav",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T10:52:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/09-nav/index.html reviews/09-nav/judge-r1",
+    "outDir": "reviews/09-nav/judge-r1",
+    "screenshotsRead": [
+      "stage.png",
+      "full.png",
+      "stage-reduced-motion.png",
+      "states/state-loading.png",
+      "states/state-empty.png",
+      "states/state-error.png",
+      "states/state-offline.png",
+      "states/state-permission.png",
+      "states/normal-step3.png",
+      "states/arrive-card.png",
+      "states/toll-on.png",
+      "states/textscale.png",
+      "states/gaze-dwell.png",
+      "states/reroute.png",
+      "states/arrived-real.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 8,
+    "notes": "Drove all six states via the out-of-stage dev rail (window.__setNavState) plus clicks on turn card, reroute, mute, toll toggle. Zero console/page errors across every state. Reduced-motion honored (probe audit: 0 infinite animations, content present). 2x root font-size test rendered pixel-identical to 1x - all 41 font-size declarations are px-locked, no rem/em anywhere. Gaze check: cursor dot tracks the pointer but elementFromPoint lookup misses - zero .gaze-focus elements after pointermove over the mute button, dwell never activated, no banner. Arrive card shows 'Then onto' dangling text, '10 min to turn' at arrival, '1 steps - 0 m'. Map pin labels are static: at step 3 the card says 'Exit 2A - Embarcadero 620 m' while the map still shows 'Next - Valencia St' and 'You - Valencia'."
+  },
+  "blind": {
+    "A": "visionOS Maps directions view (Vision Pro, visionOS 2, 2024)",
+    "B": "Meta Ray-Ban Display walking navigation HUD (Horizon OS, Connect 2025)",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "A single floating glass window over the room. Apple-blue route over photoreal map tiles, turn-by-turn list in a left sidebar, search pill top-left, ETA chip bottom-right. Hover highlight on buttons is subtle, selection is pinch not dwell. Loading is a spinner over blank tiles; errors surface as terse alerts. Everything is legible up close and weak at arm's length because the hierarchy is productivity-window, not HUD.",
+    "B": "Almost nothing on the lens, deliberately. A green route line rendered pinned to the world through the right lens plus one compact white-on-dark chip: turn arrow and remaining meters. Everything else is spoken audio. Glance time is effectively zero and there is exactly one focal element, but there is no visible map context, no settings surface, and error/reroute handling is invisible visually.",
+    "C": "A 600x600 stack: glass map card with a painted gradient world, saturated blue route, four pins and a pulsing you-dot; below it a turn card with a 34px arrow tile and a 30px tabular distance number; a controls row (Reroute, Voice, Avoid-tolls switch); an Up Next chip strip; a hint row. Six states exist (normal/loading/empty/error/offline/no-location), each designed with recovery actions. Two focal systems compete (map route line + turn card), a banner adds a third during transitions, and the platform's gaze-focus/dwell interaction never actually engages on hover."
+  },
+  "referenceScreens": {
+    "visionOS": "Maps directions view on Vision Pro (visionOS 2, 2024): one floating glass window over the physical room, Apple-blue route line on photoreal map tiles filling the window, turn list in a left sidebar with small SF Pro rows, rounded search pill top-left, ETA chip bottom-right. Selection is eye+pinch with a soft hover highlight; there is no dwell ring and no persistent next-turn HUD card.",
+    "horizonOS": "Meta Ray-Ban Display walking navigation demo (Connect 2025, runs Horizon OS on the glasses): a green route line drawn pinned to the world through the right lens, plus one compact white-on-dark chip showing the turn arrow and remaining meters. No map view, no visible control surface, no visible error state - reroute and guidance are audio-first."
+  },
+  "scores": {
+    "visionOS": { "glanceability": 6, "focusDiscipline": 7, "materialHonesty": 8, "motion": 8, "typography": 9, "edgeStates": 5, "dependability": 8, "accessibility": 9, "delight": 6 },
+    "horizonOS": { "glanceability": 10, "focusDiscipline": 9, "materialHonesty": 9, "motion": 7, "typography": 7, "edgeStates": 3, "dependability": 7, "accessibility": 5, "delight": 8 },
+    "ours": { "glanceability": 7, "focusDiscipline": 5, "materialHonesty": 8, "motion": 7, "typography": 6, "edgeStates": 9, "dependability": 5, "accessibility": 5, "delight": 7 }
+  },
+  "totals": { "visionOS": 66, "horizonOS": 65, "ours": 59 },
+  "winnersPerCriterion": {
+    "glanceability": "horizonOS",
+    "focusDiscipline": "horizonOS",
+    "materialHonesty": "horizonOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "horizonOS"
+  },
+  "overallRanking": ["visionOS", "horizonOS", "ours"],
+  "biggestGap": "Gaze hover-focus and dwell activation (the platform's primary input per VISION.md) never engage on this surface - os/shared/core.js:41-53 (targetFromPoint) - expected: moving head-gaze over the turn card applies .gaze-focus (scale 1.015 + focus ring, styles exist at components/09-nav/index.html:270) and 350ms dwell activates it; got: core computes stage-local coords ((clientX - scaledRect.left)/1.15) and hands them to document.elementFromPoint(), which expects viewport coords, so the hit-test lands ~184px left of the stage at scale 1.15 - verified by DOM: pointermove over the Voice button produced zero .gaze-focus elements, no dwell class, no activation, while the piece's own hint row (index.html:901) renders 'Gaze + dwell 350 ms on next turn'. Fix the coordinate space (pass e.clientX/e.clientY to elementFromPoint, and use the local coords only for the cursor transform) or stop advertising dwell until it works.",
+  "reason": "Judged blind as three systems, ours ranked third (59 vs 66 visionOS Maps directions, 65 Ray-Ban Display nav HUD). Ours genuinely wins edge states - all six designed, recoverable, with a layout-matched skeleton and a cached-map offline preview that beats visionOS's spinner-plus-alert defaults and the Ray-Ban HUD's invisible error handling. But it loses the surface's core promise: on a gaze-primary platform, hover focus and dwell activation demonstrably do not function (DOM-verified), so gaze focus states cannot be unmistakable and the primary activation path is dead (clicks still work via native events). Secondary confirmed defects: static map pins contradict the live turn card at every step past the first ('Next - Valencia St' pinned while the card reads 'Exit 2A - Embarcadero'); arrive card renders dangling 'Then onto', nonsensical '10 min to turn', and '1 steps - 0 m' (index.html:791, 806-812, 860); broken grammar shipped in two edge states ('Distance and ETA stay and glanceable', 'Turn-by-turn stays and glanceable', index.html:1167, 1259); a developer-facing reassurance 'No dead ends.' rendered as user copy (index.html:1202); destination naming flips between Ferry Building and Embarcadero between the summary pill, arrive card, and banner; and text scale is unsupported - 41 px-locked font sizes render identically at 2x root font size, verified by screenshot. Motion is close to spec (260-320ms prism-ease) but the reroute brightness flash runs 420ms, over the 320ms budget. Not a fabricated gap: every defect above was reproduced in the DOM or pixels during this session.",
+  "passCondition": "Ours ranked third of three (59/90). One gap named (gaze focus/dwell coordinate bug). Fail."
+}

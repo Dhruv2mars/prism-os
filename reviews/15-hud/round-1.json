@@ -1,0 +1,102 @@
+{
+  "piece": "15-hud",
+  "round": 1,
+  "critic": "fresh-context critic, round 1",
+  "judgedAt": "2026-09-05T10:55:00Z",
+  "verdict": "fail",
+  "probeEvidence": {
+    "cmd": "bun tools/probe.mjs http://localhost:4310/components/15-hud/index.html reviews/15-hud/judge-r1",
+    "outDir": "reviews/15-hud/judge-r1",
+    "screenshotsRead": [
+      "stage.png",
+      "full.png",
+      "stage-reduced-motion.png",
+      "state-normal.png",
+      "state-normal-bottom.png",
+      "state-loading.png",
+      "state-empty.png",
+      "state-error.png",
+      "state-offline.png",
+      "state-permission.png",
+      "state-stress.png",
+      "state-thermalbad.png",
+      "state-highload.png",
+      "state-scrub.png"
+    ],
+    "consoleErrors": 0,
+    "pageErrors": 0,
+    "stageSize": "600x600",
+    "inStageFocusables": 13,
+    "notes": "Drove all six edge states plus stress/thermal-bad/high-load/scrub via window.__setHUDVariant and direct clicks; zero console or page errors across every state. Reduced-motion render is intact. Rest state: 44px tabular FPS hero is instantly readable, but the hero sparkline renders as a nearly-empty blue-outlined box (fixed 18-96 domain flattens 86-92 FPS data against the top edge). Token leak visible in pixels: 'TARGET 90 FPS · PRISM-EASE 260MS' under the hero graph, 'prism-ease · 260ms' in the Simulate header, 'TAB CYCLE · SPACE STRESS · 260 MS' in the hintbar. Builder meta-commentary rendered as UI copy inside loading/empty/offline/permission states ('Loading uses .skeleton + shimmer — no spinner', 'Probe: loading · shimmer 1.2s', 'Empty · 600×600 stage pending', 'no dead ends' x2). Gate: FAIL (token leak); no lab rail but piece exposes its own state rail outside the stage, which works. 13 in-stage focusables, 14 loud elements at rest. Edge states themselves are strong: skeletons not spinners, offline shows cached-with-age + retry, error carries PR-PERF-503 code + Retry/View-cached, permission offers Allow/Not-now/Open-Settings; no dead ends hit. Latent source bugs: mem 'critical' branch unreachable (memNow>560 checked before >700, index.html:735-736); battery drain runs to 0% with no response; scrub tip age math counts 880ms sim ticks as 1s."
+  },
+  "blind": {
+    "A": "visionOS Control Center (visionOS 2, 2024) — frosted module grid over blurred room",
+    "B": "Meta Horizon OS — Quest 3 Quick Settings tray (v69) + OVR Metrics performance overlay",
+    "C": "artifact under review",
+    "oursIs": "C"
+  },
+  "blindDescriptions": {
+    "A": "A swipe-down grid of frosted circular and rounded-square glass tiles floating over a heavily blurred view of the physical room. Monochrome white glyphs for Wi-Fi/Bluetooth/media, horizontal capsule sliders for brightness and volume, one accent color for active states, time and battery as the only numbers. Two text sizes, zero charts, zero edge states because the surface is always-available. Reads as physical glass; motion is spring-eased and shallow.",
+    "B": "A dark translucent tray docked beside the curved universal menu: rows of pill toggles (Guardian, Wi-Fi, Recording) with white glyphs and a battery pill at top — compact, single focal cluster, decent hierarchy. The platform's actual performance surface, the OVR Metrics overlay, is a flat semi-transparent black rectangle of small undifferentiated text lines (FPS, App FPS, GPU util) pinned in space: honest telemetry, zero typography, zero hierarchy, no loading/error/empty concept at all.",
+    "C": "A 600x600 glass HUD stack: hero card with 44px tabular FPS numeral, thermal kicker dot, frame-time/p95 sub-stats and a scrub-able sparkline; a 2x2 grid of metric cards (memory, battery, latency, thermal) each with a mini sparkline; a frame-time histogram with color-banded legend; an in-stage 'Simulate' control panel (load/thermal/battery/stress) and a persistent keyboard hintbar. Six designed edge states with recovery actions, banner confirmations, 260ms staggered rise-in. Undermined by engineering tokens and builder meta-commentary rendered as on-screen copy, and by a hero sparkline that reads as an empty outlined box."
+  },
+  "referenceScreens": {
+    "visionOS": "visionOS Control Center (visionOS 2, 2024): a floating grid of frosted circular/rounded-square glass modules over a blurred backdrop of the user's room — top row Now Playing and connectivity toggles, capsule sliders for brightness/volume, all glyphs monochrome white with a single accent for active states, time/battery the only numerals. It is the surface a wearer glances at for system state: glanceable in well under a second, physically glassy, and it never shows a loading or error state.",
+    "horizonOS": "Meta Horizon OS on Quest 3 (v69, 2024): Quick Settings is a dark translucent tray docked at the edge of the curved universal menu, with rows of pill toggles (Guardian, Wi-Fi, Recording, Passthrough) and a battery pill — one compact focal cluster. The comparable telemetry surface, the OVR Metrics Tool overlay, is a flat semi-transparent black panel of small uniform white text lines pinned in 3D space: raw FPS/GPU numbers with no hierarchy, no color semantics, and no designed edge states."
+  },
+  "scores": {
+    "visionOS": {
+      "glanceability": 9,
+      "focusDiscipline": 7,
+      "materialHonesty": 9,
+      "motion": 9,
+      "typography": 9,
+      "edgeStates": 5,
+      "dependability": 9,
+      "accessibility": 9,
+      "delight": 7
+    },
+    "horizonOS": {
+      "glanceability": 6,
+      "focusDiscipline": 7,
+      "materialHonesty": 7,
+      "motion": 7,
+      "typography": 6,
+      "edgeStates": 5,
+      "dependability": 7,
+      "accessibility": 7,
+      "delight": 5
+    },
+    "ours": {
+      "glanceability": 7,
+      "focusDiscipline": 5,
+      "materialHonesty": 7,
+      "motion": 8,
+      "typography": 2,
+      "edgeStates": 9,
+      "dependability": 7,
+      "accessibility": 6,
+      "delight": 8
+    }
+  },
+  "totals": {
+    "visionOS": 73,
+    "horizonOS": 56,
+    "ours": 59
+  },
+  "winnersPerCriterion": {
+    "glanceability": "visionOS",
+    "focusDiscipline": "horizonOS",
+    "materialHonesty": "visionOS",
+    "motion": "visionOS",
+    "typography": "visionOS",
+    "edgeStates": "ours",
+    "dependability": "visionOS",
+    "accessibility": "visionOS",
+    "delight": "ours"
+  },
+  "overallRanking": ["visionOS", "ours", "horizonOS"],
+  "biggestGap": "Engineering tokens and builder self-narration rendered as user-visible copy · components/15-hud/index.html:495 ('TARGET 90 FPS · PRISM-EASE 260MS' on the hero axis), :578 ('prism-ease · 260ms' in the Simulate header), :454 ('TAB CYCLE · SPACE STRESS · 260 MS' hintbar), :1044/:1047/:1075/:1157/:1203 (state-card captions like 'Loading uses .skeleton + shimmer — no spinner', 'Probe: loading · shimmer 1.2s', 'Empty · 600×600 stage pending', 'no dead ends') · expected: wearer-facing copy only, e.g. 'Target 90 FPS', silent captions or wearer-meaningful hints · got: internal easing names, durations, probe labels and design-process commentary printed on the lens, which the rubric makes an automatic typography 1-3 and which caps an otherwise strong surface at 2/10 on that criterion",
+  "reason": "Ours ranks second (59) behind visionOS (73) and ahead of Horizon OS (56), so the pass condition fails. The artifact genuinely beats both references on edge states (six designed, recoverable, skeleton-not-spinner, cached-with-age) and on delight (scrub-with-live-tip serves function), and its motion system is compliant and reduced-motion honored. But three things sink it: (1) the automatic typography violation — 'prism-ease 260MS' and '260 ms' rendered on the hero, simulate header and hintbar, plus builder meta-commentary ('no spinner', 'Probe:', 'no dead ends') printed inside user-facing state cards, an unforgivable class of leak at platform quality; (2) focus discipline — 14 loud elements at rest with the in-stage Simulate panel and persistent hintbar permanently competing with the hero for a 20-degree FOV; (3) the focal graph itself is broken — the hero sparkline's fixed 18-96 domain flattens 86-92 FPS data into a line hugging the top border, so the single most important trend reads as an empty outlined box at arm's length. Latent dependability bugs (unreachable memory-critical branch at index.html:735-736, battery draining to 0% with no response, scrub age math off by 12%) are real but secondary.",
+  "passCondition": "Ours did not rank first (59 vs visionOS 73); one gap class named, so fail."
+}
