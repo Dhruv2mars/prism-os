@@ -1,7 +1,7 @@
 {
   "project": "Prism OS",
   "tagline": "Prism OS \u2014 the operating system for smart glasses.",
-  "updated": "2026-09-01T15:21:50",
+  "updated": "2026-09-01T20:42:52",
   "wave": 0,
   "runId": "gauntlet-2",
   "doneDefinition": "Every piece carries two consecutive PASS verdicts from two different fresh critics; the coherence integrator signs off on the whole system; the web apps runtime actually runs a third-party app; the developer platform is real; the dashboard shows N/N passed.",
@@ -403,10 +403,10 @@
       "name": "app catalog & install",
       "wave": 4,
       "surface": "Discover, install, update, and remove third-party web apps.",
-      "status": "queued",
-      "round": 0,
-      "verdict": null,
-      "gap": null,
+      "status": "built",
+      "round": 1,
+      "verdict": "no critic yet \u2014 probe gate green r1",
+      "gap": "",
       "consecutivePasses": 0,
       "path": "components/23-appstore/index.html"
     },
@@ -415,10 +415,10 @@
       "name": "developer SDK & manifest spec",
       "wave": 4,
       "surface": "The surface a third-party developer actually calls, documented and callable.",
-      "status": "queued",
-      "round": 0,
-      "verdict": null,
-      "gap": null,
+      "status": "built",
+      "round": 1,
+      "verdict": "no critic yet \u2014 dev portal gate green (38 checks)",
+      "gap": "",
       "consecutivePasses": 0,
       "path": "components/24-devsdk/index.html"
     },
@@ -581,6 +581,11 @@
       "at": "2026-09-01T15:21:50",
       "event": "12-webapps rebuilt on the real runtime; gates green; committed cec4c3a",
       "detail": "Content-sized app windows (app measures body.scrollHeight, host clamps to 96..430), system text scale and reduced motion pushed across the sandbox boundary over host:display, gaze hit-test corrected in lab.js, spacing capped at 1.5x while type scales to 3.1x. Probe PASS on every state; RUNTIME GATE: PASS - 45 checks; no regression on 00-foundation, 16-motion, 17-audio-haptics."
+    },
+    {
+      "at": "2026-09-01T20:42:52",
+      "event": "Developer platform and app catalog landed; shell reaches every piece",
+      "detail": "24-devsdk (portal, imports the shipping manifest module so docs cannot drift) + tools/test-devportal.mjs (38 checks). 23-appstore (real install, real validator refusals, real update check against the manifest on disk, real sandboxed launch with real grant sheets). Shell now lists 21 pieces with a Start here row and renders each piece whole. lab.js gains ?lab=0. Fixed 15-hud invalid selector. Smoke test: 20 of 20 lens pieces load clean at default and with ?lab=0."
     }
   ],
   "repo": "https://github.com/Dhruv2mars/prism-os",
@@ -602,6 +607,20 @@
       "detail": "The probe's reticle rest-point check runs at default scale only. The builder self-reported a residual: at exactly 200-240% text the bearing line passes through the stage-centre rest point.",
       "decision": "Left for the critic to judge rather than gated. The rest-zone rule is a proxy for the real requirement, which is that the reticle must never occlude a glyph; the systemic fix already composites it as a hollow ring that stays invisible until gaze. Extending an absolute centre-clear rule to 240% text would force layouts to keep a hole in the middle of the screen at the exact scale where space is scarcest.",
       "risk": "If a critic names it, it becomes a real gap and gets fixed."
+    },
+    {
+      "piece": "24-devsdk",
+      "item": "Not gated by tools/probe.mjs",
+      "detail": "The developer portal is a desktop page, not a 600x600 lens, so the probe gate (which asserts a 600x600 stage, world layer, gaze rest zone and lab rail) does not apply to it. It is gated instead by tools/test-devportal.mjs, which walks every documented SDK method and error code against a real sandboxed frame and fails if the docs and the runtime disagree. 38 checks, currently green.",
+      "decision": "Deliberate. Rendering an SDK reference inside a 600x600 lens would make the reference worse to use in order to make a screenshot look consistent.",
+      "risk": "A critic scoring it on the lens rubric would score it as an outlier. The portal is judged on whether a third party could ship against it."
+    },
+    {
+      "piece": "shell",
+      "item": "Embedded pieces are scaled to fit, not shown at 1:1",
+      "detail": "A piece is a 600x600 lens and the shell window that holds it is smaller than the lens. Pieces render at full size and scale to fit (~0.86) so nothing is cropped; Pop out opens the piece at 1:1 in its own tab.",
+      "decision": "Cropping was worse: the old 560x520 window cut off the bottom edge, which is where every piece puts its decisions.",
+      "risk": "Type inside the shell reads ~14% smaller than designed. Judged at 1:1 via Pop out or the piece URL."
     }
   ],
   "decisions": [

@@ -4,7 +4,7 @@
 <div style="max-width:900px;margin:0 auto;padding:40px 22px 70px">
   <header style="display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">
     <h1 style="font-size:26px;font-weight:800;letter-spacing:-0.02em;margin:0">Prism OS <span style="color:#56b8ff;font-weight:700">build progress</span></h1>
-    <span style="color:#8b93a7;font-size:13px;font-variant-numeric:tabular-nums">2026-09-01T15:21:50 UTC · wave 0</span>
+    <span style="color:#8b93a7;font-size:13px;font-variant-numeric:tabular-nums">2026-09-01T20:42:52 UTC · wave 0</span>
   </header>
   <p style="color:#8b93a7;margin:0 0 14px;font-size:14px">Prism OS — the operating system for smart glasses.</p>
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
@@ -246,18 +246,18 @@
 
 <tr>
   <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">23-appstore<div style="font-weight:400;color:#8b93a7;font-size:12px">app catalog &amp; install</div></td>
-  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
-  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">built</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R1</td>
   <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
-  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">no critic yet — probe gate green r1</td>
 </tr>
 
 <tr>
   <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600;white-space:nowrap">24-devsdk<div style="font-weight:400;color:#8b93a7;font-size:12px">developer SDK &amp; manifest spec</div></td>
-  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">queued</span></td>
-  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R0</td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)"><span style="background:rgba(139,147,167,.15);color:#8b93a7;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">built</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#8b93a7;font-variant-numeric:tabular-nums">R1</td>
   <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06)" title="two consecutive passes required"><span style="display:inline-flex;gap:3px;vertical-align:middle"><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span><span style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.13)"></span></span></td>
-  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px"><span style="color:#58607a">—</span></td>
+  <td style="padding:9px 13px;border-bottom:1px solid rgba(255,255,255,.06);color:#c6cdd9;font-size:13px">no critic yet — dev portal gate green (38 checks)</td>
 </tr>
 
 <tr>
@@ -334,8 +334,7 @@
   <div style="color:#8b93a7;font-size:12px;line-height:1.55;margin-top:5px"><b style="color:#c6cdd9">Residual </b>The ACTIVATION path is still wrong. core.js pointerdown calls focused.click() against its own mis-resolved element, so a click can fire on an element the wearer was not looking at. The lab-side listener corrects the highlight, not the dispatch. Fixing it needs either an edit to frozen core.js or a capture-phase interceptor that swallows core's pointerdown, and neither is in scope without permission to touch the frozen file. Recorded here rather than dropped.</div>
 </div>
   <h2 style="font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#58607a;margin:26px 0 8px">Build log</h2>
-  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.55"><div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+1h</span><span style="color:#aab2c5">wave 0 open: 3 builders live on foundation, motion, audio+haptics — all on the new gate</span></div>
-<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+1h</span><span style="color:#aab2c5">live progress page published · regenerated from PROGRESS.json by tools/build-live.mjs after every verdict</span></div>
+  <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.55"><div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">t+1h</span><span style="color:#aab2c5">live progress page published · regenerated from PROGRESS.json by tools/build-live.mjs after every verdict</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T07:26:54</span><span style="color:#aab2c5">undefined</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T07:26:54</span><span style="color:#aab2c5">undefined</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T07:26:54</span><span style="color:#aab2c5">undefined</span></div>
@@ -348,6 +347,7 @@
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T12:41:37</span><span style="color:#aab2c5">undefined</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T12:47:50</span><span style="color:#aab2c5">undefined</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">2026-08-31T12:48:37</span><span style="color:#aab2c5">undefined</span></div>
+<div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">undefined</span><span style="color:#aab2c5">undefined</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">undefined</span><span style="color:#aab2c5">undefined</span></div>
 <div style="display:flex;gap:10px;padding:3px 0"><span style="color:#58607a;font-variant-numeric:tabular-nums;white-space:nowrap">undefined</span><span style="color:#aab2c5">undefined</span></div></div>
   <p style="color:#58607a;font-size:12px;margin-top:24px;line-height:1.6;max-width:78ch">Every piece is built by one agent and judged by a fresh-context critic that runs the probe itself and inspects only rendered output, scored blind against a named visionOS screen and a named Horizon OS screen across nine criteria. Every piece carries two consecutive PASS verdicts from two different fresh critics; the coherence integrator signs off on the whole system; the web apps runtime actually runs a third-party app; the developer platform is real; the dashboard shows N/N passed.</p>
